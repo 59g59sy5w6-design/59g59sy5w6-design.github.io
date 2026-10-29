@@ -5,7 +5,8 @@ citer « Open Prices » et partager les modifications sous la même licence.
 Fichier quotidien (Parquet) : https://www.data.gouv.fr/fr/datasets/open-prices
 
 Usage :
-  python3 tools/openprices.py --stats      # couverture par enseigne, écrite dans tools/work/openprices_stats.json
+  python3 tools/openprices.py --stats                    # couverture par enseigne (tools/work/openprices_stats.json)
+  python3 tools/openprices.py --near 48.85,2.51,7        # magasins à moins de 7 km d'un point (tools/work/openprices_near.json)
 """
 import argparse, collections, datetime, json, os, re, sys, urllib.request
 
@@ -96,9 +97,41 @@ def stats():
         print(f"{ens:12} {i['prix_90j']:6} prix sur 90 jours, {i['magasins_90j']:4} magasins, {i['produits_90j']:5} produits, dernier {i['dernier']}")
 
 
+def near(spec):
+    import math
+    lat0, lon0, km = (float(x) for x in spec.split(","))
+    df = load()
+    df = df[df["location_osm_address_country_code"].astype(str).str.lower() == "fr"].copy()
+    df = df[df["location_osm_lat"].notna() & df["location_osm_lon"].notna()]
+    rad = math.radians
+    def dist(lat, lon):
+        dlat, dlon = rad(lat - lat0), rad(lon - lon0)
+        h = math.sin(dlat / 2) ** 2 + math.cos(rad(lat0)) * math.cos(rad(lat)) * math.sin(dlon / 2) ** 2
+        return 6371 * 2 * math.asin(math.sqrt(h))
+    locs = df.groupby("location_id").agg(lat=("location_osm_lat", "first"), lon=("location_osm_lon", "first"))
+    locs["km"] = [dist(a, b) for a, b in zip(locs["lat"], locs["lon"])]
+    keep = locs[locs["km"] <= km]
+    df["d"] = df["date"].astype(str).str[:10]
+    d90 = str(datetime.date.today() - datetime.timedelta(days=90))
+    out = []
+    for lid, row in keep.sort_values("km").iterrows():
+        sub = df[df["location_id"] == lid]
+        name = str(sub["location_osm_display_name"].iloc[0])
+        ens = next((e for e, rx in ENSEIGNES.items() if re.search(rx, name.lower())), None)
+        out.append({"location_id": int(lid), "enseigne": ens, "magasin": name.split(",")[0], "ville": str(sub["location_osm_address_city"].iloc[0]),
+                    "km": round(float(row["km"]), 1), "prix": int(len(sub)), "prix_90j": int((sub["d"] >= d90).sum()),
+                    "produits": int(sub["product_code"].dropna().nunique()), "dernier": str(sub["d"].max()), "premier": str(sub["d"].min())})
+    json.dump(out, open(os.path.join(lib.WORK, "openprices_near.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    for o in out:
+        print(f"{o['km']:5} km  {str(o['enseigne']):12} {o['magasin'][:40]:40} {o['ville'][:22]:22} {o['prix']:5} prix ({o['prix_90j']} sur 90 j), {o['produits']} produits, du {o['premier']} au {o['dernier']}")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--stats", action="store_true")
+    ap.add_argument("--near", help="lat,lon,km")
     a = ap.parse_args()
     if a.stats:
         stats()
+    if a.near:
+        near(a.near)

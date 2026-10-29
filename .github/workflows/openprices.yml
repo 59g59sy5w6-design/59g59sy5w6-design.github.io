@@ -3,6 +3,11 @@ name: Essai Open Prices
 # diag-openprices, sans toucher à main.
 on:
   workflow_dispatch:
+    inputs:
+      near:
+        description: "Magasins autour d'un point : lat,lon,km (facultatif)"
+        type: string
+        default: ""
 permissions:
   contents: write
 jobs:
@@ -16,11 +21,14 @@ jobs:
           python-version: "3.12"
       - run: pip install --quiet pandas pyarrow
       - run: python3 tools/openprices.py --stats
+      - if: ${{ inputs.near != '' }}
+        run: python3 tools/openprices.py --near "${{ inputs.near }}"
       - name: Compte rendu sur la branche diag-openprices
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -q -B diag-openprices
           git add -f tools/work/openprices_stats.json
+          [ -f tools/work/openprices_near.json ] && git add -f tools/work/openprices_near.json
           git commit -q -m "Open Prices : couverture $(date -u +%Y-%m-%dT%H:%MZ)"
           git push -q -f origin diag-openprices
