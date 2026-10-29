@@ -15,16 +15,7 @@ const PLAN = [
     { click: /choisir vos courses|choisir (un|mon|votre) magasin/i },
     { type: PLACE, into: /code postal/i },
     { click: new RegExp(PLACE.split("-")[0], "i"), within: "li, [role=option], button, a" },
-    { choose: /lockers|drive|click/i, avoid: /livraison à domicile/i },
-    { goto: "https://www.auchan.fr/recherche?text=lait%20demi%20%C3%A9cr%C3%A9m%C3%A9" },
-  ] },
-  { id: "leclerc", url: "https://www.e.leclerc/fp/lait-de-montagne-demi-ecreme-brique-1-l-delisse-3564700596241", steps: [
-    { click: /choisir (mon|un|votre) magasin/i },
-    { type: PLACE, into: /code postal/i },
-    { click: new RegExp(PLACE.split("-")[0], "i"), within: "li, [role=option], button, a" },
-    { click: /^choisir$/i },
-    { goto: "https://www.e.leclerc/fp/lait-de-montagne-demi-ecreme-brique-1-l-delisse-3564700596241" },
-    { goto: "https://www.e.leclerc/recherche?q=lait%20demi%20%C3%A9cr%C3%A9m%C3%A9" },
+    { expand: /lockers fontenay/i },
   ] },
 ];
 
@@ -79,6 +70,27 @@ async function clickText(page, re, within) {
           }
           await page.waitForTimeout(3500);
           await snap(done ? `saisie ${st.type}` : "aucun champ de saisie trouvé");
+        }
+        if (st.expand) {
+          // déplie « Infos et Tarifs » de la carte voulue et recopie le texte de la carte (frais, minimum, horaires)
+          const card = await page.evaluate(({ want }) => {
+            const W = new RegExp(want, "i");
+            for (const b of document.querySelectorAll("button, a")) {
+              if (!/infos et tarifs|voir les d[ée]tails/i.test(b.innerText || "")) continue;
+              let c = b;
+              for (let k = 0; k < 6 && c.parentElement; k++) { c = c.parentElement; if ((c.innerText || "").length > 60) break; }
+              if (W.test(c.innerText || "")) { b.click(); return true; }
+            }
+            return false;
+          }, { want: st.expand.source });
+          await page.waitForTimeout(2500);
+          const txt = await page.evaluate(({ want }) => {
+            const W = new RegExp(want, "i");
+            const cands = [...document.querySelectorAll("div, section, article, li")].filter((e) => W.test(e.innerText || "") && (e.innerText || "").length < 1500);
+            cands.sort((a, b) => (b.innerText || "").length - (a.innerText || "").length);
+            return cands.length ? cands[0].innerText.replace(/\s+/g, " ") : "";
+          }, { want: st.expand.source });
+          await snap((card ? "infos dépliées : " : "infos introuvables : ") + txt.slice(0, 900));
         }
         if (st.choose) {
           // le bouton « Choisir » de la première carte qui correspond (retrait en magasin, sans adresse à donner)
