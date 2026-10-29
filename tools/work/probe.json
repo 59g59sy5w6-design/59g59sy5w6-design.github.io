@@ -1,0 +1,94 @@
+[
+ {
+  "id": "leclerc-drive",
+  "url": "https://www.leclercdrive.fr/",
+  "status": 403,
+  "final": "https://www.leclercdrive.fr/",
+  "title": "leclercdrive.fr",
+  "text": "",
+  "euros": 0,
+  "markers": [
+   "datadome"
+  ],
+  "storePrompt": false
+ },
+ {
+  "id": "leclerc-fiche",
+  "url": "https://www.e.leclerc/fp/lait-de-montagne-demi-ecreme-brique-1-l-delisse-3564700596241",
+  "status": 200,
+  "final": "https://www.e.leclerc/fp/lait-de-montagne-demi-ecreme-brique-1-l-delisse-3564700596241",
+  "title": "Lait de montagne demi écrémé brique - 1 l - DELISSE au meilleur prix | E.Leclerc",
+  "text": "Menu principal Aller directement au contenu principal Pied de page MENU Catalogues Drive Foire aux whiskies Bonnes affaires Granulés de bois Déguisement halloween Vitality Chauffage Offres bébé Soin cheveux Abris de jardin High-Tech Retour Accueil Univers non marchand Nos produits Marque Repère Alimentaire Marque Repère Frais Marque Repère Laits et Oeufs Marque Repère Laits spéciaux et arômatisés ",
+  "euros": 2,
+  "markers": [
+   "verification"
+  ],
+  "storePrompt": false
+ },
+ {
+  "id": "auchan",
+  "url": "https://www.auchan.fr/",
+  "status": 200,
+  "final": "https://www.auchan.fr/",
+  "title": "Auchan. Promos, infos drives et magasins, courses en ligne livrées à domicile.",
+  "text": "Aller directement au contenu Aller directement à la recherche Aller directement à la navigation Aller directement à la rubrique besoin d'aide Choisir vos courses Me connecter Rayons Promos Lancer la recherche Annuler Mes produits 0,00 € Bienvenue :) Drive, Click & Collect, Livraison... C'est vous qui décidez ! Maison & Loisirs Catalogues Défis Waaoh Activer mon jour W!* Choisir un drive ou la livr",
+  "euros": 1,
+  "markers": [
+   "datadome"
+  ],
+  "storePrompt": false
+ },
+ {
+  "id": "auchan-fiche",
+  "url": "https://www.auchan.fr/auchan-bio-lait-equitable-demi-ecreme-bouteille-6x1l/pr-289734",
+  "status": 200,
+  "final": "https://www.auchan.fr/auchan-bio-cultivons-le-bon-lait-demi-ecreme-sterilise-uht/pr-C1170544?storeCateringSellerId=&storeCateringSelectedDate=",
+  "title": "AUCHAN BIO CULTIVONS LE BON - Lait demi-écrémé stérilisé UHT 6x1l pas cher - Auchan.fr",
+  "text": "Aller directement au contenu Aller directement à la recherche Aller directement à la navigation Aller directement à la rubrique besoin d'aide Choisir vos courses Me connecter Rayons Promos Lancer la recherche Annuler Mes produits 0,00 € Accueil Produits laitiers, oeufs, fromages Laits, boissons végétales, oeufs Lait demi-écrémé Agrandir l'illustration à 200% Réduire l'illustration à 100 % Partager",
+  "euros": 1,
+  "markers": [
+   "datadome"
+  ],
+  "storePrompt": true
+ },
+ {
+  "id": "intermarche",
+  "url": "https://www.intermarche.com/",
+  "status": 403,
+  "final": "https://www.intermarche.com/",
+  "title": "intermarche.com",
+  "text": "",
+  "euros": 0,
+  "markers": [
+   "datadome"
+  ],
+  "storePrompt": false
+ },
+ {
+  "id": "coursesu",
+  "url": "https://www.coursesu.com/",
+  "status": 403,
+  "final": "https://www.coursesu.com/",
+  "title": "Attention Required! | Cloudflare",
+  "text": "Sorry, you have been blocked You are unable to access coursesu.com Why have I been blocked? This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data. What can I do to resolve this",
+  "euros": 0,
+  "markers": [
+   "cloudflare",
+   "verification"
+  ],
+  "storePrompt": false
+ },
+ {
+  "id": "carrefour",
+  "url": "https://www.carrefour.fr/",
+  "status": 403,
+  "final": "https://www.carrefour.fr/",
+  "title": "Un instant…",
+  "text": "C’est une formalité… si vous êtes un humain ! Vérifions ensemble que vous n’êtes pas un robot. Client IP : 4.242.196.98 Ray ID : a5251ec7cbfbd864",
+  "euros": 0,
+  "markers": [
+   "verification"
+  ],
+  "storePrompt": false
+ }
+]
