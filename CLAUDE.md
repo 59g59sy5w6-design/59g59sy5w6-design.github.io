@@ -25,19 +25,19 @@ Lancer en local : `python3 -m http.server 8000` à la racine, puis ouvrir http:/
 
 ## Mettre à jour les prix
 
-Les prix sont relus sur les pages rayon publiques listées dans `tools/sources.json`. Chaque page se lit avec WebFetch et le prompt de la page, qui demande la liste des produits en JSON. Les scripts retrouvent ensuite ces lectures dans l'historique de la session.
+Un robot relit les prix toutes les heures : `.github/workflows/prix.yml` lance `tools/ci.sh` sur GitHub Actions (à la minute 17 de chaque heure, et à la demande depuis l'onglet Actions).
 
-1. `python3 tools/dump.py --reset`
-2. Lire les pages de `tools/sources.json` par séries de 8 appels WebFetch en parallèle, avec exactement l'URL et le prompt de chaque page. Après chaque série, lancer `python3 tools/dump.py` : il enregistre les lectures dans `tools/work/fetches.json` (rien ne se perd si l'historique est compacté) et affiche les pages restantes.
-3. Pour Houra, si une réponse donne un `next_page` qui n'est pas déjà dans la liste, le lire aussi avec le même prompt.
-4. Une page en erreur ou vide se relit une fois en fin de série. Si elle échoue encore, passer : `tools/build.py` reprend les produits du relevé précédent pour cette page, avec leur ancienne date, pendant 21 jours au plus.
-5. `bash tools/refresh.sh` : normalisation, rapprochement entre enseignes, catalogue, comparaison avec la version publiée, nouvelle version du service worker, test de l'appli.
-6. Relire la sortie. Si une enseigne perd plus d'un tiers de ses produits ou si beaucoup de prix doublent, chercher la cause avant de publier (page changée, réponse tronquée).
-7. Commit `Prix du <date>` avec le résumé de `tools/check.py`, puis push sur `main`.
+1. `tools/scrape.js` ouvre chaque page de `tools/sources.json` dans Chromium (Playwright), fait défiler la page, puis lit chaque vignette produit : nom, contenance, prix, prix barré, prix à l'unité, offre, lien. Pour Houra, il suit aussi la page suivante. Une page refusée par l'enseigne est notée, sans tentative de contournement.
+2. `tools/build.py`, `tools/match.py`, `tools/make_catalog.py` reconstruisent `data/catalog.json`, `data/meta.json` et `data/status.json` (heure de vérification par enseigne). Une page illisible, ou lue de façon nettement moins complète que la fois précédente, garde les produits du relevé précédent avec leur date, pendant 21 jours au plus.
+3. Si des prix ont changé : test de l'appli (`tools/smoke.js`), comparaison (`tools/check.py`), commit `Prix du <date>` et publication. Sinon, seul `data/status.json` est publié, pour afficher l'heure de vérification.
 
-`tools/state/items.json` garde les produits du dernier relevé : il doit rester dans le dépôt pour la reprise des pages illisibles.
+Diagnostic : lancer le workflow avec l'option « diag ». Le compte rendu par page (`tools/work/scrape.json`) et des extraits des pages mal lues arrivent sur la branche `diag`, sans toucher à `main`.
 
-Carrefour bloque souvent la lecture de certaines pages : les rayons concernés sont signalés dans `data/meta.json` et dans l'appli.
+Relevé à la main, si le robot ne peut pas lire une enseigne : lire les pages de `tools/sources.json` avec WebFetch et le prompt de chaque page, par séries de 8, en lançant `python3 tools/dump.py` après chaque série (`--reset` au début). Puis `bash tools/refresh.sh`, relire la sortie, commit et push.
+
+`tools/state/items.json` garde les produits du dernier relevé publié : il doit rester dans le dépôt pour la reprise des pages illisibles.
+
+L'appli va chercher les prix à chaque ouverture (le service worker sert `data/` depuis le réseau d'abord) et revérifie toutes les 10 minutes quand elle reste ouverte.
 
 ## Faire évoluer le catalogue
 

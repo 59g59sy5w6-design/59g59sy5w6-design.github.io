@@ -282,6 +282,24 @@ meta = {'updatedAt': updated, 'products': len(products), 'offers': sum(len(p['of
         'multi': sum(1 for p in products if len(p['offers']) > 1), 'coverage': coverage, 'notes': notes}
 json.dump(meta, open(os.path.join(lib.ROOT, 'data', 'meta.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 
+# ---------------------------------------------------------------- état du relevé (heure de la dernière vérification par enseigne)
+status_path = os.path.join(lib.ROOT, 'data', 'status.json')
+old_status = json.load(open(status_path, encoding='utf-8')) if os.path.exists(status_path) else {}
+report = json.load(open(os.path.join(lib.WORK, 'report.json'), encoding='utf-8')) if os.path.exists(os.path.join(lib.WORK, 'report.json')) else {'pages': []}
+now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
+status = {'checkedAt': now, 'retailers': {}}
+for ret in rets:
+    pages = [p for p in report['pages'] if p['retailer'] == ret]
+    ok = [p for p in pages if p['products']]
+    fresh_ts = [it['ts'] for it in fresh if it['ret'] == ret]
+    prev = (old_status.get('retailers') or {}).get(ret, {})
+    status['retailers'][ret] = {
+        'pages': len(pages), 'read': len(ok),
+        'checkedAt': (max(fresh_ts)[:16] + 'Z') if fresh_ts else prev.get('checkedAt'),
+        'products': sum(1 for it in fresh if it['ret'] == ret),
+    }
+json.dump(status, open(status_path, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+
 # ---------------------------------------------------------------- mémoire pour le prochain relevé
 os.makedirs(lib.STATE, exist_ok=True)
 keep = ['ret', 'ray', 'rid', 'brand', 'label', 'fmt_raw', 'qty', 'rolls', 'lav', 'price', 'was', 'promo', 'url', 'ean', 'ts', 'src', 'pos', 'full']

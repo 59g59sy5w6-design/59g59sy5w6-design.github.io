@@ -15,6 +15,17 @@
   const ic = (n, cls) => `<svg class="ic ${cls || ""}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
   const plural = (n, one, many) => n.toLocaleString("fr-FR") + NB + (n > 1 ? many : one);
   const dateFr = (iso) => { try { return new Date(iso + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { return iso; } };
+  const dayKey = (d) => d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+  /* « aujourd'hui à 14h17 », « hier à 9h05 », « le 28 octobre à 14h17 » */
+  function whenFr(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return "";
+    const hm = d.getHours() + "h" + String(d.getMinutes()).padStart(2, "0");
+    const now = new Date(), y = new Date(now.getTime() - 86400000);
+    if (dayKey(d) === dayKey(now)) return "aujourd'hui à " + hm;
+    if (dayKey(d) === dayKey(y)) return "hier à " + hm;
+    return "le " + d.toLocaleDateString("fr-FR", { day: "numeric", month: "long" }) + " à " + hm;
+  }
   const joinEt = (a) => (a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " et " + a[a.length - 1]);
   const store = {
     get(k, d) { try { const v = localStorage.getItem("cabas." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
@@ -83,15 +94,50 @@
   }
   const img = (p, w) => `<img src="${Packs.url(p)}" alt="" width="${w || 240}" height="${w || 240}" decoding="async"${w && w < 100 ? "" : ' loading="lazy"'}>`;
 
+  /* heure de la dernière vérification des prix, par enseigne (data/status.json, écrit par le robot de relevé) */
+  function lastCheck(ret) {
+    const r = (S.status && S.status.retailers) || {};
+    if (ret) return (r[ret] || {}).checkedAt || null;
+    let best = null;
+    for (const k of Object.keys(r)) { const t = r[k].checkedAt; if (t && (!best || t > best)) best = t; }
+    return best;
+  }
+  function offerWhen(o) {
+    const t = lastCheck(o.ret);
+    if (t && t.slice(0, 10) === o.at) return "Vérifié " + whenFr(t);
+    return "Relevé le " + dateFr(o.at);
+  }
+  const recent = (t) => t && Date.now() - new Date(t).getTime() < 26 * 3600 * 1000;
+  /* « Prix vérifiés aujourd'hui à 15h08 (Houra : 28 octobre) » : les enseignes pas relues récemment sont nommées avec leur date */
+  function freshText() {
+    let best = null;
+    const late = [];
+    for (const r of S.rets) {
+      const t = lastCheck(r.id);
+      if (recent(t)) { if (!best || t > best) best = t; }
+      else if (S.retDate && S.retDate[r.id]) late.push(r.name + "\u00a0: " + dateFr(S.retDate[r.id]).replace(/ \d{4}$/, ""));
+    }
+    if (!best) return "Prix relevés le " + dateFr(S.meta.updatedAt);
+    return "Prix vérifiés " + whenFr(best) + (late.length ? " (" + late.join(", ") + ")" : "");
+  }
+  const isStale = () => !S.rets.some((r) => recent(lastCheck(r.id)));
+
   async function load() {
     const get = (u) => fetch(u, { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
-    const [c, r, m] = await Promise.all([get("data/catalog.json"), get("data/retailers.json"), get("data/meta.json")]);
+    const [c, r, m, st] = await Promise.all([get("data/catalog.json"), get("data/retailers.json"), get("data/meta.json"), get("data/status.json").catch(() => null)]);
+    S.status = st || {};
+    S.loadedAt = Date.now();
     S.rayons = c.rayons.slice().sort((a, b) => a.order - b.order);
     S.list = c.products;
+    S.prods = new Map();
     S.list.forEach((p, i) => { p.rank = i; S.prods.set(p.id, p); });
+    S._sug = null;
+    RES.key = "";
     S.rets = r.slice().sort((a, b) => a.order - b.order);
     S.retMap = new Map(S.rets.map((x) => [x.id, x]));
     S.meta = m || {};
+    S.retDate = {};
+    for (const p of S.list) for (const k of Object.keys(p.offers || {})) { const d = p.offers[k].at; if (d && (!S.retDate[k] || d > S.retDate[k])) S.retDate[k] = d; }
     let changed = false;
     for (const id of Object.keys(S.basket)) if (!S.prods.has(id) || !(S.basket[id] > 0)) { delete S.basket[id]; changed = true; }
     if (changed) saveBasket();
@@ -303,7 +349,7 @@
     return `<div class="install"><svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><div><b>Installe Cabas sur ton iPhone</b>Touche ${ic("share")} en bas de Safari, puis «\u00a0Sur l'écran d'accueil\u00a0».</div><button class="x" type="button" data-act="hideinstall" aria-label="Masquer">${ic("x")}</button></div>`;
   }
   function footNote() {
-    return `<p class="foot">${plural(S.list.length, "produit", "produits")}, prix relevés le ${esc(dateFr(S.meta.updatedAt))} sur ${esc(joinEt(S.rets.map((r) => r.service)))}.<br><a href="#/apropos">À propos des prix</a></p>`;
+    return `<p class="foot">${plural(S.list.length, "produit", "produits")} de ${esc(joinEt(S.rets.map((r) => r.service)))}. ${esc(freshText())}.<br><a href="#/apropos">À propos des prix</a></p>`;
   }
   function chipsHtml(key, base) {
     const f = F(key), n = nActive(f);
@@ -359,6 +405,7 @@
       right: `<a class="icbtn" href="#/reglages" aria-label="Réglages">${ic("gear")}</a>`,
       html: `<h1 class="lt wordmark"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</h1>` +
         `<div class="srow"><button class="search" type="button" data-act="gosearch">${ic("search")}<span>Produits, marques</span></button></div>` +
+        `<p class="fresh${isStale() ? " old" : ""}">${ic("clock")}<span>${esc(freshText())}${isStale() ? ", ils ont pu changer depuis" : ""}</span></p>` +
         installCard() +
         (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals">${ds.map(dealCard).join("")}</div>` : "") +
         `<div class="sh"><h2>Rayons</h2><a href="#/rayons">Tout voir</a></div><div class="cats">${tiles}</div>` +
@@ -405,7 +452,7 @@
     const rows = all.map((o, i) => {
       const off = !retOn(o.ret), low = b && o.ret === b.ret && on.length > 1;
       return `<a class="row offer${off ? " off" : ""}" href="${esc(o.url)}" target="_blank" rel="noopener"><span class="av">${esc(retName(o.ret).slice(0, 1))}</span><span class="rt"><span class="on">${esc(retName(o.ret))}${low ? '<span class="tag-low">Le moins cher</span>' : ""}</span>` +
-        `<span class="os">${esc(o.name || "")}</span><span class="os">Relevé le ${esc(dateFr(o.at))}${o.cat ? ", page du rayon" : ""}${off ? ", enseigne désactivée" : ""}</span>${o.promo ? `<span class="os promo">Offre\u00a0: ${esc(o.promo)}</span>` : ""}</span>` +
+        `<span class="os">${esc(o.name || "")}</span><span class="os">${esc(offerWhen(o))}${o.cat ? ", page du rayon" : ""}${off ? ", enseigne désactivée" : ""}</span>${o.promo ? `<span class="os promo">Offre\u00a0: ${esc(o.promo)}</span>` : ""}</span>` +
         `<span class="op">${px(o.price)}${unitPrice(p, o.price) ? `<span class="unit">${unitPrice(p, o.price)}</span>` : ""}</span></a>`;
     }).join("");
     const toks = norm(p.name).split(" ").filter((t) => t.length > 3 && !/^\d/.test(t)).slice(0, 4);
@@ -566,7 +613,7 @@
       title: "Panier", grouped: true,
       right: `<button class="txtbtn" type="button" data-act="clear">Vider</button>`,
       html: `<h1 class="lt">Panier</h1><div class="cartcols"><div class="cside">${side}${zipNote}</div><div class="cmain">${main}</div></div>` +
-        `<p class="foot">Prix relevés le ${esc(dateFr(S.meta.updatedAt))}. Le total exact s'affiche sur le site de chaque enseigne au moment de commander.<br><a href="#/reglages">Livraison et frais</a></p>`,
+        `<p class="foot">${esc(freshText())}. Le total exact s'affiche sur le site de chaque enseigne au moment de commander.<br><a href="#/reglages">Livraison et frais</a></p>`,
     };
   };
 
@@ -587,7 +634,7 @@
         `<p class="gf">Le panier n'utilise que les enseignes activées. Touche une enseigne pour voir ses frais et leurs sources.</p>` +
         `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
         `<label class="row" for="extra"><span class="rt">Coût d'une commande en plus<small>Ton temps, les sacs, la réception. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
-        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.0, prix du ${esc(dateFr(S.meta.updatedAt))}</span></div></div>` +
+        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
     };
   };
@@ -618,9 +665,9 @@
     return {
       title: "À propos des prix", grouped: true,
       html: `<h1 class="lt">À propos des prix</h1>` +
-        `<h2 class="gh">Le relevé du ${esc(dateFr(m.updatedAt))}</h2><div class="group">${S.rets.map((r) => `<div class="row"><span class="rt">${esc(r.name)}<small>${esc(r.service)}</small></span><span class="val num">${plural(cov[r.id] || 0, "prix", "prix")}</span></div>`).join("")}<div class="row"><span class="rt">Produits vendus par plusieurs enseignes</span><span class="val num">${esc(m.multi || 0)}</span></div></div>` +
+        `<h2 class="gh">Dernière vérification</h2><div class="group">${S.rets.map((r) => { const st = ((S.status || {}).retailers || {})[r.id] || {}; return `<div class="row"><span class="rt">${esc(r.name)}<small>${st.checkedAt ? "Vérifié " + esc(whenFr(st.checkedAt)) + (st.pages ? ", " + st.read + " page" + (st.read > 1 ? "s" : "") + " lue" + (st.read > 1 ? "s" : "") + " sur " + st.pages : "") : "Relevé du " + esc(dateFr(m.updatedAt))}</small></span><span class="val num">${plural(cov[r.id] || 0, "prix", "prix")}</span></div>`; }).join("")}<div class="row"><span class="rt">Produits vendus par plusieurs enseignes</span><span class="val num">${esc(m.multi || 0)}</span></div></div>` +
         `<h2 class="gh">Comment lire les prix</h2><div class="group"><div class="prose" style="padding:12px 16px">${(m.notes || []).map((n) => `<p>${esc(n)}</p>`).join("")}</div></div>` +
-        `<p class="gf">Cabas n'est lié à aucune enseigne. Les noms des enseignes et des marques appartiennent à leurs propriétaires.</p>`,
+        `<p class="gf">Un robot relit les pages rayon de chaque enseigne toutes les heures. Une page qui n'a pas pu être lue garde ses prix précédents, avec leur date. Cabas n'est lié à aucune enseigne. Les noms des enseignes et des marques appartiennent à leurs propriétaires.</p>`,
     };
   };
 
@@ -1045,6 +1092,28 @@
     if (navigator.share) { try { await navigator.share({ title, text, url }); } catch (err) { /* partage annulé */ } return; }
     try { await navigator.clipboard.writeText(url); toast("Lien copié"); } catch (err) { toast(url); }
   }
+
+  /* ---------- prix à jour pendant que l'appli est ouverte ---------- */
+  let refreshing = false;
+  async function refreshData() {
+    if (!S.ready || refreshing) return;
+    refreshing = true;
+    try {
+      const st = await fetch("data/status.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null));
+      S.lastCheckFetch = Date.now();
+      if (st && JSON.stringify(st) !== JSON.stringify(S.status)) {
+        const m = await fetch("data/meta.json", { cache: "no-cache" }).then((r) => r.json());
+        if (JSON.stringify(m) !== JSON.stringify(S.meta)) await load(); else S.status = st;
+        const typing = document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+        if ($("#sheet").hidden && !typing) rerender();
+      }
+    } catch (e) { /* hors ligne : on garde les prix chargés */ }
+    refreshing = false;
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && Date.now() - (S.lastCheckFetch || S.loadedAt || 0) > 5 * 60 * 1000) refreshData();
+  });
+  setInterval(() => { if (document.visibilityState === "visible") refreshData(); }, 10 * 60 * 1000);
 
   /* ---------- démarrage ---------- */
   function renderFail() {
