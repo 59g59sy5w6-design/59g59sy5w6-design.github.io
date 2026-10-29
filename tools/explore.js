@@ -9,16 +9,17 @@ const { chromium } = require("playwright");
 const OUT = path.join(__dirname, "work", "explore");
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 const REFUSE = /^(tout refuser|refuser|continuer sans accepter|refuser tout|je refuse)$/i;
+const PLACE = process.env.PLACE || "Fontenay-sous-Bois";
 const PLAN = [
   { id: "auchan", url: "https://www.auchan.fr/", steps: [
     { click: /choisir vos courses|choisir (un|mon|votre) magasin/i },
-    { type: "94120", into: /code postal|ville|adresse|rechercher/i },
-    { wait: 3000 },
+    { type: PLACE, into: /code postal/i },
+    { click: new RegExp(PLACE.split("-")[0], "i"), within: "li, [role=option], button, a" },
   ] },
   { id: "leclerc", url: "https://www.e.leclerc/fp/lait-de-montagne-demi-ecreme-brique-1-l-delisse-3564700596241", steps: [
-    { click: /choisir (mon|un|votre) magasin|voir la disponibilit|mon magasin/i },
-    { type: "94120", into: /code postal|ville|adresse|rechercher|magasin/i },
-    { wait: 3000 },
+    { click: /choisir (mon|un|votre) magasin/i },
+    { type: PLACE, into: /code postal/i },
+    { click: new RegExp(PLACE.split("-")[0], "i"), within: "li, [role=option], button, a" },
   ] },
 ];
 
@@ -32,8 +33,8 @@ async function clickables(page) {
   });
 }
 
-async function clickText(page, re) {
-  const els = await page.$$("button, a, [role=button]");
+async function clickText(page, re, within) {
+  const els = await page.$$(within || "button, a, [role=button]");
   for (const el of els) {
     const t = ((await el.innerText().catch(() => "")) || (await el.getAttribute("aria-label").catch(() => "")) || "").replace(/\s+/g, " ").trim();
     if (re.test(t) && (await el.isVisible().catch(() => false))) { await el.click({ timeout: 5000 }).catch(() => {}); return t; }
@@ -63,15 +64,15 @@ async function clickText(page, re) {
       };
       await snap("arrivée" + (refused ? ` (cookies : ${refused})` : ""));
       for (const st of site.steps) {
-        if (st.click) { const t = await clickText(page, st.click); await page.waitForTimeout(2500); await snap(t ? `clic « ${t} »` : `rien à cliquer pour ${st.click}`); }
+        if (st.click) { const t = await clickText(page, st.click, st.within); await page.waitForTimeout(3500); await snap(t ? `clic « ${t} »` : `rien à cliquer pour ${st.click}`); }
         if (st.type) {
           const inputs = await page.$$("input");
           let done = false;
           for (const i of inputs) {
-            const h = [await i.getAttribute("placeholder"), await i.getAttribute("aria-label"), await i.getAttribute("name"), await i.getAttribute("id")].join(" ");
-            if (st.into.test(h) && (await i.isVisible().catch(() => false))) { await i.fill(st.type).catch(() => {}); await i.press("Enter").catch(() => {}); done = true; break; }
+            const h = [await i.getAttribute("placeholder"), await i.getAttribute("aria-label")].join(" ");
+            if (st.into.test(h) && (await i.isVisible().catch(() => false))) { await i.click().catch(() => {}); await i.type(st.type, { delay: 60 }).catch(() => {}); done = true; break; }
           }
-          await page.waitForTimeout(3000);
+          await page.waitForTimeout(3500);
           await snap(done ? `saisie ${st.type}` : "aucun champ de saisie trouvé");
         }
         if (st.wait) await page.waitForTimeout(st.wait);
