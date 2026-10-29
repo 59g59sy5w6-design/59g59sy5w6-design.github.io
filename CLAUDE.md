@@ -38,7 +38,7 @@ Deux sources publient sur `main`, chacune avec `tools/publish.sh`, qui repart du
 
 **Ce que font les scripts.** `tools/build.py`, `tools/match.py` et `tools/make_catalog.py` reconstruisent `data/catalog.json`, `data/meta.json` et `data/status.json` (heure de vérification par enseigne). Une page non lue, ou lue de façon nettement moins complète que la fois précédente, garde les produits du relevé précédent avec leur date, pendant 21 jours au plus. Si des prix ont changé : test de l'appli (`tools/smoke.js`), comparaison (`tools/check.py`) et commit `Prix du <date> (<enseignes>, <source>)`. Sinon, seul `data/status.json` est publié.
 
-`tools/state/items.json` garde les produits du dernier relevé publié : il doit rester dans le dépôt.
+`tools/state/items.json` garde les produits du dernier relevé publié, `tools/state/ids.json` l'identifiant de chaque produit : un produit garde le même identifiant d'un relevé à l'autre, car les paniers et les listes enregistrés sur les téléphones en dépendent. Quand deux produits fusionnent, l'identifiant abandonné renvoie vers celui qui reste (`aliases` dans `data/catalog.json`) et l'appli déplace les articles concernés. Ces deux fichiers doivent rester dans le dépôt.
 
 Diagnostic du robot : lancer le workflow avec l'option « diag ». Il relit les trois enseignes et dépose le compte rendu par page (`tools/work/scrape.json`) et des extraits de pages sur la branche `diag`, sans toucher à `main`.
 

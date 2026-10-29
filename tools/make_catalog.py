@@ -162,8 +162,8 @@ def slug(s):
     return re.sub(r'\s+', '-', s)[:72].strip('-')
 
 
-products = []
-used = set()
+# ---------------------------------------------------------------- produits
+products, built = [], []
 for c, lst in clusters.items():
     lst = sorted(lst, key=lambda x: (PRIO[x['ret']], x['price']))
     main = lst[0]
@@ -195,13 +195,9 @@ for c, lst in clusters.items():
     for x in lst:
         md = md or mdd_of(x['brand'], x['ret'])
     ean = next((x['ean'] for x in lst if x.get('ean')), None)
-    pid = slug(f"{brand} {label} {disp}") or slug(main['rid'])
-    base, k = pid, 2
-    while pid in used:
-        pid = f"{base}-{k}"; k += 1
-    used.add(pid)
+    base = slug(f"{brand} {label} {disp}") or slug(main['rid'])
     rank = min({'monoprix': 0, 'carrefour': 4, 'houra': 8}[x['ret']] + x['pos'] for x in lst)
-    p = {'id': pid, 'brand': brand, 'name': label, 'format': disp, 'icon': icon_of(main),
+    p = {'id': None, 'brand': brand, 'name': label, 'format': disp, 'icon': icon_of(main),
          'type': 'mdd' if md else 'nb', 'offers': offers, 'rank': rank, 'ray': main['ray']}
     if md:
         p['mdd'] = md
@@ -216,6 +212,78 @@ for c, lst in clusters.items():
     if dsc:
         p['desc'] = dsc
     products.append(p)
+    built.append((lst, p, base))
+
+
+# ---------------------------------------------------------------- identifiants stables
+# Un produit garde son identifiant d'un relevé à l'autre : les paniers et les listes enregistrés sur les téléphones en dépendent.
+# tools/state/ids.json associe chaque fiche d'enseigne (rid) à l'identifiant du produit qui la contient. À défaut (premier
+# passage), l'identifiant est retrouvé dans le catalogue précédent par le lien de la fiche, ou par le nom affiché et la contenance.
+# Quand deux produits fusionnent, l'identifiant abandonné renvoie vers celui qui reste (« aliases » dans data/catalog.json).
+ids_path = os.path.join(lib.STATE, 'ids.json')
+prev_ids = json.load(open(ids_path, encoding='utf-8')) if os.path.exists(ids_path) else {}
+cat_path = os.path.join(lib.ROOT, 'data', 'catalog.json')
+last_cat = json.load(open(cat_path, encoding='utf-8')) if os.path.exists(cat_path) else {'products': []}
+prev_cat = json.load(open(os.environ['CABAS_PREV_CATALOG'], encoding='utf-8')) if os.environ.get('CABAS_PREV_CATALOG') else last_cat
+prev_aliases = {**(last_cat.get('aliases') or {}), **(prev_cat.get('aliases') or {})}
+
+
+def offer_index(cat):
+    """Index des offres d'un catalogue : par lien de fiche, par nom affiché et contenance, par nom seul (noms ambigus écartés)."""
+    by_url, by_nf, by_name = {}, collections.defaultdict(set), collections.defaultdict(set)
+    for pp in cat['products']:
+        for r, o in pp['offers'].items():
+            if o.get('url') and not o.get('cat'):
+                by_url[(r, o['url'])] = pp['id']
+            if o.get('name'):
+                by_nf[(r, o['name'], pp.get('format'))].add(pp['id'])
+                by_name[(r, o['name'])].add(pp['id'])
+    uniq = lambda m: {k: next(iter(v)) for k, v in m.items() if len(v) == 1}
+    return by_url, uniq(by_nf), uniq(by_name)
+
+
+def lookup(index, pp):
+    """Identifiant, dans un index, du produit qui porte les mêmes offres que pp (le plus fréquent)."""
+    by_url, by_nf, by_name = index
+    cnt = collections.Counter()
+    for r, o in pp['offers'].items():
+        hit = (by_url.get((r, o.get('url'))) if not o.get('cat') else None) or by_nf.get((r, o.get('name'), pp.get('format'))) or by_name.get((r, o.get('name')))
+        if hit:
+            cnt[hit] += 1
+    return cnt
+
+
+prev_index = offer_index(prev_cat) if not prev_ids else None
+wish = collections.defaultdict(list)
+for n, (lst, pp, base) in enumerate(built):
+    cnt = collections.Counter(prev_ids[x['rid']] for x in lst if x['rid'] in prev_ids)
+    first = prev_ids.get(lst[0]['rid'])
+    if not cnt and prev_index:
+        cnt = lookup(prev_index, pp)
+        first = None
+    if cnt:
+        top = first or cnt.most_common(1)[0][0]
+        wish[top].append((cnt[top], first == top, n))
+for pid0, cands in wish.items():
+    cands.sort(key=lambda t: (-t[0], not t[1]))
+    built[cands[0][2]][1]['id'] = pid0
+used = {pp['id'] for pp in products if pp['id']}
+fresh_ids = 0
+for lst, pp, base in built:
+    if not pp['id']:
+        pid, k = base, 2
+        while pid in used:
+            pid = f"{base}-{k}"; k += 1
+        pp['id'] = pid
+        used.add(pid)
+        fresh_ids += 1
+aliases = {}
+for lst, pp, base in built:
+    for x in lst:
+        old = prev_ids.get(x['rid'])
+        if old and old != pp['id']:
+            aliases[old] = pp['id']
+        prev_ids[x['rid']] = pp['id']
 
 
 # ---------------------------------------------------------------- catalogue de l'appli
@@ -226,7 +294,27 @@ for p in products:
     p.pop('rank', None)
 rayons = [{'id': rid, 'name': name, 'aisle': aisle, 'order': i} for i, (rid, name, aisle) in enumerate(RAYONS)]
 os.makedirs(os.path.join(lib.ROOT, 'data'), exist_ok=True)
-json.dump({'rayons': rayons, 'products': products}, open(os.path.join(lib.ROOT, 'data', 'catalog.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+live = {pp['id'] for pp in products}
+# un produit du catalogue publié qui n'existe plus sous son identifiant renvoie vers celui qui reprend ses offres
+idx = offer_index({'products': products})
+for pp in last_cat['products'] + prev_cat['products']:
+    if pp['id'] in live or pp['id'] in aliases:
+        continue
+    hit = lookup(idx, pp).most_common(1)
+    if hit:
+        aliases[pp['id']] = hit[0][0]
+for old, new in prev_aliases.items():
+    aliases.setdefault(old, new)
+for old in list(aliases):
+    seen, t = {old}, aliases[old]
+    while t in aliases and t not in seen and t not in live:
+        seen.add(t); t = aliases[t]
+    aliases[old] = t
+aliases = {k: v for k, v in sorted(aliases.items()) if k not in live and v in live}
+json.dump({'rayons': rayons, 'products': products, 'aliases': aliases}, open(os.path.join(lib.ROOT, 'data', 'catalog.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+os.makedirs(lib.STATE, exist_ok=True)
+json.dump(dict(sorted(prev_ids.items())), open(ids_path, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+print('identifiants repris', len(products) - fresh_ids, 'nouveaux', fresh_ids, 'renvois', len(aliases))
 
 # ---------------------------------------------------------------- informations sur le relevé
 MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']

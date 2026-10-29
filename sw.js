@@ -1,6 +1,6 @@
 /* Cabas hors ligne : l'appli et le dernier relevé de prix restent disponibles sans réseau.
    Changer VERSION à chaque mise en ligne pour que les téléphones récupèrent les nouveaux fichiers. */
-const VERSION = "cabas-2026-10-29-3";
+const VERSION = "cabas-2026-10-29-4";
 const FILES = [
   "./", "index.html", "app.css", "app.js", "packs.js", "optimizer.js", "worker.js", "manifest.webmanifest",
   "data/catalog.json", "data/retailers.json", "data/meta.json", "data/status.json",

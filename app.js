@@ -86,7 +86,7 @@
   const rayon = (id) => S.rayons.find((r) => r.id === id);
   const hp = (id) => "#/produit/" + encodeURIComponent(id);
   const hr = (id) => "#/rayon/" + encodeURIComponent(id);
-  const count = () => Object.values(S.basket).reduce((a, q) => a + (q > 0 ? q : 0), 0);
+  const count = () => Object.keys(S.basket).reduce((a, id) => a + (S.basket[id] > 0 && (!S.ready || S.prods.has(id)) ? S.basket[id] : 0), 0);
   function subtotal() {
     let t = 0;
     for (const id of Object.keys(S.basket)) { const p = S.prods.get(id); const b = p && best(p); if (b) t += b.price * S.basket[id]; }
@@ -138,9 +138,20 @@
     S.meta = m || {};
     S.retDate = {};
     for (const p of S.list) for (const k of Object.keys(p.offers || {})) { const d = p.offers[k].at; if (d && (!S.retDate[k] || d > S.retDate[k])) S.retDate[k] = d; }
-    let changed = false;
-    for (const id of Object.keys(S.basket)) if (!S.prods.has(id) || !(S.basket[id] > 0)) { delete S.basket[id]; changed = true; }
-    if (changed) saveBasket();
+    /* un produit qui a changé d'identifiant d'un relevé à l'autre est suivi grâce à c.aliases ;
+       un produit absent du relevé reste dans le panier et les listes, sans compter, jusqu'à son retour */
+    S.alias = c.aliases || {};
+    const follow = (o) => {
+      let ch = false;
+      for (const id of Object.keys(o)) {
+        const q = o[id], to = S.alias[id];
+        if (!(q > 0)) { delete o[id]; ch = true; }
+        else if (!S.prods.has(id) && to && S.prods.has(to)) { o[to] = Math.min(99, (o[to] || 0) + q); delete o[id]; ch = true; }
+      }
+      return ch;
+    };
+    if (follow(S.basket)) saveBasket();
+    if (S.lists.map((L) => follow(L.items || {})).some(Boolean)) saveLists();
     const rn = new Map(S.rayons.map((x) => [x.id, x.name]));
     for (const p of S.list) {
       p._b = norm(p.brand);
@@ -443,7 +454,7 @@
   };
 
   VIEWS.produit = (r) => {
-    const p = S.prods.get(r.id);
+    const p = S.prods.get(r.id) || S.prods.get((S.alias || {})[r.id]);
     if (!p) return notFound();
     const all = offers(p, false), on = offers(p, true), b = on[0] || null;
     const ray = rayon(p.r);
