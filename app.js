@@ -114,8 +114,12 @@
     const late = [];
     for (const r of S.rets) {
       const t = lastCheck(r.id);
-      if (recent(t)) { if (!best || t > best) best = t; }
-      else if (S.retDate && S.retDate[r.id]) late.push(r.name + "\u00a0: " + dateFr(S.retDate[r.id]).replace(/ \d{4}$/, ""));
+      if (recent(t)) {
+        if (!best || t > best) best = t;
+        // enseigne vérifiée, mais dont une bonne part des prix vient d'un relevé plus ancien (pages non lues cette fois)
+        const ds = (S.retDates && S.retDates[r.id]) || [], day = t.slice(0, 10), old = ds.filter((d) => d < day);
+        if (old.length > 0.3 * ds.length) late.push(r.name + "\u00a0: en partie du " + dateFr(old.sort()[0]).replace(/ \d{4}$/, ""));
+      } else if (S.retDate && S.retDate[r.id]) late.push(r.name + "\u00a0: " + dateFr(S.retDate[r.id]).replace(/ \d{4}$/, ""));
     }
     if (!best) return "Prix relevés le " + dateFr(S.meta.updatedAt);
     return "Prix vérifiés " + whenFr(best) + (late.length ? " (" + late.join(", ") + ")" : "");
@@ -137,7 +141,13 @@
     S.retMap = new Map(S.rets.map((x) => [x.id, x]));
     S.meta = m || {};
     S.retDate = {};
-    for (const p of S.list) for (const k of Object.keys(p.offers || {})) { const d = p.offers[k].at; if (d && (!S.retDate[k] || d > S.retDate[k])) S.retDate[k] = d; }
+    S.retDates = {};
+    for (const p of S.list) for (const k of Object.keys(p.offers || {})) {
+      const d = p.offers[k].at;
+      if (!d) continue;
+      if (!S.retDate[k] || d > S.retDate[k]) S.retDate[k] = d;
+      (S.retDates[k] = S.retDates[k] || []).push(d);
+    }
     /* un produit qui a changé d'identifiant d'un relevé à l'autre est suivi grâce à c.aliases ;
        un produit absent du relevé reste dans le panier et les listes, sans compter, jusqu'à son retour */
     S.alias = c.aliases || {};
