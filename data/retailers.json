@@ -113,7 +113,7 @@
   "id": "auchan",
   "name": "Auchan",
   "service": "auchan.fr",
-  "order": 3,
+  "order": 6,
   "home": "https://www.auchan.fr/",
   "channel": {
    "mode": "retrait",
@@ -141,7 +141,7 @@
   "id": "auchan-alesia",
   "name": "Auchan",
   "service": "auchan.fr",
-  "order": 4,
+  "order": 7,
   "home": "https://www.auchan.fr/",
   "group": "auchan",
   "channel": {
@@ -169,7 +169,7 @@
   "id": "auchan-bellesfeuilles",
   "name": "Auchan",
   "service": "auchan.fr",
-  "order": 5,
+  "order": 8,
   "home": "https://www.auchan.fr/",
   "group": "auchan",
   "channel": {
@@ -189,6 +189,126 @@
     {
      "label": "Bonial, avril 2023",
      "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
+    }
+   ]
+  }
+ },
+ {
+  "id": "auchan-livraison-perreux",
+  "name": "Auchan",
+  "service": "auchan.fr",
+  "order": 3,
+  "home": "https://www.auchan.fr/",
+  "group": "auchan",
+  "channel": {
+   "mode": "livraison",
+   "where": "Le Perreux-sur-Marne",
+   "minOrder": 50,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 9.9
+    },
+    {
+     "from": 150,
+     "fee": 5
+    },
+    {
+     "from": 180,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "Livraison à domicile Auchan, zone Le Perreux-sur-Marne : prix relevés sur auchan.fr pour cette zone (avec l'adresse publique de la mairie quand Auchan en demande une, jamais la tienne). Minimum de 50 € affiché par Auchan. Les frais dépendent du créneau et de la zone et s'affichent avant la validation du panier ; l'appli compte par défaut le barème publié par Bonial en 2023 : 9,90 € jusqu'à 150 €, 5 € jusqu'à 180 €, offerte au-delà.",
+   "sources": [
+    {
+     "label": "Bonial, avril 2023",
+     "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
+    },
+    {
+     "label": "Vitepromo, octobre 2026",
+     "url": "https://www.vitepromo.com/alimentation-courses/code-promo-auchan"
+    }
+   ]
+  }
+ },
+ {
+  "id": "auchan-livraison-paris16",
+  "name": "Auchan",
+  "service": "auchan.fr",
+  "order": 4,
+  "home": "https://www.auchan.fr/",
+  "group": "auchan",
+  "channel": {
+   "mode": "livraison",
+   "where": "Paris 16e",
+   "minOrder": 50,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 9.9
+    },
+    {
+     "from": 150,
+     "fee": 5
+    },
+    {
+     "from": 180,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "Livraison à domicile Auchan, zone Paris 16e : prix relevés sur auchan.fr pour cette zone (avec l'adresse publique de la mairie quand Auchan en demande une, jamais la tienne). Minimum de 50 € affiché par Auchan. Les frais dépendent du créneau et de la zone et s'affichent avant la validation du panier ; l'appli compte par défaut le barème publié par Bonial en 2023 : 9,90 € jusqu'à 150 €, 5 € jusqu'à 180 €, offerte au-delà.",
+   "sources": [
+    {
+     "label": "Bonial, avril 2023",
+     "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
+    },
+    {
+     "label": "Vitepromo, octobre 2026",
+     "url": "https://www.vitepromo.com/alimentation-courses/code-promo-auchan"
+    }
+   ]
+  }
+ },
+ {
+  "id": "auchan-livraison-paris14",
+  "name": "Auchan",
+  "service": "auchan.fr",
+  "order": 5,
+  "home": "https://www.auchan.fr/",
+  "group": "auchan",
+  "channel": {
+   "mode": "livraison",
+   "where": "Paris 14e",
+   "minOrder": 50,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 9.9
+    },
+    {
+     "from": 150,
+     "fee": 5
+    },
+    {
+     "from": 180,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "Livraison à domicile Auchan, zone Paris 14e : prix relevés sur auchan.fr pour cette zone (avec l'adresse publique de la mairie quand Auchan en demande une, jamais la tienne). Minimum de 50 € affiché par Auchan. Les frais dépendent du créneau et de la zone et s'affichent avant la validation du panier ; l'appli compte par défaut le barème publié par Bonial en 2023 : 9,90 € jusqu'à 150 €, 5 € jusqu'à 180 €, offerte au-delà.",
+   "sources": [
+    {
+     "label": "Bonial, avril 2023",
+     "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
+    },
+    {
+     "label": "Vitepromo, octobre 2026",
+     "url": "https://www.vitepromo.com/alimentation-courses/code-promo-auchan"
     }
    ]
   }

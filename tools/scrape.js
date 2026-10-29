@@ -145,18 +145,38 @@ const STORE = {
     await page.waitForTimeout(3500);
     await clickText(page, new RegExp(st.lieu.split("-")[0], "i"), "li, [role=option], button, a");
     await page.waitForTimeout(4000);
-    const label = await page.evaluate(({ want }) => {
+    // carte voulue : un point de retrait (st.retrait), ou la livraison à domicile de la zone (st.livraison)
+    const label = await page.evaluate(({ want, home }) => {
       const W = new RegExp(want, "i");
       for (const b of document.querySelectorAll("button, a")) {
         if (!/^\s*choisir\s*$/i.test(b.innerText || "")) continue;
         let card = b;
         for (let k = 0; k < 6 && card.parentElement; k++) { card = card.parentElement; if ((card.innerText || "").length > 40) break; }
         const t = (card.innerText || "").replace(/\s+/g, " ");
-        if (W.test(t) && !/livraison à domicile/i.test(t)) { b.click(); return t.slice(0, 120); }
+        if (W.test(t) && home === /livraison à domicile/i.test(t)) { b.click(); return t.slice(0, 120); }
       }
       return null;
-    }, { want: st.retrait });
+    }, { want: st.livraison ? "livraison à domicile" : st.retrait, home: !!st.livraison });
     await page.waitForTimeout(4000);
+    if (label && st.livraison) {
+      // certaines zones demandent une adresse : on donne l'adresse publique de la zone (sa mairie), jamais celle d'un utilisateur
+      for (const i of await page.$$("input")) {
+        const h = [await i.getAttribute("placeholder"), await i.getAttribute("aria-label")].join(" ");
+        if (/rechercher un produit|code postal/i.test(h) || !(await i.isVisible().catch(() => false))) continue;
+        await i.click().catch(() => {});
+        await i.type(st.livraison.adresse, { delay: 50 }).catch(() => {});
+        await page.waitForTimeout(3500);
+        const want = new RegExp(st.livraison.choisir, "i");
+        for (const el of await page.$$("li, [role=option]")) {
+          const t = ((await el.innerText().catch(() => "")) || "").replace(/\s+/g, " ").trim();
+          if (want.test(t) && t.length < 120 && (await el.isVisible().catch(() => false))) { await el.click().catch(() => {}); break; }
+        }
+        await page.waitForTimeout(4000);
+        break;
+      }
+      const ok = await page.evaluate(() => /livraison à\s*:/i.test(document.body.innerText || "") || /livrées à/i.test(document.body.innerText || ""));
+      if (!ok) return null;
+    }
     return label;
   },
 };

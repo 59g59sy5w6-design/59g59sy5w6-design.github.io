@@ -760,6 +760,318 @@
    "match": "text=lessive%20liquide#bellesfeuilles",
    "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#bellesfeuilles",
    "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "eaux",
+   "host": "auchan.fr",
+   "match": "text=eau%20plate#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=eau%20plate#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jus",
+   "host": "auchan.fr",
+   "match": "text=jus%20d%27orange#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sodas",
+   "host": "auchan.fr",
+   "match": "text=cola#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=cola#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lait",
+   "host": "auchan.fr",
+   "match": "text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "yaourts",
+   "host": "auchan.fr",
+   "match": "text=yaourt%20nature#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20nature#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages",
+   "host": "auchan.fr",
+   "match": "text=fromage%20r%C3%A2p%C3%A9#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pates",
+   "host": "auchan.fr",
+   "match": "text=p%C3%A2tes#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conserves",
+   "host": "auchan.fr",
+   "match": "text=sardines#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=sardines#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cafe",
+   "host": "auchan.fr",
+   "match": "text=caf%C3%A9%20moulu#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "gateaux",
+   "host": "auchan.fr",
+   "match": "text=madeleines#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=madeleines#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "papier",
+   "host": "auchan.fr",
+   "match": "text=papier%20toilette#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=papier%20toilette#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vaisselle",
+   "host": "auchan.fr",
+   "match": "text=liquide%20vaisselle#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lessive",
+   "host": "auchan.fr",
+   "match": "text=lessive%20liquide#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "eaux",
+   "host": "auchan.fr",
+   "match": "text=eau%20plate#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=eau%20plate#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "jus",
+   "host": "auchan.fr",
+   "match": "text=jus%20d%27orange#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "sodas",
+   "host": "auchan.fr",
+   "match": "text=cola#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=cola#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "lait",
+   "host": "auchan.fr",
+   "match": "text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "yaourts",
+   "host": "auchan.fr",
+   "match": "text=yaourt%20nature#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20nature#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "fromages",
+   "host": "auchan.fr",
+   "match": "text=fromage%20r%C3%A2p%C3%A9#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "pates",
+   "host": "auchan.fr",
+   "match": "text=p%C3%A2tes#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "conserves",
+   "host": "auchan.fr",
+   "match": "text=sardines#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=sardines#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "cafe",
+   "host": "auchan.fr",
+   "match": "text=caf%C3%A9%20moulu#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "gateaux",
+   "host": "auchan.fr",
+   "match": "text=madeleines#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=madeleines#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "papier",
+   "host": "auchan.fr",
+   "match": "text=papier%20toilette#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=papier%20toilette#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "vaisselle",
+   "host": "auchan.fr",
+   "match": "text=liquide%20vaisselle#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "lessive",
+   "host": "auchan.fr",
+   "match": "text=lessive%20liquide#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "eaux",
+   "host": "auchan.fr",
+   "match": "text=eau%20plate#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=eau%20plate#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "jus",
+   "host": "auchan.fr",
+   "match": "text=jus%20d%27orange#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "sodas",
+   "host": "auchan.fr",
+   "match": "text=cola#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=cola#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "lait",
+   "host": "auchan.fr",
+   "match": "text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "yaourts",
+   "host": "auchan.fr",
+   "match": "text=yaourt%20nature#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20nature#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "fromages",
+   "host": "auchan.fr",
+   "match": "text=fromage%20r%C3%A2p%C3%A9#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "pates",
+   "host": "auchan.fr",
+   "match": "text=p%C3%A2tes#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "conserves",
+   "host": "auchan.fr",
+   "match": "text=sardines#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=sardines#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "cafe",
+   "host": "auchan.fr",
+   "match": "text=caf%C3%A9%20moulu#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "gateaux",
+   "host": "auchan.fr",
+   "match": "text=madeleines#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=madeleines#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "papier",
+   "host": "auchan.fr",
+   "match": "text=papier%20toilette#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=papier%20toilette#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "vaisselle",
+   "host": "auchan.fr",
+   "match": "text=liquide%20vaisselle#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "lessive",
+   "host": "auchan.fr",
+   "match": "text=lessive%20liquide#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#livraison-paris14",
+   "prompt": ""
   }
  ],
  "robot": {
@@ -768,7 +1080,10 @@
   "carrefour": false,
   "auchan": true,
   "auchan-alesia": true,
-  "auchan-bellesfeuilles": true
+  "auchan-bellesfeuilles": true,
+  "auchan-livraison-perreux": true,
+  "auchan-livraison-paris16": true,
+  "auchan-livraison-paris14": true
  },
  "robot_note": "Le 29 octobre 2026, depuis GitHub Actions, Monoprix répond par une page de vérification humaine et Carrefour par une page d'attente anti-robot (403). Ces deux enseignes sont relues par Claude avec WebFetch (voir CLAUDE.md), jamais en contournant leur protection.",
  "magasins": {
@@ -786,7 +1101,31 @@
    "enseigne": "auchan",
    "lieu": "Paris 16e",
    "retrait": "Belles Feuilles"
+  },
+  "auchan-livraison-perreux": {
+   "enseigne": "auchan",
+   "lieu": "Le Perreux-sur-Marne",
+   "livraison": {
+    "adresse": "Place de la Libération Le Perreux",
+    "choisir": "Le Perreux"
+   }
+  },
+  "auchan-livraison-paris16": {
+   "enseigne": "auchan",
+   "lieu": "Paris 16e",
+   "livraison": {
+    "adresse": "71 avenue Henri Martin Paris",
+    "choisir": "Henri Martin.*Paris"
+   }
+  },
+  "auchan-livraison-paris14": {
+   "enseigne": "auchan",
+   "lieu": "Paris 14e",
+   "livraison": {
+    "adresse": "2 place Ferdinand Brunot Paris",
+    "choisir": "Ferdinand Brunot.*Paris"
+   }
   }
  },
- "magasins_note": "Enseignes dont les prix dépendent du magasin : le robot choisit ce point de retrait (jamais une livraison à domicile, qui demanderait une adresse)."
+ "magasins_note": "Enseignes dont les prix dépendent du magasin ou de la zone de livraison. Points de retrait : le robot choisit la carte du point. Livraison à domicile : il choisit la zone et, si Auchan demande une adresse, donne l'adresse publique de la mairie de la zone, jamais celle d'un utilisateur."
 }
