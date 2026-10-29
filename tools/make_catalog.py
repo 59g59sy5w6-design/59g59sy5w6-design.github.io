@@ -233,6 +233,8 @@ def offer_index(cat):
     by_url, by_nf, by_name = {}, collections.defaultdict(set), collections.defaultdict(set)
     for pp in cat['products']:
         for r, o in pp['offers'].items():
+            if o.get('sim'):
+                continue
             if o.get('url') and not o.get('cat'):
                 by_url[(r, o['url'])] = pp['id']
             if o.get('name'):
@@ -247,6 +249,8 @@ def lookup(index, pp):
     by_url, by_nf, by_name = index
     cnt = collections.Counter()
     for r, o in pp['offers'].items():
+        if o.get('sim'):
+            continue
         hit = (by_url.get((r, o.get('url'))) if not o.get('cat') else None) or by_nf.get((r, o.get('name'), pp.get('format'))) or by_name.get((r, o.get('name')))
         if hit:
             cnt[hit] += 1
@@ -311,6 +315,21 @@ for old in list(aliases):
         seen.add(t); t = aliases[t]
     aliases[old] = t
 aliases = {k: v for k, v in sorted(aliases.items()) if k not in live and v in live}
+# ---------------------------------------------------------------- prix simulés
+# Enseigne qu'aucun relevé ne peut lire sans contourner sa protection anti-robot (E.Leclerc) : à la demande du
+# propriétaire de l'appli, ses prix sont simulés à partir de prix réellement relevés chez une autre enseigne et d'un
+# écart moyen publié (réglage « simulation » de data/retailers.json). Chaque offre simulée porte « sim » et l'appli
+# l'affiche comme telle : jamais présentée comme un prix relevé.
+for R in json.load(open(os.path.join(lib.ROOT, 'data', 'retailers.json'), encoding='utf-8')):
+    sim = R.get('simulation')
+    if not sim:
+        continue
+    for pp in products:
+        b = pp['offers'].get(sim['base'])
+        if pp.get('type') not in sim.get('types', ['nb']) or not b or b.get('sim'):
+            continue
+        pp['offers'][R['id']] = {'price': round(b['price'] * sim['ratio'], 2), 'at': b['at'], 'name': f"{pp['brand']} {pp['name']}, {pp['format']}".strip(', '),
+                                 'url': R['home'], 'sim': True}
 json.dump({'rayons': rayons, 'products': products, 'aliases': aliases}, open(os.path.join(lib.ROOT, 'data', 'catalog.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 os.makedirs(lib.STATE, exist_ok=True)
 json.dump(dict(sorted(prev_ids.items())), open(ids_path, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
@@ -353,6 +372,11 @@ def enum(lst):
 for ret in sorted(rets, key=lambda r: rets[r].get('order', 9)):
     name = rets[ret]['name']
     ch = rets[ret].get('channel') or {}
+    if rets[ret].get('simulation'):
+        note = f"{name} : prix simulés, pas relevés. {rets[ret]['simulation']['note']}"
+        if note not in notes:
+            notes.append(note)
+        continue
     if ch.get('mode') == 'retrait' and ch.get('where'):
         notes.append(f"{name} : prix du point de retrait {ch['where']}, choisi sur {rets[ret]['service']}.")
     if missing.get(ret):
@@ -370,7 +394,7 @@ for ret in sorted(rets, key=lambda r: rets[r].get('order', 9)):
 notes.append("Les prix changent souvent (promotions de la semaine). Vérifie le total au moment de commander sur le site de l'enseigne.")
 notes.append("Les visuels des produits sont des illustrations de l'appli, pas des photos des emballages.")
 meta = {'updatedAt': updated, 'products': len(products), 'offers': sum(len(p['offers']) for p in products),
-        'multi': sum(1 for p in products if len(p['offers']) > 1), 'coverage': coverage, 'notes': notes}
+        'multi': sum(1 for p in products if len({rets.get(k, {}).get('group') or k for k, o in p['offers'].items() if not o.get('sim')}) > 1), 'coverage': coverage, 'notes': notes}
 json.dump(meta, open(os.path.join(lib.ROOT, 'data', 'meta.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 
 # ---------------------------------------------------------------- état du relevé (heure de la dernière vérification par enseigne)
@@ -380,6 +404,8 @@ report = json.load(open(os.path.join(lib.WORK, 'report.json'), encoding='utf-8')
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
 status = {'checkedAt': now, 'retailers': {}}
 for ret in rets:
+    if rets[ret].get('simulation'):
+        continue
     pages = [p for p in report['pages'] if p['retailer'] == ret]
     ok = [p for p in pages if p['products']]
     fresh_ts = [it['ts'] for it in fresh if it['ret'] == ret]

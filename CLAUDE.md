@@ -18,7 +18,7 @@ Lancer en local : `python3 -m http.server 8000` à la racine, puis ouvrir http:/
 ## Règles
 
 - Interface en français, tutoiement, ton sobre. Pas de tiret cadratin, pas de couleurs décoratives, pas d'émojis.
-- Uniquement des prix réellement relevés sur les sites des enseignes, jamais estimés. Chaque prix garde sa date.
+- Uniquement des prix réellement relevés sur les sites des enseignes, jamais estimés. Chaque prix garde sa date. Seule exception, à la demande du propriétaire de l'appli : E.Leclerc, dont le catalogue ne se lit pas sans contourner sa protection anti-robot, a des prix simulés (réglage `simulation` de `data/retailers.json`, calcul dans `tools/make_catalog.py`). Chaque offre simulée porte `sim` et l'appli l'affiche partout comme telle (« Simulé », « Prix simulé, pas relevé », « Estimation avec des prix simulés ») ; elle n'entre pas dans les écarts de prix de l'accueil.
 - Aucune donnée personnelle dans le dépôt (il est public) : pas d'adresse, pas de code postal, pas de nom.
 - Pas de logos ni de visuels de marque. Les noms d'enseignes et de marques s'écrivent en texte.
 - À chaque changement de fichiers servis, lancer `python3 tools/bump.py` pour changer `VERSION` dans `sw.js`, sinon les téléphones gardent l'ancienne version en cache.

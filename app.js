@@ -103,6 +103,7 @@
     return best;
   }
   function offerWhen(o) {
+    if (o.sim) return "Prix simulé, pas relevé";
     const t = lastCheck(o.ret);
     if (t && t.slice(0, 10) === o.at) return "Vérifié " + whenFr(t);
     return "Relevé le " + dateFr(o.at);
@@ -113,6 +114,7 @@
     let best = null;
     const late = [];
     for (const r of S.rets) {
+      if (r.simulated) continue;
       const t = lastCheck(r.id);
       if (recent(t)) {
         if (!best || t > best) best = t;
@@ -124,7 +126,7 @@
     if (!best) return "Prix relevés le " + dateFr(S.meta.updatedAt);
     return "Prix vérifiés " + whenFr(best) + (late.length ? " (" + late.join(", ") + ")" : "");
   }
-  const isStale = () => !S.rets.some((r) => recent(lastCheck(r.id)));
+  const isStale = () => !S.rets.some((r) => !r.simulated && recent(lastCheck(r.id)));
 
   /* plusieurs points de retrait d'une même enseigne (« group ») : un seul compte à la fois, choisi dans les réglages */
   function groupsOf() {
@@ -329,18 +331,18 @@
     return `<button type="button" class="add${v === "flat" ? " flat" : ""}" data-buy="${esc(id)}" data-v="${v}" data-act="inc" data-id="${esc(id)}" aria-label="Ajouter ${nm} au panier">${ic("plus")}</button>`;
   }
   function card(p) {
-    const b = best(p), n = offers(p, false).length;
+    const b = best(p), n = offers(p, false).filter((o) => !o.sim).length;
     const badge = b && b.promo ? '<span class="badge promo">Offre</span>' : n > 1 ? `<span class="badge">${n} enseignes</span>` : "";
     const u = b ? unitPrice(p, b.price) : "";
     return `<article class="card"><div class="tile"><a class="cover" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name + ", " + p.format)}">${img(p)}</a>${badge}${b ? buyCtl(p.id, "tile") : ""}</div>` +
       `<a class="meta" href="${hp(p.id)}" tabindex="-1" aria-hidden="true"><div class="prow">${b ? px(b.price) + (u ? `<span class="unit">${u}</span>` : "") : '<span class="na">Pas dans tes enseignes</span>'}</div>` +
-      (b ? `<div class="where">chez ${esc(retName(b.ret))}</div>` : "") +
+      (b ? `<div class="where">chez ${esc(retName(b.ret))}${b.sim ? ", prix simulé" : ""}</div>` : "") +
       `<div class="pname"><b>${esc(p.brand)}</b> ${esc(p.name)}</div><div class="pfmt">${esc(p.format)}</div></a></article>`;
   }
   function deals(n) {
     const out = [];
     for (const p of S.list) {
-      const os = offers(p, true);
+      const os = offers(p, true).filter((o) => !o.sim);
       if (os.length < 2) continue;
       const hi = os[os.length - 1].price, gap = hi - os[0].price, rel = gap / hi;
       if (rel < 0.15 || gap < 0.5) continue;
@@ -489,8 +491,8 @@
     const hi = on.length > 1 ? on[on.length - 1] : null;
     const u = b ? unitPrice(p, b.price) : "";
     const rows = all.map((o, i) => {
-      const off = !retOn(o.ret), low = b && o.ret === b.ret && on.length > 1;
-      return `<a class="row offer${off ? " off" : ""}" href="${esc(o.url)}" target="_blank" rel="noopener"><span class="av">${esc(retName(o.ret).slice(0, 1))}</span><span class="rt"><span class="on">${esc(retName(o.ret))}${low ? '<span class="tag-low">Le moins cher</span>' : ""}</span>` +
+      const off = !retOn(o.ret), low = b && o.ret === b.ret && on.length > 1 && !o.sim;
+      return `<a class="row offer${off ? " off" : ""}" href="${esc(o.url)}" target="_blank" rel="noopener"><span class="av">${esc(retName(o.ret).slice(0, 1))}</span><span class="rt"><span class="on">${esc(retName(o.ret))}${low ? '<span class="tag-low">Le moins cher</span>' : ""}${o.sim ? '<span class="tag-sim">Simulé</span>' : ""}</span>` +
         `<span class="os">${esc(o.name || "")}</span><span class="os">${esc(offerWhen(o))}${o.cat ? ", page du rayon" : ""}${off ? ", enseigne désactivée" : ""}</span>${o.promo ? `<span class="os promo">Offre\u00a0: ${esc(o.promo)}</span>` : ""}</span>` +
         `<span class="op">${px(o.price)}${unitPrice(p, o.price) ? `<span class="unit">${unitPrice(p, o.price)}</span>` : ""}</span></a>`;
     }).join("");
@@ -504,7 +506,7 @@
       right: `<button class="icbtn" type="button" data-act="share" data-id="${esc(p.id)}" aria-label="Partager">${ic("share")}</button>`,
       html: `<div class="pdp"><div class="pimg">${img(p, 480)}${promo ? '<span class="badge promo">Offre</span>' : ""}</div>` +
         `<div class="pmain"><div class="ph"><p class="pb">${esc(p.brand)}</p><h1>${esc(p.name)}</h1><p class="pf">${esc(p.format)}${u ? ", " + esc(u) : ""}</p>` +
-        (b ? `<div class="pprice">${px(b.price)}${on.length > 1 ? '<span class="sticker lg">Meilleur prix</span>' : ""}<p class="pw">chez <b>${esc(retName(b.ret))}</b>${hi && hi.price - b.price >= 0.01 ? `, ${eur(hi.price - b.price)} de moins que chez ${esc(retName(hi.ret))}` : ""}</p></div>` : `<p class="pw" style="margin-top:14px">Ce produit n'est vendu par aucune de tes enseignes activées.</p>`) +
+        (b ? `<div class="pprice">${px(b.price)}${b.sim ? '<span class="tag-sim lg">Prix simulé</span>' : on.length > 1 ? '<span class="sticker lg">Meilleur prix</span>' : ""}<p class="pw">chez <b>${esc(retName(b.ret))}</b>${b.sim ? " (prix simulé)" : ""}${hi && hi.price - b.price >= 0.01 ? `, ${eur(hi.price - b.price)} de moins que chez ${esc(retName(hi.ret))}` : ""}</p></div>` : `<p class="pw" style="margin-top:14px">Ce produit n'est vendu par aucune de tes enseignes activées.</p>`) +
         `<div class="pinline">${buyCtl(p.id, "bar")}</div></div></div>` +
         `<div class="pmore"><h2 class="gh">Prix dans ${all.length > 1 ? "les enseignes" : "l'enseigne"}</h2><div class="group">${rows}</div><p class="gf">Touche une enseigne pour ouvrir le produit sur son site. Les offres (2e à moitié prix, cagnotte) ne sont pas déduites des totaux.</p>` +
         `<h2 class="gh">Caractéristiques</h2><div class="group"><dl class="spec">${spec.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div></div>` +
@@ -552,7 +554,7 @@
   function itemsList(items) {
     return Object.keys(items).filter((id) => S.prods.has(id)).map((id) => {
       const p = S.prods.get(id), b = best(p), q = items[id];
-      return `<a class="row th" href="${hp(id)}"><span class="thumb">${img(p, 48)}</span><span class="rt"><b style="font-weight:600">${esc(p.brand)}</b> ${esc(p.name)}<small>${esc(p.format)}${b ? ", " + eur(b.price) + " chez " + esc(retName(b.ret)) : ", pas dans tes enseignes"}</small></span><span class="val num">× ${q}</span></a>`;
+      return `<a class="row th" href="${hp(id)}"><span class="thumb">${img(p, 48)}</span><span class="rt"><b style="font-weight:600">${esc(p.brand)}</b> ${esc(p.name)}<small>${esc(p.format)}${b ? ", " + eur(b.price) + " chez " + esc(retName(b.ret)) + (b.sim ? " (simulé)" : "") : ", pas dans tes enseignes"}</small></span><span class="val num">× ${q}</span></a>`;
     }).join("");
   }
   VIEWS.liste = (r) => {
@@ -598,6 +600,7 @@
       (P.fixed ? `<div class="ln"><span>Frais de service</span><span>${eurC(P.fixed)}</span></div>` : "") +
       `<div class="ln tot"><span>Total ${esc(r.name)}</span><span>${eurC(o.sub + o.fee)}</span></div>` +
       (nt ? `<p class="hint">Encore ${eurC(nt.need)} chez ${esc(r.name)} et la livraison ${nt.fee > 0 ? "passe à " + eurC(nt.fee) : "devient offerte"}.</p>` : "") +
+      (r.simulated ? `<p class="hint">Prix simulés, pas relevés : le vrai total s'affiche sur ${esc(r.service)}.</p>` : "") +
       `<a class="btn" href="${esc(r.home)}" target="_blank" rel="noopener">Commander sur ${esc(r.service)}${ic("ext")}</a>` +
       (links ? `<details><summary>Retrouver chaque produit sur ${esc(r.service)}</summary><ul>${links}</ul></details>` : "") + `</div></section>`;
   }
@@ -623,8 +626,10 @@
       let save = "";
       if (k > 1 && full[0] && full[0].tot - money >= 1) save = `${eurC(full[0].tot - money)} de moins que tout chez ${esc(full[0].name)}`;
       else if (k === 1 && full.length > 1) { const other = full.find((x) => x.name !== names[0]); if (other && other.tot - money >= 1) save = `${eurC(other.tot - money)} de moins qu'ailleurs`; }
+      if (save && bst.orders.some((o) => (S.retMap.get(o.ch.id) || {}).simulated)) save += ", selon la simulation";
       const notCheapest = bst.orders.some((o) => o.items.some((x) => { const b = best(S.prods.get(x.l.id)); return b && b.ret !== o.ch.id && b.price * 100 * x.l.q < x.cost - 0.5; }));
-      side = `<div class="sum"><p class="sl">${skipped.length ? `Meilleure option pour ${M.lines.length - skipped.length} produits sur ${M.lines.length}` : bst.orders.some((o) => pickup(S.retMap.get(o.ch.id))) ? (bst.orders.every((o) => pickup(S.retMap.get(o.ch.id))) ? "Total le plus bas, retrait compris" : "Total le plus bas, livraison et retrait compris") : "Total le plus bas, livraison comprise"}</p><div class="st">${px(money / 100)}</div>` +
+      const simUsed = bst.orders.some((o) => (S.retMap.get(o.ch.id) || {}).simulated);
+      side = `<div class="sum"><p class="sl">${simUsed ? "Estimation avec des prix simulés" : skipped.length ? `Meilleure option pour ${M.lines.length - skipped.length} produits sur ${M.lines.length}` : bst.orders.some((o) => pickup(S.retMap.get(o.ch.id))) ? (bst.orders.every((o) => pickup(S.retMap.get(o.ch.id))) ? "Total le plus bas, retrait compris" : "Total le plus bas, livraison et retrait compris") : "Total le plus bas, livraison comprise"}</p><div class="st">${px(money / 100)}</div>` +
         `<p class="sh2">${k === 1 ? "En une commande chez " + esc(names[0]) : "En " + k + " commandes\u00a0: " + esc(joinEt(names))}</p>` +
         (save ? `<p class="sv">${save}</p>` : "") +
         (notCheapest ? `<p class="sn">Certains produits ne sont pas pris là où ils sont le moins chers\u00a0: avec les minimums d'achat et la livraison, ce regroupement revient moins cher.</p>` : "") +
@@ -658,8 +663,16 @@
 
   /* réglages */
   const pickup = (r) => ((r && r.channel) || {}).mode === "retrait";
-  const optionLabel = (r) => { const w = (r.channel || {}).where; return w ? (pickup(r) ? "Retrait à " + w : "Livraison à domicile, " + w) : r.name; };
+  const optionLabel = (r) => {
+    const ch = r.channel || {};
+    if (ch.label) return ch.label + (r.simulated ? ", prix simulés" : "");
+    return ch.where ? (pickup(r) ? "Retrait à " + ch.where : "Livraison à domicile, " + ch.where) : r.name;
+  };
   function feeShort(r) {
+    if (r.simulated) return "Prix simulés, " + feeShortReal(r).replace(/^./, (c) => c.toLowerCase());
+    return feeShortReal(r);
+  }
+  function feeShortReal(r) {
     const ch = r.channel || {}, T = tiersOf(r);
     const free = T.find((t) => t.fee === 0 && t.from > 0);
     if (pickup(r)) return `Retrait ${ch.where ? "à " + ch.where : "en magasin"}, ${T[0].fee > 0 ? eur(T[0].fee) : "gratuit"}${ch.minOrder ? `, minimum ${eurR(ch.minOrder)}` : ""}`;
@@ -708,7 +721,7 @@
     return {
       title: "À propos des prix", grouped: true,
       html: `<h1 class="lt">À propos des prix</h1>` +
-        `<h2 class="gh">Dernière vérification</h2><div class="group">${S.rets.map((r) => { const st = ((S.status || {}).retailers || {})[r.id] || {}; return `<div class="row"><span class="rt">${esc(r.name)}<small>${st.checkedAt ? "Vérifié " + esc(whenFr(st.checkedAt)) + (st.pages ? ", " + st.read + " page" + (st.read > 1 ? "s" : "") + " lue" + (st.read > 1 ? "s" : "") + " sur " + st.pages : "") : "Relevé du " + esc(dateFr(m.updatedAt))}</small></span><span class="val num">${plural(cov[r.id] || 0, "prix", "prix")}</span></div>`; }).join("")}<div class="row"><span class="rt">Produits vendus par plusieurs enseignes</span><span class="val num">${esc(m.multi || 0)}</span></div></div>` +
+        `<h2 class="gh">Dernière vérification</h2><div class="group">${S.rets.map((r) => { const st = ((S.status || {}).retailers || {})[r.id] || {}; return `<div class="row"><span class="rt">${esc(r.name)}<small>${r.simulated ? "Prix simulés, pas relevés" : st.checkedAt ? "Vérifié " + esc(whenFr(st.checkedAt)) + (st.pages ? ", " + st.read + " page" + (st.read > 1 ? "s" : "") + " lue" + (st.read > 1 ? "s" : "") + " sur " + st.pages : "") : "Relevé du " + esc(dateFr(m.updatedAt))}</small></span><span class="val num">${plural(cov[r.id] || 0, "prix", "prix")}</span></div>`; }).join("")}<div class="row"><span class="rt">Produits vendus par plusieurs enseignes</span><span class="val num">${esc(m.multi || 0)}</span></div></div>` +
         `<h2 class="gh">Comment lire les prix</h2><div class="group"><div class="prose" style="padding:12px 16px">${(m.notes || []).map((n) => `<p>${esc(n)}</p>`).join("")}</div></div>` +
         `<p class="gf">Les prix viennent des pages rayon des enseignes, relues à chaque relevé. Une page qui n'a pas pu être lue garde ses prix précédents, avec leur date. Cabas n'est lié à aucune enseigne. Les noms des enseignes et des marques appartiennent à leurs propriétaires.</p>`,
     };

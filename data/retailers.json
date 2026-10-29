@@ -312,5 +312,95 @@
     }
    ]
   }
+ },
+ {
+  "id": "leclerc-livraison",
+  "name": "E.Leclerc",
+  "service": "leclercdrive.fr",
+  "order": 9,
+  "home": "https://www.leclercdrive.fr/",
+  "group": "leclerc",
+  "simulated": true,
+  "simulation": {
+   "base": "auchan",
+   "ratio": 0.882,
+   "types": [
+    "nb"
+   ],
+   "note": "Le catalogue d'E.Leclerc ne se lit pas sans contourner sa protection anti-robot. Pour les grandes marques, l'appli prend le prix relevé chez Auchan (Fontenay-sous-Bois) et le multiplie par 0,882 : d'après le palmarès UFC-Que Choisir de septembre 2026, un panier de 150 € chez E.Leclerc coûte environ 20 € de plus chez Auchan. Les marques E.Leclerc ne sont pas simulées. Le vrai prix s'affiche sur leclercdrive.fr."
+  },
+  "channel": {
+   "mode": "livraison",
+   "label": "Livraison à domicile",
+   "minOrder": 50,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 9.9
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "Conditions lues sur leclercdrive.fr : minimum de commande 50 €, livraison à partir de 7,90 € par un particulier ou de 9,90 € par un transporteur professionnel selon la zone, et livraison offerte le lendemain sur certains créneaux dans certaines zones. L'appli compte 9,90 € par défaut. Les prix d'E.Leclerc sont simulés (voir À propos des prix).",
+   "sources": [
+    {
+     "label": "E.Leclerc Drive, livraison à domicile",
+     "url": "https://www.leclercdrive.fr/conseils-drive/drive-livraison-a-domicile.aspx"
+    },
+    {
+     "label": "E.Leclerc Drive, faire ses courses au drive",
+     "url": "https://www.leclercdrive.fr/conseils-drive/drive-faire-ses-courses-au-Drive.aspx"
+    },
+    {
+     "label": "UFC-Que Choisir, palmarès de septembre 2026",
+     "url": "https://www.quechoisir.org/breve-palmares-des-supermarches-les-enseignes-les-moins-cheres-n132194/"
+    }
+   ]
+  }
+ },
+ {
+  "id": "leclerc-drive",
+  "name": "E.Leclerc",
+  "service": "leclercdrive.fr",
+  "order": 10,
+  "home": "https://www.leclercdrive.fr/",
+  "group": "leclerc",
+  "simulated": true,
+  "simulation": {
+   "base": "auchan",
+   "ratio": 0.882,
+   "types": [
+    "nb"
+   ],
+   "note": "Le catalogue d'E.Leclerc ne se lit pas sans contourner sa protection anti-robot. Pour les grandes marques, l'appli prend le prix relevé chez Auchan (Fontenay-sous-Bois) et le multiplie par 0,882 : d'après le palmarès UFC-Que Choisir de septembre 2026, un panier de 150 € chez E.Leclerc coûte environ 20 € de plus chez Auchan. Les marques E.Leclerc ne sont pas simulées. Le vrai prix s'affiche sur leclercdrive.fr."
+  },
+  "channel": {
+   "mode": "retrait",
+   "label": "Drive (retrait)",
+   "minOrder": 0,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "leclercdrive.fr présente le drive comme un service gratuit. Les prix d'E.Leclerc sont simulés (voir À propos des prix).",
+   "sources": [
+    {
+     "label": "E.Leclerc Drive, livraison à domicile",
+     "url": "https://www.leclercdrive.fr/conseils-drive/drive-livraison-a-domicile.aspx"
+    },
+    {
+     "label": "E.Leclerc Drive, faire ses courses au drive",
+     "url": "https://www.leclercdrive.fr/conseils-drive/drive-faire-ses-courses-au-Drive.aspx"
+    },
+    {
+     "label": "UFC-Que Choisir, palmarès de septembre 2026",
+     "url": "https://www.quechoisir.org/breve-palmares-des-supermarches-les-enseignes-les-moins-cheres-n132194/"
+    }
+   ]
+  }
  }
 ]
