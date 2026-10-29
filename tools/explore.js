@@ -85,15 +85,17 @@ async function clickText(page, re, within) {
           let done = false;
           for (const i of await page.$$("input")) {
             const h = [await i.getAttribute("placeholder"), await i.getAttribute("aria-label"), await i.getAttribute("type")].join(" ");
-            if (/rechercher un produit|search/i.test(h) || !(await i.isVisible().catch(() => false))) continue;
+            if (/rechercher un produit|code postal/i.test(h) || !(await i.isVisible().catch(() => false))) continue;
             await i.click().catch(() => {}); await i.type(st.address, { delay: 50 }).catch(() => {}); done = true; break;
           }
           await page.waitForTimeout(3500);
           await snap(done ? "adresse saisie" : "aucun champ d'adresse");
-          const word = st.address.split(/\s+/).find((w) => w.length > 4) || st.address;
-          const t = await clickText(page, new RegExp(word, "i"), "li, [role=option], button, a, div[role=button]");
-          await page.waitForTimeout(3500);
-          await snap(t ? `suggestion « ${t.slice(0, 80)} »` : "aucune suggestion");
+          if (done) {
+            const word = st.address.split(/\s+/).find((w) => w.length > 4) || st.address;
+            const t = await clickText(page, new RegExp(word, "i"), "li, [role=option], [class*=suggest] *, [class*=Suggest] *");
+            await page.waitForTimeout(3500);
+            await snap(t ? `suggestion « ${t.slice(0, 80)} »` : "aucune suggestion");
+          }
         }
         if (st.cards) {
           // toutes les cartes de la liste (drives, retraits, consignes), avec leur bouton « Choisir »
@@ -123,6 +125,8 @@ async function clickText(page, re, within) {
             return false;
           }, { want: st.expand.source });
           await page.waitForTimeout(2500);
+          await page.mouse.move(440, 500); await page.mouse.wheel(0, 300); await page.waitForTimeout(800);
+          await snap("détails dépliés (copie d'écran)");
           const txt = await page.evaluate(({ want }) => {
             const W = new RegExp(want, "i");
             const cands = [...document.querySelectorAll("div, section, article, li")].filter((e) => W.test(e.innerText || "") && (e.innerText || "").length < 1500);
