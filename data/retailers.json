@@ -1,1 +1,139 @@
-[{"id":"monoprix","name":"Monoprix","service":"courses.monoprix.fr","order":0,"home":"https://courses.monoprix.fr/","channel":{"mode":"livraison","minOrder":60,"tiers":[{"from":0,"fee":12},{"from":120,"half":true},{"from":150,"fee":0}],"fixedFee":3.2,"editable":true,"feeNote":"Minimum 60 €. Livraison offerte dès 150 € et à moitié prix dès 120 € (courses.monoprix.fr). Sous 120 €, 2 à 12 € selon le créneau (guide Yoojo, septembre 2026) : 12 € sont comptés tant que tu n'indiques pas ton créneau. 3,20 € de frais de service constatés sur une commande d'octobre 2026.","sources":[{"label":"Monoprix Plus","url":"https://courses.monoprix.fr/content/presentation-monoprix-plus"}]}},{"id":"carrefour","name":"Carrefour","service":"carrefour.fr","order":1,"home":"https://www.carrefour.fr/","channel":{"mode":"livraison","minOrder":60,"tiers":[{"from":0,"fee":8},{"from":100,"fee":5},{"from":150,"fee":0}],"fixedFee":0,"editable":true,"feeNote":"Minimum 60 € et frais de préparation offerts (Bons Plans Mania, 24 octobre 2026). Carrefour donne les frais exacts une fois l'adresse saisie ; l'appli compte 8 € sous 100 €, 5 € de 100 à 150 € et 0 € dès 150 € d'après le guide Livraison Infos (juillet 2026). Prix relevés sur carrefour.fr sans magasin choisi : ils peuvent varier selon le magasin qui livre.","sources":[{"label":"Bons Plans Mania","url":"https://bonsplansmania.fr/article/livraison-courses-carrefour-domicile-frais-minimum-commande-2026"},{"label":"Livraison Infos","url":"https://livraisoninfos.fr/livraison/carrefour-livraison-a-domicile-le-guide-complet/"}]}},{"id":"houra","name":"Houra","service":"houra.fr","order":2,"home":"https://www.houra.fr/","channel":{"mode":"livraison","minOrder":60,"tiers":[{"from":0,"fee":9.9},{"from":120,"fee":7.9},{"from":150,"fee":5.0},{"from":200,"fee":0}],"fixedFee":0,"editable":false,"feeNote":"Minimum 60 € en Île-de-France (FAQ Houra). Barème lu sur houra.fr pour une commune d'Île-de-France en octobre 2026 : 9,90 € dès 60 €, 7,90 € dès 120 €, 5 € dès 150 €, offerte dès 200 €. Il peut varier selon la commune.","sources":[{"label":"FAQ Houra","url":"https://www.houra.fr/faq"}]}}]
+[
+ {
+  "id": "monoprix",
+  "name": "Monoprix",
+  "service": "courses.monoprix.fr",
+  "order": 0,
+  "home": "https://courses.monoprix.fr/",
+  "channel": {
+   "mode": "livraison",
+   "minOrder": 60,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 12
+    },
+    {
+     "from": 120,
+     "half": true
+    },
+    {
+     "from": 150,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 3.2,
+   "editable": true,
+   "feeNote": "Minimum 60 €. Livraison offerte dès 150 € et à moitié prix dès 120 € (courses.monoprix.fr). Sous 120 €, 2 à 12 € selon le créneau (guide Yoojo, septembre 2026) : 12 € sont comptés tant que tu n'indiques pas ton créneau. 3,20 € de frais de service constatés sur une commande d'octobre 2026.",
+   "sources": [
+    {
+     "label": "Monoprix Plus",
+     "url": "https://courses.monoprix.fr/content/presentation-monoprix-plus"
+    }
+   ]
+  }
+ },
+ {
+  "id": "carrefour",
+  "name": "Carrefour",
+  "service": "carrefour.fr",
+  "order": 1,
+  "home": "https://www.carrefour.fr/",
+  "channel": {
+   "mode": "livraison",
+   "minOrder": 60,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 8
+    },
+    {
+     "from": 100,
+     "fee": 5
+    },
+    {
+     "from": 150,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "Minimum 60 € et frais de préparation offerts (Bons Plans Mania, 24 octobre 2026). Carrefour donne les frais exacts une fois l'adresse saisie ; l'appli compte 8 € sous 100 €, 5 € de 100 à 150 € et 0 € dès 150 € d'après le guide Livraison Infos (juillet 2026). Prix relevés sur carrefour.fr sans magasin choisi : ils peuvent varier selon le magasin qui livre.",
+   "sources": [
+    {
+     "label": "Bons Plans Mania",
+     "url": "https://bonsplansmania.fr/article/livraison-courses-carrefour-domicile-frais-minimum-commande-2026"
+    },
+    {
+     "label": "Livraison Infos",
+     "url": "https://livraisoninfos.fr/livraison/carrefour-livraison-a-domicile-le-guide-complet/"
+    }
+   ]
+  }
+ },
+ {
+  "id": "houra",
+  "name": "Houra",
+  "service": "houra.fr",
+  "order": 2,
+  "home": "https://www.houra.fr/",
+  "channel": {
+   "mode": "livraison",
+   "minOrder": 60,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 9.9
+    },
+    {
+     "from": 120,
+     "fee": 7.9
+    },
+    {
+     "from": 150,
+     "fee": 5.0
+    },
+    {
+     "from": 200,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 0,
+   "editable": false,
+   "feeNote": "Minimum 60 € en Île-de-France (FAQ Houra). Barème lu sur houra.fr pour une commune d'Île-de-France en octobre 2026 : 9,90 € dès 60 €, 7,90 € dès 120 €, 5 € dès 150 €, offerte dès 200 €. Il peut varier selon la commune.",
+   "sources": [
+    {
+     "label": "FAQ Houra",
+     "url": "https://www.houra.fr/faq"
+    }
+   ]
+  }
+ },
+ {
+  "id": "auchan",
+  "name": "Auchan",
+  "service": "auchan.fr",
+  "order": 3,
+  "home": "https://www.auchan.fr/",
+  "channel": {
+   "mode": "retrait",
+   "where": "Fontenay-sous-Bois (Auchan Lockers)",
+   "minOrder": 0,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 0.2
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "Prix relevés sur auchan.fr pour le point de retrait en consigne Auchan Lockers Fontenay (Fontenay-sous-Bois), sans adresse ni compte. Auchan n'affiche pas de minimum pour ce retrait. Le magazine Bonial indiquait en avril 2023 un retrait en consigne à 0,20 € et un drive gratuit : à vérifier au moment de commander.",
+   "sources": [
+    {
+     "label": "Bonial, avril 2023",
+     "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
+    }
+   ]
+  }
+ }
+]

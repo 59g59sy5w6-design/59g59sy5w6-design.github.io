@@ -576,7 +576,7 @@
     const nItems = o.items.reduce((a, x) => a + x.l.q, 0);
     return `<section class="order" aria-label="Commande ${esc(r.name)}"><div class="oh"><span class="av">${esc(r.name.slice(0, 1))}</span><div class="rt"><h3>${esc(r.name)}</h3><small>${plural(nItems, "article", "articles")}</small></div>${px((o.sub + o.fee) / 100)}</div>` +
       o.items.map((x) => itemRow(x.l.id, x.cost, x.l.q)).join("") +
-      `<div class="of"><div class="ln"><span>Articles</span><span>${eurC(o.sub)}</span></div><div class="ln"><span>Livraison</span><span>${fee > 0 ? eurC(fee) : "Offerte"}</span></div>` +
+      `<div class="of"><div class="ln"><span>Articles</span><span>${eurC(o.sub)}</span></div><div class="ln"><span>${pickup(r) ? "Retrait" : "Livraison"}</span><span>${fee > 0 ? eurC(fee) : pickup(r) ? "Gratuit" : "Offerte"}</span></div>` +
       (P.fixed ? `<div class="ln"><span>Frais de service</span><span>${eurC(P.fixed)}</span></div>` : "") +
       `<div class="ln tot"><span>Total ${esc(r.name)}</span><span>${eurC(o.sub + o.fee)}</span></div>` +
       (nt ? `<p class="hint">Encore ${eurC(nt.need)} chez ${esc(r.name)} et la livraison ${nt.fee > 0 ? "passe à " + eurC(nt.fee) : "devient offerte"}.</p>` : "") +
@@ -606,7 +606,7 @@
       if (k > 1 && full[0] && full[0].tot - money >= 1) save = `${eurC(full[0].tot - money)} de moins que tout chez ${esc(full[0].name)}`;
       else if (k === 1 && full.length > 1) { const other = full.find((x) => x.name !== names[0]); if (other && other.tot - money >= 1) save = `${eurC(other.tot - money)} de moins qu'ailleurs`; }
       const notCheapest = bst.orders.some((o) => o.items.some((x) => { const b = best(S.prods.get(x.l.id)); return b && b.ret !== o.ch.id && b.price * 100 * x.l.q < x.cost - 0.5; }));
-      side = `<div class="sum"><p class="sl">${skipped.length ? `Meilleure option pour ${M.lines.length - skipped.length} produits sur ${M.lines.length}` : "Total le plus bas, livraison comprise"}</p><div class="st">${px(money / 100)}</div>` +
+      side = `<div class="sum"><p class="sl">${skipped.length ? `Meilleure option pour ${M.lines.length - skipped.length} produits sur ${M.lines.length}` : bst.orders.some((o) => pickup(S.retMap.get(o.ch.id))) ? (bst.orders.every((o) => pickup(S.retMap.get(o.ch.id))) ? "Total le plus bas, retrait compris" : "Total le plus bas, livraison et retrait compris") : "Total le plus bas, livraison comprise"}</p><div class="st">${px(money / 100)}</div>` +
         `<p class="sh2">${k === 1 ? "En une commande chez " + esc(names[0]) : "En " + k + " commandes\u00a0: " + esc(joinEt(names))}</p>` +
         (save ? `<p class="sv">${save}</p>` : "") +
         (notCheapest ? `<p class="sn">Certains produits ne sont pas pris là où ils sont le moins chers\u00a0: avec les minimums d'achat et la livraison, ce regroupement revient moins cher.</p>` : "") +
@@ -639,9 +639,11 @@
   };
 
   /* réglages */
+  const pickup = (r) => ((r && r.channel) || {}).mode === "retrait";
   function feeShort(r) {
     const ch = r.channel || {}, T = tiersOf(r);
     const free = T.find((t) => t.fee === 0 && t.from > 0);
+    if (pickup(r)) return `Retrait ${ch.where ? "à " + ch.where : "en magasin"}, ${T[0].fee > 0 ? eur(T[0].fee) : "gratuit"}${ch.minOrder ? `, minimum ${eurR(ch.minOrder)}` : ""}`;
     return `Minimum ${eurR(ch.minOrder || 0)}, livraison ${eur(T[0].fee)}${free ? `, offerte dès ${eurR(free.from)}` : ""}${ch.fixedFee ? `, frais de service ${eur(ch.fixedFee)}` : ""}`;
   }
   VIEWS.reglages = () => {
@@ -667,7 +669,7 @@
       const lo = Math.max(t.from, ch.minOrder || 0), hi = T[i + 1] ? T[i + 1].from : null;
       if (hi != null && lo >= hi) return "";
       const lab = hi == null ? `Dès ${eurR(lo)}` : `De ${eurR(lo)} à ${eurR(hi)}`;
-      return `<div class="row"><span class="rt">${lab}</span><span class="val num">${t.fee > 0 ? eur(t.fee) : "Offerte"}</span></div>`;
+      return `<div class="row"><span class="rt">${lab}</span><span class="val num">${t.fee > 0 ? eur(t.fee) : pickup(R0) ? "Gratuit" : "Offerte"}</span></div>`;
     }).join("");
     const ov = S.prefs.fee[R0.id] || {};
     const firstTo = T[1] ? T[1].from : null;
@@ -675,8 +677,8 @@
       title: R0.name, grouped: true,
       html: `<h1 class="lt">${esc(R0.name)}</h1><p class="lt-sub">${esc(R0.service)}</p>` +
         `<div class="group"><div class="row"><span class="rt">Utiliser ${esc(R0.name)}</span><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(R0.id)}"${retOn(R0.id) ? " checked" : ""} aria-label="Utiliser ${esc(R0.name)}"><span></span></label></div></div>` +
-        `<h2 class="gh">Livraison à domicile</h2><div class="group"><div class="row"><span class="rt">Commande minimum</span><span class="val num">${eurR(ch.minOrder || 0)}</span></div>${rows}${ch.fixedFee ? `<div class="row"><span class="rt">Frais de service</span><span class="val num">${eur(ch.fixedFee)}</span></div>` : ""}</div>` +
-        (ch.editable ? `<h2 class="gh">Ton créneau</h2><div class="group"><label class="row" for="fee-${esc(R0.id)}"><span class="rt">Frais de livraison${firstTo ? " sous " + eurR(firstTo) : ""}<small>Selon le créneau choisi. Par défaut, le prix le plus haut.</small></span><input class="inl num" id="fee-${esc(R0.id)}" type="number" inputmode="decimal" min="0" step="0.1" data-fee="${esc(R0.id)}" value="${esc(ov.base != null ? ov.base : ch.tiers[0].fee)}"><span class="val">€</span></label></div>` : "") +
+        `<h2 class="gh">${pickup(R0) ? "Retrait" + (ch.where ? " à " + esc(ch.where) : "") : "Livraison à domicile"}</h2><div class="group"><div class="row"><span class="rt">Commande minimum</span><span class="val num">${eurR(ch.minOrder || 0)}</span></div>${rows}${ch.fixedFee ? `<div class="row"><span class="rt">Frais de service</span><span class="val num">${eur(ch.fixedFee)}</span></div>` : ""}</div>` +
+        (ch.editable ? `<h2 class="gh">Ton créneau</h2><div class="group"><label class="row" for="fee-${esc(R0.id)}"><span class="rt">${pickup(R0) ? "Frais de retrait" : "Frais de livraison"}${firstTo ? " sous " + eurR(firstTo) : ""}<small>${pickup(R0) ? "À vérifier sur le site au moment de commander." : "Selon le créneau choisi. Par défaut, le prix le plus haut."}</small></span><input class="inl num" id="fee-${esc(R0.id)}" type="number" inputmode="decimal" min="0" step="0.1" data-fee="${esc(R0.id)}" value="${esc(ov.base != null ? ov.base : ch.tiers[0].fee)}"><span class="val">€</span></label></div>` : "") +
         (ch.feeNote ? `<h2 class="gh">D'où viennent ces frais</h2><div class="group"><p class="prose" style="padding:12px 16px"><span>${esc(ch.feeNote)}</span></p>${(ch.sources || []).map((s) => `<a class="row link" href="${esc(s.url)}" target="_blank" rel="noopener"><span class="rt">${esc(s.label)}</span>${ic("ext", "ext")}</a>`).join("")}</div>` : "") +
         `<div class="group" style="margin-top:28px"><a class="row link" href="${esc(R0.home)}" target="_blank" rel="noopener"><span class="rt">Ouvrir ${esc(R0.service)}</span>${ic("ext", "ext")}</a></div>`,
     };
@@ -952,12 +954,17 @@
     if (S.route.name === "recherche") { S.shown.s = 0; $("#sres").innerHTML = searchBody(); mountLazy(); onScroll(); }
     else { const k = "r:" + S.route.id; S.shown[k] = 0; rerender(); }
   }
+  function zipHint() {
+    const liv = S.rets.filter((r) => !pickup(r)).map((r) => r.name), ret = S.rets.filter(pickup);
+    return (liv.length ? joinEt(liv) + (liv.length > 1 ? " livrent" : " livre") + " en Île-de-France." : "") +
+      ret.map((r) => ` ${r.name} : retrait${r.channel.where ? " à " + r.channel.where : ""}.`).join("");
+  }
   function zipSheet() {
     openSheet({
       title: "Livraison", focus: "#zipIn",
       left: `<button class="txtbtn" type="button" data-act="close">Annuler</button>`,
       right: `<button class="txtbtn" type="button" data-act="zipok">OK</button>`,
-      body: `<p>Ton code postal sert à vérifier que les enseignes te livrent. Il reste sur cet appareil.</p><label class="field"><input id="zipIn" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" autocomplete="postal-code" placeholder="Code postal, par exemple 75011" value="${esc(S.prefs.zip)}" aria-label="Code postal"><small>Monoprix, Carrefour et Houra livrent en Île-de-France.</small></label>`,
+      body: `<p>Ton code postal sert à vérifier que les enseignes te livrent. Il reste sur cet appareil.</p><label class="field"><input id="zipIn" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" autocomplete="postal-code" placeholder="Code postal, par exemple 75011" value="${esc(S.prefs.zip)}" aria-label="Code postal"><small>${esc(zipHint())}</small></label>`,
     });
   }
   function nameSheet(title, value, act, id) {

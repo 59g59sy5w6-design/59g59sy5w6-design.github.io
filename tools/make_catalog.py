@@ -352,6 +352,9 @@ def enum(lst):
 
 for ret in sorted(rets, key=lambda r: rets[r].get('order', 9)):
     name = rets[ret]['name']
+    ch = rets[ret].get('channel') or {}
+    if ch.get('mode') == 'retrait' and ch.get('where'):
+        notes.append(f"{name} : prix du point de retrait {ch['where']}, choisi sur {rets[ret]['service']}.")
     if missing.get(ret):
         lst = missing[ret]
         notes.append(f"{name} : {'le rayon ' + enum(lst) + " n'a" if len(lst) == 1 else 'les rayons ' + enum(lst) + " n'ont"} pas pu être lu{'s' if len(lst) > 1 else ''} pendant le relevé.")

@@ -1,6 +1,6 @@
 # Cabas
 
-Cabas compare les prix de tes courses chez Monoprix, Carrefour et Houra, puis calcule où commander pour payer le moins cher, livraison comprise.
+Cabas compare les prix de tes courses chez Monoprix, Carrefour, Houra et Auchan, puis calcule où commander pour payer le moins cher, livraison comprise.
 
 ## Installer sur iPhone
 

@@ -1,7 +1,7 @@
 {
   "name": "Cabas",
   "short_name": "Cabas",
-  "description": "Compare les prix de tes courses chez Monoprix, Carrefour et Houra, et trouve où commander pour payer le moins cher, livraison comprise.",
+  "description": "Compare les prix de tes courses chez Monoprix, Carrefour, Houra et Auchan, et trouve où commander pour payer le moins cher, livraison comprise.",
   "lang": "fr",
   "dir": "ltr",
   "id": "./",

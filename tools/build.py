@@ -43,7 +43,8 @@ def explained(ratio, qty, text):
 
 
 def page_key(url):
-    return (url or "").split("?")[0].split("#")[0].rstrip("/")
+    # la requête compte : les pages de recherche Auchan ne diffèrent que par elle (recherche?text=...)
+    return (url or "").split("#")[0].rstrip("/")
 
 
 F = json.load(open(os.path.join(lib.WORK, "fetches.json"), encoding="utf-8"))
