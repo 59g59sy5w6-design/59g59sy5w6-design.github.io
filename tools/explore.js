@@ -15,7 +15,7 @@ const PLAN = [
     { click: /choisir vos courses|choisir (un|mon|votre) magasin/i },
     { type: PLACE, into: /code postal/i },
     { click: new RegExp(PLACE.split("-")[0], "i"), within: "li, [role=option], button, a" },
-    { click: /^choisir$/i },
+    { choose: /lockers|drive|click/i, avoid: /livraison à domicile/i },
     { goto: "https://www.auchan.fr/recherche?text=lait%20demi%20%C3%A9cr%C3%A9m%C3%A9" },
   ] },
   { id: "leclerc", url: "https://www.e.leclerc/fp/lait-de-montagne-demi-ecreme-brique-1-l-delisse-3564700596241", steps: [
@@ -79,6 +79,22 @@ async function clickText(page, re, within) {
           }
           await page.waitForTimeout(3500);
           await snap(done ? `saisie ${st.type}` : "aucun champ de saisie trouvé");
+        }
+        if (st.choose) {
+          // le bouton « Choisir » de la première carte qui correspond (retrait en magasin, sans adresse à donner)
+          const label = await page.evaluate(({ want, avoid }) => {
+            const W = new RegExp(want, "i"), A = new RegExp(avoid, "i");
+            for (const b of document.querySelectorAll("button, a")) {
+              if (!/^\s*choisir\s*$/i.test(b.innerText || "")) continue;
+              let card = b;
+              for (let k = 0; k < 6 && card.parentElement; k++) { card = card.parentElement; if ((card.innerText || "").length > 40) break; }
+              const t = (card.innerText || "").replace(/\s+/g, " ");
+              if (W.test(t) && !A.test(t)) { b.click(); return t.slice(0, 120); }
+            }
+            return null;
+          }, { want: st.choose.source, avoid: st.avoid ? st.avoid.source : "$^" });
+          await page.waitForTimeout(4000);
+          await snap(label ? `choix « ${label} »` : "aucune carte ne correspond");
         }
         if (st.wait) await page.waitForTimeout(st.wait);
         if (st.goto) {
