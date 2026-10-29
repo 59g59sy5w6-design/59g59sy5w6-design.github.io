@@ -339,7 +339,7 @@ for ret in rets:
 services = [rets[r]['service'] for r in sorted(rets, key=lambda r: rets[r].get('order', 9))]
 notes = [
     f"Prix relevés le {fr(updated)} sur les pages rayon publiques de {', '.join(services[:-1])} et {services[-1]}, tels qu'affichés à l'unité. Les offres du type « 2e à -50 % » ou cagnotte sont signalées sur la fiche, mais les totaux utilisent le prix affiché à l'unité.",
-    "Un même produit est rapproché entre enseignes par marque, désignation et contenance. Les marques distributeur ne sont vendues que par leur enseigne.",
+    "Un même produit est rapproché entre enseignes par marque, désignation et contenance. Les marques distributeur ne sont vendues que par leur enseigne, sauf Auchan et Pouce, vendues aussi par Houra.",
 ]
 def low(x):
     return x[:1].lower() + x[1:]
