@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=madeleines",
+ "status": 200,
+ "title": "Votre recherche madeleines sur Auchan.fr",
+ "products": [
+  {
+   "name": "ST MICHEL Petites madeleines sans huile de palme",
+   "price": 2.07,
+   "was": null,
+   "unit": "4,14€ / kg",
+   "promo": null,
+   "format": "500g",
+   "url": "https://www.auchan.fr/st-michel-petites-madeleines-sans-huile-de-palme/pr-C1247177"
+  },
+  {
+   "name": "ST MICHEL Petites madeleines aux pépites de chocolat sans huile de palme",
+   "price": 2.11,
+   "was": null,
+   "unit": "5,28€ / kg",
+   "promo": null,
+   "format": "400g",
+   "url": "https://www.auchan.fr/st-michel-petites-madeleines-aux-pepites-de-chocolat-sans-huile-de-palme/pr-C1247176"
+  },
+  {
+   "name": "BONNE MAMAN Madeleines nappées de chocolat au lait sachets individuels",
+   "price": 3.66,
+   "was": null,
+   "unit": "12,20€ / kg",
+   "promo": null,
+   "format": "300g",
+   "url": "https://www.auchan.fr/bonne-maman-madeleines-nappees-de-chocolat-au-lait-sachets-individuels/pr-C1244262"
+  },
+  {
+   "name": "AUCHAN Madeleines longues aux œufs frais sachets fraîcheur",
+   "price": 3.21,
+   "was": null,
+   "unit": "7,30€ / kg",
+   "promo": null,
+   "format": "440g",
+   "url": "https://www.auchan.fr/auchan-madeleines-longues-aux-oeufs-frais-sachets-fraicheur/pr-C1244126"
+  },
+  {
+   "name": "ST MICHEL Madeleines recette de Commercy pur beurre sachets individuels",
+   "price": 3.93,
+   "was": null,
+   "unit": "13,10€ / kg",
+   "promo": null,
+   "format": "300g",
+   "url": "https://www.auchan.fr/st-michel-madeleines-recette-de-commercy-pur-beurre-sachets-individuels/pr-C1247180"
+  },
+  {
+   "name": "LE STER Madeleines longues aux perles de sucre",
+   "price": 1.87,
+   "was": null,
+   "unit": "7,48€ / kg",
+   "promo": null,
+   "format": "250g",
+   "url": "https://www.auchan.fr/le-ster-madeleines-longues-aux-perles-de-sucre/pr-C1243760"
+  },
+  {
+   "name": "ST MICHEL Petites madeleines nature",
+   "price": 4,
+   "was": null,
+   "unit": "4,00€ / kg",
+   "promo": null,
+   "format": "1kg",
+   "url": "https://www.auchan.fr/st-michel-petites-madeleines-nature/pr-C1247179"
+  },
+  {
+   "name": "ST MICHEL Madeleines moelleuses sachets individuels",
+   "price": 3.35,
+   "was": null,
+   "unit": "5,58€ / kg",
+   "promo": null,
+   "format": "600g",
+   "url": "https://www.auchan.fr/st-michel-madeleines-moelleuses-sachets-individuels/pr-C1247178"
+  }
+ ]
+}

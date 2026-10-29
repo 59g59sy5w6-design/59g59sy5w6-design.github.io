@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu",
+ "status": 200,
+ "title": "Café moulu pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "AUCHAN Café moulu classico 100% arabica intensité 7",
+   "price": 7.51,
+   "was": null,
+   "unit": "15,02€ / kg",
+   "promo": "cagnottés",
+   "format": "2x250g",
+   "url": "https://www.auchan.fr/auchan-cafe-moulu-classico-100-arabica-intensite-7/pr-C1269326"
+  },
+  {
+   "name": "AUCHAN Café moulu tradition intensité 8",
+   "price": 10.11,
+   "was": null,
+   "unit": "10,11€ / kg",
+   "promo": "cagnottés",
+   "format": "4x250g",
+   "url": "https://www.auchan.fr/auchan-cafe-moulu-tradition-intensite-8/pr-C1309192"
+  },
+  {
+   "name": "MALONGO Café moulu équitable pur arabica",
+   "price": 11.12,
+   "was": null,
+   "unit": "22,24€ / kg",
+   "promo": null,
+   "format": "500g",
+   "url": "https://www.auchan.fr/malongo-cafe-moulu-equitable-pur-arabica/pr-C1267382"
+  },
+  {
+   "name": "LAVAZZA Café moulu l'espresso italiano classico pur arabica intensité 5",
+   "price": 9.96,
+   "was": null,
+   "unit": "19,92€ / kg",
+   "promo": null,
+   "format": "2x250g",
+   "url": "https://www.auchan.fr/lavazza-cafe-moulu-l-espresso-italiano-classico-pur-arabica-intensite-5/pr-C1274667"
+  },
+  {
+   "name": "NATURELA Café moulu bio pur arabica intensité 7",
+   "price": 18.9,
+   "was": null,
+   "unit": "18,90€ / kg",
+   "promo": null,
+   "format": "1kg",
+   "url": "https://www.auchan.fr/naturela-cafe-moulu-bio-pur-arabica-intensite-7/pr-C1260435"
+  },
+  {
+   "name": "LAVAZZA Café moulu Momento Dolce Intensité 7",
+   "price": 8.99,
+   "was": null,
+   "unit": "17,98€ / kg",
+   "promo": null,
+   "format": "2x250g",
+   "url": "https://www.auchan.fr/lavazza-cafe-moulu-momento-dolce-intensite-7/pr-C1854960"
+  },
+  {
+   "name": "LES CAFES SATI Café moulu franc et intense mélange tonique",
+   "price": 13.33,
+   "was": null,
+   "unit": "13,33€ / kg",
+   "promo": null,
+   "format": "4x250g",
+   "url": "https://www.auchan.fr/les-cafes-sati-cafe-moulu-franc-et-intense-melange-tonique/pr-C1260329"
+  },
+  {
+   "name": "MALONGO Café moulu équitable pur arabica",
+   "price": 5.61,
+   "was": null,
+   "unit": "22,44€ / kg",
+   "promo": null,
+   "format": "250g",
+   "url": "https://www.auchan.fr/malongo-cafe-moulu-equitable-pur-arabica/pr-C1274372"
+  }
+ ]
+}

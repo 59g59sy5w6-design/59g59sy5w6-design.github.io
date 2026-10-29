@@ -1,0 +1,76 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=eau%20plate",
+ "status": 200,
+ "title": "Eaux plates natures pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "CRISTALINE Eau de source plate",
+   "price": 1.22,
+   "was": null,
+   "unit": "0,14€ / l",
+   "promo": null,
+   "format": "6x1,5l",
+   "url": "https://www.auchan.fr/cristaline-eau-de-source-plate/pr-C1222322"
+  },
+  {
+   "name": "CRISTALINE Eau de source plate bouteilles",
+   "price": 1.95,
+   "was": null,
+   "unit": "0,33€ / l",
+   "promo": null,
+   "format": "12x50cl",
+   "url": "https://www.auchan.fr/cristaline-eau-de-source-plate-bouteilles/pr-C1206322"
+  },
+  {
+   "name": "AUCHAN Eau de source de montagne",
+   "price": 1.83,
+   "was": null,
+   "unit": "0,20€ / l",
+   "promo": null,
+   "format": "6x1,5l",
+   "url": "https://www.auchan.fr/auchan-eau-de-source-de-montagne/pr-C1207721"
+  },
+  {
+   "name": "CRISTALINE Eau de source plate",
+   "price": 1.14,
+   "was": null,
+   "unit": "0,19€ / l",
+   "promo": null,
+   "format": "6x1l",
+   "url": "https://www.auchan.fr/cristaline-eau-de-source-plate/pr-C1206570"
+  },
+  {
+   "name": "CRISTALINE Eau de source plate",
+   "price": 0.98,
+   "was": null,
+   "unit": "0,20€ / l",
+   "promo": null,
+   "url": "https://www.auchan.fr/cristaline-eau-de-source-plate/pr-C1222319"
+  },
+  {
+   "name": "AUCHAN Eau de source de montagne",
+   "price": 0.97,
+   "was": null,
+   "unit": "0,19€ / l",
+   "promo": null,
+   "url": "https://www.auchan.fr/auchan-eau-de-source-de-montagne/pr-C1222346"
+  },
+  {
+   "name": "CRISTALINE Eau de source plate avec robinet intégré",
+   "price": 2.49,
+   "was": null,
+   "unit": "0,31€ / l",
+   "promo": null,
+   "url": "https://www.auchan.fr/cristaline-eau-de-source-plate-avec-robinet-integre/pr-C1501562"
+  },
+  {
+   "name": "ROCHE CLAIRE Eau de source de montagne plate",
+   "price": 3.49,
+   "was": null,
+   "unit": "0,39€ / l",
+   "promo": null,
+   "format": "6x1.5l",
+   "url": "https://www.auchan.fr/roche-claire-eau-de-source-de-montagne-plate/pr-C1826935"
+  }
+ ]
+}

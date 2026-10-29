@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=cola",
+ "status": 200,
+ "title": "Colas, Coca-Cola, Pepsi pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "COCA-COLA Boisson gazeuse aux extraits végétaux sans sucres",
+   "price": 1.82,
+   "was": null,
+   "unit": "1,04€ / l",
+   "promo": null,
+   "format": "1,75l",
+   "url": "https://www.auchan.fr/coca-cola-boisson-gazeuse-aux-extraits-vegetaux-sans-sucres/pr-C1211975"
+  },
+  {
+   "name": "COCA-COLA Boisson gazeuse aux extraits végétaux goût original",
+   "price": 1.97,
+   "was": null,
+   "unit": "1,58€ / l",
+   "promo": null,
+   "format": "1,25l",
+   "url": "https://www.auchan.fr/coca-cola-boisson-gazeuse-aux-extraits-vegetaux-gout-original/pr-C1213303"
+  },
+  {
+   "name": "COCA-COLA Boisson gazeuse aux extraits végétaux boîtes slim",
+   "price": 14.53,
+   "was": null,
+   "unit": "2,20€ / l",
+   "promo": null,
+   "format": "20x33cl",
+   "url": "https://www.auchan.fr/coca-cola-boisson-gazeuse-aux-extraits-vegetaux-boites-slim/pr-C1394041"
+  },
+  {
+   "name": "COCA-COLA Boisson gazeuse aux extraits végétaux sans sucres boîtes slim",
+   "price": 11.91,
+   "was": null,
+   "unit": "1,80€ / l",
+   "promo": null,
+   "format": "20x33cl",
+   "url": "https://www.auchan.fr/coca-cola-boisson-gazeuse-aux-extraits-vegetaux-sans-sucres-boites-slim/pr-C1394055"
+  },
+  {
+   "name": "COCA-COLA Boisson gazeuse aux extraits végétaux zéro boîtes slim",
+   "price": 7.18,
+   "was": null,
+   "unit": "1,81€ / l",
+   "promo": null,
+   "format": "12x33cl",
+   "url": "https://www.auchan.fr/coca-cola-boisson-gazeuse-aux-extraits-vegetaux-zero-boites-slim/pr-C1394015"
+  },
+  {
+   "name": "COCA-COLA Boisson gazeuse aux extraits végétaux goût original",
+   "price": 11.8,
+   "was": null,
+   "unit": "1,57€ / l",
+   "promo": null,
+   "format": "6x1,25l",
+   "url": "https://www.auchan.fr/coca-cola-boisson-gazeuse-aux-extraits-vegetaux-gout-original/pr-C1213302"
+  },
+  {
+   "name": "COCA-COLA Boisson gazeuse aux extraits végétaux sans sucres",
+   "price": 9.09,
+   "was": null,
+   "unit": "1,21€ / l",
+   "promo": null,
+   "format": "6x1,25l",
+   "url": "https://www.auchan.fr/coca-cola-boisson-gazeuse-aux-extraits-vegetaux-sans-sucres/pr-C1212004"
+  },
+  {
+   "name": "COCA-COLA Boisson gazeuse aux extraits végétaux arôme cerise",
+   "price": 1.88,
+   "was": null,
+   "unit": "1,50€ / l",
+   "promo": null,
+   "format": "1,25l",
+   "url": "https://www.auchan.fr/coca-cola-boisson-gazeuse-aux-extraits-vegetaux-arome-cerise/pr-C1213301"
+  }
+ ]
+}

@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=jus%20d%27orange",
+ "status": 200,
+ "title": "Votre recherche jus d'orange sur Auchan.fr",
+ "products": [
+  {
+   "name": "MONTEBELO BRASIL Pur jus d'orange sans pulpe",
+   "price": 2.79,
+   "was": null,
+   "unit": "2,79€ / l",
+   "promo": null,
+   "format": "1l",
+   "url": "https://www.auchan.fr/montebelo-brasil-pur-jus-d-orange-sans-pulpe/pr-C1789172"
+  },
+  {
+   "name": "TROPICANA Pur jus d'orange sans pulpe",
+   "price": 2.85,
+   "was": null,
+   "unit": "3,17€ / l",
+   "promo": null,
+   "format": "90cl",
+   "url": "https://www.auchan.fr/tropicana-pur-jus-d-orange-sans-pulpe/pr-C1183385"
+  },
+  {
+   "name": "TROPICANA Pur jus d'oranges sanguinello orange sanguine pressée avec pulpe",
+   "price": 3.99,
+   "was": null,
+   "unit": "4,43€ / l",
+   "promo": null,
+   "format": "90cl",
+   "url": "https://www.auchan.fr/tropicana-pur-jus-d-oranges-sanguinello-orange-sanguine-pressee-avec-pulpe/pr-C1183363"
+  },
+  {
+   "name": "AUCHAN Pur jus d'orange sans pulpe",
+   "price": 2.58,
+   "was": null,
+   "unit": "2,58€ / l",
+   "promo": null,
+   "format": "1L",
+   "url": "https://www.auchan.fr/auchan-pur-jus-d-orange-sans-pulpe/pr-C1198536"
+  },
+  {
+   "name": "MONTEBELO BRASIL Pur jus d'orange avec pulpe",
+   "price": 2.79,
+   "was": null,
+   "unit": "2,79€ / l",
+   "promo": null,
+   "format": "1l",
+   "url": "https://www.auchan.fr/montebelo-brasil-pur-jus-d-orange-avec-pulpe/pr-C1789171"
+  },
+  {
+   "name": "AUCHAN Pur jus d'orange avec pulpe",
+   "price": 2.58,
+   "was": null,
+   "unit": "2,58€ / l",
+   "promo": null,
+   "format": "1L",
+   "url": "https://www.auchan.fr/auchan-pur-jus-d-orange-avec-pulpe/pr-C1200593"
+  },
+  {
+   "name": "ANDROS Pur jus d'orange pressée sans pulpe",
+   "price": 5.39,
+   "was": null,
+   "unit": "3,59€ / l",
+   "promo": null,
+   "format": "1,5L",
+   "url": "https://www.auchan.fr/andros-pur-jus-d-orange-pressee-sans-pulpe/pr-C1197888"
+  },
+  {
+   "name": "TROPICANA Pur jus d'orange pressée avec pulpe",
+   "price": 2.95,
+   "was": null,
+   "unit": "3,28€ / l",
+   "promo": null,
+   "format": "90cl",
+   "url": "https://www.auchan.fr/tropicana-pur-jus-d-orange-pressee-avec-pulpe/pr-C1183388"
+  }
+ ]
+}

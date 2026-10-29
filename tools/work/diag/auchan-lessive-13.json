@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=lessive%20liquide",
+ "status": 200,
+ "title": "Lessives liquides pas cher à prix Auchan",
+ "products": [
+  {
+   "name": "X-TRA Express Lessive liquide efficacité",
+   "price": 3.59,
+   "was": 5.99,
+   "unit": "2,85€ / l",
+   "promo": "-40 %",
+   "format": "1.26l",
+   "url": "https://www.auchan.fr/x-tra-express-lessive-liquide-efficacite/pr-C1881285"
+  },
+  {
+   "name": "SKIP Lessive liquide Mon Cycle Court Parfait Efficacité Express",
+   "price": 7.19,
+   "was": 11.99,
+   "unit": "4,85€ / l",
+   "promo": "-40 %",
+   "format": "1.482l",
+   "url": "https://www.auchan.fr/skip-lessive-liquide-mon-cycle-court-parfait-efficacite-express/pr-C1862286"
+  },
+  {
+   "name": "X-TRA Express Lessive liquide anti-odeurs",
+   "price": 3.59,
+   "was": 5.99,
+   "unit": "2,85€ / l",
+   "promo": "-40 %",
+   "format": "1.26l",
+   "url": "https://www.auchan.fr/x-tra-express-lessive-liquide-anti-odeurs/pr-C1881286"
+  },
+  {
+   "name": "X-TRA Express Lessive liquide fibres et couleurs",
+   "price": 3.59,
+   "was": 5.99,
+   "unit": "2,85€ / l",
+   "promo": "-40 %",
+   "format": "1.26l",
+   "url": "https://www.auchan.fr/x-tra-express-lessive-liquide-fibres-et-couleurs/pr-C1881239"
+  },
+  {
+   "name": "SKIP Lessive Liquide Mon Cycle Court Parfait Intensité Max Sport Active",
+   "price": 7.19,
+   "was": 11.99,
+   "unit": "4,85€ / l",
+   "promo": "-40 %",
+   "format": "1,482l",
+   "url": "https://www.auchan.fr/skip-lessive-liquide-mon-cycle-court-parfait-intensite-max-sport-active/pr-C1862289"
+  },
+  {
+   "name": "SKIP Lessive Liquide Mon Cycle Court Parfait Intensité Fraîcheur Sublime",
+   "price": 7.19,
+   "was": 11.99,
+   "unit": "4,85€ / l",
+   "promo": "-40 %",
+   "format": "1.482l",
+   "url": "https://www.auchan.fr/skip-lessive-liquide-mon-cycle-court-parfait-intensite-fraicheur-sublime/pr-C1862282"
+  },
+  {
+   "name": "GENIE Lessive liquide fleurs fraîches",
+   "price": 9.99,
+   "was": null,
+   "unit": "3,96€ / l",
+   "promo": "-50% sur le 2ème",
+   "format": "2,52l",
+   "url": "https://www.auchan.fr/genie-lessive-liquide-fleurs-fraiches/pr-C1829423"
+  },
+  {
+   "name": "X-TRA Lessive liquide evasion maroc",
+   "price": 8.06,
+   "was": null,
+   "unit": "4,07€ / l",
+   "promo": "-80% sur le 2ème",
+   "format": "1,98l",
+   "url": "https://www.auchan.fr/x-tra-lessive-liquide-evasion-maroc/pr-C1856098"
+  }
+ ]
+}

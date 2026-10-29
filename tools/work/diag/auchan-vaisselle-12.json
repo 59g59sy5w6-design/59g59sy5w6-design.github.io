@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=liquide%20vaisselle",
+ "status": 200,
+ "title": "Liquide vaisselle pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "MIR Liquide vaisselle secret de japon fleur de lotus cerisier",
+   "price": 1.55,
+   "was": null,
+   "unit": "2,30€ / l",
+   "promo": "50 % cagnottés tous les 4 €",
+   "format": "0,675l",
+   "url": "https://www.auchan.fr/mir-liquide-vaisselle-secret-de-japon-fleur-de-lotus-cerisier/pr-C1786884"
+  },
+  {
+   "name": "AUCHAN Liquide vaisselle flacon super dégraissant au vinaigre de framboise",
+   "price": 1.32,
+   "was": null,
+   "unit": "1,76€ / l",
+   "promo": "cagnottés",
+   "format": "750ml",
+   "url": "https://www.auchan.fr/auchan-liquide-vaisselle-flacon-super-degraissant-au-vinaigre-de-framboise/pr-C1879995"
+  },
+  {
+   "name": "L'ARBRE VERT Recharge liquide vaisselle mains peaux sensibles sans parfum",
+   "price": 2.63,
+   "was": null,
+   "unit": "2,63€ / l",
+   "promo": null,
+   "format": "1l",
+   "url": "https://www.auchan.fr/l-arbre-vert-recharge-liquide-vaisselle-mains-peaux-sensibles-sans-parfum/pr-C1630688"
+  },
+  {
+   "name": "PAIC Excel 24h liquide vaisselle ultra dégraissant mandarine",
+   "price": 2.54,
+   "was": null,
+   "unit": "5,08€ / l",
+   "promo": null,
+   "format": "0,5l",
+   "url": "https://www.auchan.fr/paic-excel-24h-liquide-vaisselle-ultra-degraissant-mandarine/pr-C1857970"
+  },
+  {
+   "name": "AUCHAN BETTER LIFE Liquide vaisselle dégraissant aloe vera",
+   "price": 1.38,
+   "was": null,
+   "unit": "2,76€ / l",
+   "promo": null,
+   "format": "500ml",
+   "url": "https://www.auchan.fr/auchan-better-life-liquide-vaisselle-degraissant-aloe-vera/pr-C1331906"
+  },
+  {
+   "name": "AUCHAN Liquide vaisselle dégraissant fleurs de cerisier",
+   "price": 0.71,
+   "was": null,
+   "unit": "1,42€ / l",
+   "promo": null,
+   "format": "500ml",
+   "url": "https://www.auchan.fr/auchan-liquide-vaisselle-degraissant-fleurs-de-cerisier/pr-C1882638"
+  },
+  {
+   "name": "POUCE Liquide vaisselle citron",
+   "price": 0.7,
+   "was": null,
+   "unit": "0,70€ / l",
+   "promo": null,
+   "format": "1l",
+   "url": "https://www.auchan.fr/pouce-liquide-vaisselle-citron/pr-C1608060"
+  },
+  {
+   "name": "MIR Mousse active liquide vaisselle dégraissant fruits rouges",
+   "price": 2.15,
+   "was": null,
+   "unit": "3,19€ / l",
+   "promo": "50 % cagnottés tous les 4 €",
+   "format": "675ml",
+   "url": "https://www.auchan.fr/mir-mousse-active-liquide-vaisselle-degraissant-fruits-rouges/pr-C1858434"
+  }
+ ]
+}

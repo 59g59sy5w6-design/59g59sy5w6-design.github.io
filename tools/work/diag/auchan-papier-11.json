@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=papier%20toilette",
+ "status": 200,
+ "title": "Papier toilette pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "AUCHAN Papier toilette blanc ultra doux et moelleux 3 épaisseurs",
+   "price": 4.93,
+   "was": null,
+   "unit": null,
+   "promo": null,
+   "format": "12 rouleaux",
+   "url": "https://www.auchan.fr/auchan-papier-toilette-blanc-ultra-doux-et-moelleux-3-epaisseurs/pr-C1224204"
+  },
+  {
+   "name": "FLOREX Papier toilette blanc 2 épaisseurs",
+   "price": 3.19,
+   "was": null,
+   "unit": null,
+   "promo": null,
+   "format": "18 rouleaux",
+   "url": "https://www.auchan.fr/florex-papier-toilette-blanc-2-epaisseurs/pr-C1186594"
+  },
+  {
+   "name": "AUCHAN Papier toilette blanc ultra doux et moelleux 3 épaisseurs",
+   "price": 2.57,
+   "was": null,
+   "unit": null,
+   "promo": "cagnottés",
+   "format": "6 rouleaux",
+   "url": "https://www.auchan.fr/auchan-papier-toilette-blanc-ultra-doux-et-moelleux-3-epaisseurs/pr-C1224110"
+  },
+  {
+   "name": "RENOVA Papier toilette blanc souple et doux 2 épaisseurs ultra soin",
+   "price": 6.99,
+   "was": null,
+   "unit": null,
+   "promo": null,
+   "format": "24 rouleaux",
+   "url": "https://www.auchan.fr/renova-papier-toilette-blanc-souple-et-doux-2-epaisseurs-ultra-soin/pr-C1784504"
+  },
+  {
+   "name": "AUCHAN Papier toilette blanc ultra moelleux 5 épaisseurs",
+   "price": 3.66,
+   "was": null,
+   "unit": null,
+   "promo": null,
+   "format": "6 rouleaux",
+   "url": "https://www.auchan.fr/auchan-papier-toilette-blanc-ultra-moelleux-5-epaisseurs/pr-C1223893"
+  },
+  {
+   "name": "AUCHAN Papier toilette rose maxi doux et résistant 2 épaisseurs",
+   "price": 7.49,
+   "was": null,
+   "unit": null,
+   "promo": null,
+   "format": "24 rouleaux",
+   "url": "https://www.auchan.fr/auchan-papier-toilette-rose-maxi-doux-et-resistant-2-epaisseurs/pr-C1224111"
+  },
+  {
+   "name": "RENOVA Papier toilette blanc souple et doux 2 épaisseurs",
+   "price": 3.89,
+   "was": null,
+   "unit": null,
+   "promo": "-50% sur le 2ème",
+   "format": "12 rouleaux",
+   "url": "https://www.auchan.fr/renova-papier-toilette-blanc-souple-et-doux-2-epaisseurs/pr-C1233842"
+  },
+  {
+   "name": "LOTUS Papier toilette blanc ultra doux aquatube 2 épaisseurs",
+   "price": 4.23,
+   "was": null,
+   "unit": null,
+   "promo": null,
+   "format": "6 rouleaux",
+   "url": "https://www.auchan.fr/lotus-papier-toilette-blanc-ultra-doux-aquatube-2-epaisseurs/pr-C1234083"
+  }
+ ]
+}

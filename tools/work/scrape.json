@@ -1,0 +1,119 @@
+[
+ {
+  "retailer": "auchan",
+  "rayon": "eaux",
+  "url": "https://www.auchan.fr/recherche?text=eau%20plate",
+  "status": 200,
+  "products": 55,
+  "error": null,
+  "title": "Eaux plates natures pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "jus",
+  "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange",
+  "status": 200,
+  "products": 89,
+  "error": null,
+  "title": "Votre recherche jus d'orange sur Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "sodas",
+  "url": "https://www.auchan.fr/recherche?text=cola",
+  "status": 200,
+  "products": 46,
+  "error": null,
+  "title": "Colas, Coca-Cola, Pepsi pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "lait",
+  "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9",
+  "status": 200,
+  "products": 38,
+  "error": null,
+  "title": "Lait demi-écrémé pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "yaourts",
+  "url": "https://www.auchan.fr/recherche?text=yaourt%20nature",
+  "status": 200,
+  "products": 135,
+  "error": null,
+  "title": "Yaourts nature pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "fromages",
+  "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9",
+  "status": 200,
+  "products": 86,
+  "error": null,
+  "title": "Fromages râpés, parmesan pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "pates",
+  "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes",
+  "status": 200,
+  "products": 60,
+  "error": null,
+  "title": "Pâtes pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "conserves",
+  "url": "https://www.auchan.fr/recherche?text=sardines",
+  "status": 200,
+  "products": 78,
+  "error": null,
+  "title": "Votre recherche sardines sur Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "cafe",
+  "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu",
+  "status": 200,
+  "products": 90,
+  "error": null,
+  "title": "Café moulu pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "gateaux",
+  "url": "https://www.auchan.fr/recherche?text=madeleines",
+  "status": 200,
+  "products": 76,
+  "error": null,
+  "title": "Votre recherche madeleines sur Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "papier",
+  "url": "https://www.auchan.fr/recherche?text=papier%20toilette",
+  "status": 200,
+  "products": 60,
+  "error": null,
+  "title": "Papier toilette pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "vaisselle",
+  "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle",
+  "status": 200,
+  "products": 57,
+  "error": null,
+  "title": "Liquide vaisselle pas cher - Auchan.fr"
+ },
+ {
+  "retailer": "auchan",
+  "rayon": "lessive",
+  "url": "https://www.auchan.fr/recherche?text=lessive%20liquide",
+  "status": 200,
+  "products": 150,
+  "error": null,
+  "title": "Lessives liquides pas cher à prix Auchan"
+ }
+]

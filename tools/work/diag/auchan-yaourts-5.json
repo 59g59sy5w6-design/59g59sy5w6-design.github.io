@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=yaourt%20nature",
+ "status": 200,
+ "title": "Yaourts nature pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "GERVITA Fromage blanc mousse nature",
+   "price": 3.51,
+   "was": null,
+   "unit": "4,39€ / kg",
+   "promo": null,
+   "format": "8x100g",
+   "url": "https://www.auchan.fr/gervita-fromage-blanc-mousse-nature/pr-C1176387"
+  },
+  {
+   "name": "DANONE Cottage cheese Fromage nature salé à tartiner",
+   "price": 3.88,
+   "was": null,
+   "unit": "9,70€ / kg",
+   "promo": null,
+   "format": "400g",
+   "url": "https://www.auchan.fr/danone-cottage-cheese-fromage-nature-sale-a-tartiner/pr-C1869005"
+  },
+  {
+   "name": "AUCHAN Mousse sur fromage frais nature",
+   "price": 2.96,
+   "was": null,
+   "unit": "3,70€ / kg",
+   "promo": null,
+   "format": "8x100g",
+   "url": "https://www.auchan.fr/auchan-mousse-sur-fromage-frais-nature/pr-C1177459"
+  },
+  {
+   "name": "FJORD Yaourt fromage blanc nature",
+   "price": 3.45,
+   "was": null,
+   "unit": "3,45€ / kg",
+   "promo": null,
+   "format": "8x125g",
+   "url": "https://www.auchan.fr/fjord-yaourt-fromage-blanc-nature/pr-C1171809"
+  },
+  {
+   "name": "FJORD Yaourt fromage blanc nature",
+   "price": 2.11,
+   "was": null,
+   "unit": "4,22€ / kg",
+   "promo": null,
+   "format": "4x125g",
+   "url": "https://www.auchan.fr/fjord-yaourt-fromage-blanc-nature/pr-C1171810"
+  },
+  {
+   "name": "AUCHAN Spécialité laitière Stracciatella au fromage blanc",
+   "price": 1.76,
+   "was": null,
+   "unit": "3,67€ / kg",
+   "promo": null,
+   "format": "4x120g",
+   "url": "https://www.auchan.fr/auchan-specialite-laitiere-stracciatella-au-fromage-blanc/pr-C1816764"
+  },
+  {
+   "name": "GERVITA Fromage blanc mousse nature",
+   "price": 1.92,
+   "was": null,
+   "unit": "4,80€ / kg",
+   "promo": null,
+   "format": "4x100g",
+   "url": "https://www.auchan.fr/gervita-fromage-blanc-mousse-nature/pr-C1178093"
+  },
+  {
+   "name": "AUCHAN Mousse sur fromage frais nature",
+   "price": 1.59,
+   "was": null,
+   "unit": "3,98€ / kg",
+   "promo": null,
+   "format": "4x100g",
+   "url": "https://www.auchan.fr/auchan-mousse-sur-fromage-frais-nature/pr-C1177460"
+  }
+ ]
+}

@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=p%C3%A2tes",
+ "status": 200,
+ "title": "Pâtes pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "BARILLA Penne rigate",
+   "price": 1.09,
+   "was": null,
+   "unit": "2,18€ / kg",
+   "promo": null,
+   "format": "500g",
+   "url": "https://www.auchan.fr/barilla-penne-rigate/pr-C1241597"
+  },
+  {
+   "name": "RUMMO Fusilli n°48",
+   "price": 2.3,
+   "was": null,
+   "unit": "4,60€ / kg",
+   "promo": null,
+   "format": "500g",
+   "url": "https://www.auchan.fr/rummo-fusilli-n48/pr-C1229762"
+  },
+  {
+   "name": "AUCHAN Penne rigate",
+   "price": 0.71,
+   "was": null,
+   "unit": "1,42€ / kg",
+   "promo": "cagnottés",
+   "format": "500g",
+   "url": "https://www.auchan.fr/auchan-penne-rigate/pr-C1241074"
+  },
+  {
+   "name": "RUMMO Spaghetti grossi n°5",
+   "price": 2.27,
+   "was": null,
+   "unit": "4,54€ / kg",
+   "promo": null,
+   "format": "500g",
+   "url": "https://www.auchan.fr/rummo-spaghetti-grossi-n5/pr-C1229760"
+  },
+  {
+   "name": "AUCHAN Spaghetti",
+   "price": 0.79,
+   "was": null,
+   "unit": "1,58€ / kg",
+   "promo": "cagnottés",
+   "format": "500g",
+   "url": "https://www.auchan.fr/auchan-spaghetti/pr-C1241236"
+  },
+  {
+   "name": "AUCHAN Farfalle",
+   "price": 0.8,
+   "was": null,
+   "unit": "1,60€ / kg",
+   "promo": null,
+   "format": "500g",
+   "url": "https://www.auchan.fr/auchan-farfalle/pr-C1241150"
+  },
+  {
+   "name": "BARILLA Penne rigate",
+   "price": 2.06,
+   "was": null,
+   "unit": "2,06€ / kg",
+   "promo": null,
+   "format": "1kg",
+   "url": "https://www.auchan.fr/barilla-penne-rigate/pr-C1224575"
+  },
+  {
+   "name": "BARILLA Pipe rigate",
+   "price": 1.17,
+   "was": null,
+   "unit": "2,34€ / kg",
+   "promo": null,
+   "format": "500g",
+   "url": "https://www.auchan.fr/barilla-pipe-rigate/pr-C1241596"
+  }
+ ]
+}

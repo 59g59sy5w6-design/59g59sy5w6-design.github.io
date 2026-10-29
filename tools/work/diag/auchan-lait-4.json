@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9",
+ "status": 200,
+ "title": "Lait demi-écrémé pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "CANDIA Grandlait Lait frais demi-écrémé de montagne",
+   "price": 1.35,
+   "was": null,
+   "unit": "1,35€ / l",
+   "promo": "-50% sur le 2ème",
+   "format": "1l",
+   "url": "https://www.auchan.fr/candia-grandlait-lait-frais-demi-ecreme-de-montagne/pr-C1171071"
+  },
+  {
+   "name": "AUCHAN Lait facile à digérer sans lactose",
+   "price": 5.76,
+   "was": null,
+   "unit": "1,92€ / l",
+   "promo": "50 % cagnottés sur le 2ème",
+   "format": "6x50cl",
+   "url": "https://www.auchan.fr/auchan-lait-facile-a-digerer-sans-lactose/pr-C1866970"
+  },
+  {
+   "name": "AUCHAN Lait hyper protéiné UHT",
+   "price": 10.03,
+   "was": null,
+   "unit": "1,67€ / l",
+   "promo": null,
+   "format": "6x1l",
+   "url": "https://www.auchan.fr/auchan-lait-hyper-proteine-uht/pr-C1876974"
+  },
+  {
+   "name": "AUCHAN BIO CULTIVONS LE BON - Lait demi-écrémé stérilisé UHT",
+   "price": 6.91,
+   "was": null,
+   "unit": "1,15€ / l",
+   "promo": null,
+   "format": "6x1l",
+   "url": "https://www.auchan.fr/auchan-bio-cultivons-le-bon-lait-demi-ecreme-sterilise-uht/pr-C1170544"
+  },
+  {
+   "name": "CANDIA Grandlait Lait demi-écrémé",
+   "price": 12.84,
+   "was": null,
+   "unit": "1,28€ / l",
+   "promo": null,
+   "format": "10x1l",
+   "url": "https://www.auchan.fr/candia-grandlait-lait-demi-ecreme/pr-C1171026"
+  },
+  {
+   "name": "C'EST QUI LE PATRON ?! Lait demi-écrémé équitable UHT",
+   "price": 7.62,
+   "was": null,
+   "unit": "1,27€ / l",
+   "promo": null,
+   "format": "6x1L",
+   "url": "https://www.auchan.fr/c-est-qui-le-patron-lait-demi-ecreme-equitable-uht/pr-C1169523"
+  },
+  {
+   "name": "CANDIA Viva Lait vitaminé UHT",
+   "price": 7.26,
+   "was": null,
+   "unit": "1,21€ / l",
+   "promo": null,
+   "format": "6x1L",
+   "url": "https://www.auchan.fr/candia-viva-lait-vitamine-uht/pr-C1177788"
+  },
+  {
+   "name": "AUCHAN SOLIDAIRES CULTIVONS LE BON Lait demi-écrémé UHT",
+   "price": 5.04,
+   "was": null,
+   "unit": "1,68€ / l",
+   "promo": null,
+   "format": "6x50cl",
+   "url": "https://www.auchan.fr/auchan-solidaires-cultivons-le-bon-lait-demi-ecreme-uht/pr-C1170534"
+  }
+ ]
+}

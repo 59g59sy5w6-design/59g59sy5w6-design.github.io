@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=sardines",
+ "status": 200,
+ "title": "Votre recherche sardines sur Auchan.fr",
+ "products": [
+  {
+   "name": "POUCE Sardines à l'huile de tournesol",
+   "price": 0.85,
+   "was": null,
+   "unit": "7,08€ / kg",
+   "promo": null,
+   "format": "84g",
+   "url": "https://www.auchan.fr/pouce-sardines-a-l-huile-de-tournesol/pr-C1224708"
+  },
+  {
+   "name": "CONNETABLE Sardines à l'huile d'olive vierge",
+   "price": 2.91,
+   "was": null,
+   "unit": "21,56€ / kg",
+   "promo": null,
+   "format": "135g",
+   "url": "https://www.auchan.fr/connetable-sardines-a-l-huile-d-olive-vierge/pr-C1233383"
+  },
+  {
+   "name": "CONNETABLE Sardines généreuses à l'huile d'olive",
+   "price": 3.86,
+   "was": null,
+   "unit": "13,79€ / kg",
+   "promo": null,
+   "format": "2x140g",
+   "url": "https://www.auchan.fr/connetable-sardines-genereuses-a-l-huile-d-olive/pr-C1230346"
+  },
+  {
+   "name": "CONNETABLE La sardine nature préparée en Bretagne",
+   "price": 2.3,
+   "was": null,
+   "unit": "24,21€ / kg",
+   "promo": null,
+   "format": "95g",
+   "url": "https://www.auchan.fr/connetable-la-sardine-nature-preparee-en-bretagne/pr-C1228144"
+  },
+  {
+   "name": "MOUETTES D'ARVOR Sardines à l'huile d'olive vierge extra et citron",
+   "price": 3.6,
+   "was": null,
+   "unit": "31,30€ / kg",
+   "promo": null,
+   "format": "115g",
+   "url": "https://www.auchan.fr/mouettes-d-arvor-sardines-a-l-huile-d-olive-vierge-extra-et-citron/pr-C1225836"
+  },
+  {
+   "name": "CONNETABLE Sardines à la purée de Piment d'Espelette",
+   "price": 2.89,
+   "was": null,
+   "unit": "21,41€ / kg",
+   "promo": null,
+   "format": "135g",
+   "url": "https://www.auchan.fr/connetable-sardines-a-la-puree-de-piment-d-espelette/pr-C1233389"
+  },
+  {
+   "name": "AUCHAN Sardines à l'huile d'olive extra bio",
+   "price": 2.29,
+   "was": null,
+   "unit": "28,63€ / kg",
+   "promo": null,
+   "format": "115g",
+   "url": "https://www.auchan.fr/auchan-sardines-a-l-huile-d-olive-extra-bio/pr-C1224194"
+  },
+  {
+   "name": "AUCHAN Sardines à la tomate",
+   "price": 1.42,
+   "was": null,
+   "unit": "16,14€ / kg",
+   "promo": null,
+   "format": "135g",
+   "url": "https://www.auchan.fr/auchan-sardines-a-la-tomate/pr-C1227147"
+  }
+ ]
+}

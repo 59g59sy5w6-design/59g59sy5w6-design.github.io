@@ -1,0 +1,79 @@
+{
+ "src": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9",
+ "status": 200,
+ "title": "Fromages râpés, parmesan pas cher - Auchan.fr",
+ "products": [
+  {
+   "name": "AMBROSI Parmigiano Reggiano AOP 12 mois",
+   "price": 5.49,
+   "was": null,
+   "unit": "27,45€ / kg",
+   "promo": "10% Jour W! cagnottés",
+   "format": "200g",
+   "url": "https://www.auchan.fr/ambrosi-parmigiano-reggiano-aop-12-mois/pr-C1852797"
+  },
+  {
+   "name": "PRESIDENT Emmental râpé fondant",
+   "price": 3.66,
+   "was": null,
+   "unit": "8,04€ / kg",
+   "promo": null,
+   "format": "455g",
+   "url": "https://www.auchan.fr/president-emmental-rape-fondant/pr-C1181081"
+  },
+  {
+   "name": "AUCHAN Emmental râpé français",
+   "price": 2.95,
+   "was": null,
+   "unit": "8,43€ / kg",
+   "promo": "cagnottés",
+   "format": "350g",
+   "url": "https://www.auchan.fr/auchan-emmental-rape-francais/pr-C1199997"
+  },
+  {
+   "name": "AUCHAN Emmental râpé français",
+   "price": 1.99,
+   "was": null,
+   "unit": "9,48€ / kg",
+   "promo": "cagnottés",
+   "format": "3x70g",
+   "url": "https://www.auchan.fr/auchan-emmental-rape-francais/pr-C1199998"
+  },
+  {
+   "name": "AUCHAN Emmental râpé français",
+   "price": 5.91,
+   "was": null,
+   "unit": "7,88€ / kg",
+   "promo": null,
+   "format": "750g",
+   "url": "https://www.auchan.fr/auchan-emmental-rape-francais/pr-C1196271"
+  },
+  {
+   "name": "PRESIDENT Emmental râpé fondant",
+   "price": 2.08,
+   "was": null,
+   "unit": "10,40€ / kg",
+   "promo": null,
+   "format": "200g",
+   "url": "https://www.auchan.fr/president-emmental-rape-fondant/pr-C1180705"
+  },
+  {
+   "name": "POUCE Emmental Rapé",
+   "price": 1.6,
+   "was": null,
+   "unit": "8,00€ / kg",
+   "promo": null,
+   "format": "200g",
+   "url": "https://www.auchan.fr/pouce-emmental-rape/pr-C1825638"
+  },
+  {
+   "name": "ENTREMONT Emmental râpé Français fin et fondant",
+   "price": 1.87,
+   "was": null,
+   "unit": "11,69€ / kg",
+   "promo": null,
+   "format": "160g",
+   "url": "https://www.auchan.fr/entremont-emmental-rape-francais-fin-et-fondant/pr-C1193503"
+  }
+ ]
+}
