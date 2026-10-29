@@ -14,7 +14,7 @@ if [ "${DIAG:-false}" = "true" ]; then
   git config user.name "github-actions[bot]"
   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
   git checkout -q -B diag
-  git add -f tools/work/scrape.json tools/work/diag
+  git add -f tools/work/scrape.json tools/work/diag tools/work/fetches.json
   git commit -q -m "Diagnostic du relevé $(date -u +%Y-%m-%dT%H:%MZ)" || true
   git push -q -f origin diag
   exit 0

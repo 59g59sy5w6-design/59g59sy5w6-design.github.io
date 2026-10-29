@@ -131,6 +131,14 @@ for r in raw:
             continue
         fmt = r.get('format') or ''
         brand, label = split_brand_prefix(name)
+        if not brand and ret == 'auchan':
+            # Auchan écrit la marque en capitales devant la désignation : « ST MICHEL Petites madeleines »
+            toks = name.split()
+            i = 0
+            while i < len(toks) - 1 and UPPER_TOKEN.match(toks[i]) and re.search(r'[A-ZÀ-Þ]', toks[i]):
+                i += 1
+            if i:
+                brand, label = canon_brand(' '.join(toks[:i])), ' '.join(toks[i:]).lstrip(' -–')
         url = r.get('url')
         ean = None
         if ret == 'houra':
@@ -172,11 +180,14 @@ for r in raw:
             if abs(float(r['price']) - exp) > UNIT_TOL * max(float(r['price']), exp) and not explained(float(r['price']) / exp, qty, qtext):
                 doubt = round(exp, 2)
                 doubtful.append((ret, ray, r['src'], r.get('name') or r.get('title'), r['price'], r.get('unit'), doubt))
+    promo = r.get('promo')
+    if promo and re.fullmatch(r'\s*cagnott[ée]s\s*', promo, re.I):
+        promo = None
     items.append({
         'doubt': doubt,
         'ret': ret, 'ray': ray, 'rid': f"{ret}:{rid}", 'brand': brand, 'label': label, 'fmt_raw': fmt,
         'qty': qty, 'rolls': rolls, 'lav': lav, 'price': round(float(r['price']), 2), 'was': r.get('was'),
-        'promo': r.get('promo'), 'url': url, 'ean': ean, 'ts': r['ts'], 'src': r['src'], 'pos': r['pos'],
+        'promo': promo, 'url': url, 'ean': ean, 'ts': r['ts'], 'src': r['src'], 'pos': r['pos'],
         'full': r.get('name') or r.get('title'),
     })
 
