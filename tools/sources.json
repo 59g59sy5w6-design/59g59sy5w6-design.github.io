@@ -449,5 +449,11 @@
    "url": "https://www.houra.fr/catalogue/entretien/lessive-liquide-B1557353-1.html",
    "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
   }
- ]
+ ],
+ "robot": {
+  "houra": true,
+  "monoprix": false,
+  "carrefour": false
+ },
+ "robot_note": "Le 29 octobre 2026, depuis GitHub Actions, Monoprix répond par une page de vérification humaine et Carrefour par une page d'attente anti-robot (403). Ces deux enseignes sont relues par Claude avec WebFetch (voir CLAUDE.md), jamais en contournant leur protection."
 }

@@ -35,6 +35,16 @@ function extractInPage(cfg) {
   const UNIT = /(\d{1,4}[,.]\d{2})\s?€\s?\/\s?(kg|kilo|l|litre|unité|unite|pièce|piece|article|lavage|rouleau|100\s?g|100\s?ml)\b/i;
   const text = (el) => (el ? (el.innerText || el.textContent || "").replace(/ /g, " ").trim() : "");
   const num = (m) => (m[1] != null ? parseFloat(m[1] + "." + m[2]) : parseFloat(m[3] + "." + m[4]));
+  const hidden = (el) => /(sr-only|visually-hidden|screen-reader)/i.test(typeof el.className === "string" ? el.className : "");
+  const struckEl = (el, tile) => {
+    for (let e = el; e && e !== tile.parentElement; e = e.parentElement) {
+      if (/^(DEL|S|STRIKE)$/.test(e.tagName)) return true;
+      const c = typeof e.className === "string" ? e.className : "";
+      if (/(line-through|strike|crossed|old-?price|price-?old|prix-?barre|barre)/i.test(c)) return true;
+      try { if ((getComputedStyle(e).textDecorationLine || "").includes("line-through")) return true; } catch (err) { /* élément détaché */ }
+    }
+    return false;
+  };
   const out = [];
   for (const [href, as] of groups) {
     let tile = null;
@@ -46,37 +56,48 @@ function extractInPage(cfg) {
     if (!tile) continue;
     const full = text(tile);
     if (!full) continue;
-    // nom : le plus long texte de lien, titre ou texte alternatif d'image qui n'est pas un prix
-    const cands = [];
-    for (const a of as) { cands.push(text(a), a.getAttribute("title") || "", a.getAttribute("aria-label") || ""); }
-    tile.querySelectorAll("h1,h2,h3,h4,[class*=title],[class*=Title],[class*=name],[class*=Name],[class*=label],[class*=Label]").forEach((e) => cands.push(text(e)));
-    tile.querySelectorAll("img[alt]").forEach((i) => cands.push(i.getAttribute("alt") || ""));
-    const name = cands.map((c) => c.replace(/\s+/g, " ").trim()).filter((c) => c.length >= 4 && c.length <= 220 && !/^\d+[,.]\d{2}\s?€/.test(c) && !/^(ajouter|voir|découvrir|choisir|acheter)/i.test(c))
-      .sort((a, b) => b.length - a.length)[0] || "";
-    // prix barrés : éléments del, s, ou classes « old », « strike », « crossed », « barre »
-    const struck = new Set();
-    tile.querySelectorAll("del,s,strike,[class*=old],[class*=Old],[class*=strike],[class*=Strike],[class*=crossed],[class*=Crossed],[class*=barre],[class*=before],[class*=Before]").forEach((e) => { const t = text(e); let m; PRICE.lastIndex = 0; while ((m = PRICE.exec(t))) struck.add(num(m)); });
-    let price = null, was = null;
-    const lines = full.split(/\n+/).map((l) => l.trim()).filter(Boolean);
-    for (const l of lines) {
-      if (UNIT.test(l) || /\/\s?(kg|l|litre|kilo|unité|lavage|rouleau)\b/i.test(l)) continue;
+    // nom : l'attribut title du lien quand l'enseigne le donne complet (Houra : « Marque Désignation, contenance »),
+    // sinon le plus long texte de lien, titre ou texte alternatif d'image qui n'est pas un prix
+    let name = as.map((a) => (a.getAttribute("title") || "").trim()).find((t) => t.length >= 4) || "";
+    if (!name || cfg.retailer !== "houra") {
+      const cands = [];
+      for (const a of as) cands.push(text(a), a.getAttribute("title") || "", a.getAttribute("aria-label") || "");
+      tile.querySelectorAll("h1,h2,h3,h4,[class*=title],[class*=Title],[class*=name],[class*=Name]").forEach((e) => cands.push(text(e)));
+      tile.querySelectorAll("img[alt]").forEach((i) => cands.push(i.getAttribute("alt") || ""));
+      name = cands.map((c) => c.replace(/\s+/g, " ").trim()).filter((c) => c.length >= 4 && c.length <= 220 && !/^\d+[,.]\d{2}\s?€/.test(c) && !/^(ajouter|voir|découvrir|choisir|acheter|ouvrir)/i.test(c))
+        .sort((a, b) => b.length - a.length)[0] || "";
+    }
+    // prix : le montant affiché en plus gros caractères qui n'est ni barré, ni un prix au kilo ou au litre,
+    // ni un montant d'offre (« Cagnottez 0,23 € », « -1 € »), ni un texte masqué
+    let price = null, was = null, best = null;
+    const walker = document.createTreeWalker(tile, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const el = n.parentElement;
+      if (!el || hidden(el)) continue;
+      const t = (n.nodeValue || "").replace(/ /g, " ");
+      if (!/€/.test(t) || UNIT.test(t) || /€\s?\/\s?\w/.test(t)) continue;
+      if (el.closest("button")) continue;
+      if (/(cagnott|économ|econom|remise|offert|gagn|fidélit|fidelit|bon d|soit|avantage|crédit|credit|reduc|réduc|%|^\s*-)/i.test(t)) continue;
+      let size = 0;
+      try { size = parseFloat(getComputedStyle(el).fontSize) || 0; } catch (err) { size = 0; }
       PRICE.lastIndex = 0;
       let m;
-      while ((m = PRICE.exec(l))) {
+      while ((m = PRICE.exec(t))) {
         const v = num(m);
-        if (struck.has(v)) { if (was == null) was = v; continue; }
-        if (price == null) price = v;
+        if (struckEl(el, tile)) { if (was == null) was = v; continue; }
+        if (!best || size > best.size) best = { v, size };
       }
-      if (price != null) break;
     }
+    price = best ? best.v : null;
     if (price == null || !(price > 0)) continue;
     const um = full.match(UNIT);
     const fm = full.match(/\b(?:le|la|les|l')\s?(?:lot|pack|bouteille|bouteilles|brique|briques|pot|pots|sachet|sachets|paquet|paquets|boîte|boîtes|boite|flacon|bidon|barquette|étui|tube|rouleaux|canette|canettes|bocal)\b[^\n€]{0,70}/i)
       || full.match(/\b\d+\s?x\s?\(?\d+(?:[,.]\d+)?\s?(?:cl|l|ml|g|kg)\b[^\n€]{0,20}/i)
       || full.match(/\b\d+\s(?:pots|rouleaux|briques|bouteilles|canettes|sachets|lavages)\b/i);
-    const pm = lines.find((l) => /(-\s?\d+\s?%|\d+\s?(?:e|ème)\s(?:à|offert)|2ème|offert|cagnott|remise|payez|prenez|gratuit)/i.test(l) && l.length < 120);
+    const lines = full.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+    const pm = lines.find((l) => /(-\s?\d+\s?%|\d+\s?(?:e|ème)\s(?:à|offert)|2ème|2e\b|offert|cagnott|remise|payez|prenez|gratuit)/i.test(l) && l.length < 120 && !/€\s?\//.test(l));
     const o = { name, price, was: was != null && was > price ? was : null, unit: um ? um[0] : null, promo: pm || null };
-    if (fm) o.format = fm[0].trim();
+    if (fm && cfg.retailer !== "houra") o.format = fm[0].trim();
     if (cfg.retailer === "carrefour") { o.title = name; o.href = new URL(href).pathname; }
     else o.url = href;
     out.push(o);
@@ -103,7 +124,11 @@ async function readPage(page, src) {
 }
 
 (async () => {
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, "sources.json"), "utf8")).pages.filter((p) => !only.length || only.includes(p.retailer));
+  const conf = JSON.parse(fs.readFileSync(path.join(__dirname, "sources.json"), "utf8"));
+  const robot = conf.robot || {};
+  // une enseigne dont le site refuse les robots n'est pas relue par ce script (voir « robot » dans tools/sources.json)
+  const sources = conf.pages.filter((p) => (only.length ? only.includes(p.retailer) : robot[p.retailer] !== false));
+  console.log("Enseignes relues par le robot :", [...new Set(sources.map((p) => p.retailer))].join(", ") || "aucune");
   fs.mkdirSync(WORK, { recursive: true });
   if (diag) fs.mkdirSync(path.join(WORK, "diag"), { recursive: true });
   const browser = await chromium.launch();

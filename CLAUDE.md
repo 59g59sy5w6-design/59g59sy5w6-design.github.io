@@ -25,19 +25,24 @@ Lancer en local : `python3 -m http.server 8000` à la racine, puis ouvrir http:/
 
 ## Mettre à jour les prix
 
-Un robot relit les prix toutes les heures : `.github/workflows/prix.yml` lance `tools/ci.sh` sur GitHub Actions (à la minute 17 de chaque heure, et à la demande depuis l'onglet Actions).
+Deux sources publient sur `main`, chacune avec `tools/publish.sh`, qui repart du dernier état publié, reconstruit le catalogue avec ses propres lectures et réessaie si `main` a bougé entre-temps.
 
-1. `tools/scrape.js` ouvre chaque page de `tools/sources.json` dans Chromium (Playwright), fait défiler la page, puis lit chaque vignette produit : nom, contenance, prix, prix barré, prix à l'unité, offre, lien. Pour Houra, il suit aussi la page suivante. Une page refusée par l'enseigne est notée, sans tentative de contournement.
-2. `tools/build.py`, `tools/match.py`, `tools/make_catalog.py` reconstruisent `data/catalog.json`, `data/meta.json` et `data/status.json` (heure de vérification par enseigne). Une page illisible, ou lue de façon nettement moins complète que la fois précédente, garde les produits du relevé précédent avec leur date, pendant 21 jours au plus.
-3. Si des prix ont changé : test de l'appli (`tools/smoke.js`), comparaison (`tools/check.py`), commit `Prix du <date>` et publication. Sinon, seul `data/status.json` est publié, pour afficher l'heure de vérification.
+**Le robot GitHub, toutes les heures (Houra).** `.github/workflows/prix.yml` lance `tools/ci.sh` à la minute 17 de chaque heure (et à la demande depuis l'onglet Actions). `tools/scrape.js` ouvre chaque page Houra de `tools/sources.json` dans Chromium, fait défiler la page et lit chaque vignette : nom (attribut title du lien), prix (le montant le plus gros, ni barré, ni au kilo, ni montant d'offre), prix barré, prix au kilo, offre, lien. Monoprix et Carrefour refusent les robots depuis les serveurs de GitHub (vérification humaine, page anti-robot 403) : ils sont désactivés dans le réglage `robot` de `tools/sources.json`. Ne jamais contourner ces protections.
 
-Diagnostic : lancer le workflow avec l'option « diag ». Le compte rendu par page (`tools/work/scrape.json`) et des extraits des pages mal lues arrivent sur la branche `diag`, sans toucher à `main`.
+**Claude, plusieurs fois par jour (Monoprix et Carrefour).** Une tâche planifiée lance une session Claude Code sur ce dépôt, qui suit exactement ces étapes :
 
-Relevé à la main, si le robot ne peut pas lire une enseigne : lire les pages de `tools/sources.json` avec WebFetch et le prompt de chaque page, par séries de 8, en lançant `python3 tools/dump.py` après chaque série (`--reset` au début). Puis `bash tools/refresh.sh`, relire la sortie, commit et push.
+1. `python3 tools/dump.py --reset`
+2. Lire avec WebFetch chaque page de `tools/sources.json` dont `retailer` vaut `monoprix` ou `carrefour`, avec exactement son `url` et son `prompt`, par séries de 7 appels en parallèle. Après chaque série, lancer `python3 tools/dump.py` : il enregistre les lectures dans `tools/work/fetches.json` et affiche les pages restantes. Ne pas lire les pages Houra.
+3. Relire une fois, en fin de relevé, les pages en erreur ou vides. Une page qui échoue encore garde ses prix précédents. Si une page renvoie une vérification humaine ou un blocage, passer sans chercher à le contourner.
+4. `bash tools/publish.sh claude`, puis résumer : pages lues par enseigne, nombre de prix modifiés.
 
-`tools/state/items.json` garde les produits du dernier relevé publié : il doit rester dans le dépôt pour la reprise des pages illisibles.
+**Ce que font les scripts.** `tools/build.py`, `tools/match.py` et `tools/make_catalog.py` reconstruisent `data/catalog.json`, `data/meta.json` et `data/status.json` (heure de vérification par enseigne). Une page non lue, ou lue de façon nettement moins complète que la fois précédente, garde les produits du relevé précédent avec leur date, pendant 21 jours au plus. Si des prix ont changé : test de l'appli (`tools/smoke.js`), comparaison (`tools/check.py`) et commit `Prix du <date> (<enseignes>, <source>)`. Sinon, seul `data/status.json` est publié.
 
-L'appli va chercher les prix à chaque ouverture (le service worker sert `data/` depuis le réseau d'abord) et revérifie toutes les 10 minutes quand elle reste ouverte.
+`tools/state/items.json` garde les produits du dernier relevé publié : il doit rester dans le dépôt.
+
+Diagnostic du robot : lancer le workflow avec l'option « diag ». Il relit les trois enseignes et dépose le compte rendu par page (`tools/work/scrape.json`) et des extraits de pages sur la branche `diag`, sans toucher à `main`.
+
+L'appli va chercher les prix à chaque ouverture (le service worker sert `data/` depuis le réseau d'abord) et revérifie toutes les 10 minutes quand elle reste ouverte. Elle affiche l'heure de vérification et nomme les enseignes dont les prix sont plus anciens.
 
 ## Faire évoluer le catalogue
 
