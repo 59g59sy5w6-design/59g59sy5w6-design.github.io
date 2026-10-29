@@ -1,0 +1,27 @@
+name: Essai d'accès aux enseignes
+# Ouvre quelques pages d'enseignes depuis GitHub et note ce qui s'affiche ; compte rendu sur la branche diag-probe.
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  essai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: |
+          npm install --no-save --no-audit --no-fund playwright@1.48.2 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - run: node tools/probe.js
+      - name: Compte rendu sur la branche diag-probe
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -B diag-probe
+          git add -f tools/work/probe.json
+          git commit -q -m "Essai d'accès $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f origin diag-probe
