@@ -1,0 +1,722 @@
+{
+ "columns": [
+  "id",
+  "type",
+  "product_code",
+  "product_name",
+  "category_tag",
+  "labels_tags",
+  "origins_tags",
+  "price",
+  "price_is_discounted",
+  "price_without_discount",
+  "discount_type",
+  "price_per",
+  "currency",
+  "location_osm_id",
+  "location_osm_type",
+  "location_id",
+  "date",
+  "proof_id",
+  "receipt_quantity",
+  "owner",
+  "source",
+  "created",
+  "updated",
+  "proof_file_path",
+  "proof_mimetype",
+  "proof_type",
+  "proof_date",
+  "proof_currency",
+  "proof_receipt_price_count",
+  "proof_receipt_price_total",
+  "proof_owner",
+  "proof_source",
+  "proof_created",
+  "proof_updated",
+  "location_type",
+  "location_osm_display_name",
+  "location_osm_tag_key",
+  "location_osm_tag_value",
+  "location_osm_address_postcode",
+  "location_osm_address_city",
+  "location_osm_address_country",
+  "location_osm_address_country_code",
+  "location_osm_lat",
+  "location_osm_lon",
+  "location_website_url",
+  "location_source",
+  "location_created",
+  "location_updated"
+ ],
+ "rows": 337631,
+ "name_col": "location_osm_display_name",
+ "city_col": "location_osm_address_city",
+ "postcode_col": "location_osm_address_postcode",
+ "country_col": "location_osm_address_country",
+ "countries": {
+  "France": 216643,
+  "Deutschland": 17486,
+  "België / Belgique / Belgien": 2582,
+  "Italia": 1645,
+  "Hrvatska": 1146,
+  "Suomi / Finland": 1116,
+  "España": 1112,
+  "Österreich": 896
+ },
+ "catalog_eans": 210,
+ "enseignes": {
+  "leclerc": {
+   "prix": 61358,
+   "prix_90j": 3842,
+   "prix_30j": 1305,
+   "magasins_90j": 41,
+   "produits_90j": 2746,
+   "dernier": "2026-10-28",
+   "preuves": {
+    "PRICE_TAG": 49177,
+    "GDPR_REQUEST": 7061,
+    "RECEIPT": 5120
+   },
+   "catalogue_ean_90j": 3,
+   "idf_prix_90j": 267,
+   "idf_magasins_90j": 9,
+   "top_magasins": [
+    {
+     "magasin": "E. Leclerc, Rue de Crévic, Haut de Penoy Haut de Crévic Parc Fleuri, Vandœuvre-lès-Nancy, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54500, France",
+     "ville": "Vandœuvre-lès-Nancy",
+     "cp": "54",
+     "prix_90j": 1026,
+     "produits": 984,
+     "dernier": "2026-09-02"
+    },
+    {
+     "magasin": "E. Leclerc, 5, Rue Jean Scherbeck, Rives de Meurthe, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54100, France",
+     "ville": "Nancy",
+     "cp": "54",
+     "prix_90j": 954,
+     "produits": 832,
+     "dernier": "2026-10-22"
+    },
+    {
+     "magasin": "E.Leclerc, Rue du Canal, Canteleu, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76380, France",
+     "ville": "Canteleu",
+     "cp": "76",
+     "prix_90j": 879,
+     "produits": 387,
+     "dernier": "2026-10-21"
+    },
+    {
+     "magasin": "E.Leclerc Express, Rue Dom Calmet, Saint-Nicolas - Charles III - Ville vieille - Trois Maisons - Léopold, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54100, France",
+     "ville": "Nancy",
+     "cp": "54",
+     "prix_90j": 210,
+     "produits": 181,
+     "dernier": "2026-10-28"
+    },
+    {
+     "magasin": "E.Leclerc Levallois, 38, Rue d'Alsace, Levallois-Perret, Nanterre, Hauts-de-Seine, Île-de-France, France métropolitaine, 92300, France",
+     "ville": "Levallois-Perret",
+     "cp": "92",
+     "prix_90j": 176,
+     "produits": 145,
+     "dernier": "2026-10-26"
+    },
+    {
+     "magasin": "E.Leclerc Express, Boulevard des Aiguillettes, Reclus, Vandœuvre-lès-Nancy, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54500, France",
+     "ville": "Vandœuvre-lès-Nancy",
+     "cp": "54",
+     "prix_90j": 139,
+     "produits": 139,
+     "dernier": "2026-08-26"
+    },
+    {
+     "magasin": "E.Leclerc Drive, Rue Saint-Dizier, Centre Ville, Charles III, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54100, France",
+     "ville": "Nancy",
+     "cp": "54",
+     "prix_90j": 114,
+     "produits": 68,
+     "dernier": "2026-10-25"
+    },
+    {
+     "magasin": "Carrefour City, Avenue du Général Leclerc, Saint-Pierre, René II, Bonsecours, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54100, France",
+     "ville": "Nancy",
+     "cp": "54",
+     "prix_90j": 114,
+     "produits": 113,
+     "dernier": "2026-10-27"
+    }
+   ]
+  },
+  "auchan": {
+   "prix": 25822,
+   "prix_90j": 3130,
+   "prix_30j": 556,
+   "magasins_90j": 23,
+   "produits_90j": 2696,
+   "dernier": "2026-10-28",
+   "preuves": {
+    "PRICE_TAG": 17211,
+    "GDPR_REQUEST": 6848,
+    "RECEIPT": 1763
+   },
+   "catalogue_ean_90j": 7,
+   "idf_prix_90j": 66,
+   "idf_magasins_90j": 4,
+   "top_magasins": [
+    {
+     "magasin": "Auchan, 127, Boulevard Lobau, Saint-Pierre, René II, Bonsecours, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54100, France",
+     "ville": "Nancy",
+     "cp": "54",
+     "prix_90j": 1221,
+     "produits": 1195,
+     "dernier": "2026-10-13"
+    },
+    {
+     "magasin": "Auchan Supermarché, 1, Rue des Girondins, Les Girondins, Gerland, Lyon 7e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69007, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 800,
+     "produits": 767,
+     "dernier": "2026-08-23"
+    },
+    {
+     "magasin": "Auchan, Rue du Barrois, Zone d'activités de la Sapinière, Laxou, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54520, France",
+     "ville": "Laxou",
+     "cp": "54",
+     "prix_90j": 477,
+     "produits": 468,
+     "dernier": "2026-10-28"
+    },
+    {
+     "magasin": "Auchan Supermarché, Avenue Félix Rozier, Crest, Die, Drôme, Auvergne-Rhône-Alpes, France métropolitaine, 26400, France",
+     "ville": "Crest",
+     "cp": "26",
+     "prix_90j": 266,
+     "produits": 261,
+     "dernier": "2026-09-04"
+    },
+    {
+     "magasin": "Auchan Supermarché, Rue de Stalingrad, Capuche, Secteur 4, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38100, France",
+     "ville": "Grenoble",
+     "cp": "38",
+     "prix_90j": 179,
+     "produits": 146,
+     "dernier": "2026-10-24"
+    },
+    {
+     "magasin": "Auchan, Avenue La Bruyère, Vigny Musset, Secteur 6, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38100, France",
+     "ville": "Grenoble",
+     "cp": "38",
+     "prix_90j": 67,
+     "produits": 62,
+     "dernier": "2026-09-10"
+    },
+    {
+     "magasin": "Auchan Supermaché Charenton, Place de la Coupole, Valmy, Charenton-le-Pont, Nogent-sur-Marne, Val-de-Marne, France métropolitaine, 94220, France",
+     "ville": "Charenton-le-Pont",
+     "cp": "94",
+     "prix_90j": 61,
+     "produits": 55,
+     "dernier": "2026-10-22"
+    },
+    {
+     "magasin": "Auchan, Rue Lambert, Plateau Goyaves, Saint-Louis, Saint-Pierre, La Réunion, 97450, France",
+     "ville": "Plateau Goyaves",
+     "cp": "97",
+     "prix_90j": 24,
+     "produits": 24,
+     "dernier": "2026-10-23"
+    }
+   ]
+  },
+  "intermarche": {
+   "prix": 21610,
+   "prix_90j": 2555,
+   "prix_30j": 349,
+   "magasins_90j": 38,
+   "produits_90j": 2257,
+   "dernier": "2026-10-24",
+   "preuves": {
+    "PRICE_TAG": 15517,
+    "GDPR_REQUEST": 4227,
+    "RECEIPT": 1866
+   },
+   "catalogue_ean_90j": 0,
+   "idf_prix_90j": 30,
+   "idf_magasins_90j": 10,
+   "top_magasins": [
+    {
+     "magasin": "Intermarché Express, Cours Gambetta, La Buire, Lyon 7e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69003, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 861,
+     "produits": 834,
+     "dernier": "2026-09-23"
+    },
+    {
+     "magasin": "Intermarché Super, Rue du Bois Brochet, La Roche, Bourg-de-Thizy, Thizy-les-Bourgs, Villefranche-sur-Saône, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69240, France",
+     "ville": "Bourg-de-Thizy",
+     "cp": "69",
+     "prix_90j": 533,
+     "produits": 509,
+     "dernier": "2026-08-14"
+    },
+    {
+     "magasin": "Intermarché Super, Avenue Berthelot, Le Bachut, Lyon 8e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69008, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 335,
+     "produits": 329,
+     "dernier": "2026-09-23"
+    },
+    {
+     "magasin": "Intermarché Contact, Rue de la Plantade, Les Aires Longues, Ginasservis, Brignoles, Var, Provence-Alpes-Côte d'Azur, France métropolitaine, 83560, France",
+     "ville": "Ginasservis",
+     "cp": "83",
+     "prix_90j": 244,
+     "produits": 239,
+     "dernier": "2026-09-05"
+    },
+    {
+     "magasin": "Intermarché, Rue de Renémont, Californie, Jarville-la-Malgrange, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54140, France",
+     "ville": "Jarville-la-Malgrange",
+     "cp": "54",
+     "prix_90j": 215,
+     "produits": 193,
+     "dernier": "2026-09-30"
+    },
+    {
+     "magasin": "Intermarché Express, Rue Jules Barni, Amiens, Somme, Hauts-de-France, France métropolitaine, 80000, France",
+     "ville": "Amiens",
+     "cp": "80",
+     "prix_90j": 203,
+     "produits": 199,
+     "dernier": "2026-10-11"
+    },
+    {
+     "magasin": "Intermarché, Rue Théodore Monod, Mons-en-Barœul, Lille, Nord, Hauts-de-France, France métropolitaine, 59370, France",
+     "ville": "Mons-en-Barœul",
+     "cp": "59",
+     "prix_90j": 70,
+     "produits": 69,
+     "dernier": "2026-09-01"
+    },
+    {
+     "magasin": "Intermarché, Allée Morvan Lebesque, Les Longs Champs, Jeanne d'Arc - Longs Champs - Beaulieu, Quartiers Nord-Est, Rennes, Ille-et-Vilaine, Bretagne, France métropolitaine, 35700, France",
+     "ville": "Rennes",
+     "cp": "35",
+     "prix_90j": 14,
+     "produits": 11,
+     "dernier": "2026-10-24"
+    }
+   ]
+  },
+  "u": {
+   "prix": 17089,
+   "prix_90j": 5027,
+   "prix_30j": 850,
+   "magasins_90j": 26,
+   "produits_90j": 3852,
+   "dernier": "2026-10-27",
+   "preuves": {
+    "PRICE_TAG": 14948,
+    "RECEIPT": 2141
+   },
+   "catalogue_ean_90j": 9,
+   "idf_prix_90j": 14,
+   "idf_magasins_90j": 3,
+   "top_magasins": [
+    {
+     "magasin": "Super U, Boulevard Yves Farge, Le Bon Lait, Gerland, Lyon 7e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69007, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 1409,
+     "produits": 1319,
+     "dernier": "2026-10-04"
+    },
+    {
+     "magasin": "U Express Lyon Université, Rue de Marseille, Les Girondins, Chevreul, Lyon 7e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69007, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 821,
+     "produits": 755,
+     "dernier": "2026-10-27"
+    },
+    {
+     "magasin": "Super U, Rue Édouard Vaillant, Capuche, Secteur 4, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38100, France",
+     "ville": "Grenoble",
+     "cp": "38",
+     "prix_90j": 575,
+     "produits": 477,
+     "dernier": "2026-09-26"
+    },
+    {
+     "magasin": "Super U, Rue Antoine Charial, La Villette, Lyon 3e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69003, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 543,
+     "produits": 536,
+     "dernier": "2026-09-23"
+    },
+    {
+     "magasin": "U Express, Rue Antoine Lumière, Monplaisir, Lyon 8e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69008, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 485,
+     "produits": 480,
+     "dernier": "2026-08-25"
+    },
+    {
+     "magasin": "U Express, Voie Lyonnaise 11, Préfecture, Lyon 3e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69003, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 397,
+     "produits": 386,
+     "dernier": "2026-09-23"
+    },
+    {
+     "magasin": "U Express, Cours Albert Thomas, Monplaisir, Lyon 3e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69008, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 288,
+     "produits": 283,
+     "dernier": "2026-10-19"
+    },
+    {
+     "magasin": "U Express, Avenue Jean Jaurès, Reclus, Vandœuvre-lès-Nancy, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54500, France",
+     "ville": "Vandœuvre-lès-Nancy",
+     "cp": "54",
+     "prix_90j": 228,
+     "produits": 227,
+     "dernier": "2026-08-26"
+    }
+   ]
+  },
+  "carrefour": {
+   "prix": 35659,
+   "prix_90j": 3368,
+   "prix_30j": 954,
+   "magasins_90j": 71,
+   "produits_90j": 2586,
+   "dernier": "2026-10-28",
+   "preuves": {
+    "PRICE_TAG": 26984,
+    "GDPR_REQUEST": 4967,
+    "RECEIPT": 3702
+   },
+   "catalogue_ean_90j": 16,
+   "idf_prix_90j": 548,
+   "idf_magasins_90j": 19,
+   "top_magasins": [
+    {
+     "magasin": "Carrefour Market, Avenue des Frères Lumière, Monplaisir, Lyon 8e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69008, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 495,
+     "produits": 483,
+     "dernier": "2026-10-02"
+    },
+    {
+     "magasin": "Carrefour Lyon Part-Dieu, Rue du Docteur Bouchut, Part-Dieu, Lyon 3e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69003, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 393,
+     "produits": 386,
+     "dernier": "2026-08-11"
+    },
+    {
+     "magasin": "Carrefour, Rue des Combattants d'Afrique du Nord, Écartelée - Bonabry - Orières - Paron, Fougères, Fougères-Vitré, Ille-et-Vilaine, Bretagne, France métropolitaine, 35300, France",
+     "ville": "Fougères",
+     "cp": "35",
+     "prix_90j": 235,
+     "produits": 224,
+     "dernier": "2026-09-20"
+    },
+    {
+     "magasin": "Carrefour City, Avenue Albert 1er de Belgique, Exposition Bajatière, Secteur 4, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38100, France",
+     "ville": "Grenoble",
+     "cp": "38",
+     "prix_90j": 222,
+     "produits": 186,
+     "dernier": "2026-09-26"
+    },
+    {
+     "magasin": "Carrefour, 19, Rue Madeleine Vionnet, Landy-Plaine - Marcreus - Pressensé, Aubervilliers, Saint-Denis, Seine-Saint-Denis, Île-de-France, France métropolitaine, 93300, France",
+     "ville": "Aubervilliers",
+     "cp": "93",
+     "prix_90j": 207,
+     "produits": 202,
+     "dernier": "2026-08-15"
+    },
+    {
+     "magasin": "Carrefour City, Rue Renan, Les Girondins, Jean-Macé, Lyon 7e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69007, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 204,
+     "produits": 194,
+     "dernier": "2026-10-26"
+    },
+    {
+     "magasin": "Carrefour City, Rue du Pont Mouja, Centre Ville, Charles III, Nancy, Meurthe-et-Moselle, Grand Est, France métropolitaine, 54100, France",
+     "ville": "Nancy",
+     "cp": "54",
+     "prix_90j": 193,
+     "produits": 193,
+     "dernier": "2026-08-29"
+    },
+    {
+     "magasin": "Carrefour Express, Grande Rue, Le Péage, Le Gorget, La Tronche, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38700, France",
+     "ville": "La Tronche",
+     "cp": "38",
+     "prix_90j": 120,
+     "produits": 113,
+     "dernier": "2026-09-13"
+    }
+   ]
+  },
+  "monoprix": {
+   "prix": 6221,
+   "prix_90j": 615,
+   "prix_30j": 206,
+   "magasins_90j": 22,
+   "produits_90j": 538,
+   "dernier": "2026-10-27",
+   "preuves": {
+    "PRICE_TAG": 5355,
+    "RECEIPT": 864
+   },
+   "catalogue_ean_90j": 0,
+   "idf_prix_90j": 257,
+   "idf_magasins_90j": 14,
+   "top_magasins": [
+    {
+     "magasin": "Monoprix, Rue Garibaldi, La Guillotière, Lyon 7e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69007, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 200,
+     "produits": 198,
+     "dernier": "2026-08-19"
+    },
+    {
+     "magasin": "Monoprix, Rue Sergent Michel Berthet, Pierre-Scize, Vaise, Lyon 9e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69009, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 116,
+     "produits": 116,
+     "dernier": "2026-08-21"
+    },
+    {
+     "magasin": "Monoprix, Rue de Charenton, Quartier de Picpus, Paris 12e Arrondissement, Paris, Île-de-France, France métropolitaine, 75012, France",
+     "ville": "Paris",
+     "cp": "75",
+     "prix_90j": 111,
+     "produits": 93,
+     "dernier": "2026-10-03"
+    },
+    {
+     "magasin": "Monoprix, 99, Rue du Faubourg Saint-Antoine, Quartier Sainte-Marguerite, Paris 11e Arrondissement, Paris, Île-de-France, France métropolitaine, 75011, France",
+     "ville": "Paris",
+     "cp": "75",
+     "prix_90j": 25,
+     "produits": 19,
+     "dernier": "2026-10-19"
+    },
+    {
+     "magasin": "Monoprix, Avenue du Général de Gaulle, Saint-Mandé, Nogent-sur-Marne, Val-de-Marne, Île-de-France, France métropolitaine, 94160, France",
+     "ville": "Saint-Mandé",
+     "cp": "94",
+     "prix_90j": 23,
+     "produits": 22,
+     "dernier": "2026-08-28"
+    },
+    {
+     "magasin": "Monoprix, 71, Rue Saint-Antoine, Quartier de l'Arsenal, Paris 4e Arrondissement, Paris, Île-de-France, France métropolitaine, 75004, France",
+     "ville": "Paris",
+     "cp": "75",
+     "prix_90j": 23,
+     "produits": 17,
+     "dernier": "2026-10-26"
+    },
+    {
+     "magasin": "Monoprix, Rue des Dames, Quartier des Batignolles, Paris 17e Arrondissement, Paris, Île-de-France, France métropolitaine, 75017, France",
+     "ville": "Paris",
+     "cp": "75",
+     "prix_90j": 23,
+     "produits": 20,
+     "dernier": "2026-08-27"
+    },
+    {
+     "magasin": "Monoprix, 75, Rue de Paris, Les Carrières, Charenton-le-Pont, Nogent-sur-Marne, Val-de-Marne, Île-de-France, France métropolitaine, 94220, France",
+     "ville": "Charenton-le-Pont",
+     "cp": "94",
+     "prix_90j": 22,
+     "produits": 21,
+     "dernier": "2026-10-03"
+    }
+   ]
+  },
+  "lidl": {
+   "prix": 1672,
+   "prix_90j": 86,
+   "prix_30j": 19,
+   "magasins_90j": 26,
+   "produits_90j": 47,
+   "dernier": "2026-10-28",
+   "preuves": {
+    "RECEIPT": 893,
+    "PRICE_TAG": 779
+   },
+   "catalogue_ean_90j": 0,
+   "idf_prix_90j": 7,
+   "idf_magasins_90j": 5,
+   "top_magasins": [
+    {
+     "magasin": "Lidl, 112 bis, Avenue Jean Perrot, Secteur 5, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38100, France",
+     "ville": "Grenoble",
+     "cp": "38",
+     "prix_90j": 37,
+     "produits": 1,
+     "dernier": "2026-09-12"
+    },
+    {
+     "magasin": "Lidl, Rue de Menin, Saint-Roch, Marquette-lez-Lille, Lille, Nord, Hauts-de-France, France métropolitaine, 59520, France",
+     "ville": "Marquette-lez-Lille",
+     "cp": "59",
+     "prix_90j": 9,
+     "produits": 6,
+     "dernier": "2026-08-07"
+    },
+    {
+     "magasin": "Lidl, Grande Rue de la Guillotière, La Guillotière, Lyon 7e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69007, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 5,
+     "produits": 5,
+     "dernier": "2026-08-26"
+    },
+    {
+     "magasin": "Lidl, 10, Rue de l'Ill, Saint-Morand, Altkirch, Haut-Rhin, Collectivité européenne d'Alsace, Grand Est, France métropolitaine, 68130, France",
+     "ville": "Altkirch",
+     "cp": "68",
+     "prix_90j": 3,
+     "produits": 3,
+     "dernier": "2026-10-18"
+    },
+    {
+     "magasin": "Lidl, 101, Rue des Alliés, Alliés Alpins, Secteur 4, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38100, France",
+     "ville": "Grenoble",
+     "cp": "38",
+     "prix_90j": 3,
+     "produits": 3,
+     "dernier": "2026-10-21"
+    },
+    {
+     "magasin": "Lidl, Avenue Gaston de Fontmichel, Mandelieu-la-Napoule, Grasse, Alpes-Maritimes, Provence-Alpes-Côte d'Azur, France métropolitaine, 06210, France",
+     "ville": "Mandelieu-la-Napoule",
+     "cp": "06",
+     "prix_90j": 2,
+     "produits": 2,
+     "dernier": "2026-09-11"
+    },
+    {
+     "magasin": "Lidl, Place François Mireur, Belsunce, Marseille 1er Arrondissement, Marseille, Bouches-du-Rhône, Provence-Alpes-Côte d'Azur, France métropolitaine, 13001, France",
+     "ville": "Marseille",
+     "cp": "13",
+     "prix_90j": 2,
+     "produits": 2,
+     "dernier": "2026-10-05"
+    },
+    {
+     "magasin": "Lidl, Place Hevrin Khalaf, Chevreul, Lyon 7e Arrondissement, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhône-Alpes, France métropolitaine, 69007, France",
+     "ville": "Lyon",
+     "cp": "69",
+     "prix_90j": 2,
+     "produits": 2,
+     "dernier": "2026-09-17"
+    }
+   ]
+  },
+  "aldi": {
+   "prix": 508,
+   "prix_90j": 42,
+   "prix_30j": 6,
+   "magasins_90j": 11,
+   "produits_90j": 29,
+   "dernier": "2026-10-18",
+   "preuves": {
+    "PRICE_TAG": 303,
+    "RECEIPT": 205
+   },
+   "catalogue_ean_90j": 0,
+   "idf_prix_90j": 6,
+   "idf_magasins_90j": 4,
+   "top_magasins": [
+    {
+     "magasin": "ALDI, Avenue de la Sablière, Mons-en-Barœul, Lille, Nord, Hauts-de-France, France métropolitaine, 59370, France",
+     "ville": "Mons-en-Barœul",
+     "cp": "59",
+     "prix_90j": 14,
+     "produits": 11,
+     "dernier": "2026-08-26"
+    },
+    {
+     "magasin": "Aldi, Rue Maurice Tilloy, Courrières, Lens, Pas-de-Calais, Hauts-de-France, France métropolitaine, 62710, France",
+     "ville": "Courrières",
+     "cp": "62",
+     "prix_90j": 14,
+     "produits": 5,
+     "dernier": "2026-09-04"
+    },
+    {
+     "magasin": "ALDI, 86, Rue Édouard Vaillant, Levallois-Perret, Nanterre, Hauts-de-Seine, Île-de-France, France métropolitaine, 92300, France",
+     "ville": "Levallois-Perret",
+     "cp": "92",
+     "prix_90j": 3,
+     "produits": 3,
+     "dernier": "2026-10-18"
+    },
+    {
+     "magasin": "Aldi, 2, Rue Hoche, Préfecture, Secteur 2, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38000, France",
+     "ville": "Grenoble",
+     "cp": "38",
+     "prix_90j": 3,
+     "produits": 3,
+     "dernier": "2026-10-14"
+    },
+    {
+     "magasin": "Aldi, 150, Avenue André Malraux, Sablon, Metz, Moselle, Grand Est, France métropolitaine, 57000, France",
+     "ville": "Metz",
+     "cp": "57",
+     "prix_90j": 2,
+     "produits": 2,
+     "dernier": "2026-09-12"
+    },
+    {
+     "magasin": "ALDI, Avenue Roger Secrétain, Clos Moreau, Orléans, Loiret, Centre-Val de Loire, France métropolitaine, 45100, France",
+     "ville": "Orléans",
+     "cp": "45",
+     "prix_90j": 1,
+     "produits": 1,
+     "dernier": "2026-08-18"
+    },
+    {
+     "magasin": "ALDI, Rue de Vendée, Vichy, Allier, Auvergne-Rhône-Alpes, France métropolitaine, 03200, France",
+     "ville": "Vichy",
+     "cp": "03",
+     "prix_90j": 1,
+     "produits": 1,
+     "dernier": "2026-10-14"
+    },
+    {
+     "magasin": "Aldi, 20, Boulevard Anatole France, Grand Centre Ville, Saint-Denis, Seine-Saint-Denis, Île-de-France, France métropolitaine, 93200, France",
+     "ville": "Saint-Denis",
+     "cp": "93",
+     "prix_90j": 1,
+     "produits": 1,
+     "dernier": "2026-09-28"
+    }
+   ]
+  }
+ }
+}
