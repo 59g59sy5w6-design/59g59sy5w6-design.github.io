@@ -9,6 +9,10 @@ on:
         description: "Diagnostic (compte rendu sur la branche diag, sans publier)"
         type: boolean
         default: false
+      only:
+        description: "Diagnostic : enseignes à relire (par exemple auchan)"
+        type: string
+        default: ""
 permissions:
   contents: write
   pages: write
@@ -31,4 +35,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DIAG: ${{ inputs.diag || 'false' }}
+          ONLY: ${{ inputs.only }}
         run: bash tools/ci.sh

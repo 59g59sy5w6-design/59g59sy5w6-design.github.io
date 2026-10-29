@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Robot de relevé des prix, lancé par GitHub Actions (.github/workflows/prix.yml) toutes les heures.
+# Robot de relevé des prix, lancé à la demande par GitHub Actions (.github/workflows/prix.yml).
 # Relit les pages des enseignes qui acceptent les robots (réglage « robot » de tools/sources.json),
 # puis publie avec tools/publish.sh : catalogue reconstruit si des prix ont changé, sinon heure de vérification.
 set -euo pipefail
@@ -10,7 +10,7 @@ npx playwright install --with-deps chromium >/dev/null
 
 if [ "${DIAG:-false}" = "true" ]; then
   # diagnostic : compte rendu et extraits de pages sur la branche diag, sans toucher à main
-  node tools/scrape.js --diag --only=monoprix,carrefour,houra || true
+  node tools/scrape.js --diag --only="${ONLY:-monoprix,carrefour,houra,auchan}" || true
   git config user.name "github-actions[bot]"
   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
   git checkout -q -B diag
