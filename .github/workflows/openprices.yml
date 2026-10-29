@@ -1,0 +1,26 @@
+name: Essai Open Prices
+# Couverture des prix ouverts d'Open Prices (Open Food Facts) par enseigne : compte rendu sur la branche
+# diag-openprices, sans toucher à main.
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  couverture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pandas pyarrow
+      - run: python3 tools/openprices.py --stats
+      - name: Compte rendu sur la branche diag-openprices
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -B diag-openprices
+          git add -f tools/work/openprices_stats.json
+          git commit -q -m "Open Prices : couverture $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f origin diag-openprices
