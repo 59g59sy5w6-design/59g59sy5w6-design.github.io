@@ -224,6 +224,7 @@ body:not(.grouped) .group { background: var(--group); }
 .row.th + .row.th::before, .row.th + .row::before { left: 76px; }
 .row:active, a.row:active { background: rgba(0, 0, 0, 0.05); }
 .row .chev { margin-left: auto; width: 16px; height: 16px; color: var(--ink-3); stroke-width: 2.4; flex: none; }
+.row .chk { margin-left: auto; width: 20px; height: 20px; color: var(--brand); stroke-width: 2.6; flex: none; }
 .row .val { margin-left: auto; color: var(--ink-2); white-space: nowrap; }
 .row .val + .chev { margin-left: 6px; }
 .row .rt { min-width: 0; flex: 1; }

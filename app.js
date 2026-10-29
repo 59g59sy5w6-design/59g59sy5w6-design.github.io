@@ -39,13 +39,13 @@
   const standalone = () => (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
 
   /* ---------- état ---------- */
-  const PREFS0 = { zip: "", off: {}, fee: {}, maxOrders: 3, extraCost: 0 };
+  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, maxOrders: 3, extraCost: 0 };
   const ROOTS = { accueil: "#/", rayons: "#/rayons", recherche: "#/recherche", listes: "#/listes", panier: "#/panier" };
   const S = {
     ready: false, failed: false,
     rayons: [], prods: new Map(), list: [], rets: [], retMap: new Map(), meta: {},
     basket: store.get("basket", {}),
-    prefs: Object.assign({}, PREFS0, store.get("prefs", {})),
+    prefs: Object.assign({}, PREFS0, { pick: {} }, store.get("prefs", {})),
     lists: store.get("lists", []),
     recent: store.get("recent", []),
     seen: store.get("seen", {}),
@@ -126,6 +126,24 @@
   }
   const isStale = () => !S.rets.some((r) => recent(lastCheck(r.id)));
 
+  /* plusieurs points de retrait d'une même enseigne (« group ») : un seul compte à la fois, choisi dans les réglages */
+  function groupsOf() {
+    const g = {};
+    for (const x of S.allRets || []) if (x.group) (g[x.group] = g[x.group] || []).push(x);
+    return g;
+  }
+  function pickOf(g, members) {
+    const id = (S.prefs.pick || {})[g];
+    return members.some((m) => m.id === id) ? id : members[0].id;
+  }
+  function applyGroups() {
+    const G = groupsOf();
+    S.rets = (S.allRets || []).filter((x) => !x.group || x.id === pickOf(x.group, G[x.group]));
+    S.retMap = new Map(S.rets.map((x) => [x.id, x]));
+    S._sug = null;
+    RES.key = "";
+  }
+
   async function load() {
     const get = (u) => fetch(u, { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
     const [c, r, m, st] = await Promise.all([get("data/catalog.json"), get("data/retailers.json"), get("data/meta.json"), get("data/status.json").catch(() => null)]);
@@ -137,8 +155,8 @@
     S.list.forEach((p, i) => { p.rank = i; S.prods.set(p.id, p); });
     S._sug = null;
     RES.key = "";
-    S.rets = r.slice().sort((a, b) => a.order - b.order);
-    S.retMap = new Map(S.rets.map((x) => [x.id, x]));
+    S.allRets = r.slice().sort((a, b) => a.order - b.order);
+    applyGroups();
     S.meta = m || {};
     S.retDate = {};
     S.retDates = {};
@@ -655,6 +673,7 @@
         `<p class="gf">${S.prefs.zip && !inZone() ? "Les enseignes de Cabas livrent en Île-de-France : ton code postal n'est pas encore couvert." : "Les enseignes de Cabas livrent en Île-de-France. Chacune confirme ses créneaux au moment de commander."}</p>` +
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}" style="text-decoration:none">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
         `<p class="gf">Le panier n'utilise que les enseignes activées. Touche une enseigne pour voir ses frais et leurs sources.</p>` +
+        Object.entries(groupsOf()).map(([g, ms]) => `<h2 class="gh">Point de retrait ${esc(ms[0].name)}</h2><div class="group">${ms.map((m) => `<button class="row" type="button" data-act="pick" data-g="${esc(g)}" data-id="${esc(m.id)}" aria-pressed="${m.id === pickOf(g, ms)}"><span class="rt">${esc((m.channel || {}).where || m.name)}<small>${esc(feeShort(m).replace(/^Retrait à [^,]+, /, "Retrait "))}</small></span>${m.id === pickOf(g, ms) ? ic("check", "chk") : ""}</button>`).join("")}</div><p class="gf">Les prix ${esc(ms[0].name)} dépendent du magasin : choisis le point de retrait le plus proche de toi.</p>`).join("") +
         `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
         `<label class="row" for="extra"><span class="rt">Coût d'une commande en plus<small>Ton temps, les sacs, la réception. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
         `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
@@ -1049,6 +1068,7 @@
       case "maxk": S.prefs.maxOrders = +t.dataset.k; savePrefs(); rerender(); break;
       case "clear": confirmSheet("Vider le panier\u00a0?", "Tous les produits du panier seront retirés.", "Vider le panier", "clearok"); break;
       case "clearok": S.basket = {}; saveBasket(); closeSheet(); rerender(); break;
+      case "pick": S.prefs.pick = Object.assign({}, S.prefs.pick, { [t.dataset.g]: id }); savePrefs(); applyGroups(); renderChrome(); rerender(); toast("Point de retrait choisi"); break;
       case "share": shareProduct(id); break;
       case "hideinstall": S.seen.install = true; store.set("seen", S.seen); t.closest(".install").remove(); break;
       case "install": installSheet(); break;
@@ -1074,7 +1094,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); break;
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {} }); S.seen = {}; ["basket", "lists", "recent", "prefs", "seen"].forEach((x) => store.set(x, x === "lists" || x === "recent" ? [] : {})); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {} }); S.seen = {}; ["basket", "lists", "recent", "prefs", "seen"].forEach((x) => store.set(x, x === "lists" || x === "recent" ? [] : {})); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
       default: break;
     }

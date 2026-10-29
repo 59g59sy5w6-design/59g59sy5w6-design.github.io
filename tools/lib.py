@@ -69,9 +69,15 @@ def route(url):
     if _SOURCES is None:
         _SOURCES = load_sources()["pages"]
     for p in _SOURCES:
-        if p["host"] in url and p["match"] in url:
+        if p["url"] == url:
             return p["retailer"], p["rayon"]
-    return None
+    # sinon la page de la liste dont le repère (« match ») est le plus long : les pages des différents points de
+    # retrait Auchan ne diffèrent que par leur fragment (#alesia...)
+    best = None
+    for p in _SOURCES:
+        if p["host"] in url and p["match"] in url and (best is None or len(p["match"]) > len(best["match"])):
+            best = p
+    return (best["retailer"], best["rayon"]) if best else None
 
 
 # ---------------------------------------------------------------- quantities
@@ -202,6 +208,8 @@ MDD = {
     'monoprix': ['Monoprix', 'Naturalia', 'Tous les Jours'],
     'houra': ['Auchan', 'Pouce'],
     'auchan': ['Auchan', 'Pouce'],
+    'auchan-alesia': ['Auchan', 'Pouce'],
+    'auchan-bellesfeuilles': ['Auchan', 'Pouce'],
     'carrefour': ['Carrefour', 'Simpl', 'Reflets de France'],
 }
 

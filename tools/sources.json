@@ -552,19 +552,240 @@
    "match": "text=lessive%20liquide",
    "url": "https://www.auchan.fr/recherche?text=lessive%20liquide",
    "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "eaux",
+   "host": "auchan.fr",
+   "match": "text=eau%20plate#alesia",
+   "url": "https://www.auchan.fr/recherche?text=eau%20plate#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "jus",
+   "host": "auchan.fr",
+   "match": "text=jus%20d%27orange#alesia",
+   "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "sodas",
+   "host": "auchan.fr",
+   "match": "text=cola#alesia",
+   "url": "https://www.auchan.fr/recherche?text=cola#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "lait",
+   "host": "auchan.fr",
+   "match": "text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#alesia",
+   "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "yaourts",
+   "host": "auchan.fr",
+   "match": "text=yaourt%20nature#alesia",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20nature#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "fromages",
+   "host": "auchan.fr",
+   "match": "text=fromage%20r%C3%A2p%C3%A9#alesia",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "pates",
+   "host": "auchan.fr",
+   "match": "text=p%C3%A2tes#alesia",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "conserves",
+   "host": "auchan.fr",
+   "match": "text=sardines#alesia",
+   "url": "https://www.auchan.fr/recherche?text=sardines#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "cafe",
+   "host": "auchan.fr",
+   "match": "text=caf%C3%A9%20moulu#alesia",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "gateaux",
+   "host": "auchan.fr",
+   "match": "text=madeleines#alesia",
+   "url": "https://www.auchan.fr/recherche?text=madeleines#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "papier",
+   "host": "auchan.fr",
+   "match": "text=papier%20toilette#alesia",
+   "url": "https://www.auchan.fr/recherche?text=papier%20toilette#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "vaisselle",
+   "host": "auchan.fr",
+   "match": "text=liquide%20vaisselle#alesia",
+   "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "lessive",
+   "host": "auchan.fr",
+   "match": "text=lessive%20liquide#alesia",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "eaux",
+   "host": "auchan.fr",
+   "match": "text=eau%20plate#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=eau%20plate#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jus",
+   "host": "auchan.fr",
+   "match": "text=jus%20d%27orange#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sodas",
+   "host": "auchan.fr",
+   "match": "text=cola#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=cola#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lait",
+   "host": "auchan.fr",
+   "match": "text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "yaourts",
+   "host": "auchan.fr",
+   "match": "text=yaourt%20nature#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20nature#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages",
+   "host": "auchan.fr",
+   "match": "text=fromage%20r%C3%A2p%C3%A9#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pates",
+   "host": "auchan.fr",
+   "match": "text=p%C3%A2tes#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conserves",
+   "host": "auchan.fr",
+   "match": "text=sardines#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=sardines#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cafe",
+   "host": "auchan.fr",
+   "match": "text=caf%C3%A9%20moulu#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "gateaux",
+   "host": "auchan.fr",
+   "match": "text=madeleines#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=madeleines#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "papier",
+   "host": "auchan.fr",
+   "match": "text=papier%20toilette#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=papier%20toilette#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vaisselle",
+   "host": "auchan.fr",
+   "match": "text=liquide%20vaisselle#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lessive",
+   "host": "auchan.fr",
+   "match": "text=lessive%20liquide#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#bellesfeuilles",
+   "prompt": ""
   }
  ],
  "robot": {
   "houra": true,
   "monoprix": false,
   "carrefour": false,
-  "auchan": true
+  "auchan": true,
+  "auchan-alesia": true,
+  "auchan-bellesfeuilles": true
  },
  "robot_note": "Le 29 octobre 2026, depuis GitHub Actions, Monoprix répond par une page de vérification humaine et Carrefour par une page d'attente anti-robot (403). Ces deux enseignes sont relues par Claude avec WebFetch (voir CLAUDE.md), jamais en contournant leur protection.",
  "magasins": {
   "auchan": {
+   "enseigne": "auchan",
    "lieu": "Fontenay-sous-Bois",
    "retrait": "Lockers Fontenay"
+  },
+  "auchan-alesia": {
+   "enseigne": "auchan",
+   "lieu": "Paris 14e",
+   "retrait": "Paris Alesia"
+  },
+  "auchan-bellesfeuilles": {
+   "enseigne": "auchan",
+   "lieu": "Paris 16e",
+   "retrait": "Belles Feuilles"
   }
  },
  "magasins_note": "Enseignes dont les prix dépendent du magasin : le robot choisit ce point de retrait (jamais une livraison à domicile, qui demanderait une adresse)."

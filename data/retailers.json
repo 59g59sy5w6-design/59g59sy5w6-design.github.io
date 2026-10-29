@@ -134,6 +134,63 @@
      "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
     }
    ]
+  },
+  "group": "auchan"
+ },
+ {
+  "id": "auchan-alesia",
+  "name": "Auchan",
+  "service": "auchan.fr",
+  "order": 4,
+  "home": "https://www.auchan.fr/",
+  "group": "auchan",
+  "channel": {
+   "mode": "retrait",
+   "where": "Paris Alésia (191 rue d'Alésia)",
+   "minOrder": 0,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "Prix relevés sur auchan.fr pour le Click & Collect du supermarché Auchan Paris Alésia, 191 rue d'Alésia à Paris, sans adresse ni compte. Auchan n'affiche pas de minimum pour ce retrait. Le magazine Bonial indiquait en avril 2023 que le retrait en drive est gratuit : à vérifier au moment de commander.",
+   "sources": [
+    {
+     "label": "Bonial, avril 2023",
+     "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
+    }
+   ]
+  }
+ },
+ {
+  "id": "auchan-bellesfeuilles",
+  "name": "Auchan",
+  "service": "auchan.fr",
+  "order": 5,
+  "home": "https://www.auchan.fr/",
+  "group": "auchan",
+  "channel": {
+   "mode": "retrait",
+   "where": "Paris Belles Feuilles (16 rue des Belles Feuilles)",
+   "minOrder": 0,
+   "tiers": [
+    {
+     "from": 0,
+     "fee": 0
+    }
+   ],
+   "fixedFee": 0,
+   "editable": true,
+   "feeNote": "Prix relevés sur auchan.fr pour le Click & Collect du supermarché Auchan Paris Belles Feuilles, 16 rue des Belles Feuilles à Paris, sans adresse ni compte. Auchan n'affiche pas de minimum pour ce retrait. Le magazine Bonial indiquait en avril 2023 que le retrait en drive est gratuit : à vérifier au moment de commander.",
+   "sources": [
+    {
+     "label": "Bonial, avril 2023",
+     "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
+    }
+   ]
   }
  }
 ]

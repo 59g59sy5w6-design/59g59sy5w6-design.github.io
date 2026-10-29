@@ -161,6 +161,10 @@ const STORE = {
   },
 };
 
+// enseigne d'une source : « auchan-alesia » est un point de retrait Auchan (réglage « magasins » de tools/sources.json)
+let STORES = {};
+const brandOf = (retailer) => (STORES[retailer] && STORES[retailer].enseigne) || retailer.split("-")[0];
+
 async function readPage(page, src) {
   const res = await page.goto(src.url, { waitUntil: "domcontentloaded", timeout: 45000 });
   const status = res ? res.status() : 0;
@@ -168,13 +172,13 @@ async function readPage(page, src) {
   // faire défiler pour charger les vignettes paresseuses, jusqu'à ce que le nombre de liens produit se stabilise
   let last = -1;
   for (let i = 0; i < 14; i++) {
-    const n = await page.evaluate((p) => [...document.querySelectorAll("a[href]")].filter((a) => new RegExp(p).test(a.href.split("?")[0])).length, PRODUCT[src.retailer]);
+    const n = await page.evaluate((p) => [...document.querySelectorAll("a[href]")].filter((a) => new RegExp(p).test(a.href.split("?")[0])).length, PRODUCT[brandOf(src.retailer)]);
     if (n === last && i > 2) break;
     last = n;
     await page.mouse.wheel(0, 2200);
     await page.waitForTimeout(900);
   }
-  const data = await page.evaluate(extractInPage, { product: PRODUCT[src.retailer], retailer: src.retailer });
+  const data = await page.evaluate(extractInPage, { product: PRODUCT[brandOf(src.retailer)], retailer: brandOf(src.retailer) });
   return { status, ...data };
 }
 
@@ -187,23 +191,32 @@ async function readPage(page, src) {
   fs.mkdirSync(WORK, { recursive: true });
   if (diag) fs.mkdirSync(path.join(WORK, "diag"), { recursive: true });
   const browser = await chromium.launch();
-  const ctx = await browser.newContext({ userAgent: UA, locale: "fr-FR", timezoneId: "Europe/Paris", viewport: { width: 1366, height: 900 } });
-  const page = await ctx.newPage();
+  const fresh = async () => browser.newContext({ userAgent: UA, locale: "fr-FR", timezoneId: "Europe/Paris", viewport: { width: 1366, height: 900 } });
+  let ctx = await fresh();
+  let page = await ctx.newPage();
   const rows = [], summary = [];
   const done = new Set();
   const chosen = {};
-  const stores = conf.magasins || {};
+  let current = null;
+  STORES = conf.magasins || {};
   const queue = sources.map((s) => ({ ...s }));
   while (queue.length) {
     const src = queue.shift();
-    const key = src.retailer === "auchan" ? src.url.split("#")[0] : src.url.split("?")[0];
+    const key = STORES[src.retailer] ? src.url : src.url.split("?")[0];
     if (done.has(key)) continue;
     done.add(key);
-    if (STORE[src.retailer] && stores[src.retailer] && !(src.retailer in chosen)) {
-      chosen[src.retailer] = await STORE[src.retailer](page, stores[src.retailer]).catch((e) => null);
-      console.log(`${src.retailer} : magasin ${chosen[src.retailer] ? "choisi, " + chosen[src.retailer] : "non choisi, pages ignorées"}`);
+    // un point de retrait se choisit à chaque changement d'enseigne ou de point (le choix précédent est remplacé)
+    const chooser = STORES[src.retailer] && STORE[brandOf(src.retailer)];
+    if (chooser && current !== src.retailer) {
+      // navigateur neuf pour chaque point de retrait : aucun choix précédent ne reste en mémoire
+      await ctx.close();
+      ctx = await fresh();
+      page = await ctx.newPage();
+      chosen[src.retailer] = await chooser(page, STORES[src.retailer]).catch((e) => null);
+      current = src.retailer;
+      console.log(`${src.retailer} : point de retrait ${chosen[src.retailer] ? "choisi, " + chosen[src.retailer] : "non choisi, pages ignorées"}`);
     }
-    if (STORE[src.retailer] && !chosen[src.retailer]) { summary.push({ retailer: src.retailer, rayon: src.rayon, url: src.url, status: 0, products: 0, error: "magasin non choisi" }); continue; }
+    if (chooser && !chosen[src.retailer]) { summary.push({ retailer: src.retailer, rayon: src.rayon, url: src.url, status: 0, products: 0, error: "point de retrait non choisi" }); continue; }
     let r = null, err = null;
     for (let attempt = 0; attempt < 2 && !r; attempt++) {
       try { r = await readPage(page, src); } catch (e) { err = String(e.message || e).split("\n")[0]; await sleep(4000); }
@@ -215,7 +228,6 @@ async function readPage(page, src) {
     if (r) {
       rows.push({ url: src.url, prompt: src.prompt, text: JSON.stringify(src.retailer === "carrefour" ? r.products : { products: r.products, next_page: r.next_page }), ts });
       if (r.next_page && src.retailer === "houra" && !done.has(r.next_page.split("?")[0]) && queue.length < 200 && /-\d+\.html/.test(r.next_page)) queue.unshift({ ...src, url: r.next_page });
-      if (r.next_page && src.retailer === "auchan" && (src.depth || 0) < 2 && !done.has(r.next_page.split("#")[0])) queue.unshift({ ...src, url: r.next_page, depth: (src.depth || 0) + 1 });
       if (diag) {
         const slug = `${src.retailer}-${src.rayon}-${done.size}`;
         fs.writeFileSync(path.join(WORK, "diag", slug + ".json"), JSON.stringify({ src: src.url, status: r.status, title: r.title, products: r.products.slice(0, 8) }, null, 1));

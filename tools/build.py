@@ -43,8 +43,9 @@ def explained(ratio, qty, text):
 
 
 def page_key(url):
-    # la requête compte : les pages de recherche Auchan ne diffèrent que par elle (recherche?text=...)
-    return (url or "").split("#")[0].rstrip("/")
+    # la requête et le fragment comptent : les pages de recherche Auchan ne diffèrent que par la requête
+    # (recherche?text=...) et, d'un point de retrait à l'autre, par le fragment (#alesia...)
+    return (url or "").rstrip("/")
 
 
 F = json.load(open(os.path.join(lib.WORK, "fetches.json"), encoding="utf-8"))
@@ -132,7 +133,7 @@ for r in raw:
             continue
         fmt = r.get('format') or ''
         brand, label = split_brand_prefix(name)
-        if not brand and ret == 'auchan':
+        if not brand and ret.startswith('auchan'):
             # Auchan écrit la marque en capitales devant la désignation : « ST MICHEL Petites madeleines »
             toks = name.split()
             i = 0
@@ -149,7 +150,7 @@ for r in raw:
                 if parse_qty(tail) or parse_rolls(tail) or re.search(r'\d', tail):
                     label, fmt = lab.strip(), tail.strip()
             rid = (re.search(r'/(\d+)/?$', url or '') or [None, key(name)])[1]
-        elif ret == 'auchan':
+        elif ret.startswith('auchan'):
             rid = (re.search(r'/pr-(C?\d+)', url or '') or [None, key(name)])[1]
         else:
             rid = (re.search(r'(MPX_\d+)', url or '') or [None, key(name)])[1]
