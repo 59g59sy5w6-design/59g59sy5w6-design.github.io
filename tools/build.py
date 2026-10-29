@@ -13,6 +13,33 @@ from lib import *  # noqa: E402,F401,F403
 import lib  # noqa: E402
 
 CARRY_MAX_DAYS = 21
+# Contrôle des lectures faites par Claude (WebFetch) : le prix doit concorder avec le prix au kilo ou au litre
+# affiché à côté. Un écart signale presque toujours un prix pris sur la vignette voisine.
+UNIT_TOL = 0.08          # écart admis entre le prix lu et prix au kilo x contenance
+PAGE_DOUBT_MAX = 0.3     # au-delà de cette part de prix douteux, la lecture de la page entière est écartée
+NO_UNIT_CHECK = {"conserves"}   # prix au kilo égoutté : ne se compare pas au poids net
+UNIT_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*€\s*(?:/|le|la|par)\s*(100\s*g|100\s*ml|kg|kilo(?:gramme)?s?|l|litres?)\b", re.I)
+
+
+def unit_expected(unit_text, qty):
+    """Prix attendu d'après le prix à l'unité de mesure affiché (« 3,78 € / kilo ») et la contenance, ou None."""
+    m = UNIT_RE.search(str(unit_text or ""))
+    if not m or not qty or not qty.get("v"):
+        return None
+    per = 100 if m.group(2).lower().startswith("100") else 1000
+    return float(m.group(1).replace(",", ".")) * qty.get("n", 1) * qty["v"] / per
+
+
+def explained(ratio, qty, text):
+    """Un écart qui vient de la contenance écrite et non du prix : « 16 doses 104g » (contenance totale),
+    « 1.75cl » pour 1,75 L, « 450ml + 50% offert ». Le prix lu est alors gardé."""
+    cands = [10, 100, 1000]
+    n = (qty or {}).get("n", 1)
+    if n > 1:
+        cands.append(n)
+    for m in re.finditer(r"\+\s?(\d{1,3})\s?%", str(text or "")):
+        cands.append(1 + int(m.group(1)) / 100)
+    return any(abs(ratio * c - 1) <= UNIT_TOL or abs(ratio / c - 1) <= UNIT_TOL for c in cands)
 
 
 def page_key(url):
@@ -72,6 +99,8 @@ print("produits lus", len(raw), dict(collections.Counter(r["ret"] for r in raw))
 # ---------------------------------------------------------------- normalise
 items = []
 unbranded = []
+CHECKED = {ret for ret, on in (lib.load_sources().get("robot") or {}).items() if on is False}
+checked, doubtful = collections.Counter(), []
 for r in raw:
     ret = r['ret']
     if ret == 'carrefour':
@@ -133,12 +162,33 @@ for r in raw:
             qty = parse_qty(fmt) or parse_qty(r.get('name') or r.get('title'))
         if ray == 'lessive':
             lav = parse_lavages(qtext)
+    doubt = None
+    if ret in CHECKED and ray not in NO_UNIT_CHECK:
+        exp = unit_expected(r.get('unit'), qty)
+        if exp:
+            checked[r['src']] += 1
+            if abs(float(r['price']) - exp) > UNIT_TOL * max(float(r['price']), exp) and not explained(float(r['price']) / exp, qty, qtext):
+                doubt = round(exp, 2)
+                doubtful.append((ret, ray, r['src'], r.get('name') or r.get('title'), r['price'], r.get('unit'), doubt))
     items.append({
+        'doubt': doubt,
         'ret': ret, 'ray': ray, 'rid': f"{ret}:{rid}", 'brand': brand, 'label': label, 'fmt_raw': fmt,
         'qty': qty, 'rolls': rolls, 'lav': lav, 'price': round(float(r['price']), 2), 'was': r.get('was'),
         'promo': r.get('promo'), 'url': url, 'ean': ean, 'ts': r['ts'], 'src': r['src'], 'pos': r['pos'],
         'full': r.get('name') or r.get('title'),
     })
+
+# prix douteux : la vignette garde son prix précédent ; une page qui en compte trop est relue la fois suivante
+doubt_by_page = collections.Counter(d[2] for d in doubtful)
+bad_pages = {page_key(src) for src, n in doubt_by_page.items() if n > PAGE_DOUBT_MAX * checked[src]}
+for k in bad_pages:
+    ok_pages.pop(k, None)
+keep_prev = {it['rid'] for it in items if it['doubt'] and page_key(it['src']) not in bad_pages}
+items = [it for it in items if not it['doubt'] and page_key(it['src']) not in bad_pages]
+for it in items:
+    it.pop('doubt', None)
+prev_by_rid = {it['rid']: it for it in prev}
+items += [dict(prev_by_rid[rid], carried=True) for rid in keep_prev if rid in prev_by_rid]
 
 # reprise du relevé précédent pour les pages non lues cette fois
 today = datetime.datetime.now(datetime.timezone.utc)
@@ -167,7 +217,8 @@ report = {"date": today.strftime("%Y-%m-%d"), "pages": [], "rayons": {}}
 for p in pages:
     k = page_key(p["url"])
     report["pages"].append({"retailer": p["retailer"], "rayon": p["rayon"], "url": p["url"], "read": k in read_pages, "products": ok_pages.get(k, 0),
-                            "rejected": any(page_key(r[2]) == k for r in rejected)})
+                            "rejected": any(page_key(r[2]) == k for r in rejected) or k in bad_pages,
+                            "doubtful": sum(n for src, n in doubt_by_page.items() if page_key(src) == k)})
 for it in items:
     r = report["rayons"].setdefault(f"{it['ret']}:{it['ray']}", {"nouveaux": 0, "repris": 0})
     r["repris" if it.get("carried") else "nouveaux"] += 1
@@ -181,6 +232,8 @@ for u in unbranded[:30]:
     print("   ", u)
 for ret, ray, url, n, n0, l, l0 in rejected:
     print(f"lecture écartée (moins complète que la précédente : {n} produits dont {l} avec lien, contre {n0} dont {l0}) : {ret} {ray} {url}")
+for ret, ray, src, name, price, unit, exp in doubtful:
+    print(f"prix douteux, prix précédent gardé : {ret} {ray} {name} lu {price} € mais {unit} donne {exp} €" + (" (page entière écartée)" if page_key(src) in bad_pages else ""))
 if fails:
     print("pages sans produit cette fois :")
     for p in fails:
