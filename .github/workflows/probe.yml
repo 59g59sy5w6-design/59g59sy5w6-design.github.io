@@ -11,6 +11,10 @@ on:
         description: "Lieux à essayer, séparés par | (ville ou arrondissement)"
         type: string
         default: "Fontenay-sous-Bois"
+      livraison:
+        description: "Livraison à domicile : lieu@adresse publique, séparés par ; (facultatif)"
+        type: string
+        default: ""
 permissions:
   contents: write
 jobs:
@@ -30,6 +34,7 @@ jobs:
         run: node tools/explore.js
         env:
           PLACES: ${{ inputs.places }}
+          LIVRAISON: ${{ inputs.livraison }}
       - name: Compte rendu sur la branche diag-probe
         run: |
           git config user.name "github-actions[bot]"

@@ -10,7 +10,18 @@ const OUT = path.join(__dirname, "work", "explore");
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 const REFUSE = /^(tout refuser|refuser|continuer sans accepter|refuser tout|je refuse)$/i;
 const PLACES = (process.env.PLACES || "Fontenay-sous-Bois").split("|");
-const PLAN = PLACES.map((place, i) => ({ id: "auchan-" + (i + 1), url: "https://www.auchan.fr/", steps: [
+// livraison à domicile : « lieu@adresse publique » (une mairie), séparés par « ; »
+const DELIV = (process.env.LIVRAISON || "").split(";").filter(Boolean).map((x) => x.split("@"));
+const PLAN = DELIV.length ? DELIV.map(([place, addr], i) => ({ id: "livraison-" + (i + 1), url: "https://www.auchan.fr/", steps: [
+  { click: /choisir vos courses|choisir (un|mon|votre) magasin/i },
+  { type: place, into: /code postal/i },
+  { click: new RegExp(place.split("-")[0], "i"), within: "li, [role=option], button, a" },
+  { expand: /livraison à domicile/i },
+  { choose: /livraison à domicile/i },
+  { address: addr },
+  { click: /^(valider|confirmer|continuer|enregistrer|c'est parti|voir les créneaux|commencer mes courses)/i },
+  { goto: "https://www.auchan.fr/recherche?text=lait%20demi%20%C3%A9cr%C3%A9m%C3%A9" },
+] })) : PLACES.map((place, i) => ({ id: "auchan-" + (i + 1), url: "https://www.auchan.fr/", steps: [
   { click: /choisir vos courses|choisir (un|mon|votre) magasin/i },
   { type: place, into: /code postal/i },
   { click: new RegExp(place.split("-")[0], "i"), within: "li, [role=option], button, a" },
@@ -68,6 +79,21 @@ async function clickText(page, re, within) {
           }
           await page.waitForTimeout(3500);
           await snap(done ? `saisie ${st.type}` : "aucun champ de saisie trouvé");
+        }
+        if (st.address) {
+          // adresse publique de la zone (mairie) dans le champ d'adresse du choix de livraison
+          let done = false;
+          for (const i of await page.$$("input")) {
+            const h = [await i.getAttribute("placeholder"), await i.getAttribute("aria-label"), await i.getAttribute("type")].join(" ");
+            if (/rechercher un produit|search/i.test(h) || !(await i.isVisible().catch(() => false))) continue;
+            await i.click().catch(() => {}); await i.type(st.address, { delay: 50 }).catch(() => {}); done = true; break;
+          }
+          await page.waitForTimeout(3500);
+          await snap(done ? "adresse saisie" : "aucun champ d'adresse");
+          const word = st.address.split(/\s+/).find((w) => w.length > 4) || st.address;
+          const t = await clickText(page, new RegExp(word, "i"), "li, [role=option], button, a, div[role=button]");
+          await page.waitForTimeout(3500);
+          await snap(t ? `suggestion « ${t.slice(0, 80)} »` : "aucune suggestion");
         }
         if (st.cards) {
           // toutes les cartes de la liste (drives, retraits, consignes), avec leur bouton « Choisir »
