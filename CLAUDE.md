@@ -31,6 +31,7 @@ Deux sources publient sur `main`, chacune avec `tools/publish.sh`, qui repart du
 
 **Claude, cinq fois par jour (Monoprix et Carrefour).** Une tâche planifiée du compte Claude (« Relevé des prix Monoprix et Carrefour », à 7h56, 10h56, 13h56, 18h56 et 21h56, heure de Paris) lance une session Claude Code qui rattache ce dépôt, le clone et suit exactement ces étapes :
 
+0. `bash tools/kick_robot.sh` : relance le robot Houra si son dernier relevé a plus de 90 minutes (les déclenchements programmés de GitHub Actions sont parfois en retard ou sautés).
 1. `python3 tools/dump.py --reset` : vide les lectures et affiche les pages à lire (celles des enseignes dont le réglage `robot` vaut false), une par ligne, avec l'`url` et le `prompt` exacts.
 2. Lire chaque page avec WebFetch, avec exactement cette `url` et ce `prompt`, par séries de 7 appels en parallèle. Après chaque série, lancer `python3 tools/dump.py` : il enregistre les lectures dans `tools/work/fetches.json` et affiche les pages encore sans lecture. Ne pas lire les pages Houra.
 3. Relire une fois, en fin de relevé, les pages encore sans lecture (`deja_essayee` vaut true). Une page qui échoue encore garde ses prix précédents. Si une page renvoie une vérification humaine ou un blocage, passer sans chercher à le contourner.
