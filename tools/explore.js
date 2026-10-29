@@ -15,11 +15,16 @@ const PLAN = [
     { click: /choisir vos courses|choisir (un|mon|votre) magasin/i },
     { type: PLACE, into: /code postal/i },
     { click: new RegExp(PLACE.split("-")[0], "i"), within: "li, [role=option], button, a" },
+    { click: /^choisir$/i },
+    { goto: "https://www.auchan.fr/recherche?text=lait%20demi%20%C3%A9cr%C3%A9m%C3%A9" },
   ] },
   { id: "leclerc", url: "https://www.e.leclerc/fp/lait-de-montagne-demi-ecreme-brique-1-l-delisse-3564700596241", steps: [
     { click: /choisir (mon|un|votre) magasin/i },
     { type: PLACE, into: /code postal/i },
     { click: new RegExp(PLACE.split("-")[0], "i"), within: "li, [role=option], button, a" },
+    { click: /^choisir$/i },
+    { goto: "https://www.e.leclerc/fp/lait-de-montagne-demi-ecreme-brique-1-l-delisse-3564700596241" },
+    { goto: "https://www.e.leclerc/recherche?q=lait%20demi%20%C3%A9cr%C3%A9m%C3%A9" },
   ] },
 ];
 
@@ -76,6 +81,14 @@ async function clickText(page, re, within) {
           await snap(done ? `saisie ${st.type}` : "aucun champ de saisie trouvé");
         }
         if (st.wait) await page.waitForTimeout(st.wait);
+        if (st.goto) {
+          await page.goto(st.goto, { waitUntil: "domcontentloaded", timeout: 45000 }).catch(() => {});
+          await page.waitForTimeout(5000);
+          await page.mouse.wheel(0, 900);
+          await page.waitForTimeout(1500);
+          const euros = await page.evaluate(() => ((document.body ? document.body.innerText : "").match(/\d+[,.]\d{2}\s?€/g) || []).slice(0, 12));
+          await snap(`page ${st.goto.split("/").slice(3).join("/").slice(0, 60)} : ${euros.length} prix ${euros.join(" ")}`);
+        }
       }
     } catch (e) { rec.error = String(e.message || e).split("\n")[0]; }
     report.push(rec);
