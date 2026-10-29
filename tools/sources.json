@@ -1,0 +1,453 @@
+{
+ "about": "Pages rayon relues pour Cabas. Chaque page est lue avec WebFetch et son prompt, qui demande les produits en JSON. Pour Houra, suivre aussi next_page quand il est donné. Le champ match sert à reconnaître les pages suivantes d'un même rayon.",
+ "pages": [
+  {
+   "retailer": "monoprix",
+   "rayon": "eaux",
+   "host": "courses.monoprix.fr",
+   "match": "eau-plate",
+   "url": "https://courses.monoprix.fr/categories/boissons-et-lait/eau/eau-plate/cb2210ff-6456-45d2-bbb0-e7f6b16e3b03",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "jus",
+   "host": "courses.monoprix.fr",
+   "match": "jus-d-orange",
+   "url": "https://courses.monoprix.fr/categories/boissons-et-lait/jus-et-sirop/jus-d-orange/b8ec396e-3a30-4f0d-b1d5-007e95f36f31",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "sodas",
+   "host": "courses.monoprix.fr",
+   "match": "/colas/",
+   "url": "https://courses.monoprix.fr/categories/boissons-et-lait/soda-et-boisson-aromatis%C3%A9e/colas/3a639f37-52f0-4f2f-b103-8da6ccc1aff9",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "lait",
+   "host": "courses.monoprix.fr",
+   "match": "lait-uht-demi",
+   "url": "https://courses.monoprix.fr/categories/produits-laitiers-%C5%93ufs-et-fromages/laits/lait-uht-demi-%C3%A9cr%C3%A9m%C3%A9/b965e8e2-5f8c-499d-bd3d-e15629a4b4f8",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "yaourts",
+   "host": "courses.monoprix.fr",
+   "match": "yaourts-natures",
+   "url": "https://courses.monoprix.fr/categories/produits-laitiers-%C5%93ufs-et-fromages/yaourts/yaourts-natures/d69bf4b9-7133-41d4-b809-e9e7acf621be",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "fromages",
+   "host": "courses.monoprix.fr",
+   "match": "fromages-r%C3%A2p%C3%A9s",
+   "url": "https://courses.monoprix.fr/categories/produits-laitiers-%C5%93ufs-et-fromages/fromages-%C3%A0-cuisiner-raclettes-et-ap%C3%A9ritifs/fromages-r%C3%A2p%C3%A9s/5dcab751-ab85-496f-963e-b97f2685325c",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "pates",
+   "host": "courses.monoprix.fr",
+   "match": "p%C3%A2tes",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/p%C3%A2te-riz-c%C3%A9r%C3%A9ale-et-pur%C3%A9e/p%C3%A2tes/6046b8a4-1677-4f4e-a6c1-42f20f5d26f0",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text, \"price\": current price as number in euros, \"was\": crossed-out price or null, \"unit\": price per unit text or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"subcategories\": [{\"name\",\"url\"}] for every sub-category link on the page (pâtes longues, pâtes courtes, etc.)}."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "pates",
+   "host": "courses.monoprix.fr",
+   "match": "p%C3%A2tes",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/p%C3%A2te-riz-c%C3%A9r%C3%A9ale-et-pur%C3%A9e/p%C3%A2tes/p%C3%A2tes-courtes/a5ff45df-925b-4a21-a6e8-9c86feda8f61",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "conserves",
+   "host": "courses.monoprix.fr",
+   "match": "sardine-en-conserve",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/conserve/conserve-de-poisson/sardine-en-conserve/671dcf7f-2f01-4b8c-b01b-0b3ccea12ac1",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "cafe",
+   "host": "courses.monoprix.fr",
+   "match": "moulu-arabica",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sucr%C3%A9e/caf%C3%A9-th%C3%A9-et-boisson-chaude/caf%C3%A9/moulu-arabica-robusta/29f31011-40a8-47be-8597-623cce2b5d1c",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "gateaux",
+   "host": "courses.monoprix.fr",
+   "match": "madeleine-financier",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sucr%C3%A9e/g%C3%A2teau-cr%C3%AApe-et-gaufre/madeleine-financier-et-muffin/d054df91-87e1-4ef8-baf3-8f50f4512400",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "papier",
+   "host": "courses.monoprix.fr",
+   "match": "papiers-toilette/",
+   "url": "https://courses.monoprix.fr/categories/hygi%C3%A8ne-beaut%C3%A9/papiers-toilette-mouchoirs-et-cotons/papiers-toilette/ed85106d-8857-426e-8268-92e8ab6f2366",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "vaisselle",
+   "host": "courses.monoprix.fr",
+   "match": "liquide-vaisselle",
+   "url": "https://courses.monoprix.fr/categories/entretien-nettoyage/produits-nettoyants-et-multi-usages/produit-vaisselle/liquide-vaisselle/df10dc38-5dd9-472b-8122-57c6831259fc",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "lessive",
+   "host": "courses.monoprix.fr",
+   "match": "lessive-liquide",
+   "url": "https://courses.monoprix.fr/categories/entretien-nettoyage/lessive-et-soin-du-linge/lessive/lessive-liquide/6f10764c-8c10-4a0e-b825-2105c9d1803e",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "eaux",
+   "host": "carrefour.fr",
+   "match": "eaux-plates",
+   "url": "https://www.carrefour.fr/r/boissons/eaux/eaux-plates",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros or null if no price shown, \"unit\": price per litre/kg text or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"store_note\": any text about choosing a store / prices depending on store, \"next_page\": URL of next page or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "jus",
+   "host": "carrefour.fr",
+   "match": "jus-orange-agrumes",
+   "url": "https://www.carrefour.fr/r/boissons/jus-fruits-legumes/jus-orange-agrumes",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la bouteille de 1L\"), \"price\": price as number in euros, \"unit\": price per litre text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "sodas",
+   "host": "carrefour.fr",
+   "match": "/colas",
+   "url": "https://www.carrefour.fr/r/boissons/colas-thes-glaces-et-soft-drinks/colas",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le pack de 6 bouteilles de 1,5L\", \"La bouteille de 1,25L\"), \"price\": price as number in euros, \"unit\": price per litre/kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "lait",
+   "host": "carrefour.fr",
+   "match": "lait-demi-ecreme",
+   "url": "https://www.carrefour.fr/r/cremerie/laits/lait-demi-ecreme",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le pack de 6 bouteilles de 1L\"), \"price\": price as number in euros, \"unit\": price per litre text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "yaourts",
+   "host": "carrefour.fr",
+   "match": "yaourts-natures",
+   "url": "https://www.carrefour.fr/r/cremerie/yaourts-fromages-blancs/yaourts-natures",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"les 4 pots de 125g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "fromages",
+   "host": "carrefour.fr",
+   "match": "fromages-rapes",
+   "url": "https://www.carrefour.fr/r/cremerie/fromage-cuisiner/fromages-rapes",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le sachet de 200g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "pates",
+   "host": "carrefour.fr",
+   "match": "/r/epicerie-salee/pates",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/pates",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le paquet de 500g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "conserves",
+   "host": "carrefour.fr",
+   "match": "conserves-poissons/sardines",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/conserves-et-bocaux/conserves-poissons/sardines",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la boîte de 135g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "cafe",
+   "host": "carrefour.fr",
+   "match": "cafes-moulus",
+   "url": "https://www.carrefour.fr/r/epicerie-sucree/cafes/cafes-moulus",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le paquet de 250g\", \"les 2 paquets de 250g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "gateaux",
+   "host": "carrefour.fr",
+   "match": "gateaux-moelleux/madeleines",
+   "url": "https://www.carrefour.fr/r/epicerie-sucree/gateaux-moelleux/madeleines",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le sachet de 500g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "papier",
+   "host": "carrefour.fr",
+   "match": "papier-wc",
+   "url": "https://www.carrefour.fr/r/hygiene-et-beaute/papiers/papier-wc",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"les 12 rouleaux\"), \"price\": price as number in euros, \"unit\": price per unit text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "vaisselle",
+   "host": "carrefour.fr",
+   "match": "liquides-vaisselle",
+   "url": "https://www.carrefour.fr/r/entretien-et-nettoyage/vaisselle/liquides-vaisselle",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le flacon de 750mL\"), \"price\": price as number in euros, \"unit\": price per litre text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "lessive",
+   "host": "carrefour.fr",
+   "match": "lessives-liquides",
+   "url": "https://www.carrefour.fr/r/entretien-et-nettoyage/linge/lessives/lessives-liquides",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le bidon de 2L\", \"40 lavages\"), \"price\": price as number in euros, \"unit\": price per litre or per lavage text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "eaux",
+   "host": "houra.fr",
+   "match": "B1557242",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/eau-plate-B1557242-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "eaux",
+   "host": "houra.fr",
+   "match": "B1557242",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/eau-plate-B1557242-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "jus",
+   "host": "houra.fr",
+   "match": "B1557247",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/jus-d-orange-B1557247-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sodas",
+   "host": "houra.fr",
+   "match": "B1557279",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/boissons-cola-B1557279-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sodas",
+   "host": "houra.fr",
+   "match": "B1557279",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/boissons-cola-B1557279-2.html?order=2",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "lait",
+   "host": "houra.fr",
+   "match": "B1556970",
+   "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/lait-demi-ecreme-B1556970-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "yaourts",
+   "host": "houra.fr",
+   "match": "B1557008",
+   "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/yaourts-et-fromages-blancs-nature-B1557008-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "yaourts",
+   "host": "houra.fr",
+   "match": "B1557008",
+   "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/yaourts-et-fromages-blancs-nature-B1557008-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "yaourts",
+   "host": "houra.fr",
+   "match": "B1557008",
+   "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/yaourts-et-fromages-blancs-nature-B1557008-3.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "fromages",
+   "host": "houra.fr",
+   "match": "B1556996",
+   "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/fromages-rapes-et-parmesan-B1556996-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "fromages",
+   "host": "houra.fr",
+   "match": "B1556996",
+   "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/fromages-rapes-et-parmesan-B1556996-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "host": "houra.fr",
+   "match": "B1558701",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-coquillettes-et-pipe-rigate-B1558701-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "host": "houra.fr",
+   "match": "B1558705",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-fusilli-torti-et-torsades-B1558705-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "host": "houra.fr",
+   "match": "B1558705",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-fusilli-torti-et-torsades-B1558705-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "host": "houra.fr",
+   "match": "B1558704",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-penne-et-macaroni-B1558704-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"unit\": price per kg/l text as written or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "host": "houra.fr",
+   "match": "B1558704",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-penne-et-macaroni-B1558704-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "host": "houra.fr",
+   "match": "B1558616",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-seches-B1558616-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written, \"price\": current price as number in euros, \"was\": crossed-out price or null, \"unit\": price per unit text as written or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"subcategories\": [{\"name\": ..., \"url\": absolute URL}] listing every sub-category or rayon link visible on the page, \"pagination\": text describing how many products / pages exist and the URL of the next page if any}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "host": "houra.fr",
+   "match": "B1558684",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-spaghetti-B1558684-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "host": "houra.fr",
+   "match": "B1558684",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-spaghetti-B1558684-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "conserves",
+   "host": "houra.fr",
+   "match": "B1557087",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-sardines-B1557087-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cafe",
+   "host": "houra.fr",
+   "match": "B1557671",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/cafe-moulu-B1557671-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cafe",
+   "host": "houra.fr",
+   "match": "B1557671",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/cafe-moulu-B1557671-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "gateaux",
+   "host": "houra.fr",
+   "match": "B1557690",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/madeleines-et-financiers-B1557690-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "gateaux",
+   "host": "houra.fr",
+   "match": "B1557690",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/madeleines-et-financiers-B1557690-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "papier",
+   "host": "houra.fr",
+   "match": "B1557359",
+   "url": "https://www.houra.fr/catalogue/entretien/papier-toilette-B1557359-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "papier",
+   "host": "houra.fr",
+   "match": "B1557359",
+   "url": "https://www.houra.fr/catalogue/entretien/papier-toilette-B1557359-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "vaisselle",
+   "host": "houra.fr",
+   "match": "B1557343",
+   "url": "https://www.houra.fr/catalogue/entretien/liquide-vaisselle-a-la-main-B1557343-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "vaisselle",
+   "host": "houra.fr",
+   "match": "B1557343",
+   "url": "https://www.houra.fr/catalogue/entretien/liquide-vaisselle-a-la-main-B1557343-2.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "lessive",
+   "host": "houra.fr",
+   "match": "B1557353",
+   "url": "https://www.houra.fr/catalogue/entretien/lessive-liquide-B1557353-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  }
+ ]
+}

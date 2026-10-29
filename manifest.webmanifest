@@ -1,0 +1,20 @@
+{
+  "name": "Cabas",
+  "short_name": "Cabas",
+  "description": "Compare les prix de tes courses chez Monoprix, Carrefour et Houra, et trouve où commander pour payer le moins cher, livraison comprise.",
+  "lang": "fr",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "categories": ["shopping", "food"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
