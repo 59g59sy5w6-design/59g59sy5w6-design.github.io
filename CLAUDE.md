@@ -25,17 +25,21 @@ Lancer en local : `python3 -m http.server 8000` à la racine, puis ouvrir http:/
 
 ## Mettre à jour les prix
 
-Deux sources publient sur `main`, chacune avec `tools/publish.sh`, qui repart du dernier état publié, reconstruit le catalogue avec ses propres lectures et réessaie si `main` a bougé entre-temps.
+L'appli est une preuve de concept : les relevés automatiques sont suspendus et se lancent à la demande. Deux sources publient sur `main`, chacune avec `tools/publish.sh`, qui repart du dernier état publié, reconstruit le catalogue avec ses propres lectures et réessaie si `main` a bougé entre-temps.
 
-**Le robot GitHub, toutes les heures (Houra).** `.github/workflows/prix.yml` lance `tools/ci.sh` à la minute 23 de chaque heure (et à la demande depuis l'onglet Actions). `tools/scrape.js` ouvre chaque page Houra de `tools/sources.json` dans Chromium, fait défiler la page et lit chaque vignette : nom (attribut title du lien), prix (le montant le plus gros, ni barré, ni au kilo, ni montant d'offre), prix barré, prix au kilo, offre, lien. Monoprix et Carrefour refusent les robots depuis les serveurs de GitHub (vérification humaine, page anti-robot 403) : ils sont désactivés dans le réglage `robot` de `tools/sources.json`. Ne jamais contourner ces protections.
+**Houra, par le robot GitHub.** Onglet Actions du dépôt, workflow « Relevé des prix », « Run workflow ». Depuis une session Claude Code : `gh api -X POST repos/59g59sy5w6-design/59g59sy5w6-design.github.io/actions/workflows/prix.yml/dispatches -f ref=main`. Le robot (`tools/ci.sh`, puis `tools/scrape.js`) ouvre chaque page Houra de `tools/sources.json` dans Chromium, fait défiler la page et lit chaque vignette : nom (attribut title du lien), prix (le montant le plus gros, ni barré, ni au kilo, ni montant d'offre), prix barré, prix au kilo, offre, lien. Monoprix et Carrefour refusent les robots depuis les serveurs de GitHub (vérification humaine, page anti-robot 403) : ils sont désactivés dans le réglage `robot` de `tools/sources.json`. Ne jamais contourner ces protections.
 
-**Claude, cinq fois par jour (Monoprix et Carrefour).** Une tâche planifiée du compte Claude (« Relevé des prix Monoprix et Carrefour », à 7h56, 10h56, 13h56, 18h56 et 21h56, heure de Paris) lance une session Claude Code qui rattache ce dépôt, le clone et suit exactement ces étapes :
+**Monoprix et Carrefour, par Claude.** Quand on demande un relevé dans une session Claude Code sur ce dépôt, suivre exactement ces étapes :
 
-0. `bash tools/kick_robot.sh` : relance le robot Houra si son dernier relevé a plus de 70 minutes (les déclenchements programmés de GitHub Actions sont parfois en retard ou sautés).
+0. `bash tools/kick_robot.sh` : relance aussi le robot Houra si son dernier relevé a plus de 70 minutes.
 1. `python3 tools/dump.py --reset` : vide les lectures et affiche les pages à lire (celles des enseignes dont le réglage `robot` vaut false), une par ligne, avec l'`url` et le `prompt` exacts.
 2. Lire chaque page avec WebFetch, avec exactement cette `url` et ce `prompt`, par séries de 7 appels en parallèle. Après chaque série, lancer `python3 tools/dump.py` : il enregistre les lectures dans `tools/work/fetches.json` et affiche les pages encore sans lecture. Ne pas lire les pages Houra.
 3. Relire une fois, en fin de relevé, les pages encore sans lecture (`deja_essayee` vaut true). Une page qui échoue encore garde ses prix précédents. Si une page renvoie une vérification humaine ou un blocage, passer sans chercher à le contourner.
 4. `bash tools/publish.sh claude`, puis résumer : pages lues par enseigne, nombre de prix modifiés.
+
+WebFetch ne lit que les adresses données par l'utilisateur ou trouvées par une recherche : une tâche planifiée doit donc citer les adresses des pages dans son texte. Une session lancée par la tâche dure 5 à 10 minutes et consomme le quota Claude du compte.
+
+**Remettre les relevés automatiques.** La tâche planifiée « Relevé des prix Monoprix et Carrefour » existe toujours, désactivée (application Claude, tâches planifiées) : la réactiver, ou la lancer une fois. Pour Houra, rajouter le bloc `schedule` indiqué en tête de `.github/workflows/prix.yml`. Le 29 octobre 2026, GitHub n'a déclenché aucun passage programmé : `tools/kick_robot.sh`, lancé à chaque relevé de Claude, rattrape ce cas.
 
 **Ce que font les scripts.** `tools/build.py`, `tools/match.py` et `tools/make_catalog.py` reconstruisent `data/catalog.json`, `data/meta.json` et `data/status.json` (heure de vérification par enseigne). Une page non lue, ou lue de façon nettement moins complète que la fois précédente, garde les produits du relevé précédent avec leur date, pendant 21 jours au plus. Pour Monoprix et Carrefour, chaque prix lu est comparé au prix au kilo ou au litre affiché à côté : un prix qui ne concorde pas garde sa valeur précédente, et une page où plus de 30 % des prix ne concordent pas est écartée en entier. Si des prix ont changé : test de l'appli (`tools/smoke.js`), comparaison (`tools/check.py`) et commit `Prix du <date> (<enseignes>, <source>)`. Sinon, seul `data/status.json` est publié.
 

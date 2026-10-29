@@ -11,7 +11,7 @@ L'appli s'ouvre alors en plein écran depuis son icône et fonctionne sans rése
 
 ## Ce que fait l'appli
 
-- Près de 1 800 produits dans 13 rayons, avec les prix des pages rayon de courses.monoprix.fr, carrefour.fr et houra.fr. Houra est relu toutes les heures par un robot (GitHub Actions). Monoprix et Carrefour refusent les robots : Claude relit leurs pages cinq fois par jour.
+- Près de 1 800 produits dans 13 rayons, avec les prix des pages rayon de courses.monoprix.fr, carrefour.fr et houra.fr. Les relevés se lancent à la demande : Houra par un robot (GitHub Actions), Monoprix et Carrefour par Claude, car leurs sites refusent les robots.
 - Un même produit est rapproché entre enseignes par marque, désignation et contenance, ce qui rend environ 200 produits comparables.
 - Le panier est réparti en une, deux ou trois commandes pour obtenir le total le plus bas, en tenant compte des minimums d'achat et des frais de livraison de chaque enseigne.
 - Des listes permettent de remettre un panier entier en un geste.

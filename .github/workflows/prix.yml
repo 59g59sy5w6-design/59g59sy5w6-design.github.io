@@ -1,7 +1,8 @@
 name: Relevé des prix
+# Relevé à la demande (onglet Actions, « Run workflow »). Pour le remettre toutes les heures, ajouter :
+#   schedule:
+#     - cron: "23 * * * *"
 on:
-  schedule:
-    - cron: "23 * * * *"
   workflow_dispatch:
     inputs:
       diag:
