@@ -7,6 +7,9 @@ tools/sources.json (ou une page suivante du même rayon) et les écrit dans tool
 Les lectures s'ajoutent à celles déjà enregistrées : lancer ce script après chaque série de pages lues,
 pour que rien ne se perde si l'historique de la session est compacté en cours de route.
 
+Les pages à lire sont celles des enseignes que le robot GitHub ne peut pas lire (réglage « robot » à false dans
+tools/sources.json) : le script les affiche à la fin, une par ligne, avec l'url et le prompt à passer à WebFetch.
+
 Usage :
   python3 tools/dump.py --reset              # début d'un relevé : repartir d'une liste vide
   python3 tools/dump.py                      # après chaque série de lectures WebFetch
@@ -68,6 +71,7 @@ def main():
         with open(dest, "w", encoding="utf-8") as fh:
             json.dump([], fh)
         print("tools/work/fetches.json vidé")
+        show_todo([])
         return
     paths = a.transcript or transcripts()[-1:]
     if not paths:
@@ -87,12 +91,21 @@ def main():
     with open(dest, "w", encoding="utf-8") as fh:
         json.dump(allrows, fh, ensure_ascii=False, indent=0)
     ok = sum(1 for r in allrows if lib.parse_json(r["text"]) not in (None, [], {}))
-    pages = {page_key(r["url"]) for r in allrows}
-    todo = [x["url"] for x in lib.load_sources()["pages"] if page_key(x["url"]) not in pages]
     print(f"{len(added)} lectures ajoutées, {len(allrows)} au total ({ok} avec une réponse JSON).")
-    print(f"pages de la liste encore à lire : {len(todo)}")
-    for u in todo[:60]:
-        print("   ", u)
+    show_todo(allrows)
+
+
+def show_todo(rows):
+    """Pages à lire par Claude qui n'ont pas encore de lecture avec des produits, avec l'url et le prompt exacts."""
+    src = lib.load_sources()
+    robot = src.get("robot") or {}
+    done = {page_key(r["url"]) for r in rows if lib.parse_json(r["text"]) not in (None, [], {})}
+    tried = {page_key(r["url"]) for r in rows}
+    mine = [x for x in src["pages"] if robot.get(x["retailer"]) is False]
+    todo = [x for x in mine if page_key(x["url"]) not in done]
+    print(f"pages à lire par Claude ({', '.join(sorted({x['retailer'] for x in mine}))}) : {len(mine)}, encore sans lecture : {len(todo)}")
+    for x in todo:
+        print(json.dumps({"url": x["url"], "prompt": x["prompt"], "deja_essayee": page_key(x["url"]) in tried}, ensure_ascii=False))
 
 
 if __name__ == "__main__":

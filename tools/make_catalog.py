@@ -381,6 +381,10 @@ for ret in rets:
     ok = [p for p in pages if p['products']]
     fresh_ts = [it['ts'] for it in fresh if it['ret'] == ret]
     prev = (old_status.get('retailers') or {}).get(ret, {})
+    if not ok and prev.get('checkedAt'):
+        # enseigne pas relue cette fois (l'autre source publie) : on garde le compte rendu de sa dernière lecture
+        status['retailers'][ret] = prev
+        continue
     status['retailers'][ret] = {
         'pages': len(pages), 'read': len(ok),
         'checkedAt': (max(fresh_ts)[:16] + 'Z') if fresh_ts else prev.get('checkedAt'),
