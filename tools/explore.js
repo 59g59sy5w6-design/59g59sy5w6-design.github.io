@@ -9,15 +9,13 @@ const { chromium } = require("playwright");
 const OUT = path.join(__dirname, "work", "explore");
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 const REFUSE = /^(tout refuser|refuser|continuer sans accepter|refuser tout|je refuse)$/i;
-const PLACE = process.env.PLACE || "Fontenay-sous-Bois";
-const PLAN = [
-  { id: "auchan", url: "https://www.auchan.fr/", steps: [
-    { click: /choisir vos courses|choisir (un|mon|votre) magasin/i },
-    { type: PLACE, into: /code postal/i },
-    { click: new RegExp(PLACE.split("-")[0], "i"), within: "li, [role=option], button, a" },
-    { expand: /lockers fontenay/i },
-  ] },
-];
+const PLACES = (process.env.PLACES || "Fontenay-sous-Bois").split("|");
+const PLAN = PLACES.map((place, i) => ({ id: "auchan-" + (i + 1), url: "https://www.auchan.fr/", steps: [
+  { click: /choisir vos courses|choisir (un|mon|votre) magasin/i },
+  { type: place, into: /code postal/i },
+  { click: new RegExp(place.split("-")[0], "i"), within: "li, [role=option], button, a" },
+  { cards: true },
+] }));
 
 async function clickables(page) {
   return page.evaluate(() => {
@@ -70,6 +68,21 @@ async function clickText(page, re, within) {
           }
           await page.waitForTimeout(3500);
           await snap(done ? `saisie ${st.type}` : "aucun champ de saisie trouvé");
+        }
+        if (st.cards) {
+          // toutes les cartes de la liste (drives, retraits, consignes), avec leur bouton « Choisir »
+          for (let k = 0; k < 6; k++) { await page.mouse.move(440, 600); await page.mouse.wheel(0, 1500); await page.waitForTimeout(700); }
+          rec.cards = await page.evaluate(() => {
+            const out = [];
+            for (const b of document.querySelectorAll("button, a")) {
+              if (!/^\s*choisir\s*$/i.test(b.innerText || "")) continue;
+              let c = b;
+              for (let k = 0; k < 6 && c.parentElement; k++) { c = c.parentElement; if ((c.innerText || "").length > 40) break; }
+              out.push((c.innerText || "").replace(/\s+/g, " ").replace(/ Choisir.*$/, "").slice(0, 220));
+            }
+            return out;
+          });
+          await snap(`${rec.cards.length} cartes`);
         }
         if (st.expand) {
           // déplie « Infos et Tarifs » de la carte voulue et recopie le texte de la carte (frais, minimum, horaires)

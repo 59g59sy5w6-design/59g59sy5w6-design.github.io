@@ -7,6 +7,10 @@ on:
         description: "Explorer le choix de magasin (copies d'écran)"
         type: boolean
         default: false
+      places:
+        description: "Lieux à essayer, séparés par | (ville ou arrondissement)"
+        type: string
+        default: "Fontenay-sous-Bois"
 permissions:
   contents: write
 jobs:
@@ -24,6 +28,8 @@ jobs:
       - run: node tools/probe.js
       - if: ${{ inputs.explore }}
         run: node tools/explore.js
+        env:
+          PLACES: ${{ inputs.places }}
       - name: Compte rendu sur la branche diag-probe
         run: |
           git config user.name "github-actions[bot]"
