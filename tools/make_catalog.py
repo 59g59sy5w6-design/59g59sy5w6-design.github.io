@@ -15,7 +15,7 @@ clusters = collections.defaultdict(list)
 for rid, c in d['cluster_of'].items():
     clusters[c].append(items[rid])
 
-PRIO = {'houra': 0, 'monoprix': 1, 'carrefour': 2}
+PRIO = {'houra': 0, 'monoprix': 1, 'carrefour': 2, 'auchan': 3}
 PROPER = set('''vosges alpes ile france bresil perou mexique ethiopie costa rica guatemala honduras rwanda laos bretagne alsace
 marseille commercy italie espelette riga mediterranee japon provence savoie normandie madagascar valencia colombie
 equateur popayan bahia naples gragnano montagne'''.split())
@@ -165,7 +165,7 @@ def slug(s):
 # ---------------------------------------------------------------- produits
 products, built = [], []
 for c, lst in clusters.items():
-    lst = sorted(lst, key=lambda x: (PRIO[x['ret']], x['price']))
+    lst = sorted(lst, key=lambda x: (PRIO.get(x['ret'], 9), x['price']))
     main = lst[0]
     # one offer per retailer: the cheapest listing of that retailer in the cluster
     offers = {}
@@ -196,7 +196,7 @@ for c, lst in clusters.items():
         md = md or mdd_of(x['brand'], x['ret'])
     ean = next((x['ean'] for x in lst if x.get('ean')), None)
     base = slug(f"{brand} {label} {disp}") or slug(main['rid'])
-    rank = min({'monoprix': 0, 'carrefour': 4, 'houra': 8}[x['ret']] + x['pos'] for x in lst)
+    rank = min({'monoprix': 0, 'carrefour': 4, 'auchan': 6, 'houra': 8}.get(x['ret'], 9) + x['pos'] for x in lst)
     p = {'id': None, 'brand': brand, 'name': label, 'format': disp, 'icon': icon_of(main),
          'type': 'mdd' if md else 'nb', 'offers': offers, 'rank': rank, 'ray': main['ray']}
     if md:

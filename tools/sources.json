@@ -448,12 +448,124 @@
    "match": "B1557353",
    "url": "https://www.houra.fr/catalogue/entretien/lessive-liquide-B1557353-1.html",
    "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": total products text, \"next_page\": URL of the next page or null}."
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "eaux",
+   "host": "auchan.fr",
+   "match": "text=eau%20plate",
+   "url": "https://www.auchan.fr/recherche?text=eau%20plate",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "jus",
+   "host": "auchan.fr",
+   "match": "text=jus%20d%27orange",
+   "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "sodas",
+   "host": "auchan.fr",
+   "match": "text=cola",
+   "url": "https://www.auchan.fr/recherche?text=cola",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "lait",
+   "host": "auchan.fr",
+   "match": "text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9",
+   "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "yaourts",
+   "host": "auchan.fr",
+   "match": "text=yaourt%20nature",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20nature",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "fromages",
+   "host": "auchan.fr",
+   "match": "text=fromage%20r%C3%A2p%C3%A9",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "pates",
+   "host": "auchan.fr",
+   "match": "text=p%C3%A2tes",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "conserves",
+   "host": "auchan.fr",
+   "match": "text=sardines",
+   "url": "https://www.auchan.fr/recherche?text=sardines",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "cafe",
+   "host": "auchan.fr",
+   "match": "text=caf%C3%A9%20moulu",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "gateaux",
+   "host": "auchan.fr",
+   "match": "text=madeleines",
+   "url": "https://www.auchan.fr/recherche?text=madeleines",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "papier",
+   "host": "auchan.fr",
+   "match": "text=papier%20toilette",
+   "url": "https://www.auchan.fr/recherche?text=papier%20toilette",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "vaisselle",
+   "host": "auchan.fr",
+   "match": "text=liquide%20vaisselle",
+   "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "lessive",
+   "host": "auchan.fr",
+   "match": "text=lessive%20liquide",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20liquide",
+   "prompt": ""
   }
  ],
  "robot": {
   "houra": true,
   "monoprix": false,
-  "carrefour": false
+  "carrefour": false,
+  "auchan": true
  },
- "robot_note": "Le 29 octobre 2026, depuis GitHub Actions, Monoprix répond par une page de vérification humaine et Carrefour par une page d'attente anti-robot (403). Ces deux enseignes sont relues par Claude avec WebFetch (voir CLAUDE.md), jamais en contournant leur protection."
+ "robot_note": "Le 29 octobre 2026, depuis GitHub Actions, Monoprix répond par une page de vérification humaine et Carrefour par une page d'attente anti-robot (403). Ces deux enseignes sont relues par Claude avec WebFetch (voir CLAUDE.md), jamais en contournant leur protection.",
+ "magasins": {
+  "auchan": {
+   "lieu": "Fontenay-sous-Bois",
+   "retrait": "Lockers Fontenay"
+  }
+ },
+ "magasins_note": "Enseignes dont les prix dépendent du magasin : le robot choisit ce point de retrait (jamais une livraison à domicile, qui demanderait une adresse)."
 }

@@ -24,7 +24,7 @@ for attempt in 1 2 3; do
   python3 tools/match.py > tools/work/match.log
   tail -1 tools/work/match.log
   python3 tools/make_catalog.py
-  READ=$(python3 -c "import json; r=json.load(open('tools/work/report.json')); n={'monoprix':'Monoprix','carrefour':'Carrefour','houra':'Houra'}; print(', '.join(sorted({n.get(p['retailer'], p['retailer']) for p in r['pages'] if p['products']})) or 'aucune page lue')")
+  READ=$(python3 -c "import json; r=json.load(open('tools/work/report.json')); n={'monoprix':'Monoprix','carrefour':'Carrefour','houra':'Houra','auchan':'Auchan'}; print(', '.join(sorted({n.get(p['retailer'], p['retailer']) for p in r['pages'] if p['products']})) or 'aucune page lue')")
   WHEN=$(TZ=Europe/Paris date +'%d/%m/%Y à %Hh%M')
   if git diff --quiet -- data/catalog.json data/meta.json; then
     git add data/status.json tools/state/ids.json

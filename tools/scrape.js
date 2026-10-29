@@ -18,7 +18,9 @@ const PRODUCT = {
   monoprix: "/products/[^/?#]+/MPX_\\d+",
   houra: "houra\\.fr/[^/?#]+/\\d{5,}/?$",
   carrefour: "/p/[^/?#]+-\\d{8,14}$",
+  auchan: "auchan\\.fr/[^/?#]+/pr-C?\\d+",
 };
+const REFUSE = /^(tout refuser|refuser|continuer sans accepter|refuser tout|je refuse)$/i;
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -59,7 +61,13 @@ function extractInPage(cfg) {
     // nom : l'attribut title du lien quand l'enseigne le donne complet (Houra : « Marque Désignation, contenance »),
     // sinon le plus long texte de lien, titre ou texte alternatif d'image qui n'est pas un prix
     let name = as.map((a) => (a.getAttribute("title") || "").trim()).find((t) => t.length >= 4) || "";
-    if (!name || cfg.retailer !== "houra") {
+    if (cfg.retailer === "auchan") {
+      // Auchan : « MARQUE Désignation » dans le bloc de description de la vignette, contenance dans une pastille à part
+      const d = tile.querySelector("[class*=description], [class*=Description], [class*=title], [class*=Title]");
+      const t = d ? text(d).replace(/\s+/g, " ") : "";
+      if (t && !/€/.test(t) && t.length >= 4) name = t;
+    }
+    if (!name || (cfg.retailer !== "houra" && cfg.retailer !== "auchan")) {
       const cands = [];
       for (const a of as) cands.push(text(a), a.getAttribute("title") || "", a.getAttribute("aria-label") || "");
       tile.querySelectorAll("h1,h2,h3,h4,[class*=title],[class*=Title],[class*=name],[class*=Name]").forEach((e) => cands.push(text(e)));
@@ -98,6 +106,10 @@ function extractInPage(cfg) {
     const pm = lines.find((l) => /(-\s?\d+\s?%|\d+\s?(?:e|ème)\s(?:à|offert)|2ème|2e\b|offert|cagnott|remise|payez|prenez|gratuit)/i.test(l) && l.length < 120 && !/€\s?\//.test(l));
     const o = { name, price, was: was != null && was > price ? was : null, unit: um ? um[0] : null, promo: pm || null };
     if (fm && cfg.retailer !== "houra") o.format = fm[0].trim();
+    if (cfg.retailer === "auchan") {
+      const chip = lines.find((l) => /^\d+(?:[,.]\d+)?\s?(?:x\s?\d+(?:[,.]\d+)?\s?)?(?:cl|l|ml|g|kg)$/i.test(l));
+      if (chip) o.format = chip;
+    }
     if (cfg.retailer === "carrefour") { o.title = name; o.href = new URL(href).pathname; }
     else o.url = href;
     out.push(o);
@@ -105,6 +117,49 @@ function extractInPage(cfg) {
   const next = document.querySelector("a[rel=next], link[rel=next]");
   return { products: out, next_page: next ? next.href : null, title: document.title };
 }
+
+async function clickText(page, re, within) {
+  for (const el of await page.$$(within || "button, a, [role=button]")) {
+    const t = ((await el.innerText().catch(() => "")) || (await el.getAttribute("aria-label").catch(() => "")) || "").replace(/\s+/g, " ").trim();
+    if (re.test(t) && (await el.isVisible().catch(() => false))) { await el.click({ timeout: 5000 }).catch(() => {}); return t; }
+  }
+  return null;
+}
+
+/* Choix du magasin, comme une personne : enseignes dont les prix dépendent du magasin (réglage « magasins » de
+   tools/sources.json). On ne choisit jamais une livraison à domicile, qui demanderait une adresse. */
+const STORE = {
+  async auchan(page, st) {
+    await page.goto("https://www.auchan.fr/", { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.waitForTimeout(3500);
+    await clickText(page, REFUSE);
+    await page.waitForTimeout(1000);
+    await clickText(page, /choisir vos courses|choisir (un|mon|votre) (magasin|drive)/i);
+    await page.waitForTimeout(2500);
+    let typed = false;
+    for (const i of await page.$$("input")) {
+      const h = [await i.getAttribute("placeholder"), await i.getAttribute("aria-label")].join(" ");
+      if (/code postal/i.test(h) && (await i.isVisible().catch(() => false))) { await i.click().catch(() => {}); await i.type(st.lieu, { delay: 60 }); typed = true; break; }
+    }
+    if (!typed) return null;
+    await page.waitForTimeout(3500);
+    await clickText(page, new RegExp(st.lieu.split("-")[0], "i"), "li, [role=option], button, a");
+    await page.waitForTimeout(4000);
+    const label = await page.evaluate(({ want }) => {
+      const W = new RegExp(want, "i");
+      for (const b of document.querySelectorAll("button, a")) {
+        if (!/^\s*choisir\s*$/i.test(b.innerText || "")) continue;
+        let card = b;
+        for (let k = 0; k < 6 && card.parentElement; k++) { card = card.parentElement; if ((card.innerText || "").length > 40) break; }
+        const t = (card.innerText || "").replace(/\s+/g, " ");
+        if (W.test(t) && !/livraison à domicile/i.test(t)) { b.click(); return t.slice(0, 120); }
+      }
+      return null;
+    }, { want: st.retrait });
+    await page.waitForTimeout(4000);
+    return label;
+  },
+};
 
 async function readPage(page, src) {
   const res = await page.goto(src.url, { waitUntil: "domcontentloaded", timeout: 45000 });
@@ -136,12 +191,19 @@ async function readPage(page, src) {
   const page = await ctx.newPage();
   const rows = [], summary = [];
   const done = new Set();
+  const chosen = {};
+  const stores = conf.magasins || {};
   const queue = sources.map((s) => ({ ...s }));
   while (queue.length) {
     const src = queue.shift();
-    const key = src.url.split("?")[0];
+    const key = src.retailer === "auchan" ? src.url.split("#")[0] : src.url.split("?")[0];
     if (done.has(key)) continue;
     done.add(key);
+    if (STORE[src.retailer] && stores[src.retailer] && !(src.retailer in chosen)) {
+      chosen[src.retailer] = await STORE[src.retailer](page, stores[src.retailer]).catch((e) => null);
+      console.log(`${src.retailer} : magasin ${chosen[src.retailer] ? "choisi, " + chosen[src.retailer] : "non choisi, pages ignorées"}`);
+    }
+    if (STORE[src.retailer] && !chosen[src.retailer]) { summary.push({ retailer: src.retailer, rayon: src.rayon, url: src.url, status: 0, products: 0, error: "magasin non choisi" }); continue; }
     let r = null, err = null;
     for (let attempt = 0; attempt < 2 && !r; attempt++) {
       try { r = await readPage(page, src); } catch (e) { err = String(e.message || e).split("\n")[0]; await sleep(4000); }
@@ -153,6 +215,7 @@ async function readPage(page, src) {
     if (r) {
       rows.push({ url: src.url, prompt: src.prompt, text: JSON.stringify(src.retailer === "carrefour" ? r.products : { products: r.products, next_page: r.next_page }), ts });
       if (r.next_page && src.retailer === "houra" && !done.has(r.next_page.split("?")[0]) && queue.length < 200 && /-\d+\.html/.test(r.next_page)) queue.unshift({ ...src, url: r.next_page });
+      if (r.next_page && src.retailer === "auchan" && (src.depth || 0) < 2 && !done.has(r.next_page.split("#")[0])) queue.unshift({ ...src, url: r.next_page, depth: (src.depth || 0) + 1 });
       if (diag) {
         const slug = `${src.retailer}-${src.rayon}-${done.size}`;
         fs.writeFileSync(path.join(WORK, "diag", slug + ".json"), JSON.stringify({ src: src.url, status: r.status, title: r.title, products: r.products.slice(0, 8) }, null, 1));

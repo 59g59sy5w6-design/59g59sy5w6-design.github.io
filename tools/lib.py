@@ -201,6 +201,7 @@ FAMILY = {'Monoprix Je Suis Vert': 'Monoprix', 'Monoprix Gourmet': 'Monoprix', '
 MDD = {
     'monoprix': ['Monoprix', 'Naturalia', 'Tous les Jours'],
     'houra': ['Auchan', 'Pouce'],
+    'auchan': ['Auchan', 'Pouce'],
     'carrefour': ['Carrefour', 'Simpl', 'Reflets de France'],
 }
 

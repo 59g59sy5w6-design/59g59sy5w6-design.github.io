@@ -140,6 +140,8 @@ for r in raw:
                 if parse_qty(tail) or parse_rolls(tail) or re.search(r'\d', tail):
                     label, fmt = lab.strip(), tail.strip()
             rid = (re.search(r'/(\d+)/?$', url or '') or [None, key(name)])[1]
+        elif ret == 'auchan':
+            rid = (re.search(r'/pr-(C?\d+)', url or '') or [None, key(name)])[1]
         else:
             rid = (re.search(r'(MPX_\d+)', url or '') or [None, key(name)])[1]
         if not brand:
