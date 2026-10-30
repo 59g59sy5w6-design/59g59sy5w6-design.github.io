@@ -139,6 +139,7 @@
    ]
   },
   "group": "auchan",
+  "livraison": "auchan-livraison-perreux",
   "magasin": true
  },
  {
@@ -148,6 +149,7 @@
   "order": 7,
   "home": "https://www.auchan.fr/",
   "group": "auchan",
+  "livraison": "auchan-livraison-paris14",
   "channel": {
    "mode": "retrait",
    "where": "Paris Alésia (191 rue d'Alésia)",
@@ -177,6 +179,7 @@
   "order": 8,
   "home": "https://www.auchan.fr/",
   "group": "auchan",
+  "livraison": "auchan-livraison-paris16",
   "channel": {
    "mode": "retrait",
    "where": "Paris Belles Feuilles (16 rue des Belles Feuilles)",
@@ -375,6 +378,7 @@
   "order": 10,
   "home": "https://www.leclercdrive.fr/",
   "group": "leclerc",
+  "livraison": "leclerc-livraison",
   "simulated": true,
   "simulation": {
    "base": "auchan",

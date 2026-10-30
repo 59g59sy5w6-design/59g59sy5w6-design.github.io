@@ -39,13 +39,13 @@
   const standalone = () => (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
 
   /* ---------- état ---------- */
-  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, maxOrders: 3, extraCost: 0 };
+  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, liv: {}, maxOrders: 3, extraCost: 0 };
   const ROOTS = { accueil: "#/", rayons: "#/rayons", recherche: "#/recherche", listes: "#/listes", panier: "#/panier" };
   const S = {
     ready: false, failed: false,
     rayons: [], prods: new Map(), list: [], rets: [], retMap: new Map(), meta: {},
     basket: store.get("basket", {}),
-    prefs: Object.assign({}, PREFS0, { pick: {} }, store.get("prefs", {})),
+    prefs: Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {} }, store.get("prefs", {})),
     lists: store.get("lists", []),
     recent: store.get("recent", []),
     seen: store.get("seen", {}),
@@ -59,7 +59,9 @@
 
   /* ---------- données ---------- */
   const retName = (id) => (S.retMap.get(id) || {}).name || id;
-  const retOn = (id) => S.retMap.has(id) && !S.prefs.off[id];
+  /* désactiver une enseigne vaut pour toutes ses options de livraison et de retrait (« group ») */
+  const offKey = (r) => (r && (r.group || r.id)) || "";
+  const retOn = (id) => S.retMap.has(id) && !S.prefs.off[offKey(S.retMap.get(id))];
   function offers(p, onlyOn) {
     const out = [];
     for (const id of Object.keys(p.offers || {})) {
@@ -138,12 +140,23 @@
     const id = (S.prefs.pick || {})[g];
     return members.some((m) => m.id === id) ? id : members[0].id;
   }
+  const isPickup = (r) => ((r && r.channel) || {}).mode === "retrait";
+  /* Option retenue dans un groupe. Avec « Sans achat en magasin » (mode false), on ne se déplace pas : un point de
+     retrait est remplacé par la livraison à domicile choisie pour lui (S.prefs.liv), sinon la plus proche (champ
+     « livraison » de data/retailers.json). Le choix des réglages reste gardé : en décochant, on revient au retrait. */
+  function pickFor(g, mode) {
+    const ms = groupsOf()[g] || [];
+    if (!ms.length) return null;
+    const id = pickOf(g, ms), r = ms.find((m) => m.id === id);
+    if (mode !== false || !isPickup(r)) return id;
+    const alt = [(S.prefs.liv || {})[id], r.livraison].find((x) => ms.some((m) => m.id === x && !isPickup(m)));
+    return alt || (ms.find((m) => !isPickup(m)) || r).id;
+  }
+  const retsFor = (mode) => (S.allRets || []).filter((x) => !x.group || x.id === pickFor(x.group, mode));
   function applyGroups() {
-    const G = groupsOf();
-    S.rets = (S.allRets || []).filter((x) => !x.group || x.id === pickOf(x.group, G[x.group]));
+    S.rets = retsFor(S.prefs.comp !== false);
     S.retMap = new Map(S.rets.map((x) => [x.id, x]));
     S._sug = null;
-    RES.base = "";
   }
 
   async function load() {
@@ -158,6 +171,13 @@
     S._sug = null;
     RES.base = "";
     S.allRets = r.slice().sort((a, b) => a.order - b.order);
+    S.allMap = new Map(S.allRets.map((x) => [x.id, x]));
+    /* réglages d'avant : une option désactivée l'était seule ; c'est désormais l'enseigne entière, telle qu'elle s'affichait */
+    if (!S.prefs.offv) {
+      const off = S.prefs.off || {}, G = groupsOf();
+      for (const g of Object.keys(G)) { const was = !!off[pickOf(g, G[g])]; G[g].forEach((m) => delete off[m.id]); if (was) off[g] = true; }
+      S.prefs.off = off; S.prefs.offv = 1; savePrefs();
+    }
     applyGroups();
     S.meta = m || {};
     S.retDate = {};
@@ -269,10 +289,10 @@
     for (let i = 1; i < T.length; i++) T[i].fee = Math.min(T[i].fee, T[i - 1].fee);
     return T;
   }
-  function channels() {
+  function chansOf(rets) {
     const out = [];
-    for (const r of S.rets) {
-      if (!retOn(r.id) || !r.channel) continue;
+    for (const r of rets) {
+      if (S.prefs.off[offKey(r)] || !r.channel) continue;
       const ch = r.channel;
       out.push({ id: r.id, store: { retailer: r.id }, P: { min: Math.round((ch.minOrder || 0) * 100), fixed: Math.round((ch.fixedFee || 0) * 100), tiers: tiersOf(r).map((t) => ({ from: Math.round(t.from * 100), fee: Math.round(t.fee * 100) })) } });
     }
@@ -283,9 +303,9 @@
      Au plus un quart des produits du panier, pour que la commande reste la base des courses.
      Réglage « Sans achat en magasin » coché (S.prefs.comp === false) : aucun, tout passe par les commandes. */
   const compMaxFor = (on, n) => (on ? Math.max(1, Math.floor(n / 4)) : 0);
-  function model() {
-    const chans = channels();
-    const store = chans.map((ch) => { const r = S.retMap.get(ch.id); return !!(r && r.magasin && !r.simulated); });
+  function model(mode) {
+    const chans = chansOf(retsFor(mode));
+    const store = chans.map((ch) => { const r = S.allMap.get(ch.id); return !!(r && r.magasin && !r.simulated); });
     const lines = [], offs = [], comp = [], uncovered = [];
     let n = 0;
     for (const id of Object.keys(S.basket)) {
@@ -302,17 +322,18 @@
       });
       if (o.length) { lines.push({ id, q, n: n++ }); offs.push(o); comp.push(c); } else uncovered.push(id);
     }
-    const compMax = compMaxFor(S.prefs.comp !== false, lines.length);
+    const compMax = compMaxFor(mode !== false, lines.length);
     return { lines, offers: offs, comp, compMax, chans, uncovered };
   }
   /* Répartition du panier : chaque nombre de commandes, de 1 au nombre d'enseignes, est calculé une fois, du plus petit au
      plus grand (optimizer.js, runAll). RES.steps[k] = { full, partial, truncated } : « full » prend tout le panier en
      k commandes au plus, « partial » laisse de côté les produits qu'aucune commande possible ne peut prendre. */
   /* Les deux réglages « Sans achat en magasin » sont calculés pour le même panier, celui qui est choisi d'abord : le panier
-     dit ce que coûte l'autre, et basculer de l'un à l'autre ne relance pas le calcul. RES.by[mode] = { steps, done },
-     mode true = achat en magasin permis. RES.queue : les réglages en cours de calcul, dans l'ordre. */
+     dit ce que coûte l'autre, et basculer de l'un à l'autre ne relance pas le calcul. RES.by[mode] = { M, steps, done },
+     mode true = achat en magasin et retrait permis, false = tout livré. RES.queue : les réglages en cours de calcul. */
   const RES = {
-    base: "", M: null, by: null, mode: true, queue: [], K: 3, lambda: 0,
+    base: "", by: null, mode: true, queue: [], K: 3, lambda: 0,
+    get M() { return this.by ? this.by[this.mode].M : null; },
     get steps() { return this.by ? this.by[this.mode].steps : {}; },
     get done() { return !this.by || this.by[this.mode].done; },
     get other() { return this.by ? this.by[!this.mode].steps : {}; },
@@ -320,19 +341,19 @@
   };
   let W = null, wSeq = 0, wBusy = false, cartTimer = 0;
   function cartResult() {
-    const base = JSON.stringify([S.basket, S.prefs.off, S.prefs.fee, S.prefs.extraCost, S.rets.map((r) => r.id)]);
     const mode = S.prefs.comp !== false;
-    if (!RES.M || RES.base !== base) {
-      const M = model();
-      Object.assign(RES, { base, M, mode, by: { true: { steps: {}, done: false }, false: { steps: {}, done: false } }, queue: [], lambda: Math.round((S.prefs.extraCost || 0) * 100) });
-      if (!M.lines.length || !M.chans.length) RES.by.true.done = RES.by.false.done = true;
-      else startCalc([mode, !mode]);
+    const base = JSON.stringify([S.basket, S.prefs.off, S.prefs.fee, S.prefs.extraCost, retsFor(true).map((r) => r.id), retsFor(false).map((r) => r.id)]);
+    if (!RES.by || RES.base !== base) {
+      const by = { true: { M: model(true), steps: {}, done: false }, false: { M: model(false), steps: {}, done: false } };
+      for (const m of [true, false]) if (!by[m].M.lines.length || !by[m].M.chans.length) by[m].done = true;
+      Object.assign(RES, { base, mode, by, queue: [], lambda: Math.round((S.prefs.extraCost || 0) * 100) });
+      const todo = [mode, !mode].filter((m) => !by[m].done);
+      if (todo.length) startCalc(todo);
     } else if (RES.mode !== mode) {
       RES.mode = mode;
       /* le réglage choisi n'est ni calculé ni en cours de calcul : il passe en premier */
       if (!RES.by[mode].done && RES.queue[0] !== mode) startCalc(RES.by[!mode].done ? [mode] : [mode, !mode]);
     }
-    RES.M.compMax = compMaxFor(mode, RES.M.lines.length);
     RES.K = Math.max(1, Math.min(RES.M.chans.length || 1, S.prefs.maxOrders || 3));
     return RES;
   }
@@ -344,13 +365,12 @@
     return true;
   }
   function runSync(seq, modes, ms) {
-    const M = RES.M;
-    for (const mode of modes) runAll(Object.assign({}, M, { compMax: compMaxFor(mode, M.lines.length) }), M.chans.length, RES.lambda, (msg) => collect(seq, Object.assign({ mode }, msg)), ms);
+    for (const mode of modes) { const M = RES.by[mode].M; runAll(M, M.chans.length, RES.lambda, (msg) => collect(seq, Object.assign({ mode }, msg)), ms); }
   }
   function startCalc(modes) {
-    const seq = ++wSeq, M = RES.M;
+    const seq = ++wSeq;
     RES.queue = modes.slice();
-    if (M.lines.length <= 10 || typeof Worker === "undefined") {
+    if (Math.max(...modes.map((m) => RES.by[m].M.lines.length)) <= 10 || typeof Worker === "undefined") {
       if (W && wBusy) { W.terminate(); W = null; wBusy = false; }
       runSync(seq, modes, 1500);
       return;
@@ -367,7 +387,7 @@
         };
       }
       wBusy = true;
-      W.postMessage({ seq, M, Kmax: M.chans.length, lambda: RES.lambda, modes: modes.map((mode) => ({ mode, compMax: compMaxFor(mode, M.lines.length) })) });
+      W.postMessage({ seq, lambda: RES.lambda, modes: modes.map((mode) => ({ mode, M: RES.by[mode].M })) });
     } catch (err) { runSync(seq, modes, 3000); }
   }
   /* une étape du calcul est arrivée : le panier n'est redessiné que si le nombre de commandes choisi est concerné */
@@ -693,9 +713,22 @@
       `<div class="of"><p class="hint" style="color:var(--ink-2)">Tes commandes ne prennent pas ces produits\u00a0: achète-les en magasin, au plus près de chez toi. Ce sont les prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p></div></section>`;
   }
   /* interrupteur « Sans achat en magasin » du panier (le même que dans les réglages) */
+  const isDrive = (r) => /drive/i.test(((r && r.channel) || {}).label || "");
+  /* retraits remplacés par la livraison à domicile quand « Sans achat en magasin » est coché */
+  function swappedPickups() {
+    if (S.prefs.comp !== false) return [];
+    const G = groupsOf(), out = [];
+    for (const g of Object.keys(G)) {
+      const from = S.allMap.get(pickOf(g, G[g])), to = S.allMap.get(pickFor(g, false));
+      if (from && to && from.id !== to.id && !S.prefs.off[g]) out.push({ from, to });
+    }
+    return out;
+  }
   const noCompRow = () => {
     const noComp = S.prefs.comp === false;
-    return `<div class="optrow"><span class="ot">Sans achat en magasin<small>${noComp ? "Tout passe par les commandes en ligne." : "À cocher si tu ne peux pas te déplacer en magasin."}</small></span><label class="sw"><input type="checkbox" data-act="nocomp" aria-label="Sans achat en magasin"${noComp ? " checked" : ""}><span></span></label></div>`;
+    const sw = swappedPickups().map(({ from, to }) => `${esc(to.name)} est livré chez toi${to.channel.where ? ", zone " + esc(to.channel.where) : ""}, au lieu du ${isDrive(from) ? "drive" : "retrait" + (from.channel.where ? " à " + esc(from.channel.where) : "")}.`);
+    return `<div class="optrow"><span class="ot">Sans achat en magasin<small>${noComp ? "Tout est livré chez toi, sans achat en magasin ni retrait." : "À cocher pour tout recevoir chez toi, sans te déplacer."}</small></span><label class="sw"><input type="checkbox" data-act="nocomp" aria-label="Sans achat en magasin"${noComp ? " checked" : ""}><span></span></label></div>` +
+      (sw.length ? `<p class="sn">${sw.join(" ")} <a href="#/reglages">Changer de zone</a></p>` : "");
   };
   const compPhrase = (r) => (r.completed && r.completed.length ? `, et ${plural(r.completed.length, "produit", "produits")} en magasin` : "");
   VIEWS.panier = () => {
@@ -757,8 +790,15 @@
       const sh2 = complete ? where.replace(/^./, (c) => c.toUpperCase()).replace(/^Chez/, "En une commande chez") + compPhrase(bst) : `Sans ${plural(skipped.length, "produit", "produits")}, ${where}${compPhrase(bst)}`;
       const altBox = alt ? `<div class="alt"><p>Tout le panier\u00a0: <b>${eurC(fullTotal(alt))}</b> en ${altK} commandes${cheaper ? `, ou <b>${eurC(fullTotal(cheaper))}</b> en ${cheaper.orders.length} commandes` : ""}${isSim(alt) || (cheaper && isSim(cheaper)) ? ", avec des prix simulés" : ""}.</p><button class="btn sm" type="button" data-act="maxk" data-k="${altK}">Passer à ${altK} commandes</button></div>`
         : searching ? `<p class="sn">Recherche d'une répartition qui prend tout le panier…</p>` : "";
-      /* ce que donne l'autre réglage « Sans achat en magasin » pour tout le panier, au même nombre de commandes si possible */
+      /* ce que donne l'autre réglage pour tout le panier, au même nombre de commandes si possible : sans déplacement
+         (tout livré) si on peut se déplacer, et inversement avec ses déplacements (produits en magasin, retrait, drive) */
       const noComp = S.prefs.comp === false, os = res.other[K];
+      const trips = (r) => {
+        const out = [], n = (r.completed || []).length;
+        if (n) out.push(`${plural(n, "produit", "produits")} en magasin`);
+        r.orders.map((o) => S.allMap.get(o.ch.id)).filter(isPickup).forEach((x) => out.push((isDrive(x) ? "le drive " : "le retrait ") + x.name));
+        return out;
+      };
       let modeCmp = "";
       if (os) {
         let ob = os.full, ok2 = K;
@@ -766,11 +806,11 @@
         const at = ok2 === K ? "" : ` en ${ok2} commandes`;
         const diff = ob && complete ? fullTotal(ob) - money : 0;
         const soit = !complete || Math.abs(diff) < 1 ? "" : diff > 0 ? `, soit ${eurC(diff)} de plus` : `, soit ${eurC(-diff)} de moins`;
-        if (!noComp && (bst.completed || []).length) {
-          if (ob) modeCmp = `Sans achat en magasin\u00a0: ${eurC(fullTotal(ob))}${at}${soit}.`;
-          else if (res.otherDone) modeCmp = "Sans achat en magasin, tes commandes ne peuvent pas prendre tout le panier.";
-        } else if (noComp && ob && (ob.completed || []).length && (complete ? diff <= -50 : !alt || fullTotal(ob) < fullTotal(alt) - 50)) {
-          modeCmp = `Avec ${plural(ob.completed.length, "produit", "produits")} en magasin${complete ? "" : ", tout le panier"}\u00a0: ${eurC(fullTotal(ob))}${at}${soit}.`;
+        if (!noComp && trips(bst).length) {
+          if (ob) modeCmp = `Tout livré chez toi\u00a0: ${eurC(fullTotal(ob))}${at}${soit}.`;
+          else if (res.otherDone) modeCmp = "Sans te déplacer, tes commandes ne peuvent pas prendre tout le panier.";
+        } else if (noComp && ob && trips(ob).length && (complete ? diff <= -50 : !alt || fullTotal(ob) < fullTotal(alt) - 50)) {
+          modeCmp = `Avec ${esc(joinEt(trips(ob)))}${complete ? "" : ", tout le panier"}\u00a0: ${eurC(fullTotal(ob))}${at}${soit}.`;
         }
       }
       /* sans achat en magasin, un point de retrait reste un déplacement : la livraison à domicile se choisit dans les réglages */
@@ -838,7 +878,11 @@
         `<p class="gf">${S.prefs.zip && !inZone() ? "Les enseignes de Cabas livrent en Île-de-France : ton code postal n'est pas encore couvert." : "Les enseignes de Cabas livrent en Île-de-France. Chacune confirme ses créneaux au moment de commander."}</p>` +
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}" style="text-decoration:none">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
         `<p class="gf">Le panier n'utilise que les enseignes activées. Touche une enseigne pour voir ses frais et leurs sources.</p>` +
-        Object.entries(groupsOf()).map(([g, ms]) => `<h2 class="gh">${esc(ms[0].name)} : livraison ou retrait</h2><div class="group">${ms.map((m) => `<button class="row" type="button" data-act="pick" data-g="${esc(g)}" data-id="${esc(m.id)}" aria-pressed="${m.id === pickOf(g, ms)}"><span class="rt">${esc(optionLabel(m))}<small>${esc(pickup(m) ? (tiersOf(m)[0].fee > 0 ? eur(tiersOf(m)[0].fee) + " par retrait" : "Retrait gratuit") : feeShort(m))}</small></span>${m.id === pickOf(g, ms) ? ic("check", "chk") : ""}</button>`).join("")}</div><p class="gf">Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.</p>`).join("") +
+        Object.entries(groupsOf()).map(([g, ms]) => {
+          const noComp = S.prefs.comp === false, cur = pickFor(g, !noComp), back = noComp && cur !== pickOf(g, ms);
+          return `<h2 class="gh">${esc(ms[0].name)} : livraison ou retrait</h2><div class="group">${ms.map((m) => { const dis = noComp && pickup(m); return `<button class="row" type="button" data-act="pick" data-g="${esc(g)}" data-id="${esc(m.id)}" aria-pressed="${m.id === cur}"${dis ? " disabled" : ""}><span class="rt">${esc(optionLabel(m))}<small>${esc(pickup(m) ? (tiersOf(m)[0].fee > 0 ? eur(tiersOf(m)[0].fee) + " par retrait" : "Retrait gratuit") : feeShort(m))}</small></span>${m.id === cur ? ic("check", "chk") : ""}</button>`; }).join("")}</div>` +
+            `<p class="gf">${noComp ? `« Sans achat en magasin » est coché\u00a0: tout est livré chez toi, pas de retrait. ${[ms.filter((m) => !pickup(m)).length > 1 ? "choisis ta zone de livraison" : "", back ? "en décochant, tu retrouves ton " + (isDrive(S.allMap.get(pickOf(g, ms))) ? "drive" : "point de retrait") : ""].filter(Boolean).join("\u00a0; ").replace(/^./, (c) => c.toUpperCase()).replace(/.$/, (c) => c + ".")}` : `Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.`}</p>`;
+        }).join("") +
         `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Sans achat en magasin<small>Tout passe par les commandes en ligne. Décoché, un produit que tes commandes ne prennent pas peut s'acheter en magasin, au prix relevé le plus bas (au plus un quart du panier).</small></span><label class="sw"><input type="checkbox" data-act="nocomp"${S.prefs.comp === false ? " checked" : ""} aria-label="Sans achat en magasin"><span></span></label></div><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
         `<label class="row" for="extra"><span class="rt">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
         `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
@@ -1233,7 +1277,13 @@
       case "maxk": S.prefs.maxOrders = +t.dataset.k; savePrefs(); rerender(); break;
       case "clear": confirmSheet("Vider le panier\u00a0?", "Tous les produits du panier seront retirés.", "Vider le panier", "clearok"); break;
       case "clearok": S.basket = {}; saveBasket(); closeSheet(); rerender(); break;
-      case "pick": S.prefs.pick = Object.assign({}, S.prefs.pick, { [t.dataset.g]: id }); savePrefs(); applyGroups(); renderChrome(); rerender(); toast("Point de retrait choisi"); break;
+      case "pick": {
+        const g = t.dataset.g, m = S.allMap.get(id), chosen = S.allMap.get(pickOf(g, groupsOf()[g] || [m]));
+        if (!m || (S.prefs.comp === false && isPickup(m))) break;
+        if (S.prefs.comp === false && isPickup(chosen)) S.prefs.liv = Object.assign({}, S.prefs.liv, { [chosen.id]: id });
+        else S.prefs.pick = Object.assign({}, S.prefs.pick, { [g]: id });
+        savePrefs(); applyGroups(); renderChrome(); rerender(); toast(isPickup(m) ? "Point de retrait choisi" : "Zone de livraison choisie"); break;
+      }
       case "share": shareProduct(id); break;
       case "hideinstall": S.seen.install = true; store.set("seen", S.seen); t.closest(".install").remove(); break;
       case "install": installSheet(); break;
@@ -1259,15 +1309,15 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); break;
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {} }); S.seen = {}; ["basket", "lists", "recent", "prefs", "seen"].forEach((x) => store.set(x, x === "lists" || x === "recent" ? [] : {})); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, offv: 1 }); S.seen = {}; ["basket", "lists", "recent", "prefs", "seen"].forEach((x) => store.set(x, x === "lists" || x === "recent" ? [] : {})); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
       default: break;
     }
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.dataset && t.dataset.act === "nocomp") { S.prefs.comp = !t.checked; savePrefs(); if (S.route.name === "panier") setTimeout(rerender, 200); return; }
-    if (t.dataset && t.dataset.act === "ret") { if (t.checked) delete S.prefs.off[t.dataset.id]; else S.prefs.off[t.dataset.id] = true; savePrefs(); renderChrome(); return; }
+    if (t.dataset && t.dataset.act === "nocomp") { S.prefs.comp = !t.checked; savePrefs(); applyGroups(); setTimeout(() => { renderChrome(); rerender(); }, 200); return; }
+    if (t.dataset && t.dataset.act === "ret") { const k = offKey(S.allMap.get(t.dataset.id)) || t.dataset.id; if (t.checked) delete S.prefs.off[k]; else S.prefs.off[k] = true; savePrefs(); renderChrome(); return; }
     if (t.id === "extra") { const v = parseFloat(String(t.value).replace(",", ".")); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; savePrefs(); return; }
     if (t.dataset && t.dataset.fee) { const v = parseFloat(String(t.value).replace(",", ".")); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; savePrefs(); return; }
     if (t.id === "fmax") { F(t.dataset.k).max = t.value; refreshSheet(); }
