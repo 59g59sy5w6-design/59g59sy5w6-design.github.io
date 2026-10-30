@@ -18,7 +18,7 @@ SPLIT = set()
 
 
 def qsig(it):
-    if it['ray'] == 'papier':
+    if it['ray'] in ('papier', 'oeufs'):
         return ('roll', it['rolls'] or 0, 1)
     q = it['qty']
     if not q:

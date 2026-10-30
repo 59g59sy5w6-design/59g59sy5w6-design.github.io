@@ -21,6 +21,36 @@ def strip_acc(s):
 HORS_COURSES = re.compile(r'(^|\s)(radiateur|robinet d arrosage|robinet arrosage|pompe d arrosage|raccord|chauffe eau|recuperateur d eau|seche serviettes)(\s|$)')
 
 
+# Rayons lus par une recherche (Auchan) : le produit doit en être un (« œufs », pas des pâtes aux œufs ; « sucre » en
+# poudre ou en morceaux, pas un bonbon). Le texte comparé est le nom sans accents (key).
+RAYON_FILTRE = {
+    'oeufs': (r'\boeufs?\b', r'pate|chocolat|lasagne|nouille|tagliatel|coquillet|spaetzle|brioche|mayonnaise|caille|surprise|kinder|paques|blanc d|jaune d|liquide'),
+    'beurre': (r'\bbeurre\b', r'cacahu|biscuit|sable|cookie|galette|croissant|brioche|madeleine|pain|gateau|sauce|escargot|crepe|palet|caramel|karite|cacao|amande|noisette|pomme de terre|ail|fines herbes|persil'),
+    'riz': (r'\briz\b', r'galette|souffle|dessert|au lait|gateau|boisson|vinaigre|feuille|nouille|cake|creme|pudding|semoule|salade|vermicelle|papier|farine|cuisine|plat|poelee|cantonais|paella|risotto prepare|biscuit|chips|crackers|tortilla'),
+    'huile': (r'\bhuile\b', r'essentielle|massage|solaire|corps|cheveux|bebe|moteur|thon|sardine|maquereau|anchois|olives |aux olives|piment|spray|vaporisateur|lampe|parfum|seche|tomates sechees|artichaut|poivron|champignon'),
+    'tomates': (r'\btomates?\b', r'ketchup|sauce|soupe|sechee|cerise|chips|thon|sardine|maquereau|jus|ravioli|pizza|farcie|gaspacho|mozzarella|tartin|plat|riz|pates|lasagne|graine|plant|semence'),
+    'thon': (r'\bthon\b', r'rillette|salade|pate |pates|tartin|sauce|pizza|sandwich|croquette|chat|chien|terrine|mousse|tomate|crudites|paella|wrap|bouchee|quiche|pain'),
+    'farine': (r'\bfarine\b', r'bebe|lait|pain d epice|prete|gateau|biscuit|preparation|cereale|bouillie|croquette|chien|chat'),
+    'sucre': (r'\bsucres?\b', r'sans sucre|bonbon|confiserie|sucre d orge|sucette|chewing|biscuit|gateau|madeleine|crepe|gaufre|chocolat|confiture|sirop|dragee|barbe|caramel|soda|boisson|the |cafe|compote|cereale|yaourt|chantilly|perles de sucre|decor|vermicelle'),
+}
+_RF = {k: (re.compile(a), re.compile(b)) for k, (a, b) in RAYON_FILTRE.items()}
+
+
+def hors_rayon(ray, label):
+    f = _RF.get(ray)
+    if not f:
+        return False
+    k = key(label)
+    return not f[0].search(k) or bool(f[1].search(k))
+
+
+def parse_oeufs(text):
+    t = ' ' + key(text) + ' '
+    m = re.search(r'(\d+)\s*(?:gros |moyens |extra |frais )?oeufs', t) or re.search(r'(?:boite|plateau|lot|etui) de\s*(\d+)', t) or re.search(r'\bx\s*(\d+)\b', t)
+    n = int(m.group(1)) if m else None
+    return n if n and 2 <= n <= 60 else None
+
+
 def hors_courses(label):
     k = key(label)
     return bool(HORS_COURSES.search(k)) and not k.startswith('eau ')
@@ -57,9 +87,17 @@ RAYONS = [
     ('lait', 'Lait demi-écrémé', 'Crèmerie'),
     ('yaourts', 'Yaourts nature', 'Crèmerie'),
     ('fromages', 'Fromages râpés', 'Crèmerie'),
+    ('oeufs', 'Œufs', 'Crèmerie'),
+    ('beurre', 'Beurre', 'Crèmerie'),
     ('pates', 'Pâtes', 'Épicerie salée'),
+    ('riz', 'Riz', 'Épicerie salée'),
+    ('huile', 'Huile', 'Épicerie salée'),
+    ('tomates', 'Tomates en conserve', 'Épicerie salée'),
     ('conserves', 'Sardines', 'Épicerie salée'),
+    ('thon', 'Thon en conserve', 'Épicerie salée'),
     ('cafe', 'Café moulu', 'Épicerie sucrée'),
+    ('farine', 'Farine', 'Épicerie sucrée'),
+    ('sucre', 'Sucre', 'Épicerie sucrée'),
     ('gateaux', 'Madeleines et gâteaux', 'Épicerie sucrée'),
     ('papier', 'Papier toilette', 'Maison'),
     ('vaisselle', 'Liquide vaisselle', 'Maison'),

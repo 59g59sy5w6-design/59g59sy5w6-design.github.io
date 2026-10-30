@@ -167,6 +167,9 @@ for r in raw:
     rolls = lav = None
     if ray == 'papier':
         rolls = parse_rolls(fmt) or parse_rolls(r.get('name') or r.get('title'))
+    elif ray == 'oeufs':
+        # boîte de 6, 10, 12 œufs : compté à l'œuf, comme les rouleaux de papier
+        rolls = parse_oeufs(fmt) or parse_oeufs(r.get('name') or r.get('title'))
     else:
         if ret == 'monoprix':
             qty = parse_qty(r.get('name')) or parse_qty(fmt)
@@ -225,7 +228,7 @@ for it in items:
     k = it["rid"]
     if k not in best or it["ts"] > best[k]["ts"]:
         best[k] = it
-items = [it for it in best.values() if not lib.hors_courses(it.get("label") or "")]
+items = [it for it in best.values() if not lib.hors_courses(it.get("label") or "") and not lib.hors_rayon(it["ray"], (it.get("label") or "") + " " + (it.get("fmt_raw") or ""))]
 
 pages = lib.load_sources()["pages"]
 report = {"date": today.strftime("%Y-%m-%d"), "pages": [], "rayons": {}}

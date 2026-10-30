@@ -374,10 +374,12 @@
   /* boîte de sardines dans son étui carton, l'extrémité de la boîte visible sur le côté */
   function tin(x, by, w, h, o) {
     const d = 46;
+    const fish = `<path d="M-30,0C-19,-12 8,-12 19,0C8,12 -19,12 -30,0Z" fill="#fff" opacity=".94"/><path d="M19,0L32,-9L29,0L32,9Z" fill="#fff" opacity=".94"/><circle cx="-20" cy="-2" r="2.2" fill="${o.sleeve}"/><path d="M-8,-6Q-4,0 -8,6" stroke="${o.sleeve}" stroke-width="1.4" fill="none" opacity=".6"/>`;
+    const tomato = `<circle r="15" fill="#fff" opacity=".95"/><circle r="11.5" fill="#e74c3c"/><path d="M0,-11l3,-5M0,-11l-4,-3M0,-11l5,-1M0,-11l-5,1" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round"/>`;
     return box(x - d / 2, by, w, d, h, {
       body: o.sleeve, metalSide: true, face: (L, T, ww, hh) =>
         `<rect x="${f(L)}" y="${f(T + hh * 0.72)}" width="${f(ww)}" height="${f(hh * 0.12)}" fill="#fff" opacity=".85"/>` +
-        `<g transform="translate(${f(L + ww * 0.5)},${f(T + hh * 0.42)})"><path d="M-30,0C-19,-12 8,-12 19,0C8,12 -19,12 -30,0Z" fill="#fff" opacity=".94"/><path d="M19,0L32,-9L29,0L32,9Z" fill="#fff" opacity=".94"/><circle cx="-20" cy="-2" r="2.2" fill="${o.sleeve}"/><path d="M-8,-6Q-4,0 -8,6" stroke="${o.sleeve}" stroke-width="1.4" fill="none" opacity=".6"/></g>` +
+        `<g transform="translate(${f(L + ww * 0.5)},${f(T + hh * 0.42)})">${o.tomato ? tomato : fish}</g>` +
         `<rect x="${f(L)}" y="${f(T)}" width="${f(ww)}" height="${f(hh * 0.1)}" fill="${dk(o.sleeve, 0.18)}"/>`
     });
   }
@@ -494,6 +496,33 @@
       L.body = /sensible|sensitive|hypoaller|bebe|tolerance/.test(t) ? "#e9f1fa" : /laine|delicat/.test(t) ? "#f4dbe7" : /noir|black|sombre/.test(t) ? "#2b2f3a" : /white|blanc/.test(t) ? "#f4f7fb" : /couleur|color/.test(t) ? "#7b4fc4" : /marseille|vegetal|savon/.test(t) ? "#e9d8b6" : /lavande/.test(t) ? "#b79ad9" : /azur|fraicheur|frais|ocean|brise/.test(t) ? "#52a8e0" : /ecolabel|eco|nature/.test(t) ? "#7fbf6a" : pick(["#2a6fd6", "#1d9bb8", "#3b5bdb", "#16a34a", "#e8590c"]);
       L.a = pick(PAL.lessive);
       L.k = /recharge|eco.?recharge/.test(t) ? "doyl" : "jugl";
+    } else if (r === "oeufs") {
+      L.a = pick(["#c8a76b", "#b98b54", "#d4b483", "#a9c3a0"]);
+      L.n = q.n > 1 ? q.n : (+(/(\d+)\s*oeufs/.exec(t) || [])[1] || 6);
+      L.k = "eggs";
+    } else if (r === "beurre") {
+      L.a = /demi.?sel|\bsel\b|salé/.test(t) ? "#1f6fb2" : /doux/.test(t) ? "#d4a017" : pick(["#d4a017", "#c0392b", "#2e7d32", "#1f6fb2"]);
+      L.k = "butter";
+    } else if (r === "riz") {
+      L.shape = "lentil";
+      L.pc = /complet|brun|rouge|noir|sauvage|camargue/.test(t) ? "#a0764a" : "#f4efe2";
+      L.a = pick(["#c0392b", "#1f4e79", "#2e7d32", "#b5651d", "#7d3c98"]);
+      L.k = "pastabag";
+    } else if (r === "farine" || r === "sucre") {
+      L.body = r === "sucre" && /roux|cassonade|complet|canne/.test(t) ? "#d8b48a" : r === "farine" ? "#f3ede1" : "#fdfdfb";
+      L.a = pick(r === "farine" ? ["#1f4e79", "#c0392b", "#2e7d32", "#b5651d"] : ["#1f6fb2", "#c0392b", "#2e7d32", "#7d3c98"]);
+      L.cube = r === "sucre" && /morceau|cube/.test(t);
+      L.k = "sack";
+    } else if (r === "huile") {
+      L.liq = /olive/.test(t) ? "#9aa23a" : /colza/.test(t) ? "#e3c13a" : "#f0c53c";
+      L.a = pick(["#2e7d32", "#c0392b", "#1f4e79", "#d4a017"]);
+      L.size = q.v >= 900 ? "l1" : "s50";
+      L.dark = true;
+      L.k = "bottle";
+    } else if (r === "tomates") {
+      L.sleeve = pick(["#c0392b", "#a93226", "#d35400"]); L.tomato = true; L.k = "tin"; L.n = q.n;
+    } else if (r === "thon") {
+      L.sleeve = pick(["#1f4e79", "#2e86c1", "#2e7d32", "#b9770e", "#264653"]); L.k = "tin"; L.n = q.n;
     } else {
       L.k = "generic"; L.a = "#8a8f98";
     }
@@ -638,10 +667,37 @@
         gr = ground(122, B + 1, long ? 56 : 78, 8);
         break;
       }
+      case "eggs": {
+        const n = L.n >= 10 ? 4 : 3;
+        s = box(120 - 23, B, 150, 46, 60, {
+          body: L.a, face: (Lx, T, w, h) => {
+            let e = "";
+            for (let i = 0; i < n; i++) { const cx = Lx + (w * (i + 0.5)) / n; e += `<ellipse cx="${f(cx + 6)}" cy="${f(T - 8)}" rx="${f((w / n) * 0.3)}" ry="${f(h * 0.36)}" fill="#f7ecd9" stroke="${dk(L.a, 0.28)}" stroke-width="1"/>`; }
+            return e + `<rect x="${f(Lx)}" y="${f(T)}" width="${f(w)}" height="${f(h)}" fill="${L.a}"/><rect x="${f(Lx)}" y="${f(T + h * 0.34)}" width="${f(w)}" height="${f(h * 0.34)}" fill="#fff" opacity=".88"/><rect x="${f(Lx + w * 0.3)}" y="${f(T + h * 0.44)}" width="${f(w * 0.4)}" height="${f(h * 0.14)}" rx="3" fill="${dk(L.a, 0.2)}" opacity=".75"/>`;
+          },
+        });
+        gr = ground(122, B + 1, 96, 8);
+        break;
+      }
+      case "butter": {
+        s = box(120 - 20, B, 136, 40, 56, {
+          body: L.a, face: (Lx, T, w, h) => `<rect x="${f(Lx + w * 0.07)}" y="${f(T + h * 0.2)}" width="${f(w * 0.86)}" height="${f(h * 0.6)}" rx="7" fill="#fff" opacity=".92"/><rect x="${f(Lx + w * 0.2)}" y="${f(T + h * 0.38)}" width="${f(w * 0.6)}" height="${f(h * 0.12)}" rx="3" fill="${L.a}" opacity=".85"/><rect x="${f(Lx + w * 0.3)}" y="${f(T + h * 0.56)}" width="${f(w * 0.4)}" height="${f(h * 0.08)}" rx="2" fill="${L.a}" opacity=".5"/>`,
+        });
+        gr = ground(122, B + 1, 90, 8);
+        break;
+      }
+      case "sack": {
+        const h = L.cube ? 96 : 150, w = L.cube ? 120 : 96;
+        s = box(120 - 17, B, w, 34, h, {
+          body: L.body, crimpTop: !L.cube, face: (Lx, T, ww, hh) => `<rect x="${f(Lx)}" y="${f(T + hh * 0.16)}" width="${f(ww)}" height="${f(hh * 0.28)}" fill="${L.a}"/><circle cx="${f(Lx + ww / 2)}" cy="${f(T + hh * 0.62)}" r="${f(Math.min(ww, hh) * 0.16)}" fill="${lt(L.a, 0.72)}"/><rect x="${f(Lx + ww * 0.2)}" y="${f(T + hh * 0.84)}" width="${f(ww * 0.6)}" height="${f(hh * 0.04)}" rx="2" fill="${L.a}" opacity=".6"/>`,
+        });
+        gr = ground(120, B + 1, L.cube ? 86 : 74, 8);
+        break;
+      }
       case "tin": {
         const two = L.n > 1, h = two ? 58 : 76;
-        s += tin(120, B, 168, h, { sleeve: L.sleeve });
-        if (two) s += tin(120, B - h - 1, 168, h, { sleeve: dk(L.sleeve, 0.06) });
+        s += tin(120, B, 168, h, { sleeve: L.sleeve, tomato: L.tomato });
+        if (two) s += tin(120, B - h - 1, 168, h, { sleeve: dk(L.sleeve, 0.06), tomato: L.tomato });
         gr = ground(126, B + 1, 100, 9);
         break;
       }

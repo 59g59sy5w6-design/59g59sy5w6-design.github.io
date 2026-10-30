@@ -65,6 +65,11 @@ def fsize(v, u):
 
 
 def qty_display(it):
+    if it['ray'] == 'oeufs':
+        n = it.get('rolls')
+        if n:
+            return f"{n} œufs", {'v': n, 'u': 'pc', 'lab': 'œuf'}
+        return it['fmt_raw'] or '', None
     if it['ray'] == 'papier':
         r = it['rolls']
         return (f"{r} rouleau" + ('x' if r > 1 else '')) if r else (it['fmt_raw'] or ''), ({'v': r, 'u': 'pc', 'lab': 'rouleau'} if r else None)
@@ -89,9 +94,12 @@ def long_desc(it, disp):
     ray = it['ray']
     cont = {'eaux': 'bouteilles', 'sodas': 'bouteilles', 'jus': 'bouteilles', 'lait': 'bouteilles ou briques',
             'yaourts': 'pots', 'fromages': 'sachets', 'conserves': 'boîtes', 'cafe': 'paquets', 'pates': 'paquets',
-            'gateaux': 'sachets', 'vaisselle': 'flacons', 'lessive': 'flacons'}.get(ray, 'unités')
+            'gateaux': 'sachets', 'vaisselle': 'flacons', 'lessive': 'flacons', 'beurre': 'plaquettes', 'riz': 'paquets',
+            'huile': 'bouteilles', 'tomates': 'boîtes', 'thon': 'boîtes', 'farine': 'paquets', 'sucre': 'paquets'}.get(ray, 'unités')
     if ray == 'papier':
         return f"Paquet de {it['rolls']} rouleaux." if it.get('rolls') else ''
+    if ray == 'oeufs':
+        return f"Boîte de {it['rolls']} œufs." if it.get('rolls') else ''
     if not q:
         return ''
     tot = q['n'] * q['v']
@@ -154,6 +162,12 @@ def icon_of(it):
         return 'flacon'
     if ray == 'lessive':
         return 'jug'
+    if ray in ('tomates', 'thon'):
+        return 'tin'
+    if ray == 'huile':
+        return 'bottle'
+    if ray == 'riz':
+        return 'bag'
     return 'box'
 
 
@@ -296,7 +310,8 @@ products.sort(key=lambda p: (ray_order[p['ray']], -len(p['offers']), p['rank']))
 for p in products:
     p['r'] = p.pop('ray')
     p.pop('rank', None)
-rayons = [{'id': rid, 'name': name, 'aisle': aisle, 'order': i} for i, (rid, name, aisle) in enumerate(RAYONS)]
+# un rayon sans aucun produit (pas encore relu) n'est pas affiché
+rayons = [{'id': rid, 'name': name, 'aisle': aisle, 'order': i} for i, (rid, name, aisle) in enumerate(RAYONS) if any(p['r'] == rid for p in products)]
 os.makedirs(os.path.join(lib.ROOT, 'data'), exist_ok=True)
 live = {pp['id'] for pp in products}
 # un produit du catalogue publié qui n'existe plus sous son identifiant renvoie vers celui qui reprend ses offres
@@ -348,8 +363,12 @@ rets = {r['id']: r for r in json.load(open(os.path.join(lib.ROOT, 'data', 'retai
 names = {rid: name for rid, name, _ in RAYONS}
 coverage = dict(collections.Counter(r for p in products for r in p['offers']))
 missing, old = collections.defaultdict(list), collections.defaultdict(set)
+# seuls comptent les rayons qu'une enseigne a dans tools/sources.json : les autres ne sont pas relevés chez elle
+lus = {(pg['retailer'], pg['rayon']) for pg in lib.load_sources()['pages']}
 for ret in rets:
     for rid, name, _ in RAYONS:
+        if (ret, rid) not in lus:
+            continue
         got = [it for it in items_all if it['ret'] == ret and it['ray'] == rid]
         if not got:
             missing[ret].append(name)

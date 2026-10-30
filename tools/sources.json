@@ -1072,6 +1072,390 @@
    "match": "text=lessive%20liquide#livraison-paris14",
    "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#livraison-paris14",
    "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "oeufs",
+   "host": "auchan.fr",
+   "match": "text=oeufs",
+   "url": "https://www.auchan.fr/recherche?text=oeufs",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "oeufs",
+   "host": "auchan.fr",
+   "match": "text=oeufs#alesia",
+   "url": "https://www.auchan.fr/recherche?text=oeufs#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "oeufs",
+   "host": "auchan.fr",
+   "match": "text=oeufs#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=oeufs#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "oeufs",
+   "host": "auchan.fr",
+   "match": "text=oeufs#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=oeufs#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "oeufs",
+   "host": "auchan.fr",
+   "match": "text=oeufs#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=oeufs#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "oeufs",
+   "host": "auchan.fr",
+   "match": "text=oeufs#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=oeufs#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "beurre",
+   "host": "auchan.fr",
+   "match": "text=beurre",
+   "url": "https://www.auchan.fr/recherche?text=beurre",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "beurre",
+   "host": "auchan.fr",
+   "match": "text=beurre#alesia",
+   "url": "https://www.auchan.fr/recherche?text=beurre#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "beurre",
+   "host": "auchan.fr",
+   "match": "text=beurre#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=beurre#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "beurre",
+   "host": "auchan.fr",
+   "match": "text=beurre#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=beurre#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "beurre",
+   "host": "auchan.fr",
+   "match": "text=beurre#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=beurre#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "beurre",
+   "host": "auchan.fr",
+   "match": "text=beurre#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=beurre#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "riz",
+   "host": "auchan.fr",
+   "match": "text=riz",
+   "url": "https://www.auchan.fr/recherche?text=riz",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "riz",
+   "host": "auchan.fr",
+   "match": "text=riz#alesia",
+   "url": "https://www.auchan.fr/recherche?text=riz#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "riz",
+   "host": "auchan.fr",
+   "match": "text=riz#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=riz#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "riz",
+   "host": "auchan.fr",
+   "match": "text=riz#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=riz#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "riz",
+   "host": "auchan.fr",
+   "match": "text=riz#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=riz#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "riz",
+   "host": "auchan.fr",
+   "match": "text=riz#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=riz#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "huile",
+   "host": "auchan.fr",
+   "match": "text=huile",
+   "url": "https://www.auchan.fr/recherche?text=huile",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "huile",
+   "host": "auchan.fr",
+   "match": "text=huile#alesia",
+   "url": "https://www.auchan.fr/recherche?text=huile#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "huile",
+   "host": "auchan.fr",
+   "match": "text=huile#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=huile#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "huile",
+   "host": "auchan.fr",
+   "match": "text=huile#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=huile#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "huile",
+   "host": "auchan.fr",
+   "match": "text=huile#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=huile#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "huile",
+   "host": "auchan.fr",
+   "match": "text=huile#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=huile#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20pel%C3%A9es",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20pel%C3%A9es#alesia",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20pel%C3%A9es#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20pel%C3%A9es#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20pel%C3%A9es#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20pel%C3%A9es#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "thon",
+   "host": "auchan.fr",
+   "match": "text=thon",
+   "url": "https://www.auchan.fr/recherche?text=thon",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "thon",
+   "host": "auchan.fr",
+   "match": "text=thon#alesia",
+   "url": "https://www.auchan.fr/recherche?text=thon#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "thon",
+   "host": "auchan.fr",
+   "match": "text=thon#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=thon#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "thon",
+   "host": "auchan.fr",
+   "match": "text=thon#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=thon#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "thon",
+   "host": "auchan.fr",
+   "match": "text=thon#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=thon#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "thon",
+   "host": "auchan.fr",
+   "match": "text=thon#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=thon#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "farine",
+   "host": "auchan.fr",
+   "match": "text=farine%20de%20bl%C3%A9",
+   "url": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "farine",
+   "host": "auchan.fr",
+   "match": "text=farine%20de%20bl%C3%A9#alesia",
+   "url": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "farine",
+   "host": "auchan.fr",
+   "match": "text=farine%20de%20bl%C3%A9#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "farine",
+   "host": "auchan.fr",
+   "match": "text=farine%20de%20bl%C3%A9#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "farine",
+   "host": "auchan.fr",
+   "match": "text=farine%20de%20bl%C3%A9#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "farine",
+   "host": "auchan.fr",
+   "match": "text=farine%20de%20bl%C3%A9#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "sucre",
+   "host": "auchan.fr",
+   "match": "text=sucre",
+   "url": "https://www.auchan.fr/recherche?text=sucre",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "sucre",
+   "host": "auchan.fr",
+   "match": "text=sucre#alesia",
+   "url": "https://www.auchan.fr/recherche?text=sucre#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sucre",
+   "host": "auchan.fr",
+   "match": "text=sucre#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=sucre#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sucre",
+   "host": "auchan.fr",
+   "match": "text=sucre#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=sucre#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "sucre",
+   "host": "auchan.fr",
+   "match": "text=sucre#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=sucre#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "sucre",
+   "host": "auchan.fr",
+   "match": "text=sucre#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=sucre#livraison-paris14",
+   "prompt": ""
   }
  ],
  "robot": {
