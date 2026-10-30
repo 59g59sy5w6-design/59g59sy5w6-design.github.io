@@ -22,3 +22,12 @@ fi
 
 node tools/scrape.js
 bash tools/publish.sh robot
+
+# compte rendu du passage (une ligne par page, pages Houra trouvées par le robot) sur la branche journal,
+# remplacée à chaque passage : les journaux d'Actions ne se lisent pas depuis une session Claude Code
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+git checkout -q -B journal
+for f in tools/work/scrape.json tools/work/discovered.json; do [ -f "$f" ] && git add -f "$f"; done
+git commit -q -m "Journal du relevé $(date -u +%Y-%m-%dT%H:%MZ)" || true
+git push -q -f origin journal || true
