@@ -407,6 +407,7 @@ body.grouped .empty .art { background: #fff; }
 .opt { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 10px 16px; width: 100%; text-align: left; font-size: 17px; letter-spacing: -0.02em; position: relative; }
 .opt + .opt::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 0.5px; background: var(--sep); }
 .opt .ck { margin-left: auto; color: var(--brand); width: 20px; height: 20px; stroke-width: 2.4; }
+.opt > span:first-child { flex: 1; min-width: 0; }
 .opt .c { margin-left: auto; font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .opt .c + .box { margin-left: 10px; }
 .box { width: 22px; height: 22px; border-radius: 11px; border: 1.5px solid var(--ink-3); flex: none; display: grid; place-items: center; color: #fff; }
@@ -485,6 +486,13 @@ body.grouped .empty .art { background: #fff; }
 .sum .alt .btns.two { grid-template-columns: 1fr 1fr; margin-top: 10px; }
 .sum .alt .btns.two .btn { width: 100%; margin-top: 0; }
 @media (prefers-reduced-motion: no-preference) { .prog span { transition: width 0.25s ease; } }
+
+.sum .bud { font-size: 15px; font-weight: 600; margin-top: 6px; letter-spacing: -0.01em; }
+.sum .bud.ok { color: var(--brand-ink); }
+.sum .bud.over { color: var(--promo); }
+.sum .bud .lnk, .sum .sn .lnk { font-size: 15px; font-weight: 400; color: var(--brand); margin-left: 4px; }
+.prow .was { font-size: 13px; color: var(--ink-2); margin-right: 6px; font-variant-numeric: tabular-nums; }
+.of .btn.tint .ic { width: 18px; height: 18px; }
 
 /* ---------- divers ---------- */
 .toast { position: fixed; z-index: 60; left: 50%; bottom: calc(var(--sb) + var(--tab) + 80px); transform: translateX(-50%); max-width: calc(100% - 48px); padding: 11px 18px; border-radius: 22px; background: rgba(28, 28, 30, 0.94); color: #fff; font-size: 15px; letter-spacing: -0.01em; text-align: center; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); animation: fade 0.2s ease; }

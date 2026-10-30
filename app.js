@@ -553,6 +553,7 @@
         `<a class="wlcta" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>` +
         savingsCard() +
         installCard() +
+        dropsRail() +
         (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals">${ds.map(dealCard).join("")}</div>` : "") +
         `<div class="sh"><h2>Rayons</h2><a href="#/rayons">Tout voir</a></div><div class="cats">${tiles}</div>` +
         (all3.length ? `<div class="sh"><h2>Comparés dans ${S.rets.length > 3 ? "plusieurs" : "les " + S.rets.length} enseignes</h2></div><div class="rail">${all3.map(card).join("")}</div>` : "") +
@@ -717,7 +718,7 @@
     const n = c.reduce((a, x) => a + x.l.q, 0);
     return `<section class="order" aria-label="À acheter en magasin"><div class="oh"><span class="av">${ic("store", "avi")}</span><div class="rt"><h3>À acheter en magasin</h3><small>${plural(n, "article", "articles")}, chez ${esc(shops)}</small></div>${px(r.compTotal / 100)}</div>` +
       c.map((x) => itemRow(x.l.id, x.cost, x.l.q, "chez " + retName(x.ret))).join("") +
-      `<div class="of"><p class="hint" style="color:var(--ink-2)">Tes commandes ne prennent pas ces produits\u00a0: achète-les en magasin, au plus près de chez toi. Ce sont les prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p></div></section>`;
+      `<div class="of"><p class="hint" style="color:var(--ink-2)">Tes commandes ne prennent pas ces produits\u00a0: achète-les en magasin, au plus près de chez toi. Ce sont les prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p><button class="btn tint" type="button" data-act="shop">${ic("list")}Liste pour le magasin</button></div></section>`;
   }
   /* interrupteur « Sans achat en magasin » du panier (le même que dans les réglages) */
   const isDrive = (r) => /drive/i.test(((r && r.channel) || {}).label || "");
@@ -837,7 +838,7 @@
       const doneBox = allDone ? `<div class="alt"><p><b>Toutes tes commandes sont passées.</b>${S.guide.saved ? ` Tu as économisé ${eurC(S.guide.saved)}, meilleurs prix et remplacements compris.` : ""}</p><div class="btns two"><button class="btn sm tint" type="button" data-act="savelist">Garder en liste</button><button class="btn sm" type="button" data-act="clearok">Vider le panier</button></div></div>` : "";
       const sw = swaps(), swTot = sw.reduce((a, x) => a + x.save, 0);
       const swapCard = sw.length && !allDone ? `<button class="savecard" type="button" data-act="swaps">${ic("swap", "si")}<span><b>Économiser encore, environ ${eur(swTot)}</b><small>${plural(sw.length, "produit a", "produits ont")} un équivalent moins cher, d'une autre marque</small></span>${ic("chev", "chev")}</button>` : "";
-      side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${doneBox}${altBox}` +
+      side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${budgetLine(money, complete)}${doneBox}${altBox}` +
         (save ? `<p class="sv">${save}</p>` : "") + (why ? `<p class="sn">${why}</p>` : "") + (more ? `<p class="sn">${more}</p>` : "") +
         (notCheapest ? `<p class="sn">Certains produits ne sont pas pris là où ils sont le moins chers\u00a0: avec les minimums d'achat et la livraison, ce regroupement revient moins cher.</p>` : "") +
         (st.truncated ? `<p class="sn">Gros panier\u00a0: le calcul a été écourté, le vrai minimum peut être un peu plus bas.</p>` : "") +
@@ -892,6 +893,7 @@
     return {
       title: "Réglages", grouped: true,
       html: `<h1 class="lt">Réglages</h1>` +
+        `<h2 class="gh">Affichage</h2><div class="group"><div class="row"><span class="rt">Taille du texte</span><div class="seg" style="width:252px" role="group" aria-label="Taille du texte">${ZOOMS.map(([v, l]) => `<button type="button" data-act="zoom" data-v="${v}" aria-pressed="${String(S.prefs.zoom || 1) === v}">${l}</button>`).join("")}</div></div><button class="row link" type="button" data-act="welcome">Reprendre les trois questions de départ</button></div>` +
         `<h2 class="gh">Livraison</h2><div class="group"><button class="row" type="button" data-act="zip"><span class="rt">Code postal</span><span class="val">${S.prefs.zip ? esc(S.prefs.zip) : "À indiquer"}</span>${ic("chev", "chev")}</button></div>` +
         `<p class="gf">${S.prefs.zip && !inZone() ? "Les enseignes de Cabas livrent en Île-de-France : ton code postal n'est pas encore couvert." : "Les enseignes de Cabas livrent en Île-de-France. Chacune confirme ses créneaux au moment de commander."}</p>` +
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}" style="text-decoration:none">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
@@ -902,6 +904,7 @@
             `<p class="gf">${noComp ? `« Sans achat en magasin » est coché\u00a0: tout est livré chez toi, pas de retrait. ${[ms.filter((m) => !pickup(m)).length > 1 ? "choisis ta zone de livraison" : "", back ? "en décochant, tu retrouves ton " + (isDrive(S.allMap.get(pickOf(g, ms))) ? "drive" : "point de retrait") : ""].filter(Boolean).join("\u00a0; ").replace(/^./, (c) => c.toUpperCase()).replace(/.$/, (c) => c + ".")}` : `Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.`}</p>`;
         }).join("") +
         `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Sans achat en magasin<small>Tout passe par les commandes en ligne. Décoché, un produit que tes commandes ne prennent pas peut s'acheter en magasin, au prix relevé le plus bas (au plus un quart du panier).</small></span><label class="sw"><input type="checkbox" data-act="nocomp"${S.prefs.comp === false ? " checked" : ""} aria-label="Sans achat en magasin"><span></span></label></div><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
+        `<button class="row" type="button" data-act="budget"><span class="rt">Budget par panier<small>Le panier dit ce qu'il reste ou de combien tu dépasses.</small></span><span class="val">${parseFloat(S.prefs.budget) > 0 ? eurR(parseFloat(S.prefs.budget)) : "Aucun"}</span>${ic("chev", "chev")}</button>` +
         (Object.keys(S.prefs.keep || {}).length ? `<div class="row"><span class="rt">Marques gardées<small>${plural(Object.keys(S.prefs.keep).length, "produit n'est", "produits ne sont")} plus proposés au remplacement par un équivalent moins cher.</small></span><button class="btn sm plain" type="button" data-act="keepreset">Tout reproposer</button></div>` : "") +
         `<label class="row" for="extra"><span class="rt">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
         `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
@@ -1480,6 +1483,98 @@
     };
   };
 
+  /* ---------- taille du texte ---------- */
+  /* « Grande » et « Très grande » agrandissent toute l'appli, textes et boutons, comme le zoom du navigateur. */
+  const ZOOMS = [["1", "Normale"], ["1.12", "Grande"], ["1.25", "Très grande"]];
+  function applyZoom() { try { document.documentElement.style.zoom = String(S.prefs.zoom || 1) === "1" ? "" : String(S.prefs.zoom); } catch (e) { /* zoom indisponible */ } }
+
+  /* ---------- premier lancement ---------- */
+  /* Trois questions pour que les totaux ressemblent aux courses de chacun ; tout se change ensuite dans les réglages. */
+  const SECTEURS = [["auchan", "Fontenay-sous-Bois, Le Perreux"], ["auchan-alesia", "Paris 14e"], ["auchan-bellesfeuilles", "Paris 16e"]];
+  function welcomeSheet() {
+    const build = () => {
+      const groups = new Map();
+      for (const r of S.allRets || []) { const k = offKey(r); if (!groups.has(k)) groups.set(k, r); }
+      const chips = [...groups.entries()].map(([k, r]) => `<button class="chip" type="button" data-act="wret" data-k="${esc(k)}" aria-pressed="${!S.prefs.off[k]}">${esc(r.name)}${r.simulated ? " (prix simulés)" : ""}</button>`).join("");
+      const noComp = S.prefs.comp === false, pk = (groupsOf().auchan || []).length ? pickOf("auchan", groupsOf().auchan) : "";
+      return {
+        body: `<p>Trois questions pour que les totaux ressemblent à tes courses. Tout se change ensuite dans les réglages.</p>` +
+          `<h3 class="gh">Où fais-tu tes courses\u00a0?</h3><div class="tagset">${chips}</div>` +
+          `<h3 class="gh">Peux-tu te déplacer\u00a0?</h3><div class="group">${opt("wmove", "Oui, en magasin ou en point de retrait", !noComp, 'data-v="1"')}${opt("wmove", "Non, je veux tout recevoir chez moi", noComp, 'data-v="0"')}</div>` +
+          `<h3 class="gh">Ton secteur, pour les prix Auchan</h3><div class="group">${SECTEURS.map(([id, l]) => opt("wsect", esc(l), pk === id || (S.allMap.get(id) || {}).livraison === pk, `data-id="${id}"`)).join("")}</div>` +
+          `<p class="gf">Les prix Auchan dépendent du magasin. Sans déplacement, Cabas prend la livraison à domicile du même secteur.</p>`,
+        foot: `<button class="btn" type="button" data-act="wok">C'est parti</button>`,
+      };
+    };
+    const o = build();
+    openSheet({ title: "Bienvenue sur Cabas", left: `<button class="txtbtn" type="button" data-act="wskip">Passer</button>`, right: `<span></span>`, body: o.body, foot: o.foot, build, onClose: () => { S.seen.welcome = 1; store.set("seen", S.seen); } });
+  }
+
+  /* ---------- budget ---------- */
+  function budgetLine(money, complete) {
+    const bud = Math.round((parseFloat(S.prefs.budget) || 0) * 100);
+    if (!bud || !complete) return "";
+    const d = bud - money;
+    return d >= 0 ? `<p class="bud ok">Budget de ${eurC(bud).replace(",00", "")}\u00a0: il te reste ${eurC(d)}. <button class="lnk" type="button" data-act="budget">Modifier</button></p>`
+      : `<p class="bud over">${eurC(-d)} au-dessus de ton budget de ${eurC(bud).replace(",00", "")}. <button class="lnk" type="button" data-act="budget">Modifier</button></p>`;
+  }
+  function budgetSheet() {
+    openSheet({
+      title: "Budget", focus: "#budIn",
+      left: `<button class="txtbtn" type="button" data-act="close">Annuler</button>`,
+      right: `<button class="txtbtn" type="button" data-act="budok">OK</button>`,
+      body: `<p>Le panier te dit ce qu'il reste, ou de combien tu dépasses, frais compris. Laisse vide pour ne pas en avoir.</p><label class="field"><input id="budIn" type="number" inputmode="decimal" min="0" step="5" placeholder="Par exemple 120" value="${esc(S.prefs.budget || "")}" aria-label="Budget en euros"><small>En euros, pour un panier.</small></label>`,
+    });
+  }
+
+  /* ---------- courses en magasin ---------- */
+  function shopSheet() {
+    const build = () => {
+      const st = RES.steps[RES.K], bst = st && (st.full || st.partial), c = (bst && bst.completed) || [];
+      if (!c.length) return { body: `<p>Plus rien à acheter en magasin.</p>`, foot: "" };
+      const by = new Map();
+      c.forEach((x) => { if (!by.has(x.ret)) by.set(x.ret, []); by.get(x.ret).push(x); });
+      const order = (x) => { const p = S.prods.get(x.l.id); return (S.rayons.findIndex((r) => r.id === p.r) + 1) * 1000 + (x.l.n || 0); };
+      const k = c.filter((x) => S.guide.ck["mag|" + x.l.id]).length;
+      return {
+        body: `<p>Coche chaque produit une fois dans ton panier. Les produits sont rangés par rayon.</p><div class="prog"><span style="width:${Math.round((100 * k) / c.length)}%"></span></div><p class="progl">${k} sur ${plural(c.length, "produit", "produits")}</p>` +
+          [...by.entries()].map(([ret, xs]) => `<h3 class="gh">Chez ${esc(retName(ret))}</h3><div class="group">${xs.sort((a, b) => order(a) - order(b)).map((x) => {
+            const p = S.prods.get(x.l.id), on = !!S.guide.ck["mag|" + p.id], ray = rayon(p.r);
+            return `<div class="gi${on ? " on" : ""}"><button class="box" type="button" data-act="shopck" data-p="${esc(p.id)}" role="checkbox" aria-checked="${on}" aria-label="Dans mon panier">${ic("check")}</button><span class="gt"><b>${x.l.q > 1 ? `<span class="gq">${x.l.q} ×</span> ` : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}, environ ${eurC(x.cost)}${ray ? ", rayon " + esc(ray.name.toLowerCase()) : ""}</small></span><span></span></div>`;
+          }).join("")}</div>`).join("") +
+          `<p class="gf">Prix relevés en ligne\u00a0: en magasin, ils peuvent être un peu différents.</p>`,
+        foot: "",
+      };
+    };
+    const o = build();
+    openSheet({ title: "En magasin", body: o.body, build, onClose: () => { if (S.route.name === "panier") rerender(); } });
+  }
+
+  /* ---------- baisses de prix ---------- */
+  /* À chaque nouveau relevé, les produits du panier et des listes sont comparés au prix vu la fois d'avant
+     (prix relevés, pas simulés) ; une baisse d'au moins 3 % et 10 centimes reste affichée sept jours sur l'accueil. */
+  function trackDrops() {
+    const at = S.meta.updatedAt || "";
+    if (!at || store.get("seenAt", "") === at) return;
+    const seen = store.get("seenp", {}), drops = store.get("drops", []).filter((d) => d.until >= new Date().toISOString().slice(0, 10));
+    const ids = new Set(Object.keys(S.basket).concat(...S.lists.map((L) => Object.keys(L.items || {}))));
+    const until = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
+    for (const id of ids) {
+      const p = S.prods.get(id), b = p && bestReal(p);
+      if (!b) continue;
+      const old = seen[id];
+      if (old && b.price <= old * 0.97 && old - b.price >= 0.1) { const i = drops.findIndex((d) => d.id === id); if (i >= 0) drops.splice(i, 1); drops.unshift({ id, old, now: b.price, until }); }
+      seen[id] = b.price;
+    }
+    store.set("seenp", seen); store.set("drops", drops.slice(0, 20)); store.set("seenAt", at);
+  }
+  function dropsRail() {
+    const today = new Date().toISOString().slice(0, 10);
+    const ds = store.get("drops", []).filter((d) => d.until >= today && S.prods.has(d.id)).map((d) => { const p = S.prods.get(d.id), b = bestReal(p); return b && b.price < d.old ? { p, old: d.old, b } : null; }).filter(Boolean);
+    if (!ds.length) return "";
+    return `<div class="sh"><h2>Moins cher sur tes produits</h2></div><div class="rail">${ds.map((d) => card(d.p).replace('<div class="prow">', `<div class="prow"><s class="was">${eur(d.old)}</s>`)).join("")}</div>`;
+  }
+
   /* ---------- feuilles ---------- */
   let sheetCtx = null;
   function openSheet(o) {
@@ -1497,7 +1592,8 @@
     const b = $("#sheet .sheet-b"), y = b ? b.scrollTop : 0;
     const o = sheetCtx.build();
     $("#sheet .sheet-b").innerHTML = o.body;
-    if (o.foot != null) $("#sheet .sheet-f").innerHTML = o.foot;
+    const f = $("#sheet .sheet-f");
+    if (o.foot != null && f) f.innerHTML = o.foot;
     $("#sheet .sheet-b").scrollTop = y;
   }
   function closeSheet() {
@@ -1690,8 +1786,26 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); break;
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.guide = { ck: {}, done: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" ? [] : {})); store.set("draft", ""); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.guide = { ck: {}, done: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
+      /* premier lancement */
+      case "welcome": welcomeSheet(); break;
+      case "wskip": closeSheet(); break;
+      case "wret": { const k = t.dataset.k; if (S.prefs.off[k]) delete S.prefs.off[k]; else S.prefs.off[k] = true; savePrefs(); refreshSheet(); break; }
+      case "wmove": S.prefs.comp = t.dataset.v === "1"; savePrefs(); refreshSheet(); break;
+      case "wsect": {
+        /* même secteur, même façon de recevoir : livraison à domicile si c'était le choix, sinon le point de retrait */
+        const G = groupsOf().auchan || [], cur = S.allMap.get(pickOf("auchan", G)), r = S.allMap.get(id);
+        S.prefs.pick = Object.assign({}, S.prefs.pick, { auchan: cur && !isPickup(cur) && r && r.livraison ? r.livraison : id });
+        savePrefs(); refreshSheet(); break;
+      }
+      case "wok": applyGroups(); closeSheet(); renderChrome(); rerender(); toast("C'est noté"); break;
+      /* affichage, budget, magasin */
+      case "zoom": S.prefs.zoom = t.dataset.v; savePrefs(); applyZoom(); rerender(); break;
+      case "budget": budgetSheet(); break;
+      case "budok": { const v = parseFloat(String(($("#budIn") || {}).value || "").replace(",", ".")); S.prefs.budget = v > 0 ? Math.min(v, 5000) : ""; savePrefs(); closeSheet(); rerender(); break; }
+      case "shop": shopSheet(); break;
+      case "shopck": { const k = "mag|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); break; }
       /* liste écrite ou dictée */
       case "wlgo": {
         const tx = ($("#wlIn") || {}).value || "";
@@ -1837,8 +1951,11 @@
     if (t0) { S.tab = t0; S.stacks[t0] = [h0]; } else { S.tab = "accueil"; S.stacks.accueil = ["#/", h0]; }
     S.cur = h0;
     renderChrome({});
+    applyZoom();
     try { await load(); S.ready = true; } catch (err) { S.failed = true; }
+    if (S.ready) { try { trackDrops(); } catch (e) { /* stockage indisponible */ } }
     render();
+    if (S.ready && !S.seen.welcome && !location.hash.startsWith("#/partage")) setTimeout(() => { if ($("#sheet").hidden) welcomeSheet(); }, 500);
   })();
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
     let had = !!navigator.serviceWorker.controller;
