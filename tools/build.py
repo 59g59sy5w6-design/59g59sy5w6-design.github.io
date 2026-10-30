@@ -225,7 +225,7 @@ for it in items:
     k = it["rid"]
     if k not in best or it["ts"] > best[k]["ts"]:
         best[k] = it
-items = list(best.values())
+items = [it for it in best.values() if not lib.hors_courses(it.get("label") or "")]
 
 pages = lib.load_sources()["pages"]
 report = {"date": today.strftime("%Y-%m-%d"), "pages": [], "rayons": {}}

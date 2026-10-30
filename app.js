@@ -39,16 +39,18 @@
   const standalone = () => (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
 
   /* ---------- état ---------- */
-  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, liv: {}, maxOrders: 3, extraCost: 0 };
+  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, liv: {}, keep: {}, maxOrders: 3, extraCost: 0 };
   const ROOTS = { accueil: "#/", rayons: "#/rayons", recherche: "#/recherche", listes: "#/listes", panier: "#/panier" };
   const S = {
     ready: false, failed: false,
     rayons: [], prods: new Map(), list: [], rets: [], retMap: new Map(), meta: {},
     basket: store.get("basket", {}),
-    prefs: Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {} }, store.get("prefs", {})),
+    prefs: Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {} }, store.get("prefs", {})),
     lists: store.get("lists", []),
     recent: store.get("recent", []),
     seen: store.get("seen", {}),
+    hist: store.get("hist", []),
+    guide: Object.assign({ ck: {}, done: {} }, store.get("guide", {})),
     tab: "accueil",
     stacks: { accueil: ["#/"], rayons: ["#/rayons"], recherche: ["#/recherche"], listes: ["#/listes"], panier: ["#/panier"] },
     cur: "", dir: "none", scroll: {}, shown: {}, lazy: {}, filt: {}, q: "", route: { name: "home" }, focusSearch: false,
@@ -191,6 +193,7 @@
     /* un produit qui a changé d'identifiant d'un relevé à l'autre est suivi grâce à c.aliases ;
        un produit absent du relevé reste dans le panier et les listes, sans compter, jusqu'à son retour */
     S.alias = c.aliases || {};
+    CATW = null;
     const follow = (o) => {
       let ch = false;
       for (const id of Object.keys(o)) {
@@ -212,7 +215,8 @@
   /* ---------- recherche ---------- */
   const stem = (w) => (w.length > 3 ? w.replace(/(x|s)$/, "") : w);
   const SYN = { pq: ["papier", "toilette"], coca: ["coca"], sopalin: ["essuie"], yaourt: ["yaourt"], yoghourt: ["yaourt"], yogourt: ["yaourt"], cafe: ["cafe"], emmenthal: ["emmental"], parmesan: ["parmigiano"] };
-  function search(q) {
+  const search = (q) => searchScored(q).map((x) => x[1]);
+  function searchScored(q) {
     let toks = norm(q).split(" ").filter(Boolean);
     toks = toks.flatMap((t) => SYN[t] || [t]).map(stem);
     if (!toks.length) return [];
@@ -235,7 +239,7 @@
       out.push([score, p]);
     }
     out.sort((a, b) => b[0] - a[0] || a[1].rank - b[1].rank);
-    return out.map((x) => x[1]);
+    return out;
   }
   function addRecent(q) {
     q = String(q || "").trim();
@@ -546,6 +550,8 @@
       html: `<h1 class="lt wordmark"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</h1>` +
         `<div class="srow"><button class="search" type="button" data-act="gosearch">${ic("search")}<span>Produits, marques</span></button></div>` +
         `<p class="fresh${isStale() ? " old" : ""}">${ic("clock")}<span>${esc(freshText())}${isStale() ? ", ils ont pu changer depuis" : ""}</span></p>` +
+        `<a class="wlcta" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>` +
+        savingsCard() +
         installCard() +
         (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals">${ds.map(dealCard).join("")}</div>` : "") +
         `<div class="sh"><h2>Rayons</h2><a href="#/rayons">Tout voir</a></div><div class="cats">${tiles}</div>` +
@@ -619,7 +625,8 @@
       const brands = new Map();
       S.list.forEach((p) => { if (Object.keys(p.offers).length > 1) brands.set(p.brand, (brands.get(p.brand) || 0) + 1); });
       const top = [...brands.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map((x) => x[0]);
-      return (S.recent.length ? `<div class="sh"><h2>Recherches récentes</h2><button type="button" data-act="clearrecent">Effacer</button></div><div class="group">${S.recent.map((x) => `<button class="row" type="button" data-act="setq" data-q="${esc(x)}">${ic("clock", "ext")}<span class="rt">${esc(x)}</span></button>`).join("")}</div>` : "") +
+      return `<div class="group" style="margin-top:4px"><a class="row" href="#/ecrire">${ic("pen", "ext")}<span class="rt">Chercher toute une liste<small>Colle ou dicte ta liste, Cabas trouve chaque produit</small></span>${ic("chev", "chev")}</a></div>` +
+        (S.recent.length ? `<div class="sh"><h2>Recherches récentes</h2><button type="button" data-act="clearrecent">Effacer</button></div><div class="group">${S.recent.map((x) => `<button class="row" type="button" data-act="setq" data-q="${esc(x)}">${ic("clock", "ext")}<span class="rt">${esc(x)}</span></button>`).join("")}</div>` : "") +
         `<div class="sh"><h2>Marques comparées</h2></div><div class="tagset">${top.map((x) => `<button class="chip" type="button" data-act="setq" data-q="${esc(x)}">${esc(x)}</button>`).join("")}</div>` +
         `<div class="sh"><h2>Rayons</h2></div><div class="cats">${S.rayons.map(catTile).join("")}</div>`;
     }
@@ -644,7 +651,7 @@
     return {
       title: "Listes", grouped: true,
       html: `<h1 class="lt">Listes</h1>` +
-        (n ? `<div class="pad" style="padding-top:4px"><button class="btn tint" type="button" data-act="savelist">${ic("plus")}Enregistrer le panier en liste</button></div>` : "") +
+        `<div class="pad btns" style="padding-top:4px"><a class="btn" href="#/ecrire">${ic("pen")}Écrire ou dicter une liste</a>${n ? `<button class="btn tint" type="button" data-act="savelist">${ic("plus")}Enregistrer le panier en liste</button>` : ""}</div>` +
         (S.lists.length ? `<h2 class="gh">Mes listes</h2><div class="group">${S.lists.map(listRow).join("")}</div><p class="gf">Une liste se remet dans le panier en un geste.</p>` :
           `<div class="empty" style="padding-top:28px">${emptyArt("list")}<h2>Aucune liste</h2><p>Enregistre ton panier en liste pour le refaire la semaine prochaine en un geste.</p></div>`) +
         (Object.keys(sg.items).length ? `<h2 class="gh">Suggestion</h2>${suggestCard(sg)}` : ""),
@@ -665,7 +672,8 @@
       html: `<h1 class="lt">${esc(L.name)}</h1><p class="lt-sub">${plural(e.n, "produit", "produits")}, environ ${eur(e.t)} au meilleur prix</p>` +
         `<div class="pad btns" style="padding-top:6px"><button class="btn" type="button" data-act="addlist" data-id="${esc(L.id)}">${ic("plus")}Tout ajouter au panier</button><button class="btn tint" type="button" data-act="replacelist" data-id="${esc(L.id)}">Remplacer le panier par cette liste</button></div>` +
         `<h2 class="gh">Produits</h2><div class="group">${itemsList(L.items)}</div>` +
-        `<div class="group" style="margin-top:28px"><button class="row link" type="button" data-act="renamelist" data-id="${esc(L.id)}">Renommer la liste</button><button class="row danger" type="button" data-act="dellist" data-id="${esc(L.id)}">Supprimer la liste</button></div>`,
+        `<div class="group" style="margin-top:28px"><button class="row link" type="button" data-act="sharelist" data-id="${esc(L.id)}">Partager la liste</button><button class="row link" type="button" data-act="renamelist" data-id="${esc(L.id)}">Renommer la liste</button><button class="row danger" type="button" data-act="dellist" data-id="${esc(L.id)}">Supprimer la liste</button></div>` +
+        `<p class="gf">Le lien de partage contient la liste elle-même\u00a0: la personne qui l'ouvre peut l'ajouter à son panier ou à ses listes.</p>`,
     };
   };
   VIEWS.suggestion = () => {
@@ -691,7 +699,6 @@
     const r = S.retMap.get(o.ch.id), P = o.ch.P;
     const fee = o.fee - P.fixed;
     const nt = nextTier(o.ch, o.sub);
-    const links = o.items.map((x) => { const p = S.prods.get(x.l.id), of = p.offers[o.ch.id]; return of && of.url ? `<li><a href="${esc(of.url)}" target="_blank" rel="noopener">${ic("ext", "ext")}<span>${esc(p.brand + " " + p.name)}${of.cat ? " (page du rayon)" : ""}</span></a></li>` : ""; }).join("");
     const nItems = o.items.reduce((a, x) => a + x.l.q, 0);
     return `<section class="order" aria-label="Commande ${esc(r.name)}"><div class="oh"><span class="av">${esc(r.name.slice(0, 1))}</span><div class="rt"><h3>${esc(r.name)}</h3><small>${plural(nItems, "article", "articles")}${r.group && (r.channel || {}).where ? ", " + esc((pickup(r) ? "retrait à " : "livraison ") + r.channel.where) : ""}</small></div>${px((o.sub + o.fee) / 100)}</div>` +
       o.items.map((x) => itemRow(x.l.id, x.cost, x.l.q)).join("") +
@@ -700,8 +707,8 @@
       `<div class="ln tot"><span>Total ${esc(r.name)}</span><span>${eurC(o.sub + o.fee)}</span></div>` +
       (nt ? `<p class="hint">Encore ${eurC(nt.need)} chez ${esc(r.name)} et la livraison ${nt.fee > 0 ? "passe à " + eurC(nt.fee) : "devient offerte"}.</p>` : "") +
       (r.simulated ? `<p class="hint">Prix simulés, pas relevés : le vrai total s'affiche sur ${esc(r.service)}.</p>` : "") +
-      `<a class="btn" href="${esc(r.home)}" target="_blank" rel="noopener">Commander sur ${esc(r.service)}${ic("ext")}</a>` +
-      (links ? `<details><summary>Retrouver chaque produit sur ${esc(r.service)}</summary><ul>${links}</ul></details>` : "") + `</div></section>`;
+      (S.guide.done[r.id] ? `<button class="btn tint" type="button" data-act="guide" data-id="${esc(r.id)}">${ic("check")}Commande passée</button>` : `<button class="btn" type="button" data-act="guide" data-id="${esc(r.id)}">Passer la commande sur ${esc(r.service)}</button>`) +
+      `</div></section>`;
   }
   function compHtml(r) {
     const c = r.completed || [];
@@ -730,10 +737,20 @@
     return `<div class="optrow"><span class="ot">Sans achat en magasin<small>${noComp ? "Tout est livré chez toi, sans achat en magasin ni retrait." : "À cocher pour tout recevoir chez toi, sans te déplacer."}</small></span><label class="sw"><input type="checkbox" data-act="nocomp" aria-label="Sans achat en magasin"${noComp ? " checked" : ""}><span></span></label></div>` +
       (sw.length ? `<p class="sn">${sw.join(" ")} <a href="#/reglages">Changer de zone</a></p>` : "");
   };
+  /* tout le panier dans une seule enseigne ; les produits qu'elle ne vend pas, complétés en magasin quand c'est permis */
+  function singlesOf(M) {
+    return M.chans.map((c, i) => Object.assign(singleBasket(M, i), { i })).map((x) => {
+      let comp = 0, compN = 0, compOK = true;
+      M.offers.forEach((offs, l) => { if (!offs.some((o) => o.c === x.i)) { compN++; if (M.comp[l]) comp += M.comp[l].cost; else compOK = false; } });
+      compOK = compOK && compN <= M.compMax;
+      const tot = x.ok && (!x.missing || compOK) ? x.sub + x.fee + (x.missing ? comp : 0) : null;
+      return { s: x, name: (S.retMap.get(x.ch.id) || S.allMap.get(x.ch.id) || {}).name || x.ch.id, tot, compN: x.missing && compOK ? compN : 0 };
+    });
+  }
   const compPhrase = (r) => (r.completed && r.completed.length ? `, et ${plural(r.completed.length, "produit", "produits")} en magasin` : "");
   VIEWS.panier = () => {
     const ids = Object.keys(S.basket).filter((id) => S.basket[id] > 0 && S.prods.has(id));
-    if (!ids.length) return { title: "Panier", grouped: true, html: `<h1 class="lt">Panier</h1><div class="empty">${emptyArt("bag")}<h2>Ton panier est vide</h2><p>Ajoute des produits\u00a0: Cabas cherche où les commander pour payer le moins cher, livraison comprise.</p><a class="btn" href="#/rayons">Parcourir les rayons</a></div>` };
+    if (!ids.length) return { title: "Panier", grouped: true, html: `<h1 class="lt">Panier</h1><div class="empty">${emptyArt("bag")}<h2>Ton panier est vide</h2><p>Ajoute des produits\u00a0: Cabas cherche où les commander pour payer le moins cher, livraison comprise.</p><a class="btn" href="#/ecrire">${ic("pen")}Écrire ou dicter ma liste</a><a class="btn tint" href="#/rayons" style="margin-top:0">Parcourir les rayons</a></div>` };
     const res = cartResult(), M = res.M, K = res.K;
     const nRet = M.chans.length;
     const nameOf = (o) => S.retMap.get(o.ch.id).name;
@@ -759,14 +776,7 @@
       const top = altK && res.steps[nRet] && res.steps[nRet].full;
       const cheaper = top && fullTotal(top) < fullTotal(alt) - 50 ? top : null;
       const searching = !complete && !altK && !res.done;
-      const singles = M.chans.map((c, i) => Object.assign(singleBasket(M, i), { i })).map((x) => {
-        /* produits que l'enseigne ne vend pas : complétés en magasin quand c'est possible */
-        let comp = 0, compN = 0, compOK = true;
-        M.offers.forEach((offs, l) => { if (!offs.some((o) => o.c === x.i)) { compN++; if (M.comp[l]) comp += M.comp[l].cost; else compOK = false; } });
-        compOK = compOK && compN <= M.compMax;
-        const tot = x.ok && (!x.missing || compOK) ? x.sub + x.fee + (x.missing ? comp : 0) : null;
-        return { s: x, name: S.retMap.get(x.ch.id).name, tot, compN: x.missing && compOK ? compN : 0 };
-      });
+      const singles = singlesOf(M);
       const full = singles.filter((x) => x.tot != null).sort((a, b) => a.tot - b.tot);
       const k = bst.orders.length, names = bst.orders.map(nameOf);
       const simUsed = isSim(bst);
@@ -781,6 +791,8 @@
         if (other && other.tot - money >= 50) save = `${eurC(other.tot - money)} de moins qu'ailleurs`;
       }
       if (save && simUsed) save += ", selon la simulation";
+      const sp = S.swapPrev;
+      if (complete && sp && sp.key === JSON.stringify(S.basket) && sp.total - money >= 1) save = (save ? save + ". " : "") + `${eurC(sp.total - money)} de moins grâce aux remplacements`;
       const more = complete && k < K ? `Au-delà ${k === 1 ? "d'une commande" : "de " + k + " commandes"}, le total ne baisse plus.` : "";
       const notCheapest = bst.orders.some((o) => o.items.some((x) => { const b = best(S.prods.get(x.l.id)); return b && b.ret !== o.ch.id && b.price * 100 * x.l.q < x.cost - 0.5; }));
       const sl = !complete ? (altK ? (K === 1 ? "Une seule commande ne suffit pas" : `En ${K} commandes, il manque des produits`) : `Meilleure option pour ${M.lines.length - skipped.length} produits sur ${M.lines.length}`)
@@ -819,11 +831,17 @@
         ` Pour tout recevoir chez toi, choisis la livraison à domicile dans les <a href="#/reglages">réglages</a>.`;
       const compRow = noCompRow() +
         (modeCmp ? `<p class="sn">${modeCmp}</p>` : "") + (pickNote ? `<p class="sn">${pickNote}</p>` : "");
-      side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${altBox}` +
+      /* toutes les commandes notées comme passées : l'économie rejoint l'historique */
+      const allDone = complete && bst.orders.every((o) => S.guide.done[o.ch.id]);
+      if (allDone) recordDone();
+      const doneBox = allDone ? `<div class="alt"><p><b>Toutes tes commandes sont passées.</b>${S.guide.saved ? ` Tu as économisé ${eurC(S.guide.saved)}, meilleurs prix et remplacements compris.` : ""}</p><div class="btns two"><button class="btn sm tint" type="button" data-act="savelist">Garder en liste</button><button class="btn sm" type="button" data-act="clearok">Vider le panier</button></div></div>` : "";
+      const sw = swaps(), swTot = sw.reduce((a, x) => a + x.save, 0);
+      const swapCard = sw.length && !allDone ? `<button class="savecard" type="button" data-act="swaps">${ic("swap", "si")}<span><b>Économiser encore, environ ${eur(swTot)}</b><small>${plural(sw.length, "produit a", "produits ont")} un équivalent moins cher, d'une autre marque</small></span>${ic("chev", "chev")}</button>` : "";
+      side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${doneBox}${altBox}` +
         (save ? `<p class="sv">${save}</p>` : "") + (why ? `<p class="sn">${why}</p>` : "") + (more ? `<p class="sn">${more}</p>` : "") +
         (notCheapest ? `<p class="sn">Certains produits ne sont pas pris là où ils sont le moins chers\u00a0: avec les minimums d'achat et la livraison, ce regroupement revient moins cher.</p>` : "") +
         (st.truncated ? `<p class="sn">Gros panier\u00a0: le calcul a été écourté, le vrai minimum peut être un peu plus bas.</p>` : "") +
-        (bst.extra ? `<p class="sn">Avec ${eurC(res.lambda)} comptés pour chaque commande en plus (réglages).</p>` : "") + seg + compRow + `</div>`;
+        (bst.extra ? `<p class="sn">Avec ${eurC(res.lambda)} comptés pour chaque commande en plus (réglages).</p>` : "") + seg + compRow + `</div>` + (swapCard ? `<div class="savewrap">${swapCard}</div>` : "");
       const opts = singles.map((x) => {
         const s2 = x.s;
         const sub = !s2.ok ? `Minimum de ${eurC(s2.ch.P.min).replace(",00", "")} non atteint, il manque ${eurC(s2.ch.P.min - s2.sub)}` : x.compN ? `Et ${plural(x.compN, "produit", "produits")} en magasin` : s2.missing ? `${plural(s2.missing, "produit manque", "produits manquent")}` : "";
@@ -846,7 +864,7 @@
     }
     return {
       title: "Panier", grouped: true,
-      right: `<button class="txtbtn" type="button" data-act="clear">Vider</button>`,
+      right: `<button class="icbtn" type="button" data-act="sharecart" aria-label="Partager la répartition">${ic("share")}</button><button class="txtbtn" type="button" data-act="clear">Vider</button>`,
       html: `<h1 class="lt">Panier</h1><div class="cartcols"><div class="cside">${side}${zipNote}</div><div class="cmain">${main}</div></div>` +
         `<p class="foot">${esc(freshText())}. Le total exact s'affiche sur le site de chaque enseigne au moment de commander.<br><a href="#/reglages">Livraison et frais</a></p>`,
     };
@@ -884,8 +902,9 @@
             `<p class="gf">${noComp ? `« Sans achat en magasin » est coché\u00a0: tout est livré chez toi, pas de retrait. ${[ms.filter((m) => !pickup(m)).length > 1 ? "choisis ta zone de livraison" : "", back ? "en décochant, tu retrouves ton " + (isDrive(S.allMap.get(pickOf(g, ms))) ? "drive" : "point de retrait") : ""].filter(Boolean).join("\u00a0; ").replace(/^./, (c) => c.toUpperCase()).replace(/.$/, (c) => c + ".")}` : `Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.`}</p>`;
         }).join("") +
         `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Sans achat en magasin<small>Tout passe par les commandes en ligne. Décoché, un produit que tes commandes ne prennent pas peut s'acheter en magasin, au prix relevé le plus bas (au plus un quart du panier).</small></span><label class="sw"><input type="checkbox" data-act="nocomp"${S.prefs.comp === false ? " checked" : ""} aria-label="Sans achat en magasin"><span></span></label></div><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
+        (Object.keys(S.prefs.keep || {}).length ? `<div class="row"><span class="rt">Marques gardées<small>${plural(Object.keys(S.prefs.keep).length, "produit n'est", "produits ne sont")} plus proposés au remplacement par un équivalent moins cher.</small></span><button class="btn sm plain" type="button" data-act="keepreset">Tout reproposer</button></div>` : "") +
         `<label class="row" for="extra"><span class="rt">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
-        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
+        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
     };
   };
@@ -940,6 +959,9 @@
       case "reglages": return { name: "reglages" };
       case "enseigne": return { name: "enseigne", id };
       case "apropos": return { name: "apropos" };
+      case "ecrire": return { name: "ecrire" };
+      case "partage": return { name: "partage", id };
+      case "economies": return { name: "economies" };
       default: return { name: "home" };
     }
   }
@@ -963,6 +985,9 @@
       case "reglages": return "Réglages";
       case "enseigne": return retName(r.id);
       case "apropos": return "À propos";
+      case "ecrire": return "Ma liste";
+      case "partage": return "Liste partagée";
+      case "economies": return "Économies";
     }
     return "Retour";
   }
@@ -1098,6 +1123,362 @@
     saveBasket();
     return n;
   }
+
+  /* ---------- liste écrite ou dictée ---------- */
+  /* « 2 paquets de pâtes », « coca zéro x3 », « 1 kg de café », « 6 bouteilles d'eau » : une ligne par produit, ou des
+     virgules. Chaque ligne devient une recherche ; Cabas prend le produit le moins cher au kilo ou au litre parmi les
+     plus pertinents, dans un format courant, et l'on peut en choisir un autre avant d'ajouter au panier. */
+  const STOP = new Set("de du des la le les l d un une au aux en pour avec et ou a mon ma mes produit produits paquet paquets bouteille bouteilles brique briques boite boites pot pots sachet sachets pack packs lot lots canette canettes litre litres kilo kilos gramme grammes".split(" "));
+  const NUMW = { un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10, douze: 12 };
+  const sizeOfU = (v, u) => (/^k/i.test(u) ? { v: v * 1000, u: "g" } : /^g/i.test(u) ? { v, u: "g" } : /^cl/i.test(u) ? { v: v * 10, u: "ml" } : /^ml/i.test(u) ? { v, u: "ml" } : { v: v * 1000, u: "ml" });
+  function parseLine(raw) {
+    let s = String(raw).trim().replace(/^[-*•·]+\s*/, "").replace(/^\d+[.)]\s+/, "");
+    let n = 1, size = null, m;
+    if ((m = s.match(/^(.*?)\s*(?:[x×*]\s*(\d{1,2})|\((\d{1,2})\))$/i)) && m[1]) { n = +(m[2] || m[3]); s = m[1]; }
+    if ((m = s.match(/^(\d+(?:[.,]\d+)?)\s*(kg|kilos?|g|gr|grammes?|l|litres?|cl|ml)\.?\s+(?:de\s+|d['’]\s*)?(.+)$/i))) { size = sizeOfU(parseFloat(m[1].replace(",", ".")), m[2]); s = m[3]; }
+    else if ((m = s.match(/^(\d{1,2}|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze)\s*(?:x|×|fois)?\s+(.+)$/i))) { n = /\d/.test(m[1]) ? +m[1] : NUMW[norm(m[1])]; s = m[2]; }
+    if (!size && (m = s.match(/^(.+?)\s+(\d+(?:[.,]\d+)?)\s*(kg|g|l|cl|ml)$/i))) { size = sizeOfU(parseFloat(m[2].replace(",", ".")), m[3]); s = m[1]; }
+    const toks = norm(s).split(" ").filter((t) => t && !STOP.has(t));
+    return { raw: String(raw).trim(), q: toks.join(" "), n: Math.max(1, Math.min(99, n || 1)), size };
+  }
+  const valOf = (p) => { const b = best(p); if (!b) return 1e12; const u = perUnit(p, b.price); return u == null ? b.price * 1000 : u; };
+  const byVal = (a, b) => valOf(a) - valOf(b);
+  const packsOf = (p) => { const m = /^(\d+)\s*x/i.exec(p.format || ""); return m ? +m[1] : p.qty && p.qty.u === "pc" ? p.qty.v : 1; };
+  /* mot d'ingrédient ou de parfum : dans « Tagliatelles aux œufs », le produit n'est pas des œufs */
+  const ING = new Set("au aux avec sans saveur saveurs parfum parfums gout extrait extraits sauce".split(" "));
+  function strongW(p) {
+    if (p._sw) return p._sw;
+    const nt = norm(p.name).split(" ").filter(Boolean), st = new Set();
+    const mark = (i) => ING.has(nt[i]) || ((nt[i] === "la" || nt[i] === "l") && nt[i - 1] === "a");
+    nt.forEach((w, i) => { if (mark(i - 1) || (mark(i - 2) && !mark(i - 1))) return; st.add(stem(w)); });
+    (p._b + " " + norm(p.format) + " " + norm((rayon(p.r) || {}).name) + " " + norm((p.tags || []).join(" "))).split(" ").filter(Boolean).forEach((w) => st.add(stem(w)));
+    return (p._sw = st);
+  }
+  const qToks = (q) => norm(q).split(" ").filter(Boolean).flatMap((t) => SYN[t] || [t]).map(stem);
+  const strongHit = (p, toks) => { const st = strongW(p); return toks.some((t) => { for (const w of st) if (w === t || w.startsWith(t)) return true; return false; }); };
+  /* mots qui désignent un produit à eux seuls : noms de rayons, marques, abréviations connues */
+  let CATW = null;
+  function catWords() {
+    if (CATW) return CATW;
+    CATW = new Set(Object.keys(SYN));
+    S.rayons.forEach((r) => norm(r.name).split(" ").forEach((w) => { if (w.length > 2) CATW.add(stem(w)); }));
+    S.list.forEach((p) => { const w = p._b.split(" ")[0]; if (w && w.length > 2 && w !== "sans") CATW.add(stem(w)); });
+    return CATW;
+  }
+  function matchLine(L) {
+    const out = { raw: L.raw, q: L.q, n: L.n, cands: [], avail: 0, pick: null };
+    if (!L.q) return out;
+    const toks = qToks(L.q);
+    const sc = searchScored(L.q).filter((x) => strongHit(x[1], toks));
+    if (!sc.length) return out;
+    const top = sc[0][0], rel = sc.filter((x) => x[0] >= top - 1.5).map((x) => x[1]);
+    const avail = rel.filter((p) => best(p));
+    out.cands = (avail.length ? avail : rel).slice(0, 60).map((p) => p.id);
+    out.avail = avail.length;
+    if (!avail.length) return out;
+    const sz = (p) => (p.qty && p.qty.v) || 0;
+    /* la variante la plus simple : « coca » est un Coca-Cola, pas un Coca-Cola Cherry, sauf si on l'a écrit */
+    const qs = new Set(toks);
+    const extra = (p) => sig(p).split(" ").filter((t) => VARIANT.has(t.replace(/^sans /, "")) && !qs.has(t.replace(/^sans /, ""))).length;
+    const minX = Math.min(...avail.map(extra));
+    const plain = avail.filter((p) => extra(p) === minX);
+    let pick = null, n = L.n;
+    if (L.size) {
+      const same = plain.filter((p) => p.qty && p.qty.u === L.size.u);
+      const near = same.filter((p) => Math.abs(sz(p) - L.size.v) / L.size.v <= 0.15);
+      const le = same.filter((p) => sz(p) <= L.size.v * 1.15);
+      pick = (near.length ? near : le.length ? le : same.length ? [same.slice().sort((a, b) => sz(a) - sz(b))[0]] : plain).slice().sort(byVal)[0];
+      if (pick.qty && pick.qty.u === L.size.u && sz(pick)) n = Math.max(1, Math.round(L.size.v / sz(pick)));
+    } else {
+      /* formats courants : ceux que partagent plusieurs produits pertinents (1 L et 6 x 1 L pour le lait, 500 g et 1 kg pour les pâtes) */
+      const keyS = (p) => (sz(p) ? p.qty.u + Math.round(sz(p) / Math.pow(10, Math.floor(Math.log10(sz(p))) - 1)) : "");
+      const cnt = {}, szs = plain.map(sz).filter(Boolean).sort((a, b) => a - b), med = szs.length ? szs[Math.floor((szs.length - 1) / 2)] : 0;
+      plain.forEach((p) => { const k = keyS(p); cnt[k] = (cnt[k] || 0) + 1; });
+      let common = plain.filter((p) => cnt[keyS(p)] >= 2 && (!med || sz(p) <= med * 3));
+      if (!common.length) common = plain;
+      if (L.n > 1) {
+        /* « 2 paquets de pâtes » : 2 paquets du format le plus courant ; « 6 bouteilles d'eau » : un pack de 6 s'il revient moins cher au litre */
+        const singles = common.filter((p) => packsOf(p) === 1), sc2 = {};
+        singles.forEach((p) => { const k = keyS(p); sc2[k] = (sc2[k] || 0) + 1; });
+        const mode = Object.keys(sc2).sort((a, b) => sc2[b] - sc2[a])[0];
+        const one = singles.filter((p) => keyS(p) === mode).sort(byVal)[0], pack = plain.filter((p) => packsOf(p) === L.n).sort(byVal)[0];
+        if (pack && (!one || valOf(pack) <= valOf(one))) { pick = pack; n = 1; } else pick = one || common.slice().sort(byVal)[0];
+      } else pick = common.slice().sort(byVal)[0];
+    }
+    out.pick = pick.id;
+    out.n = n;
+    return out;
+  }
+  /* Une ligne sans résultat qui contient plusieurs produits (« lait pâtes coca zéro », dictée sans virgule) est découpée
+     en morceaux disponibles qui désignent chacun un produit, s'il y en a au moins deux ; « eau gazeuse » ou « lait
+     d'amande » restent une seule ligne. */
+  function splitLine(raw) {
+    const L = parseLine(raw), M0 = matchLine(L);
+    if (M0.pick) return [M0];
+    const toks = L.q.split(" ").filter(Boolean);
+    if (toks.length < 2) return [M0];
+    const cw = catWords(), parts = [];
+    let i = 0;
+    while (i < toks.length) {
+      let hit = null, j = toks.length;
+      for (; j > i; j--) {
+        const q = toks.slice(i, j).join(" ");
+        if (!qToks(q).some((t) => cw.has(t))) continue;
+        const m = matchLine({ raw: q, q, n: 1 });
+        if (m.pick) { hit = m; break; }
+      }
+      if (hit) { parts.push(hit); i = j; }
+      else { const last = parts[parts.length - 1]; if (last && !last.pick) { last.raw += " " + toks[i]; last.q += " " + toks[i]; } else parts.push({ raw: toks[i], q: toks[i], n: 1, cands: [], avail: 0, pick: null }); i++; }
+    }
+    return parts.filter((x) => x.pick).length >= 2 ? parts : [M0];
+  }
+  function readList(text) {
+    const lines = String(text || "").split(/\n|;|•|,(?!\d)|\s+(?:et|puis|plus)\s+|\s\+\s/i).map((x) => x.trim()).filter((x) => norm(x));
+    return lines.flatMap(splitLine).slice(0, 80);
+  }
+  const wlStep = (x, i) => `<div class="stepper soft"><button type="button" data-act="wldec" data-i="${i}" aria-label="${x.n > 1 ? "Un de moins" : "Retirer"}">${ic(x.n > 1 ? "minus" : "trash")}</button><span>${x.n}</span><button type="button" data-act="wlinc" data-i="${i}" aria-label="Un de plus">${ic("plus")}</button></div>`;
+  function wlRow(x, i) {
+    if (!x.pick) {
+      const off = x.cands.length > 0 && qToks(x.q || "").some((t) => catWords().has(t));
+      return `<div class="item wli miss"><span class="thumb q">${ic("search")}</span><div class="it"><span class="wq">${esc(x.raw)}</span><b>${off ? "Pas vendu par tes enseignes" : "Pas encore dans Cabas"}</b><small>${off ? "Vendu par une enseigne ou dans une zone que tu n'utilises pas." : "Cabas ne couvre que quelques rayons pour l'instant."}</small></div><div class="ir"><button class="btn sm plain" type="button" data-act="wlsearch" data-i="${i}">Chercher</button></div></div>`;
+    }
+    const p = S.prods.get(x.pick), b = best(p), u = b ? unitPrice(p, b.price) : "";
+    return `<div class="item wli"><a class="thumb" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 52)}</a><div class="it"><span class="wq">${esc(x.raw)}</span><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${u ? ", " + esc(u) : ""}${b ? ", chez " + esc(retName(b.ret)) + (b.sim ? " (simulé)" : "") : ""}</small><button class="lnk" type="button" data-act="wlalt" data-i="${i}">Autre choix</button></div><div class="ir"><span class="lp">${b ? eurC(Math.round(b.price * 100) * x.n) : "–"}</span>${wlStep(x, i)}</div></div>`;
+  }
+  VIEWS.ecrire = () => {
+    const W = S.wl || (S.wl = { text: store.get("draft", ""), lines: null });
+    if (!W.lines) {
+      return {
+        title: "Ma liste", grouped: true,
+        html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">Écris ou dicte tes courses, Cabas trouve chaque produit au meilleur prix.</p>` +
+          `<div class="pad"><textarea id="wlIn" class="wl" rows="7" placeholder="lait&#10;2 paquets de pâtes&#10;coca zéro x3&#10;papier toilette" aria-label="Ta liste de courses" autocapitalize="off" spellcheck="true">${esc(W.text)}</textarea></div>` +
+          `<p class="gf">Une ligne par produit, ou sépare-les par des virgules. Pour dicter, touche le micro du clavier. Une quantité au début (2 paquets de pâtes) ou à la fin (coca zéro x3), un poids ou un volume (1 kg de café) sont compris.</p>` +
+          `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wlgo">Trouver les produits</button></div>` +
+          `<p class="gf" style="padding-top:14px">Rayons couverts pour l'instant\u00a0: ${esc(joinEt(S.rayons.map((r) => r.name.toLowerCase())))}.</p>`,
+      };
+    }
+    const found = W.lines.filter((x) => x.pick);
+    let t = 0;
+    found.forEach((x) => { const b = best(S.prods.get(x.pick)); if (b) t += Math.round(b.price * 100) * x.n; });
+    const nArt = found.reduce((a, x) => a + x.n, 0);
+    return {
+      title: "Ma liste", grouped: true,
+      right: `<button class="txtbtn" type="button" data-act="wledit">Modifier</button>`,
+      html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">${plural(found.length, "produit trouvé", "produits trouvés")} sur ${W.lines.length}${found.length ? ", environ " + eurC(t) + " au meilleur prix" : ""}</p>` +
+        `<div class="order" style="margin-top:4px">${W.lines.map(wlRow).join("")}</div>` +
+        `<p class="gf">Pour chaque ligne, le produit le moins cher au kilo ou au litre parmi les plus proches de ce que tu as écrit, dans un format courant. Touche «\u00a0Autre choix\u00a0» pour en prendre un autre.</p>` +
+        (found.length ? `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wladd">${ic("plus")}Ajouter ${plural(nArt, "article", "articles")} au panier</button><button class="btn tint" type="button" data-act="wlsave">Enregistrer en liste</button></div>` : ""),
+    };
+  };
+  function wlAltSheet(i) {
+    const x = S.wl.lines[i];
+    if (!x) return;
+    const list = x.cands.map((id) => S.prods.get(id)).filter((p) => p && best(p)).sort((a, b) => valOf(a) - valOf(b)).slice(0, 40);
+    openSheet({
+      title: x.raw,
+      body: `<p>Du moins cher au plus cher, au kilo ou au litre.</p><div class="group">${list.map((p) => { const b = best(p); return `<button class="opt alt" type="button" data-act="wlpick" data-i="${i}" data-id="${esc(p.id)}"><span class="thumb">${img(p, 40)}</span><span class="at"><b>${esc(p.brand)}</b> ${esc(p.name)}<small>${esc(p.format)}${unitPrice(p, b.price) ? ", " + esc(unitPrice(p, b.price)) : ""}, chez ${esc(retName(b.ret))}</small></span><span class="ap">${eur(b.price)}</span>${p.id === x.pick ? ic("check", "ck") : `<span class="ck"></span>`}</button>`; }).join("")}</div>`,
+    });
+  }
+  function wlItems() {
+    const items = {};
+    for (const x of (S.wl && S.wl.lines) || []) if (x.pick) items[x.pick] = Math.min(99, (items[x.pick] || 0) + x.n);
+    return items;
+  }
+
+  /* ---------- remplacements moins chers ---------- */
+  /* Même rayon, même nombre d'unités, contenance à 20 % près et mêmes caractéristiques (variété, forme, parfum, sans
+     sucres, eau minérale ou de source, lait frais ou UHT, bio...) : seule la marque change. Comparé sur les prix
+     relevés, jamais sur un prix simulé. */
+  const VARIANT = new Set("zero light sucre stevia max cherry vanille citron fraise peche menthe framboise mangue pamplemousse grenade cerise aromatisee decafeine decaf bio lactose croissance vitamine omega chocolat pepite nappee noisette amande caramel gluten complete integrale magnesium humide sensitive hypoallergenique couleur noir marseille brebi chevre soja coco vegetal grec grecque bifidu calcium".split(" ").map(stem));
+  const ATTR = new Set(("gazeuse petillante bulle plate aromatisee citron fraise peche menthe framboise mangue pamplemousse grenade cerise vanille " +
+    "zero light sucre stevia max cherry pulpe concentre presse orange sanguine multifruit agrume " +
+    "bio lactose entier ecreme demi croissance vitamine omega montagne microfiltre " +
+    "brasse ferme grec grecque brebi chevre soja coco vegetal bifidu calcium " +
+    "emmental mozzarella parmesan parmigiano grana comte gruyere cheddar raclette pecorino mimolette melange gratin pizza copeaux " +
+    "spaghetti spaghettini penne fusilli coquillette farfalle tagliatelle macaroni torsade lasagne linguine rigatoni tortiglioni conchiglie " +
+    "ravioli gnocchi vermicelle cheveux papillon nouille orzo fettuccine mezze tortellini cannelloni pipe perle " +
+    "complete integrale gluten fraiche oeuf epeautre lentille chiche " +
+    "huile olive tomate piment arete tournesol colza beurre minerale source magnesium sport frai uht sterilise pur nectar " +
+    "decafeine decaf arabica robusta intense corse doux " +
+    "madeleine quatre quart brownie cookie financier marbre cake moelleux crepe gaufre sable galette palmier biscuit " +
+    "chocolat pepite nappee noisette amande caramel " +
+    "double triple epaisseur compact humide " +
+    "capsule poudre gel sensitive hypoallergenique ecolabel couleur noir marseille").split(" ").map(stem));
+  function sig(p) {
+    if (p._sig != null) return p._sig;
+    /* « sans pulpe » et « avec pulpe » ne sont pas la même chose */
+    const nt = norm(p.name).split(" ").filter(Boolean).map(stem), w = new Set();
+    nt.forEach((t, i) => { if (ATTR.has(t)) w.add(nt[i - 1] === "san" ? "sans " + t : t); });
+    if ((p.tags || []).includes("Bio")) w.add("bio");
+    return (p._sig = [...w].sort().join(" "));
+  }
+  const bestReal = (p) => offers(p, true).find((o) => !o.sim) || null;
+  /* Les remplacements restent dans les enseignes de la répartition en cours : un produit remplacé peut rejoindre une
+     commande déjà prévue, et l'économie compare le prix payé aujourd'hui au prix dans ces enseignes. */
+  function swapCtx() {
+    const st = RES.steps[RES.K], bst = st && (st.full || st.partial);
+    if (!bst) return null;
+    const paid = {}, rets = new Set(bst.orders.map((o) => o.ch.id));
+    bst.orders.forEach((o) => o.items.forEach((x) => { paid[x.l.id] = { price: x.cost / x.l.q / 100, ret: o.ch.id }; }));
+    (bst.completed || []).forEach((x) => { paid[x.l.id] = { price: x.cost / x.l.q / 100, ret: x.ret }; rets.add(x.ret); });
+    return { paid, rets };
+  }
+  function swapFor(id, ctx) {
+    const p = S.prods.get(id), q = S.basket[id];
+    if (!p || !(q > 0) || (S.prefs.keep || {})[id] || !p.qty || !p.qty.v) return null;
+    const now = ctx ? ctx.paid[id] : bestReal(p);
+    const u = now && perUnit(p, now.price);
+    if (!now || u == null) return null;
+    const s = sig(p);
+    let w = null;
+    for (const e of S.list) {
+      if (e === p || e.r !== p.r || !e.qty || e.qty.u !== p.qty.u || Math.abs(e.qty.v - p.qty.v) / p.qty.v > 0.2 || packsOf(e) !== packsOf(p) || S.basket[e.id] || sig(e) !== s) continue;
+      const be = offers(e, true).find((o) => !o.sim && (!ctx || ctx.rets.has(o.ret))), ue = be && perUnit(e, be.price);
+      if (!be || ue == null || ue > u * 0.97 || (now.price - be.price) * q < 0.2) continue;
+      if (!w || be.price < w.toP.price) w = { from: p, to: e, q, fromP: now, toP: be };
+    }
+    if (w) w.save = (w.fromP.price - w.toP.price) * w.q;
+    return w;
+  }
+  const swaps = () => { const ctx = swapCtx(); return Object.keys(S.basket).map((id) => swapFor(id, ctx)).filter(Boolean).sort((a, b) => b.save - a.save); };
+  function swapSheet() {
+    const sw = swaps();
+    if (!sw.length) { toast("Aucun équivalent moins cher pour l'instant"); return; }
+    S.swSel = Object.fromEntries(sw.map((x) => [x.from.id, true]));
+    const build = () => {
+      const sel = sw.filter((x) => S.swSel[x.from.id]), tot = sel.reduce((a, x) => a + x.save, 0);
+      const row = (x) => {
+        const on = !!S.swSel[x.from.id];
+        return `<button class="swr" type="button" data-act="swaptg" data-id="${esc(x.from.id)}" role="checkbox" aria-checked="${on}"><span class="box">${ic("check")}</span><span class="swb">` +
+          `<span class="swp"><span class="thumb">${img(x.from, 40)}</span><span class="swt"><b>${esc(x.from.brand)}</b> ${esc(x.from.name)}<small>${x.q > 1 ? x.q + " × " : ""}${esc(x.from.format)}, ${eur(x.fromP.price)}</small></span></span>` +
+          `<span class="swp to"><span class="thumb">${img(x.to, 40)}</span><span class="swt"><b>${esc(x.to.brand)}</b> ${esc(x.to.name)}<small>${esc(x.to.format)}, ${eur(x.toP.price)} chez ${esc(retName(x.toP.ret))}</small></span></span>` +
+          `<span class="sws">${eur(x.save)} de moins</span></span></button>`;
+      };
+      return {
+        body: `<p>Même rayon, même type de produit, format proche\u00a0: seule la marque change. Décoche un produit pour garder sa marque, il ne te sera plus proposé.</p><div class="group">${sw.map(row).join("")}</div><p class="gf">Économie calculée sur le meilleur prix de chaque produit\u00a0; le total du panier, frais compris, est recalculé après le remplacement.</p>`,
+        foot: `<div class="swfoot">${sel.length ? `<span>Environ <b>${eur(tot)}</b> de moins</span>` : ""}<button class="btn" type="button" data-act="swapok">${sel.length ? `Remplacer ${plural(sel.length, "produit", "produits")}` : "Garder toutes les marques"}</button></div>`,
+      };
+    };
+    const o = build();
+    openSheet({ title: "Économiser encore", body: o.body, foot: o.foot, build });
+  }
+
+  /* ---------- commande guidée ---------- */
+  /* Pour chaque commande de la répartition : le site à ouvrir, chaque produit à ajouter (lien direct, nom affiché par
+     l'enseigne), une case à cocher et la progression ; « J'ai passé cette commande » la note. Quand toutes les commandes
+     sont passées, l'économie du panier rejoint l'historique (S.hist), affiché sur l'accueil. */
+  function guideOrder(rid) {
+    const st = RES.steps[RES.K], bst = st && (st.full || st.partial);
+    return bst ? bst.orders.find((o) => o.ch.id === rid) || null : null;
+  }
+  function saveGuide() { store.set("guide", S.guide); }
+  function guideSheet(rid) {
+    const r = S.retMap.get(rid);
+    if (!r) return;
+    const build = () => {
+      const o = guideOrder(rid), G = S.guide;
+      if (!o) return { body: `<p>Cette commande n'est plus dans ta répartition.</p>`, foot: "" };
+      const n = o.items.length, k = o.items.filter((x) => G.ck[rid + "|" + x.l.id]).length, done = !!G.done[rid];
+      const where = r.channel && r.channel.where ? (pickup(r) ? ", choisis le retrait à " + r.channel.where : ", choisis la livraison à domicile (" + r.channel.where + ")") : "";
+      const row = (x) => {
+        const p = S.prods.get(x.l.id), of = p.offers[rid] || {}, on = !!G.ck[rid + "|" + p.id];
+        return `<div class="gi${on ? " on" : ""}"><button class="box" type="button" data-act="guideck" data-id="${esc(rid)}" data-p="${esc(p.id)}" role="checkbox" aria-checked="${on}" aria-label="Ajouté au panier ${esc(r.service)}">${ic("check")}</button>` +
+          `<a class="gt" href="${esc(of.url || r.home)}" target="_blank" rel="noopener"><b>${x.l.q > 1 ? `<span class="gq">${x.l.q} ×</span> ` : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}, ${eurC(x.cost)}${of.cat ? ", sur la page du rayon" : ""}</small>${of.name ? `<small>Sur le site\u00a0: ${esc(of.name)}</small>` : ""}</a>${ic("ext", "ext")}</div>`;
+      };
+      return {
+        body: `<p>Ouvre ${esc(r.service)}${esc(where)}, puis ajoute chaque produit et coche-le ici. Touche un produit pour l'ouvrir sur le site.</p>` +
+          `<div class="pad gbtn"><a class="btn sm tint" href="${esc(r.home)}" target="_blank" rel="noopener">Ouvrir le site${ic("ext")}</a><button class="btn sm plain" type="button" data-act="guidecopy" data-id="${esc(rid)}">${ic("copy")}Copier la liste</button></div>` +
+          `<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${k}"><span style="width:${n ? Math.round((100 * k) / n) : 0}%"></span></div><p class="progl">${k} sur ${plural(n, "produit ajouté", "produits ajoutés")}</p>` +
+          `<div class="group">${o.items.map(row).join("")}</div>` +
+          (r.simulated ? `<p class="gf">Prix simulés, pas relevés\u00a0: le vrai total s'affiche sur ${esc(r.service)}.</p>` : ""),
+        foot: done ? `<button class="btn plain" type="button" data-act="guideundo" data-id="${esc(rid)}">Commande pas encore passée</button>` : `<button class="btn" type="button" data-act="guidedone" data-id="${esc(rid)}">J'ai passé cette commande, ${eurC(o.sub + o.fee)}</button>`,
+      };
+    };
+    const o = build();
+    openSheet({ title: "Commande " + r.name, body: o.body, foot: o.foot, build, onClose: () => { if (S.route.name === "panier") rerender(); } });
+  }
+  /* économie d'un panier : chaque produit payé au prix choisi par la répartition, plutôt qu'au prix moyen relevé dans
+     les enseignes qui le vendent ; les frais payés comptent dans les deux cas */
+  function savedOf(bst) {
+    let d = 0;
+    const lines = [].concat(...bst.orders.map((o) => o.items.map((x) => ({ l: x.l, cost: x.cost })))).concat((bst.completed || []).map((x) => ({ l: x.l, cost: x.cost })));
+    for (const x of lines) {
+      const os = offers(S.prods.get(x.l.id), true).filter((o) => !o.sim);
+      if (os.length < 2) continue;
+      d += Math.round((os.reduce((a, o) => a + o.price, 0) / os.length) * 100) * x.l.q - x.cost;
+    }
+    return Math.max(0, Math.round(d));
+  }
+  function recordDone() {
+    const st = RES.steps[RES.K], bst = st && st.full, G = S.guide, key = JSON.stringify(S.basket);
+    if (!bst || G.rec === key) return;
+    const total = fullTotal(bst), sp = S.swapPrev, saved = savedOf(bst) + (sp && sp.key === key ? Math.max(0, sp.total - total) : 0);
+    S.hist.push({ d: new Date().toISOString().slice(0, 10), t: total, s: saved, n: count(), o: bst.orders.map((o) => S.retMap.get(o.ch.id).name) });
+    store.set("hist", S.hist);
+    G.rec = key; G.saved = saved; saveGuide();
+  }
+  function savingsCard() {
+    const H = S.hist || [];
+    if (!H.length) return "";
+    const s = H.reduce((a, x) => a + (x.s || 0), 0);
+    return `<a class="savings" href="#/economies">${ic("coin", "si")}<span><b>${eurC(s)} économisés avec Cabas</b><small>Sur ${plural(H.length, "panier", "paniers")} depuis le ${esc(dateFr(H[0].d).replace(/ \d{4}$/, ""))}, grâce aux meilleurs prix et aux remplacements.</small></span>${ic("chev", "chev")}</a>`;
+  }
+  VIEWS.economies = () => {
+    const H = (S.hist || []).slice().reverse(), s = H.reduce((a, x) => a + (x.s || 0), 0);
+    return {
+      title: "Tes économies", grouped: true,
+      html: `<h1 class="lt">Tes économies</h1><p class="lt-sub">${H.length ? `${eurC(s)} sur ${plural(H.length, "panier", "paniers")}` : "Aucun panier commandé pour l'instant"}</p>` +
+        (H.length ? `<div class="group">${H.map((x) => `<div class="row"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${x.o && x.o.length ? ", " + esc(joinEt(x.o)) : ""}, ${eurC(x.t)}</small></span><span class="val num">${x.s ? eurC(x.s) : "–"}</span></div>`).join("")}</div>` +
+          `<p class="gf">Un panier compte quand toutes ses commandes sont notées comme passées. L'économie d'un panier additionne, pour chaque produit, l'écart entre le prix payé et son prix moyen dans les enseignes qui le vendent, et ce que les remplacements par un équivalent moins cher ont fait gagner. Selon les prix relevés.</p>` +
+          `<div class="group" style="margin-top:28px"><button class="row danger" type="button" data-act="histclear">Effacer l'historique</button></div>` :
+          `<div class="empty">${emptyArt("coin")}<h2>Rien pour l'instant</h2><p>Dans le panier, touche «\u00a0Passer la commande\u00a0» pour chaque enseigne\u00a0: quand tout est commandé, l'économie s'ajoute ici.</p></div>`),
+    };
+  };
+
+  /* ---------- partager ---------- */
+  const b64e = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const b64d = (s) => decodeURIComponent(escape(atob(String(s).replace(/-/g, "+").replace(/_/g, "/"))));
+  async function shareText(title, text, url) {
+    if (navigator.share) { try { await navigator.share(url ? { title, text, url } : { title, text }); } catch (err) { /* partage annulé */ } return; }
+    try { await navigator.clipboard.writeText(url ? text + "\n" + url : text); toast(url ? "Lien copié" : "Liste copiée"); } catch (err) { toast("Copie impossible sur cet appareil"); }
+  }
+  function cartText() {
+    const res = cartResult(), st = res.steps[res.K], bst = st && (st.full || st.partial);
+    const line = (id, q) => { const p = S.prods.get(id); return `- ${q > 1 ? q + " x " : ""}${p.brand} ${p.name}, ${p.format}`; };
+    const L = [`Mes courses du ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}, avec Cabas`];
+    if (bst) {
+      for (const o of bst.orders) {
+        const r = S.retMap.get(o.ch.id), ch = r.channel || {};
+        L.push("", `${r.name}${ch.where ? " (" + (pickup(r) ? "retrait à " : "livraison, ") + ch.where + ")" : ""} : ${eurC(o.sub + o.fee)}${r.simulated ? ", prix simulés" : ""}`);
+        o.items.forEach((x) => L.push(line(x.l.id, x.l.q)));
+      }
+      if ((bst.completed || []).length) { L.push("", `En magasin : ${eurC(bst.compTotal)}`); bst.completed.forEach((x) => L.push(line(x.l.id, x.l.q) + ", chez " + retName(x.ret))); }
+      if ((bst.skipped || []).length) { L.push("", "Hors commande"); bst.skipped.forEach((x) => L.push(line(x.l.id, x.l.q))); }
+      L.push("", `Total : ${eurC(fullTotal(bst))}, frais compris${st.full ? "" : ", sans les produits hors commande"}`);
+    } else {
+      L.push("");
+      Object.keys(S.basket).filter((id) => S.prods.has(id)).forEach((id) => L.push(line(id, S.basket[id])));
+    }
+    return L.join("\n");
+  }
+  function shareList(L) {
+    const items = Object.keys(L.items).filter((id) => S.prods.has(id)).map((id) => [id, L.items[id]]);
+    const url = location.origin + location.pathname + "#/partage/" + b64e(JSON.stringify({ n: L.name, i: items }));
+    shareText(L.name, `Ma liste «\u00a0${L.name}\u00a0» sur Cabas, ${plural(items.length, "produit", "produits")}`, url);
+  }
+  VIEWS.partage = (r) => {
+    let L = null;
+    try { const o = JSON.parse(b64d(r.id)); L = { name: String(o.n || "Liste partagée").slice(0, 40), items: {} }; for (const [id0, q] of o.i || []) { const id = S.prods.has(id0) ? id0 : (S.alias || {})[id0]; if (id && S.prods.has(id) && q > 0) L.items[id] = Math.min(99, (L.items[id] || 0) + (q | 0)); } } catch (err) { L = null; }
+    if (!L || !Object.keys(L.items).length) return { title: "Liste partagée", html: `<div class="empty">${emptyArt("list")}<h2>Lien illisible</h2><p>Ce lien de liste est incomplet ou ses produits ne sont plus au catalogue.</p><a class="btn" href="#/listes">Voir mes listes</a></div>` };
+    S.shared = L;
+    const e = estimate(L.items);
+    return {
+      title: L.name, grouped: true,
+      html: `<h1 class="lt">${esc(L.name)}</h1><p class="lt-sub">Liste partagée, ${plural(e.n, "produit", "produits")}, environ ${eur(e.t)} au meilleur prix</p>` +
+        `<div class="pad btns" style="padding-top:6px"><button class="btn" type="button" data-act="addshared">${ic("plus")}Tout ajouter au panier</button><button class="btn tint" type="button" data-act="keepshared">Enregistrer dans mes listes</button></div>` +
+        `<h2 class="gh">Produits</h2><div class="group">${itemsList(L.items)}</div>`,
+    };
+  };
 
   /* ---------- feuilles ---------- */
   let sheetCtx = null;
@@ -1276,7 +1657,7 @@
       case "zipok": { const v = ($("#zipIn").value || "").replace(/\D/g, "").slice(0, 5); if (v && v.length !== 5) { toast("Un code postal a 5 chiffres"); break; } S.prefs.zip = v; savePrefs(); closeSheet(); rerender(); if (v && !inZone()) toast("Livraison hors Île-de-France pas encore couverte"); break; }
       case "maxk": S.prefs.maxOrders = +t.dataset.k; savePrefs(); rerender(); break;
       case "clear": confirmSheet("Vider le panier\u00a0?", "Tous les produits du panier seront retirés.", "Vider le panier", "clearok"); break;
-      case "clearok": S.basket = {}; saveBasket(); closeSheet(); rerender(); break;
+      case "clearok": S.basket = {}; saveBasket(); S.guide = { ck: {}, done: {} }; saveGuide(); closeSheet(); renderChrome(); rerender(); break;
       case "pick": {
         const g = t.dataset.g, m = S.allMap.get(id), chosen = S.allMap.get(pickOf(g, groupsOf()[g] || [m]));
         if (!m || (S.prefs.comp === false && isPickup(m))) break;
@@ -1303,14 +1684,79 @@
         if (S.route.name === "home") rerender();
         break;
       }
-      case "replacelist": { const L = S.lists.find((x) => x.id === id); if (!L) break; addItems(L.items, true); renderChrome(); switchTab("panier"); break; }
+      case "replacelist": { const L = S.lists.find((x) => x.id === id); if (!L) break; addItems(L.items, true); S.guide = { ck: {}, done: {} }; saveGuide(); renderChrome(); switchTab("panier"); break; }
       case "renamelist": { const L = S.lists.find((x) => x.id === id); if (L) nameSheet("Renommer", L.name, "renameok", id); break; }
       case "renameok": { const L = S.lists.find((x) => x.id === id); const nm = ($("#nameIn").value || "").trim(); if (L && nm) { L.name = nm; saveLists(); } closeSheet(); rerender(); break; }
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); break;
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, offv: 1 }); S.seen = {}; ["basket", "lists", "recent", "prefs", "seen"].forEach((x) => store.set(x, x === "lists" || x === "recent" ? [] : {})); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.guide = { ck: {}, done: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" ? [] : {})); store.set("draft", ""); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
+      /* liste écrite ou dictée */
+      case "wlgo": {
+        const tx = ($("#wlIn") || {}).value || "";
+        S.wl = { text: tx, lines: readList(tx) };
+        store.set("draft", tx);
+        if (!S.wl.lines.length) { S.wl.lines = null; toast("Écris au moins un produit"); break; }
+        window.scrollTo(0, 0); rerender(); break;
+      }
+      case "wledit": if (S.wl) S.wl.lines = null; rerender(); break;
+      case "wlinc": { const x = S.wl && S.wl.lines[+t.dataset.i]; if (x) { x.n = Math.min(99, x.n + 1); rerender(); } break; }
+      case "wldec": { const L = S.wl && S.wl.lines, i = +t.dataset.i; if (L && L[i]) { if (L[i].n > 1) L[i].n--; else L.splice(i, 1); rerender(); } break; }
+      case "wlalt": wlAltSheet(+t.dataset.i); break;
+      case "wlpick": { const x = S.wl && S.wl.lines[+t.dataset.i]; if (x) x.pick = id; closeSheet(); rerender(); break; }
+      case "wlsearch": { const x = S.wl && S.wl.lines[+t.dataset.i]; S.q = x ? x.q || x.raw : ""; addRecent(S.q); S.shown.s = 0; switchTab("recherche"); break; }
+      case "wladd": {
+        const n = addItems(wlItems(), false);
+        S.wl = null; store.set("draft", "");
+        renderChrome(); bumpBadge(); switchTab("panier");
+        toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier"); break;
+      }
+      case "wlsave": nameSheet("Nouvelle liste", "Ma liste du " + new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" }), "wlsaveok"); break;
+      case "wlsaveok": {
+        const nm = ($("#nameIn").value || "").trim() || "Ma liste";
+        S.lists.unshift({ id: Date.now().toString(36), name: nm, items: wlItems(), at: new Date().toISOString().slice(0, 10) });
+        saveLists(); closeSheet(); toast("Liste enregistrée", { label: "Voir", run: () => switchTab("listes") }); break;
+      }
+      /* remplacements moins chers */
+      case "swaps": swapSheet(); break;
+      case "swaptg": S.swSel[id] = !S.swSel[id]; refreshSheet(); break;
+      case "swapok": {
+        const sw = swaps(), st = RES.steps[RES.K], prev = st && st.full ? fullTotal(st.full) : null;
+        let n = 0;
+        for (const x of sw) {
+          if (S.swSel[x.from.id]) { const q = S.basket[x.from.id]; delete S.basket[x.from.id]; S.basket[x.to.id] = Math.min(99, (S.basket[x.to.id] || 0) + q); n++; }
+          else S.prefs.keep = Object.assign({}, S.prefs.keep, { [x.from.id]: 1 });
+        }
+        saveBasket(); savePrefs();
+        S.swapPrev = prev != null && n ? { total: prev, key: JSON.stringify(S.basket) } : null;
+        closeSheet(); renderChrome(); rerender();
+        toast(n ? plural(n, "produit remplacé", "produits remplacés") : "Marques gardées"); break;
+      }
+      case "keepreset": S.prefs.keep = {}; savePrefs(); rerender(); toast("Remplacements reproposés"); break;
+      /* commande guidée */
+      case "guide": guideSheet(id); break;
+      case "guideck": { const k = id + "|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); break; }
+      case "guidecopy": {
+        const o = guideOrder(id);
+        if (!o) break;
+        const tx = o.items.map((x) => { const p = S.prods.get(x.l.id); return `${x.l.q > 1 ? x.l.q + " x " : ""}${p.brand} ${p.name}, ${p.format}`; }).join("\n");
+        (navigator.clipboard ? navigator.clipboard.writeText(tx) : Promise.reject()).then(() => toast("Liste copiée"), () => toast("Copie impossible sur cet appareil"));
+        break;
+      }
+      case "guidedone": {
+        S.guide.done[id] = 1; saveGuide(); closeSheet();
+        const st = RES.steps[RES.K], bst = st && st.full;
+        toast(bst && bst.orders.every((o) => S.guide.done[o.ch.id]) ? "Toutes tes commandes sont passées" : "Commande " + retName(id) + " notée"); break;
+      }
+      case "guideundo": delete S.guide.done[id]; S.guide.rec = ""; saveGuide(); refreshSheet(); break;
+      case "histclear": confirmSheet("Effacer l'historique\u00a0?", "Le total de tes économies repart de zéro sur cet appareil.", "Effacer", "histok"); break;
+      case "histok": S.hist = []; store.set("hist", []); closeSheet(); rerender(); break;
+      /* partager */
+      case "sharecart": shareText("Mes courses", cartText()); break;
+      case "sharelist": { const L = S.lists.find((x) => x.id === id); if (L) shareList(L); break; }
+      case "addshared": { if (!S.shared) break; const n = addItems(S.shared.items, false); renderChrome(); bumpBadge(); toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier", { label: "Voir", run: () => switchTab("panier") }); break; }
+      case "keepshared": { if (!S.shared) break; S.lists.unshift({ id: Date.now().toString(36), name: S.shared.name, items: Object.assign({}, S.shared.items), at: new Date().toISOString().slice(0, 10) }); saveLists(); toast("Ajoutée à tes listes", { label: "Voir", run: () => switchTab("listes") }); break; }
       default: break;
     }
   });
@@ -1323,8 +1769,10 @@
     if (t.id === "fmax") { F(t.dataset.k).max = t.value; refreshSheet(); }
   });
   let qT = null;
+  let draftT = null;
   document.addEventListener("input", (e) => {
     const t = e.target;
+    if (t.id === "wlIn") { if (S.wl) S.wl.text = t.value; clearTimeout(draftT); draftT = setTimeout(() => store.set("draft", t.value), 400); return; }
     if (t.id === "q") {
       clearTimeout(qT);
       const c = $(".search .clr"); if (c) c.hidden = !t.value;

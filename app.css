@@ -424,6 +424,68 @@ body.grouped .empty .art { background: #fff; }
 @keyframes up { from { transform: translateY(100%); } }
 @keyframes fade { from { opacity: 0; } }
 
+/* ---------- liste écrite, remplacements, commande guidée, économies ---------- */
+.wl { display: block; width: 100%; min-height: 172px; padding: 12px 14px; border: 0; border-radius: 14px; background: #fff; font: inherit; font-size: 17px; line-height: 25px; letter-spacing: -0.02em; color: var(--ink); resize: vertical; -webkit-appearance: none; appearance: none; }
+.wl::placeholder { color: var(--ink-3); }
+.wl:focus { outline: none; box-shadow: 0 0 0 2px var(--brand) inset; }
+.wlcta, .savings { display: flex; align-items: center; gap: 12px; margin: 6px calc(var(--g) + var(--sr)) 8px calc(var(--g) + var(--sl)); padding: 13px 14px; border-radius: 14px; background: var(--shelf); color: var(--ink); text-decoration: none; }
+.savings { background: var(--brand-tint); color: var(--brand-ink); }
+.savewrap { margin: 12px calc(var(--g) + var(--sr)) 0 calc(var(--g) + var(--sl)); }
+.savecard { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px; border-radius: 16px; background: #fff; color: var(--ink); text-align: left; }
+.wlcta .si, .savings .si, .savecard .si { width: 26px; height: 26px; color: var(--brand); flex: none; }
+.wlcta > span, .savings > span, .savecard > span { flex: 1; min-width: 0; }
+.wlcta b, .savings b, .savecard b { display: block; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; line-height: 22px; }
+.savecard b { color: var(--brand-ink); }
+.wlcta small, .savings small, .savecard small { display: block; font-size: 13px; line-height: 18px; color: var(--ink-2); margin-top: 1px; letter-spacing: -0.005em; }
+.savings small { color: var(--brand-ink); opacity: 0.85; }
+.wlcta .chev, .savings .chev, .savecard .chev { width: 16px; height: 16px; color: var(--ink-3); stroke-width: 2.4; flex: none; }
+.item.wli .wq { display: block; font-size: 12px; line-height: 16px; color: var(--ink-2); letter-spacing: 0; margin-bottom: 1px; }
+.item .lnk { display: inline-block; margin-top: 3px; padding: 2px 0; font-size: 14px; color: var(--brand); letter-spacing: -0.01em; }
+.item.miss .thumb.q { display: grid; place-items: center; color: var(--ink-3); }
+.item.miss .thumb.q .ic { width: 22px; height: 22px; }
+.item.miss .it b { font-weight: 400; }
+.opt.alt { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto 20px; gap: 10px; padding: 8px 16px; font-size: 15px; letter-spacing: -0.01em; }
+.opt.alt + .opt.alt::before { left: 66px; }
+.opt.alt .thumb, .swp .thumb { position: relative; width: 40px; height: 40px; border-radius: 8px; background: var(--shelf); }
+.opt.alt .thumb img, .swp .thumb img { position: absolute; inset: 4%; width: 92%; height: 92%; }
+.opt.alt .at { min-width: 0; line-height: 19px; }
+.opt.alt .at b { font-weight: 600; }
+.opt.alt .at small { display: block; font-size: 13px; line-height: 17px; color: var(--ink-2); margin-top: 1px; }
+.opt.alt .ap { font-family: var(--round); font-weight: 600; font-variant-numeric: tabular-nums; }
+.opt.alt .ck { margin-left: 0; width: 20px; }
+.swr { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; width: 100%; padding: 12px 16px; text-align: left; color: var(--ink); }
+.swr + .swr::before { content: ""; position: absolute; top: 0; left: 50px; right: 0; height: 0.5px; background: var(--sep); }
+.swr .box { margin-top: 9px; }
+.swr[aria-checked="true"] .box { background: var(--brand); border-color: var(--brand); }
+.swb { display: grid; gap: 6px; min-width: 0; }
+.swp { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 10px; align-items: center; }
+.swp:not(.to) { opacity: 0.55; }
+.swt { min-width: 0; font-size: 14px; line-height: 18px; letter-spacing: -0.01em; }
+.swt b { font-weight: 600; }
+.swt small { display: block; font-size: 12px; line-height: 16px; color: var(--ink-2); }
+.sws { font-size: 13px; font-weight: 600; color: var(--brand-ink); padding-left: 50px; }
+.gbtn { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; padding-bottom: 12px; }
+.gbtn .btn { width: 100%; min-width: 0; padding: 0 10px; }
+.swfoot { display: grid; gap: 8px; width: 100%; }
+.swfoot span { font-size: 14px; color: var(--ink-2); text-align: center; letter-spacing: -0.01em; }
+.swfoot b { color: var(--brand-ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+.order > .item:first-child::before { display: none; }
+.prog { height: 6px; margin: 2px var(--g) 0; border-radius: 3px; background: var(--fill); overflow: hidden; }
+.prog span { display: block; height: 100%; border-radius: 3px; background: var(--brand); }
+.progl { font-size: 13px; color: var(--ink-2); padding: 6px calc(var(--g) + 2px) 10px; font-variant-numeric: tabular-nums; }
+.gi { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr) 16px; gap: 10px; align-items: center; padding: 10px 16px; }
+.gi + .gi::before { content: ""; position: absolute; top: 0; left: 54px; right: 0; height: 0.5px; background: var(--sep); }
+.gi .box { width: 26px; height: 26px; border-radius: 13px; }
+.gi.on .box { background: var(--brand); border-color: var(--brand); }
+.gi .gt { min-width: 0; color: var(--ink); text-decoration: none; }
+.gi .gt b { display: block; font-size: 15px; font-weight: 400; line-height: 19px; letter-spacing: -0.01em; }
+.gi .gq { font-weight: 700; }
+.gi .gt small { display: block; font-size: 12px; line-height: 16px; color: var(--ink-2); margin-top: 1px; overflow-wrap: anywhere; }
+.gi.on .gt { opacity: 0.45; }
+.sum .alt .btns.two { grid-template-columns: 1fr 1fr; margin-top: 10px; }
+.sum .alt .btns.two .btn { width: 100%; margin-top: 0; }
+@media (prefers-reduced-motion: no-preference) { .prog span { transition: width 0.25s ease; } }
+
 /* ---------- divers ---------- */
 .toast { position: fixed; z-index: 60; left: 50%; bottom: calc(var(--sb) + var(--tab) + 80px); transform: translateX(-50%); max-width: calc(100% - 48px); padding: 11px 18px; border-radius: 22px; background: rgba(28, 28, 30, 0.94); color: #fff; font-size: 15px; letter-spacing: -0.01em; text-align: center; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); animation: fade 0.2s ease; }
 .toast button { color: #7ee2a8; font-weight: 600; margin-left: 10px; }

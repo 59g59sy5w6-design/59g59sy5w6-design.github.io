@@ -16,6 +16,16 @@ def strip_acc(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
 
+# Articles hors courses que la recherche d'une enseigne peut mêler à un rayon (vendeurs tiers d'auchan.fr pour
+# « eau » : radiateurs, robinets, pompes, chauffe-eau). Une eau « avec robinet intégré » reste une eau.
+HORS_COURSES = re.compile(r'(^|\s)(radiateur|robinet d arrosage|robinet arrosage|pompe d arrosage|raccord|chauffe eau|recuperateur d eau|seche serviettes)(\s|$)')
+
+
+def hors_courses(label):
+    k = key(label)
+    return bool(HORS_COURSES.search(k)) and not k.startswith('eau ')
+
+
 def key(s):
     s = str(s or '').lower().replace('œ', 'oe').replace('æ', 'ae')
     s = strip_acc(s).replace('’', "'")
