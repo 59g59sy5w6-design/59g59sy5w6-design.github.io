@@ -1,0 +1,149 @@
+{
+  "note": "Recettes simples du quotidien. Chaque ingrédient est cherché dans le catalogue (q) ; need est la quantité utilisée pour les portions indiquées, en g, ml ou pièces (pc). Les ingrédients du placard (sel, poivre, épices) ne sont pas comptés.",
+  "recettes": [
+    {
+      "id": "pates-thon-tomate", "name": "Pâtes au thon et à la tomate", "kind": "plat", "portions": 4, "minutes": 20,
+      "ing": [
+        { "q": "pâtes", "need": 400, "u": "g", "t": "400 g de pâtes" },
+        { "q": "thon", "need": 280, "u": "g", "t": "2 boîtes de thon (280 g)" },
+        { "q": "tomates pelées", "need": 400, "u": "g", "t": "1 boîte de tomates pelées (400 g)" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" },
+        { "q": "emmental râpé", "need": 60, "u": "g", "t": "60 g d'emmental râpé" }
+      ],
+      "placard": "sel, poivre, herbes de Provence",
+      "steps": ["Fais cuire les pâtes dans une grande casserole d'eau salée.", "Pendant ce temps, chauffe l'huile dans une poêle, ajoute les tomates en les écrasant et laisse réduire 10 minutes.", "Ajoute le thon émietté, sale, poivre et réchauffe 2 minutes.", "Mélange avec les pâtes égouttées et sers avec le fromage râpé."]
+    },
+    {
+      "id": "riz-thon-tomate", "name": "Riz au thon et aux tomates", "kind": "plat", "portions": 4, "minutes": 25,
+      "ing": [
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
+        { "q": "thon", "need": 280, "u": "g", "t": "2 boîtes de thon (280 g)" },
+        { "q": "tomates pelées", "need": 400, "u": "g", "t": "1 boîte de tomates pelées (400 g)" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, paprika",
+      "steps": ["Fais cuire le riz comme indiqué sur le paquet.", "Chauffe l'huile dans une poêle, ajoute les tomates et laisse mijoter 10 minutes.", "Ajoute le thon émietté et le paprika, puis le riz cuit.", "Mélange, rectifie l'assaisonnement et sers chaud."]
+    },
+    {
+      "id": "pates-sardines", "name": "Pâtes aux sardines et à la tomate", "kind": "plat", "portions": 4, "minutes": 20,
+      "ing": [
+        { "q": "pâtes", "need": 400, "u": "g", "t": "400 g de pâtes" },
+        { "q": "sardines", "need": 270, "u": "g", "t": "2 boîtes de sardines" },
+        { "q": "tomates pelées", "need": 400, "u": "g", "t": "1 boîte de tomates pelées (400 g)" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, ail, piment",
+      "steps": ["Fais cuire les pâtes.", "Fais revenir l'ail dans l'huile, ajoute les tomates écrasées et laisse réduire 8 minutes.", "Ajoute les sardines en morceaux, sans les écraser, et réchauffe doucement.", "Mélange avec les pâtes égouttées et sers aussitôt."]
+    },
+    {
+      "id": "gratin-coquillettes", "name": "Gratin de coquillettes", "kind": "plat", "portions": 4, "minutes": 35,
+      "ing": [
+        { "q": "coquillettes", "need": 300, "u": "g", "t": "300 g de coquillettes" },
+        { "q": "lait", "need": 500, "u": "ml", "t": "50 cl de lait" },
+        { "q": "beurre", "need": 40, "u": "g", "t": "40 g de beurre" },
+        { "q": "farine", "need": 40, "u": "g", "t": "40 g de farine" },
+        { "q": "emmental râpé", "need": 100, "u": "g", "t": "100 g d'emmental râpé" }
+      ],
+      "placard": "sel, poivre, muscade",
+      "steps": ["Fais cuire les coquillettes 2 minutes de moins que le temps indiqué et égoutte-les.", "Fais fondre le beurre, ajoute la farine, puis le lait petit à petit en remuant jusqu'à ce que la sauce épaississe.", "Mélange la sauce, les pâtes et la moitié du fromage dans un plat.", "Couvre du reste de fromage et passe 15 minutes au four à 200 °C."]
+    },
+    {
+      "id": "pates-fromage", "name": "Pâtes au beurre et au fromage", "kind": "plat", "portions": 4, "minutes": 15,
+      "ing": [
+        { "q": "spaghetti", "need": 400, "u": "g", "t": "400 g de spaghetti" },
+        { "q": "parmesan râpé", "need": 100, "u": "g", "t": "100 g de parmesan râpé" },
+        { "q": "beurre", "need": 30, "u": "g", "t": "30 g de beurre" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Fais cuire les spaghetti et garde une louche d'eau de cuisson.", "Égoutte, remets dans la casserole hors du feu avec le beurre.", "Ajoute le fromage et un peu d'eau de cuisson en mélangeant jusqu'à obtenir une sauce lisse.", "Poivre généreusement et sers."]
+    },
+    {
+      "id": "omelette-fromage", "name": "Omelette au fromage", "kind": "plat", "portions": 2, "minutes": 10,
+      "ing": [
+        { "q": "oeufs", "need": 6, "u": "pc", "t": "6 œufs" },
+        { "q": "emmental râpé", "need": 60, "u": "g", "t": "60 g d'emmental râpé" },
+        { "q": "lait", "need": 50, "u": "ml", "t": "5 cl de lait" },
+        { "q": "beurre", "need": 15, "u": "g", "t": "15 g de beurre" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Bats les œufs avec le lait, sale et poivre.", "Fais fondre le beurre dans une poêle à feu moyen et verse les œufs.", "Quand l'omelette prend, parsème le fromage, plie-la en deux et sers aussitôt."]
+    },
+    {
+      "id": "riz-oeufs", "name": "Riz sauté aux œufs", "kind": "plat", "portions": 4, "minutes": 25,
+      "ing": [
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
+        { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, sauce soja si tu en as",
+      "steps": ["Fais cuire le riz et laisse-le refroidir un peu.", "Chauffe l'huile dans une grande poêle, verse les œufs battus et remue pour les brouiller.", "Ajoute le riz, fais sauter 5 minutes à feu vif.", "Assaisonne et sers chaud."]
+    },
+    {
+      "id": "crepes", "name": "Crêpes", "kind": "dessert", "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "farine", "need": 250, "u": "g", "t": "250 g de farine" },
+        { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
+        { "q": "lait", "need": 500, "u": "ml", "t": "50 cl de lait" },
+        { "q": "sucre en poudre", "need": 30, "u": "g", "t": "30 g de sucre" },
+        { "q": "beurre", "need": 50, "u": "g", "t": "50 g de beurre" }
+      ],
+      "placard": "une pincée de sel",
+      "steps": ["Mélange la farine, le sucre et le sel, puis ajoute les œufs.", "Verse le lait petit à petit en fouettant pour éviter les grumeaux, puis le beurre fondu.", "Laisse reposer la pâte une heure si tu as le temps.", "Fais cuire les crêpes une à une dans une poêle chaude légèrement beurrée."]
+    },
+    {
+      "id": "pancakes", "name": "Pancakes", "kind": "dessert", "portions": 4, "minutes": 25,
+      "ing": [
+        { "q": "farine", "need": 250, "u": "g", "t": "250 g de farine" },
+        { "q": "oeufs", "need": 2, "u": "pc", "t": "2 œufs" },
+        { "q": "lait", "need": 300, "u": "ml", "t": "30 cl de lait" },
+        { "q": "sucre en poudre", "need": 30, "u": "g", "t": "30 g de sucre" },
+        { "q": "beurre", "need": 30, "u": "g", "t": "30 g de beurre" }
+      ],
+      "placard": "1 sachet de levure chimique, une pincée de sel",
+      "steps": ["Mélange la farine, la levure, le sucre et le sel.", "Ajoute les œufs, puis le lait et le beurre fondu, jusqu'à une pâte épaisse.", "Verse une petite louche dans une poêle chaude et retourne quand des bulles apparaissent.", "Sers avec ce que tu aimes : sucre, confiture, fruits."]
+    },
+    {
+      "id": "gateau-yaourt", "name": "Gâteau au yaourt", "kind": "dessert", "portions": 8, "minutes": 45,
+      "ing": [
+        { "q": "yaourt nature", "need": 125, "u": "g", "t": "1 yaourt nature" },
+        { "q": "farine", "need": 200, "u": "g", "t": "3 pots de farine (200 g)" },
+        { "q": "sucre en poudre", "need": 150, "u": "g", "t": "2 pots de sucre (150 g)" },
+        { "q": "oeufs", "need": 3, "u": "pc", "t": "3 œufs" },
+        { "q": "huile", "need": 60, "u": "ml", "t": "un demi-pot d'huile (6 cl)" }
+      ],
+      "placard": "1 sachet de levure chimique",
+      "steps": ["Préchauffe le four à 180 °C.", "Verse le yaourt dans un saladier et garde le pot pour mesurer.", "Ajoute le sucre, les œufs, la farine, la levure puis l'huile, en mélangeant à chaque fois.", "Verse dans un moule beurré et fais cuire 35 minutes."]
+    },
+    {
+      "id": "quatre-quarts", "name": "Quatre-quarts", "kind": "dessert", "portions": 8, "minutes": 55,
+      "ing": [
+        { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
+        { "q": "farine", "need": 220, "u": "g", "t": "220 g de farine" },
+        { "q": "sucre en poudre", "need": 220, "u": "g", "t": "220 g de sucre" },
+        { "q": "beurre", "need": 220, "u": "g", "t": "220 g de beurre" }
+      ],
+      "placard": "un demi-sachet de levure chimique, une pincée de sel",
+      "steps": ["Préchauffe le four à 180 °C et fais fondre le beurre.", "Fouette les œufs avec le sucre jusqu'à ce que le mélange blanchisse.", "Ajoute le beurre fondu, puis la farine, la levure et le sel.", "Verse dans un moule à cake beurré et fais cuire 40 minutes."]
+    },
+    {
+      "id": "riz-au-lait", "name": "Riz au lait", "kind": "dessert", "portions": 6, "minutes": 45,
+      "ing": [
+        { "q": "riz", "need": 120, "u": "g", "t": "120 g de riz" },
+        { "q": "lait", "need": 1000, "u": "ml", "t": "1 litre de lait" },
+        { "q": "sucre en poudre", "need": 80, "u": "g", "t": "80 g de sucre" }
+      ],
+      "placard": "vanille ou cannelle",
+      "steps": ["Porte le lait à frémissement avec la vanille.", "Verse le riz en pluie et laisse cuire à feu très doux 35 minutes en remuant souvent.", "Ajoute le sucre en fin de cuisson et laisse refroidir."]
+    },
+    {
+      "id": "flan-oeufs", "name": "Flan aux œufs", "kind": "dessert", "portions": 6, "minutes": 50,
+      "ing": [
+        { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
+        { "q": "lait", "need": 500, "u": "ml", "t": "50 cl de lait" },
+        { "q": "sucre en poudre", "need": 80, "u": "g", "t": "80 g de sucre" }
+      ],
+      "placard": "vanille",
+      "steps": ["Préchauffe le four à 160 °C et fais chauffer le lait avec la vanille.", "Fouette les œufs avec le sucre, puis verse le lait chaud en remuant.", "Répartis dans des ramequins et fais cuire 35 minutes au bain-marie."]
+    }
+  ]
+}

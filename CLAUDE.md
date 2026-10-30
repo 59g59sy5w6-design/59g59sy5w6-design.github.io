@@ -17,6 +17,8 @@ Appli web installable (PWA) qui compare les prix des courses chez Monoprix, Carr
   - **Liste pour le magasin** (`shopSheet`) : les produits « à acheter en magasin », par enseigne et par rayon, à cocher.
   - **Moins cher sur tes produits** (`trackDrops`, `dropsRail`) : à chaque nouveau relevé, les produits du panier et des listes sont comparés au prix vu au relevé d'avant (`cabas.seenp`) ; une baisse d'au moins 3 % et 10 centimes reste sur l'accueil sept jours.
   - **Taille du texte** (`prefs.zoom`, réglages, Affichage) : normale, grande, très grande, par le zoom CSS de toute la page.
+  - **Repas à petit prix** (`data/recettes.json`, `recCost`, `#/repas`, `#/repas/<id>`) : recettes simples ; chaque ingrédient est choisi comme une ligne de « Ma liste » sur les prix relevés seulement, compté pour la quantité utilisée (coût par portion) et en paquets entiers (les courses). Portions réglables, ingrédients ajoutés au panier en un geste. Une recette dont un ingrédient manque au catalogue affiche un prix partiel.
+  - **Évolution du prix** (`data/history.json`, écrit par `tools/history.py` à chaque publication, affiché par `histHtml` sur la fiche produit) : les prix relevés qui ont changé, par produit et enseigne, en escalier, avec le plus bas relevé. Rien avant deux relevés différents.
 - `sw.js`, `manifest.webmanifest`, `icons/` : installation sur l'écran d'accueil et fonctionnement hors ligne.
 - `data/catalog.json` : rayons et produits, avec pour chaque enseigne le prix, la date du relevé, le nom affiché par l'enseigne et le lien.
 - `data/retailers.json` : enseignes, minimum de commande, paliers de frais de livraison, frais de service, sources.

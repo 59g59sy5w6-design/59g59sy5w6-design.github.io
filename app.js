@@ -163,7 +163,8 @@
 
   async function load() {
     const get = (u) => fetch(u, { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
-    const [c, r, m, st] = await Promise.all([get("data/catalog.json"), get("data/retailers.json"), get("data/meta.json"), get("data/status.json").catch(() => null)]);
+    const [c, r, m, st, rc] = await Promise.all([get("data/catalog.json"), get("data/retailers.json"), get("data/meta.json"), get("data/status.json").catch(() => null), get("data/recettes.json").catch(() => null)]);
+    S.recs = (rc && rc.recettes) || [];
     S.status = st || {};
     S.loadedAt = Date.now();
     S.rayons = c.rayons.slice().sort((a, b) => a.order - b.order);
@@ -556,6 +557,7 @@
         dropsRail() +
         (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals">${ds.map(dealCard).join("")}</div>` : "") +
         `<div class="sh"><h2>Rayons</h2><a href="#/rayons">Tout voir</a></div><div class="cats">${tiles}</div>` +
+        recRail() +
         (all3.length ? `<div class="sh"><h2>Comparés dans ${S.rets.length > 3 ? "plusieurs" : "les " + S.rets.length} enseignes</h2></div><div class="rail">${all3.map(card).join("")}</div>` : "") +
         (Object.keys(sg.items).length ? `<div class="sh"><h2>Panier tout prêt</h2></div>${suggestCard(sg)}` : "") +
         footNote(),
@@ -609,12 +611,13 @@
     const promo = !!(b && b.promo);
     return {
       title: p.brand + " " + p.name, anchor: ".ph h1", dock: "bar", dockId: p.id,
+      mount: () => { if (!HIST) loadHist().then(() => { const el = $("#phist"); if (el && S.route.name === "produit" && S.prods.get(S.route.id) === p) el.innerHTML = histHtml(p); }); },
       right: `<button class="icbtn" type="button" data-act="share" data-id="${esc(p.id)}" aria-label="Partager">${ic("share")}</button>`,
       html: `<div class="pdp"><div class="pimg">${img(p, 480)}${promo ? '<span class="badge promo">Offre</span>' : ""}</div>` +
         `<div class="pmain"><div class="ph"><p class="pb">${esc(p.brand)}</p><h1>${esc(p.name)}</h1><p class="pf">${esc(p.format)}${u ? ", " + esc(u) : ""}</p>` +
         (b ? `<div class="pprice">${px(b.price)}${b.sim ? '<span class="tag-sim lg">Prix simulé</span>' : on.length > 1 ? '<span class="sticker lg">Meilleur prix</span>' : ""}<p class="pw">chez <b>${esc(retName(b.ret))}</b>${b.sim ? " (prix simulé)" : ""}${hi && hi.price - b.price >= 0.01 ? `, ${eur(hi.price - b.price)} de moins que chez ${esc(retName(hi.ret))}` : ""}</p></div>` : `<p class="pw" style="margin-top:14px">Ce produit n'est vendu par aucune de tes enseignes activées.</p>`) +
         `<div class="pinline">${buyCtl(p.id, "bar")}</div></div></div>` +
-        `<div class="pmore"><h2 class="gh">Prix dans ${all.length > 1 ? "les enseignes" : "l'enseigne"}</h2><div class="group">${rows}</div><p class="gf">Touche une enseigne pour ouvrir le produit sur son site. Les offres (2e à moitié prix, cagnotte) ne sont pas déduites des totaux.</p>` +
+        `<div class="pmore"><h2 class="gh">Prix dans ${all.length > 1 ? "les enseignes" : "l'enseigne"}</h2><div class="group">${rows}</div><p class="gf">Touche une enseigne pour ouvrir le produit sur son site. Les offres (2e à moitié prix, cagnotte) ne sont pas déduites des totaux.</p><div id="phist">${histHtml(p)}</div>` +
         `<h2 class="gh">Caractéristiques</h2><div class="group"><dl class="spec">${spec.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div></div>` +
         (sim.length ? `<div class="pfull"><div class="sh"><h2>Dans le même rayon</h2>${ray ? `<a href="${hr(ray.id)}">Tout voir</a>` : ""}</div><div class="rail">${sim.map(card).join("")}</div></div>` : "") + `</div>`,
     };
@@ -652,7 +655,7 @@
     return {
       title: "Listes", grouped: true,
       html: `<h1 class="lt">Listes</h1>` +
-        `<div class="pad btns" style="padding-top:4px"><a class="btn" href="#/ecrire">${ic("pen")}Écrire ou dicter une liste</a>${n ? `<button class="btn tint" type="button" data-act="savelist">${ic("plus")}Enregistrer le panier en liste</button>` : ""}</div>` +
+        `<div class="pad btns" style="padding-top:4px"><a class="btn" href="#/ecrire">${ic("pen")}Écrire ou dicter une liste</a><a class="btn tint" href="#/repas">Repas à petit prix</a>${n ? `<button class="btn tint" type="button" data-act="savelist">${ic("plus")}Enregistrer le panier en liste</button>` : ""}</div>` +
         (S.lists.length ? `<h2 class="gh">Mes listes</h2><div class="group">${S.lists.map(listRow).join("")}</div><p class="gf">Une liste se remet dans le panier en un geste.</p>` :
           `<div class="empty" style="padding-top:28px">${emptyArt("list")}<h2>Aucune liste</h2><p>Enregistre ton panier en liste pour le refaire la semaine prochaine en un geste.</p></div>`) +
         (Object.keys(sg.items).length ? `<h2 class="gh">Suggestion</h2>${suggestCard(sg)}` : ""),
@@ -965,6 +968,7 @@
       case "ecrire": return { name: "ecrire" };
       case "partage": return { name: "partage", id };
       case "economies": return { name: "economies" };
+      case "repas": return id ? { name: "recette", id } : { name: "repas" };
       default: return { name: "home" };
     }
   }
@@ -991,6 +995,8 @@
       case "ecrire": return "Ma liste";
       case "partage": return "Liste partagée";
       case "economies": return "Économies";
+      case "repas": return "Repas";
+      case "recette": return ((S.recs || []).find((x) => x.id === r.id) || {}).name || "Recette";
     }
     return "Retour";
   }
@@ -1157,6 +1163,8 @@
     (p._b + " " + norm(p.format) + " " + norm((rayon(p.r) || {}).name) + " " + norm((p.tags || []).join(" "))).split(" ").filter(Boolean).forEach((w) => st.add(stem(w)));
     return (p._sw = st);
   }
+  const RW = {};
+  const rayWords = (r) => RW[r] || (RW[r] = new Set(norm((rayon(r) || {}).name).split(" ").filter(Boolean).map(stem)));
   const qToks = (q) => norm(q).split(" ").filter(Boolean).flatMap((t) => SYN[t] || [t]).map(stem);
   const strongHit = (p, toks) => { const st = strongW(p); return toks.some((t) => { for (const w of st) if (w === t || w.startsWith(t)) return true; return false; }); };
   /* mots qui désignent un produit à eux seuls : noms de rayons, marques, abréviations connues */
@@ -1174,8 +1182,18 @@
     const toks = qToks(L.q);
     const sc = searchScored(L.q).filter((x) => strongHit(x[1], toks));
     if (!sc.length) return out;
-    const top = sc[0][0], rel = sc.filter((x) => x[0] >= top - 1.5).map((x) => x[1]);
-    const avail = rel.filter((p) => best(p));
+    /* prix relevés seulement (repas) : le choix ne s'appuie jamais sur un prix simulé */
+    const pb = L.real ? bestReal : best, valOf = (p) => { const b = pb(p); if (!b) return 1e12; const u = perUnit(p, b.price); return u == null ? b.price * 1000 : u; }, byVal = (a, b) => valOf(a) - valOf(b);
+    let rel = sc.map((x) => x[1]);
+    /* le mot exact plutôt qu'un début de mot (« thon », pas « Thonon ») ; le rayon qui porte ce nom d'abord (« huile » :
+       le rayon Huile, pas des sardines à l'huile) ; puis les résultats les plus pertinents */
+    const exact = rel.filter((p) => { const st = strongW(p); return toks.every((t) => st.has(t)); });
+    if (exact.length) rel = exact;
+    const inRay = rel.filter((p) => { const rw = rayWords(p.r); return toks.some((t) => rw.has(t)); });
+    if (inRay.length) rel = inRay;
+    const sco = new Map(sc.map((x) => [x[1], x[0]])), top = Math.max(...rel.map((p) => sco.get(p)));
+    rel = rel.filter((p) => sco.get(p) >= top - 1.5);
+    const avail = rel.filter((p) => pb(p));
     out.cands = (avail.length ? avail : rel).slice(0, 60).map((p) => p.id);
     out.avail = avail.length;
     if (!avail.length) return out;
@@ -1575,6 +1593,117 @@
     return `<div class="sh"><h2>Moins cher sur tes produits</h2></div><div class="rail">${ds.map((d) => card(d.p).replace('<div class="prow">', `<div class="prow"><s class="was">${eur(d.old)}</s>`)).join("")}</div>`;
   }
 
+  /* ---------- repas à petit prix ---------- */
+  /* data/recettes.json : recettes simples. Chaque ingrédient est choisi comme une ligne de « Ma liste » (variante
+     simple, format courant, le moins cher au kilo, au litre ou à la pièce), sur les prix relevés seulement, puis
+     compté pour la quantité utilisée. Les ingrédients du placard (sel, épices) ne sont pas comptés. */
+  function recIng(g, k) {
+    const m = matchLine({ raw: g.q, q: norm(g.q).split(" ").filter((t) => t && !STOP.has(t)).join(" "), n: 1, real: true });
+    const need = g.need * k;
+    if (!m.pick) return { g, need, p: null, off: m.cands.length > 0 };
+    const p = S.prods.get(m.pick), b = bestReal(p), v = (p.qty && p.qty.v) || 0;
+    const same = v && p.qty.u === g.u;
+    const n = same ? Math.max(1, Math.ceil(need / v - 1e-9)) : 1;
+    const used = same ? (b.price * need) / v : b.price;
+    return { g, need, p, b, n, used, buy: b.price * n };
+  }
+  function recCost(rc, portions) {
+    const k = (portions || rc.portions) / rc.portions;
+    const lines = rc.ing.map((g) => recIng(g, k));
+    const ok = lines.filter((x) => x.p), miss = lines.filter((x) => !x.p);
+    const used = ok.reduce((a, x) => a + x.used, 0), buy = ok.reduce((a, x) => a + x.buy, 0);
+    return { lines, ok, miss, used, buy, per: used / (portions || rc.portions), portions: portions || rc.portions };
+  }
+  /* coût de chaque recette pour les portions prévues, recalculé quand les enseignes ou le catalogue changent */
+  function recs() {
+    const key = JSON.stringify([S.rets.map((r) => r.id), S.prefs.off, S.meta.updatedAt, S.list.length]);
+    if (S._recs && S._recs.key === key) return S._recs.list;
+    const list = (S.recs || []).map((rc) => Object.assign({ c: recCost(rc) }, rc)).sort((a, b) => a.c.miss.length - b.c.miss.length || a.c.per - b.c.per);
+    S._recs = { key, list };
+    return list;
+  }
+  const fmtNeed = (v, u) => (u === "pc" ? String(Math.round(v * 10) / 10).replace(".", ",") : u === "ml" ? (v >= 100 ? String(Math.round(v / 10)).replace(".", ",") + NB + "cl" : Math.round(v) + NB + "ml") : v >= 1000 ? String(Math.round(v / 100) / 10).replace(".", ",") + NB + "kg" : Math.round(v) + NB + "g");
+  function recCard(rc) {
+    const c = rc.c, pics = c.ok.slice(0, 4).map((x) => `<span>${img(x.p, 44)}</span>`).join("");
+    return `<a class="rcard" href="#/repas/${esc(rc.id)}"><div class="stack">${pics}</div><b>${esc(rc.name)}</b><span class="rp">${c.miss.length ? "Prix partiel" : eur(c.per) + " par portion"}</span><small>${plural(rc.portions, "portion", "portions")}, ${rc.minutes}${NB}min</small></a>`;
+  }
+  function recRail() {
+    const rs = recs().filter((rc) => !rc.c.miss.length).slice(0, 8);
+    return rs.length ? `<div class="sh"><h2>Repas à petit prix</h2><a href="#/repas">Tout voir</a></div><div class="rail rails">${rs.map(recCard).join("")}</div>` : "";
+  }
+  VIEWS.repas = () => {
+    const all = recs(), row = (rc) => {
+      const c = rc.c, p0 = c.ok[0];
+      return `<a class="row th" href="#/repas/${esc(rc.id)}"><span class="thumb">${p0 ? img(p0.p, 48) : ""}</span><span class="rt">${esc(rc.name)}<small>${c.miss.length ? `Prix partiel, ${plural(c.miss.length, "ingrédient pas encore", "ingrédients pas encore")} dans Cabas` : `${eur(c.per)} par portion`}, ${plural(rc.portions, "portion", "portions")}, ${rc.minutes}${NB}min</small></span>${ic("chev", "chev")}</a>`;
+    };
+    const grp = (k, t) => { const xs = all.filter((rc) => rc.kind === k); return xs.length ? `<h2 class="gh">${t}</h2><div class="group">${xs.map(row).join("")}</div>` : ""; };
+    return {
+      title: "Repas à petit prix", grouped: true,
+      html: `<h1 class="lt">Repas à petit prix</h1><p class="lt-sub">Le coût de chaque portion, au meilleur prix relevé de chaque ingrédient.</p>` +
+        grp("plat", "Plats") + grp("dessert", "Desserts et goûters") +
+        `<p class="gf">Le coût compte la quantité utilisée de chaque produit. Les courses à faire, en paquets entiers, coûtent un peu plus, et il en restera pour une autre fois. Le sel, les épices et la levure ne sont pas comptés.</p>`,
+    };
+  };
+  VIEWS.recette = (r) => {
+    const rc = (S.recs || []).find((x) => x.id === r.id);
+    if (!rc) return notFound();
+    const P = (S.recP && S.recP[rc.id]) || rc.portions, c = recCost(rc, P), k = P / rc.portions;
+    const line = (x) => {
+      const q = k === 1 ? x.g.t : fmtNeed(x.need, x.g.u) + (x.g.u === "pc" ? " " + x.g.q.replace(/^oeufs$/, "œufs") : " de " + x.g.q);
+      if (!x.p) return `<div class="row th"><span class="thumb q">${ic("search")}</span><span class="rt">${esc(q)}<small>${x.off ? "Pas vendu par tes enseignes" : "Pas encore dans Cabas"}</small></span></div>`;
+      return `<a class="row th" href="${hp(x.p.id)}"><span class="thumb">${img(x.p, 48)}</span><span class="rt">${esc(q)}<small>${esc(x.p.brand + " " + x.p.name)}, ${esc(x.p.format)}, ${eur(x.b.price)} chez ${esc(retName(x.b.ret))}${x.n > 1 ? `, ${x.n} à acheter` : ""}</small></span><span class="val num">${eur(x.used)}</span></a>`;
+    };
+    return {
+      title: rc.name, grouped: true,
+      html: `<h1 class="lt">${esc(rc.name)}</h1><p class="lt-sub">${rc.kind === "plat" ? "Plat" : "Dessert"}, ${rc.minutes}${NB}min</p>` +
+        `<div class="sum rsum"><p class="sl">${c.miss.length ? "Coût des ingrédients comparés" : "Par portion"}</p><div class="st">${px(c.miss.length ? c.used : c.per)}</div>` +
+        `<p class="sn">${c.miss.length ? `Pour ${plural(P, "portion", "portions")}, sans ${esc(joinEt(c.miss.map((x) => x.g.q)))}, pas encore dans Cabas.` : `${eur(c.used)} pour ${plural(P, "portion", "portions")}. Les courses, en paquets entiers, font ${eur(c.buy)}\u00a0: il en restera pour une autre fois.`}</p>` +
+        `<p class="segl">Portions</p><div class="seg" role="group" aria-label="Nombre de portions">${[2, 4, 6, 8].map((v) => `<button type="button" data-act="recp" data-id="${esc(rc.id)}" data-v="${v}" aria-pressed="${v === P}">${v}</button>`).join("")}</div>` +
+        `<div class="btns" style="margin-top:14px"><button class="btn" type="button" data-act="recadd" data-id="${esc(rc.id)}">${ic("plus")}Ajouter les ingrédients au panier</button></div></div>` +
+        `<h2 class="gh">Ingrédients</h2><div class="group">${c.lines.map(line).join("")}${rc.placard ? `<div class="row"><span class="rt">Du placard<small>${esc(rc.placard)}, pas comptés</small></span></div>` : ""}</div>` +
+        `<p class="gf">Chaque produit est le moins cher au kilo, au litre ou à la pièce dans tes enseignes, selon les prix relevés. Touche-le pour en voir d'autres.</p>` +
+        `<h2 class="gh">Préparation</h2><div class="group" style="padding:14px 0 6px"><ol class="steps">${rc.steps.map((s) => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>`,
+    };
+  };
+  function recItems(id) {
+    const rc = (S.recs || []).find((x) => x.id === id);
+    if (!rc) return {};
+    const P = (S.recP && S.recP[rc.id]) || rc.portions, items = {};
+    recCost(rc, P).ok.forEach((x) => { items[x.p.id] = Math.min(99, (items[x.p.id] || 0) + x.n); });
+    return items;
+  }
+
+  /* ---------- historique des prix ---------- */
+  /* data/history.json (tools/history.py, à chaque relevé) : les prix relevés qui ont changé, par produit et enseigne.
+     Chargé à la première fiche produit ouverte ; la courbe n'apparaît qu'à partir de deux relevés différents. */
+  let HIST = null, histP = null;
+  function loadHist() {
+    if (!histP) histP = fetch("data/history.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).then((h) => (HIST = h)).catch(() => null);
+    return histP;
+  }
+  function histHtml(p) {
+    const H = HIST && HIST.p && HIST.p[p.id];
+    if (!H) return "";
+    const D = HIST.d, series = Object.keys(H).filter((r) => S.retMap.has(r) && H[r].length >= 2).slice(0, 4).map((r) => ({ r, pts: H[r].map(([i, v]) => [D[i], v]) }));
+    if (!series.length) return "";
+    const all = series.flatMap((x) => x.pts), last = [S.meta.updatedAt || "", ...all.map((x) => x[0])].sort().pop();
+    const t0 = Date.parse(all.map((x) => x[0]).sort()[0]), t1 = Math.max(Date.parse(last), t0 + 864e5);
+    const vs = all.map((x) => x[1]), lo = Math.min(...vs), hi = Math.max(...vs), pad = (hi - lo) * 0.2 || 0.1;
+    const W = 320, Hh = 110, X = (d) => 6 + ((Date.parse(d) - t0) / (t1 - t0)) * (W - 12), Y = (v) => 8 + (1 - (v - lo + pad) / (hi - lo + 2 * pad)) * (Hh - 16);
+    const cols = ["var(--brand)", "#3a3a3c", "#8e8e93", "#c7c7cc"];
+    const paths = series.map((x, k) => {
+      let d = "";
+      x.pts.forEach(([day, v], i) => { d += i ? `H${X(day).toFixed(1)}V${Y(v).toFixed(1)}` : `M${X(day).toFixed(1)},${Y(v).toFixed(1)}`; });
+      return `<path d="${d}H${X(last).toFixed(1)}" fill="none" stroke="${cols[k]}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+    }).join("");
+    const low = series.flatMap((x) => x.pts.map(([d, v]) => ({ r: x.r, d, v }))).sort((a, b) => a.v - b.v || (a.d < b.d ? 1 : -1))[0];
+    const day = (d) => esc(dateFr(d).replace(/ \d{4}$/, ""));
+    return `<h2 class="gh">Évolution du prix</h2><div class="group hist"><svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Évolution du prix depuis le ${day(all.map((x) => x[0]).sort()[0])}">${paths}</svg>` +
+      `<div class="hax"><span>${day(all.map((x) => x[0]).sort()[0])}</span><span>${day(last)}</span></div>` +
+      `<div class="hleg">${series.map((x, k) => `<span><i style="background:${cols[k]}"></i>${esc(retName(x.r))}, ${eur(x.pts[x.pts.length - 1][1])}</span>`).join("")}</div>` +
+      `<p class="hnote">Le plus bas relevé\u00a0: ${eur(low.v)} chez ${esc(retName(low.r))}, le ${day(low.d)}.</p></div>`;
+  }
+
   /* ---------- feuilles ---------- */
   let sheetCtx = null;
   function openSheet(o) {
@@ -1788,6 +1917,13 @@
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
       case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.guide = { ck: {}, done: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
+      /* repas */
+      case "recp": S.recP = Object.assign({}, S.recP, { [id]: +t.dataset.v }); rerender(); break;
+      case "recadd": {
+        const n = addItems(recItems(id), false);
+        renderChrome(); bumpBadge();
+        toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier", { label: "Voir", run: () => switchTab("panier") }); break;
+      }
       /* premier lancement */
       case "welcome": welcomeSheet(); break;
       case "wskip": closeSheet(); break;
