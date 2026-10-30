@@ -296,6 +296,7 @@ body:not(.grouped) .group { background: var(--group); }
 .offer { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
 .av { width: 34px; height: 34px; border-radius: 50%; background: #1c1c1e; color: #fff; font-size: 15px; font-weight: 600; display: grid; place-items: center; letter-spacing: 0; flex: none; }
 .av.sm { width: 28px; height: 28px; font-size: 13px; }
+.av .avi { width: 18px; height: 18px; color: #fff; stroke-width: 2; }
 .offer .on { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .offer .os { display: block; font-size: 13px; color: var(--ink-2); margin-top: 2px; line-height: 17px; letter-spacing: -0.005em; overflow-wrap: anywhere; }
 .offer .op { text-align: right; }

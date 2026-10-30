@@ -31,7 +31,8 @@
      "url": "https://courses.monoprix.fr/content/presentation-monoprix-plus"
     }
    ]
-  }
+  },
+  "magasin": true
  },
  {
   "id": "carrefour",
@@ -69,7 +70,8 @@
      "url": "https://livraisoninfos.fr/livraison/carrefour-livraison-a-domicile-le-guide-complet/"
     }
    ]
-  }
+  },
+  "magasin": true
  },
  {
   "id": "houra",
@@ -107,7 +109,8 @@
      "url": "https://www.houra.fr/faq"
     }
    ]
-  }
+  },
+  "magasin": false
  },
  {
   "id": "auchan",
@@ -135,7 +138,8 @@
     }
    ]
   },
-  "group": "auchan"
+  "group": "auchan",
+  "magasin": true
  },
  {
   "id": "auchan-alesia",
@@ -163,7 +167,8 @@
      "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
     }
    ]
-  }
+  },
+  "magasin": true
  },
  {
   "id": "auchan-bellesfeuilles",
@@ -191,7 +196,8 @@
      "url": "https://www.bonial.fr/magazine/tout-savoir-sur-le-drive-auchan-et-la-livraison-a-domicile/"
     }
    ]
-  }
+  },
+  "magasin": true
  },
  {
   "id": "auchan-livraison-perreux",
@@ -231,7 +237,8 @@
      "url": "https://www.vitepromo.com/alimentation-courses/code-promo-auchan"
     }
    ]
-  }
+  },
+  "magasin": true
  },
  {
   "id": "auchan-livraison-paris16",
@@ -271,7 +278,8 @@
      "url": "https://www.vitepromo.com/alimentation-courses/code-promo-auchan"
     }
    ]
-  }
+  },
+  "magasin": true
  },
  {
   "id": "auchan-livraison-paris14",
@@ -311,7 +319,8 @@
      "url": "https://www.vitepromo.com/alimentation-courses/code-promo-auchan"
     }
    ]
-  }
+  },
+  "magasin": true
  },
  {
   "id": "leclerc-livraison",
@@ -356,7 +365,8 @@
      "url": "https://www.quechoisir.org/breve-palmares-des-supermarches-les-enseignes-les-moins-cheres-n132194/"
     }
    ]
-  }
+  },
+  "magasin": true
  },
  {
   "id": "leclerc-drive",
@@ -401,6 +411,7 @@
      "url": "https://www.quechoisir.org/breve-palmares-des-supermarches-les-enseignes-les-moins-cheres-n132194/"
     }
    ]
-  }
+  },
+  "magasin": true
  }
 ]

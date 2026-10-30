@@ -274,18 +274,30 @@
     }
     return out;
   }
+  /* « Compléter en magasin » : un produit que les commandes ne prennent pas peut s'acheter dans une enseigne qui a des
+     magasins (réglage « magasin » de data/retailers.json), au prix relevé le plus bas, jamais à un prix simulé.
+     Au plus un quart des produits du panier, pour que la commande reste la base des courses. */
   function model() {
     const chans = channels();
-    const lines = [], offs = [], uncovered = [];
+    const store = chans.map((ch) => { const r = S.retMap.get(ch.id); return !!(r && r.magasin && !r.simulated); });
+    const lines = [], offs = [], comp = [], uncovered = [];
     let n = 0;
     for (const id of Object.keys(S.basket)) {
       const q = S.basket[id], p = S.prods.get(id);
       if (!p || !(q > 0)) continue;
       const o = [];
-      chans.forEach((ch, ci) => { const x = p.offers[ch.id]; if (x && x.price > 0) o.push({ c: ci, cost: Math.round(x.price * 100) * q }); });
-      if (o.length) { lines.push({ id, q, n: n++ }); offs.push(o); } else uncovered.push(id);
+      let c = null;
+      chans.forEach((ch, ci) => {
+        const x = p.offers[ch.id];
+        if (!x || !(x.price > 0)) return;
+        const cost = Math.round(x.price * 100) * q;
+        o.push({ c: ci, cost });
+        if (store[ci] && !x.sim && (!c || cost < c.cost)) c = { cost, ret: ch.id };
+      });
+      if (o.length) { lines.push({ id, q, n: n++ }); offs.push(o); comp.push(c); } else uncovered.push(id);
     }
-    return { lines, offers: offs, chans, uncovered };
+    const compMax = S.prefs.comp === false ? 0 : Math.max(1, Math.floor(lines.length / 4));
+    return { lines, offers: offs, comp, compMax, chans, uncovered };
   }
   /* Répartition du panier : chaque nombre de commandes, de 1 au nombre d'enseignes, est calculé une fois, du plus petit au
      plus grand (optimizer.js, runAll). RES.steps[k] = { full, partial, truncated } : « full » prend tout le panier en
@@ -293,7 +305,7 @@
   const RES = { key: "", M: null, steps: {}, done: false, K: 3, lambda: 0 };
   let W = null, wSeq = 0, wBusy = false, cartTimer = 0;
   function cartResult() {
-    const key = JSON.stringify([S.basket, S.prefs.off, S.prefs.fee, S.prefs.extraCost, S.rets.map((r) => r.id)]);
+    const key = JSON.stringify([S.basket, S.prefs.off, S.prefs.fee, S.prefs.extraCost, S.prefs.comp, S.rets.map((r) => r.id)]);
     if (RES.key !== key || !RES.M) {
       const M = model();
       Object.assign(RES, { key, M, steps: {}, done: false, lambda: Math.round((S.prefs.extraCost || 0) * 100) });
@@ -337,7 +349,7 @@
     if (redraw) { clearTimeout(cartTimer); cartTimer = setTimeout(rerender, 40); }
     else updateSegLabels();
   }
-  const fullTotal = (r) => r.itemsTotal + r.feesTotal;
+  const fullTotal = (r) => r.itemsTotal + r.feesTotal + (r.compTotal || 0);
   function segLabel(k) {
     const s = RES.steps[k];
     return !s ? "…" : s.full ? eurC(fullTotal(s.full)) : "incomplet";
@@ -611,10 +623,10 @@
   };
 
   /* panier */
-  function itemRow(id, cost, q) {
+  function itemRow(id, cost, q, note) {
     const p = S.prods.get(id);
     const unit = cost / q / 100;
-    return `<div class="item"><a class="thumb" href="${hp(id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 52)}</a><a class="it" href="${hp(id)}"><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${q > 1 ? ", " + eur(unit) + " l'unité" : ""}</small></a><div class="ir"><span class="lp">${cost ? eurC(cost) : "–"}</span>${buyCtl(id, "item")}</div></div>`;
+    return `<div class="item"><a class="thumb" href="${hp(id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 52)}</a><a class="it" href="${hp(id)}"><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${q > 1 ? ", " + eur(unit) + " l'unité" : ""}${note ? ", " + esc(note) : ""}</small></a><div class="ir"><span class="lp">${cost ? eurC(cost) : "–"}</span>${buyCtl(id, "item")}</div></div>`;
   }
   function plainItems(ids) {
     return ids.map((id) => { const p = S.prods.get(id), b = best(p), q = S.basket[id]; return itemRow(id, b ? Math.round(b.price * 100) * q : 0, q); }).join("");
@@ -635,6 +647,16 @@
       `<a class="btn" href="${esc(r.home)}" target="_blank" rel="noopener">Commander sur ${esc(r.service)}${ic("ext")}</a>` +
       (links ? `<details><summary>Retrouver chaque produit sur ${esc(r.service)}</summary><ul>${links}</ul></details>` : "") + `</div></section>`;
   }
+  function compHtml(r) {
+    const c = r.completed || [];
+    if (!c.length) return "";
+    const shops = joinEt([...new Set(c.map((x) => x.ret))].map(retName));
+    const n = c.reduce((a, x) => a + x.l.q, 0);
+    return `<section class="order" aria-label="À acheter en magasin"><div class="oh"><span class="av">${ic("store", "avi")}</span><div class="rt"><h3>À acheter en magasin</h3><small>${plural(n, "article", "articles")}, chez ${esc(shops)}</small></div>${px(r.compTotal / 100)}</div>` +
+      c.map((x) => itemRow(x.l.id, x.cost, x.l.q, "chez " + retName(x.ret))).join("") +
+      `<div class="of"><p class="hint" style="color:var(--ink-2)">Tes commandes ne prennent pas ces produits\u00a0: achète-les en magasin, au plus près de chez toi. Ce sont les prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p></div></section>`;
+  }
+  const compPhrase = (r) => (r.completed && r.completed.length ? `, et ${plural(r.completed.length, "produit", "produits")} en magasin` : "");
   VIEWS.panier = () => {
     const ids = Object.keys(S.basket).filter((id) => S.basket[id] > 0 && S.prods.has(id));
     if (!ids.length) return { title: "Panier", grouped: true, html: `<h1 class="lt">Panier</h1><div class="empty">${emptyArt("bag")}<h2>Ton panier est vide</h2><p>Ajoute des produits\u00a0: Cabas cherche où les commander pour payer le moins cher, livraison comprise.</p><a class="btn" href="#/rayons">Parcourir les rayons</a></div>` };
@@ -663,7 +685,14 @@
       const top = altK && res.steps[nRet] && res.steps[nRet].full;
       const cheaper = top && fullTotal(top) < fullTotal(alt) - 50 ? top : null;
       const searching = !complete && !altK && !res.done;
-      const singles = M.chans.map((c, i) => Object.assign(singleBasket(M, i), { i })).map((x) => ({ s: x, name: S.retMap.get(x.ch.id).name, tot: x.ok && !x.missing ? x.sub + x.fee : null }));
+      const singles = M.chans.map((c, i) => Object.assign(singleBasket(M, i), { i })).map((x) => {
+        /* produits que l'enseigne ne vend pas : complétés en magasin quand c'est possible */
+        let comp = 0, compN = 0, compOK = true;
+        M.offers.forEach((offs, l) => { if (!offs.some((o) => o.c === x.i)) { compN++; if (M.comp[l]) comp += M.comp[l].cost; else compOK = false; } });
+        compOK = compOK && compN <= M.compMax;
+        const tot = x.ok && (!x.missing || compOK) ? x.sub + x.fee + (x.missing ? comp : 0) : null;
+        return { s: x, name: S.retMap.get(x.ch.id).name, tot, compN: x.missing && compOK ? compN : 0 };
+      });
       const full = singles.filter((x) => x.tot != null).sort((a, b) => a.tot - b.tot);
       const k = bst.orders.length, names = bst.orders.map(nameOf);
       const simUsed = isSim(bst);
@@ -671,20 +700,20 @@
       let save = "", why = "";
       if (complete && k > 1) {
         const fewer = res.steps[k - 1];
-        if (fewer && fewer.full) { const d = fullTotal(fewer.full) - money; if (d >= 50) save = `${eurC(d)} de moins qu'en ${k - 1 === 1 ? "une seule commande" : (k - 1) + " commandes"}`; }
+        if (fewer && fewer.full) { const d = fullTotal(fewer.full) - money; if (d >= 50) save = `${eurC(d)} de moins qu'avec ${k - 1 === 1 ? "une seule commande" : (k - 1) + " commandes"}${fewer.full.completed && fewer.full.completed.length ? " complétée en magasin" : ""}`; }
         else if (fewer) why = k - 1 > 1 ? `En ${k - 1} commandes, il manquerait des produits.` : singles.some((x) => !x.s.missing) ? "Une seule commande ne peut pas contenir tout le panier\u00a0: son minimum d'achat ne serait pas atteint." : "Une seule commande ne peut pas contenir tout le panier\u00a0: aucune enseigne ne vend tous ces produits.";
-      } else if (complete && k === 1 && full.length > 1) {
+      } else if (complete && k === 1 && full.length > 1 && !(bst.completed && bst.completed.length)) {
         const other = full.find((x) => x.name !== names[0]);
         if (other && other.tot - money >= 50) save = `${eurC(other.tot - money)} de moins qu'ailleurs`;
       }
       if (save && simUsed) save += ", selon la simulation";
-      const more = complete && k < K ? `Au-delà de ${k === 1 ? "une commande" : k + " commandes"}, le total ne baisse plus.` : "";
+      const more = complete && k < K ? `Au-delà ${k === 1 ? "d'une commande" : "de " + k + " commandes"}, le total ne baisse plus.` : "";
       const notCheapest = bst.orders.some((o) => o.items.some((x) => { const b = best(S.prods.get(x.l.id)); return b && b.ret !== o.ch.id && b.price * 100 * x.l.q < x.cost - 0.5; }));
       const sl = !complete ? (altK ? (K === 1 ? "Une seule commande ne suffit pas" : `En ${K} commandes, il manque des produits`) : `Meilleure option pour ${M.lines.length - skipped.length} produits sur ${M.lines.length}`)
         : simUsed ? "Estimation avec des prix simulés"
         : bst.orders.some((o) => pickup(S.retMap.get(o.ch.id))) ? (bst.orders.every((o) => pickup(S.retMap.get(o.ch.id))) ? "Total le plus bas, retrait compris" : "Total le plus bas, livraison et retrait compris") : "Total le plus bas, livraison comprise";
       const where = k === 1 ? "chez " + esc(names[0]) : "en " + k + " commandes\u00a0: " + esc(joinEt(names));
-      const sh2 = complete ? where.replace(/^./, (c) => c.toUpperCase()).replace(/^Chez/, "En une commande chez") : `Sans ${plural(skipped.length, "produit", "produits")}, ${where}`;
+      const sh2 = complete ? where.replace(/^./, (c) => c.toUpperCase()).replace(/^Chez/, "En une commande chez") + compPhrase(bst) : `Sans ${plural(skipped.length, "produit", "produits")}, ${where}${compPhrase(bst)}`;
       const altBox = alt ? `<div class="alt"><p>Tout le panier\u00a0: <b>${eurC(fullTotal(alt))}</b> en ${altK} commandes${cheaper ? `, ou <b>${eurC(fullTotal(cheaper))}</b> en ${cheaper.orders.length} commandes` : ""}${isSim(alt) || (cheaper && isSim(cheaper)) ? ", avec des prix simulés" : ""}.</p><button class="btn sm" type="button" data-act="maxk" data-k="${altK}">Passer à ${altK} commandes</button></div>`
         : searching ? `<p class="sn">Recherche d'une répartition qui prend tout le panier…</p>` : "";
       side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${altBox}` +
@@ -694,12 +723,12 @@
         (bst.extra ? `<p class="sn">Avec ${eurC(res.lambda)} comptés pour chaque commande en plus (réglages).</p>` : "") + seg + `</div>`;
       const opts = singles.map((x) => {
         const s2 = x.s;
-        const sub = s2.missing ? `${plural(s2.missing, "produit manque", "produits manquent")}` : !s2.ok ? `Minimum de ${eurC(s2.ch.P.min).replace(",00", "")} non atteint, il manque ${eurC(s2.ch.P.min - s2.sub)}` : "";
+        const sub = !s2.ok ? `Minimum de ${eurC(s2.ch.P.min).replace(",00", "")} non atteint, il manque ${eurC(s2.ch.P.min - s2.sub)}` : x.compN ? `Et ${plural(x.compN, "produit", "produits")} en magasin` : s2.missing ? `${plural(s2.missing, "produit manque", "produits manquent")}` : "";
         return `<div class="row"><span class="av sm">${esc(x.name.slice(0, 1))}</span><span class="rt">Tout chez ${esc(x.name)}${sub ? `<small>${sub}</small>` : ""}</span><span class="val num">${x.tot != null ? eurC(x.tot) : "–"}</span></div>`;
       }).join("");
       const skipWhy = altK ? `${k === 1 ? esc(names[0]) + " ne vend pas ces produits" : "Les enseignes de ces commandes ne vendent pas ces produits"}\u00a0: en ${K === 1 ? "une seule commande" : K + " commandes au plus"}, ils ne peuvent pas être pris. Passe à ${altK} commandes pour avoir tout le panier, ou retire-les.`
         : "Ces produits ne rentrent dans aucune commande qui atteint le minimum d'achat de leur enseigne. Ajoute d'autres produits de ces enseignes, ou choisis un équivalent vendu ailleurs.";
-      main = bst.orders.map(orderHtml).join("") +
+      main = bst.orders.map(orderHtml).join("") + compHtml(bst) +
         (skipped.length ? `<h2 class="gh">Hors commande</h2><div class="order" style="margin-top:0">${skipped.map((x) => { const p = S.prods.get(x.l.id), b = best(p); return itemRow(x.l.id, b ? Math.round(b.price * 100) * x.l.q : 0, x.l.q); }).join("")}<div class="of"><p class="hint" style="color:var(--ink-2)">${skipWhy}</p></div></div>` : "") +
         uncovered + (nRet > 1 ? `<h2 class="gh">Comparer</h2><div class="group">${opts}</div>` : "");
     } else {
@@ -747,8 +776,8 @@
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}" style="text-decoration:none">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
         `<p class="gf">Le panier n'utilise que les enseignes activées. Touche une enseigne pour voir ses frais et leurs sources.</p>` +
         Object.entries(groupsOf()).map(([g, ms]) => `<h2 class="gh">${esc(ms[0].name)} : livraison ou retrait</h2><div class="group">${ms.map((m) => `<button class="row" type="button" data-act="pick" data-g="${esc(g)}" data-id="${esc(m.id)}" aria-pressed="${m.id === pickOf(g, ms)}"><span class="rt">${esc(optionLabel(m))}<small>${esc(pickup(m) ? (tiersOf(m)[0].fee > 0 ? eur(tiersOf(m)[0].fee) + " par retrait" : "Retrait gratuit") : feeShort(m))}</small></span>${m.id === pickOf(g, ms) ? ic("check", "chk") : ""}</button>`).join("")}</div><p class="gf">Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.</p>`).join("") +
-        `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
-        `<label class="row" for="extra"><span class="rt">Coût d'une commande en plus<small>Ton temps, les sacs, la réception. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
+        `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Compléter en magasin<small>Un produit que tes commandes ne prennent pas est compté au prix relevé le plus bas, à acheter en magasin. Au plus un quart des produits du panier.</small></span><label class="sw"><input type="checkbox" data-act="comp"${S.prefs.comp === false ? "" : " checked"} aria-label="Compléter en magasin"><span></span></label></div><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
+        `<label class="row" for="extra"><span class="rt">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
         `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
     };
@@ -1174,6 +1203,7 @@
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
+    if (t.dataset && t.dataset.act === "comp") { S.prefs.comp = t.checked; savePrefs(); RES.key = ""; return; }
     if (t.dataset && t.dataset.act === "ret") { if (t.checked) delete S.prefs.off[t.dataset.id]; else S.prefs.off[t.dataset.id] = true; savePrefs(); renderChrome(); return; }
     if (t.id === "extra") { const v = parseFloat(String(t.value).replace(",", ".")); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; savePrefs(); return; }
     if (t.dataset && t.dataset.fee) { const v = parseFloat(String(t.value).replace(",", ".")); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; savePrefs(); return; }

@@ -126,21 +126,41 @@ function branchAndBound(cost, L, m, budget, ub, deadline) {
   for (let i = 0; i < n; i++) assign[order[i]] = bestPick[i];
   return { assign, truncated };
 }
+/* Répartition la moins chère du panier entre les enseignes de `sub`.
+   Un produit qu'aucune enseigne de `sub` ne vend est « à compléter en magasin » (M.comp[l] : prix relevé le plus bas dans
+   une enseigne qui a des magasins), dans la limite de M.compMax produits ; sinon la répartition est impossible, sauf si le
+   canal « hors commande » fait partie de `sub` (deuxième passe, produits laissés de côté). */
 function solveSubset(sub, M, lambda, budget, deadline, bestScore) {
   const n = M.lines.length, m = sub.length;
   const pos = new Map(sub.map((c, i) => [c, i]));
-  const cost = [];
+  const hasSkip = sub.some((c) => M.chans[c].skip);
+  const compMax = M.compMax == null ? 0 : M.compMax;
+  const cost = [], rowLine = [], compLines = [], noReal = [];
   for (let l = 0; l < n; l++) {
-    const row = new Array(m).fill(-1); let any = false;
-    for (const of of M.offers[l]) if (pos.has(of.c)) { row[pos.get(of.c)] = of.cost; any = true; }
-    if (!any) return null;
-    cost.push(row);
+    const row = new Array(m).fill(-1); let real = false;
+    for (const of of M.offers[l]) if (pos.has(of.c)) { row[pos.get(of.c)] = of.cost; if (!M.chans[of.c].skip) real = true; }
+    if (!real) {
+      if (M.comp && M.comp[l]) { compLines.push(l); noReal.push([l, row]); continue; }
+      if (!hasSkip) return null;
+    }
+    cost.push(row); rowLine.push(l);
   }
+  if (compLines.length > compMax) {
+    if (!hasSkip) return null;
+    /* trop de produits à compléter : dans la passe « hors commande », on revient à les laisser de côté */
+    for (const [l, row] of noReal) { cost.push(row); rowLine.push(l); }
+    compLines.length = 0;
+  }
+  if (!cost.length) return null;
+  const nn = cost.length;
+  let compCost = 0; const stores = new Set();
+  for (const l of compLines) { compCost += M.comp[l].cost; stores.add(M.comp[l].ret); }
+  const compExtra = compCost + lambda * stores.size;
   const P = sub.map((c) => M.chans[c].P);
   const spec = []; for (let k = 0; k < m; k++) if (isSpecial(P[k])) spec.push(k);
   /* bornes : coût minimal des articles (chaque ligne au moins cher) et frais minimaux une fois les minimums atteints */
   let itemsLB = 0;
-  for (let l = 0; l < n; l++) { let c = Infinity; for (const x of cost[l]) if (x >= 0 && x < c) c = x; itemsLB += c; }
+  for (let i = 0; i < nn; i++) { let c = Infinity; for (const x of cost[i]) if (x >= 0 && x < c) c = x; itemsLB += c; }
   const feeLB = (Pk, Lk) => {
     if (!(Lk > 0)) return 0;
     let j0 = 0;
@@ -158,25 +178,27 @@ function solveSubset(sub, M, lambda, budget, deadline, bestScore) {
     spec.forEach((k, s) => { L[k] = opt[s][idx[s]]; });
     const cap = Math.min(best ? best.score : Infinity, bestScore == null ? Infinity : bestScore);
     let fLB = 0; for (let k = 0; k < m; k++) fLB += feeLB(P[k], L[k]);
-    const hopeless = itemsLB + fLB >= cap;
-    const r = hopeless ? null : solveTargets(cost, L, m, budget, cap === Infinity ? null : cap - fLB, deadline);
+    const hopeless = itemsLB + fLB + compExtra >= cap;
+    const r = hopeless ? null : solveTargets(cost, L, m, budget, cap === Infinity ? null : cap - fLB - compExtra, deadline);
     if (r && r.truncated) truncated = true;
     if (r && r.assign) {
       const orders = sub.map((c) => ({ ch: M.chans[c], items: [], sub: 0, fee: 0 }));
-      for (let i = 0; i < n; i++) { const k = r.assign[i]; const of = M.offers[i].find((x) => x.c === sub[k]); orders[k].items.push({ l: M.lines[i], ...of }); orders[k].sub += of.cost; }
+      for (let i = 0; i < nn; i++) { const k = r.assign[i], l = rowLine[i]; const of = M.offers[l].find((x) => x.c === sub[k]); orders[k].items.push({ l: M.lines[l], ...of }); orders[k].sub += of.cost; }
       const used = orders.filter((o) => o.items.length && !o.ch.skip);
       const skipped = [];
       orders.forEach((o) => { if (o.ch.skip) skipped.push(...o.items); });
       let ok = used.length > 0, fees = 0, items = 0;
       for (const o of used) { if (o.sub < o.ch.P.min) { ok = false; break; } o.fee = feeAt(o.ch.P, o.sub); fees += o.fee; items += o.sub; }
       if (ok) {
-        const extra = lambda * Math.max(0, used.length - 1);
-        const total = items + fees + extra;
-        const score = total + skipped.reduce((a, x) => a + x.cost, 0);
+        const extra = lambda * (Math.max(0, used.length - 1) + stores.size);
+        const total = items + fees + compCost + extra;
+        /* à total égal, la répartition sans passage en magasin l'emporte (1 centime par magasin) */
+        const score = total + skipped.reduce((a, x) => a + x.cost, 0) + stores.size;
         if (!best || score < best.score) {
           used.forEach((o) => o.items.sort((a, b) => (a.l.n ?? 0) - (b.l.n ?? 0)));
           used.sort((a, b) => b.sub - a.sub);
-          best = { orders: used, skipped, total, score, itemsTotal: items, feesTotal: fees, extra };
+          const completed = compLines.map((l) => ({ l: M.lines[l], cost: M.comp[l].cost, ret: M.comp[l].ret }));
+          best = { orders: used, skipped, completed, total, score, itemsTotal: items, feesTotal: fees, compTotal: compCost, compStores: [...stores], extra };
         }
       }
     }
