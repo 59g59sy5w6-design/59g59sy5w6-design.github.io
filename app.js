@@ -236,9 +236,10 @@
         score += b;
       }
       if (!ok) continue;
+      const words = score;
       if (p._b.startsWith(toks[0])) score += 2;
       score += Math.min(2, Object.keys(p.offers).length - 1) * 0.6;
-      out.push([score, p]);
+      out.push([score, p, words]);
     }
     out.sort((a, b) => b[0] - a[0] || a[1].rank - b[1].rank);
     return out;
@@ -901,7 +902,7 @@
     return {
       title: "Réglages", grouped: true,
       html: `<h1 class="lt">Réglages</h1>` +
-        `<h2 class="gh">Affichage</h2><div class="group"><div class="row"><span class="rt">Taille du texte</span><div class="seg" style="width:252px" role="group" aria-label="Taille du texte">${ZOOMS.map(([v, l]) => `<button type="button" data-act="zoom" data-v="${v}" aria-pressed="${String(S.prefs.zoom || 1) === v}">${l}</button>`).join("")}</div></div><button class="row link" type="button" data-act="welcome">Reprendre les trois questions de départ</button></div>` +
+        `<h2 class="gh">Affichage</h2><div class="group"><div class="row"><span class="rt">Taille du texte</span><div class="seg" style="width:252px" role="group" aria-label="Taille du texte">${ZOOMS.map(([v, l]) => `<button type="button" data-act="zoom" data-v="${v}" aria-pressed="${String(S.prefs.zoom || 1) === v}">${l}</button>`).join("")}</div></div><button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
         `<h2 class="gh">Livraison</h2><div class="group"><button class="row" type="button" data-act="zip"><span class="rt">Code postal</span><span class="val">${S.prefs.zip ? esc(S.prefs.zip) : "À indiquer"}</span>${ic("chev", "chev")}</button></div>` +
         `<p class="gf">${S.prefs.zip && !inZone() ? "Les enseignes de Cabas livrent en Île-de-France : ton code postal n'est pas encore couvert." : "Les enseignes de Cabas livrent en Île-de-France. Chacune confirme ses créneaux au moment de commander."}</p>` +
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}" style="text-decoration:none">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
@@ -1147,11 +1148,15 @@
      virgules. Chaque ligne devient une recherche ; Cabas prend le produit le moins cher au kilo ou au litre parmi les
      plus pertinents, dans un format courant, et l'on peut en choisir un autre avant d'ajouter au panier. */
   const STOP = new Set("de du des la le les l d un une au aux en pour avec et ou a mon ma mes produit produits paquet paquets bouteille bouteilles brique briques boite boites pot pots sachet sachets pack packs lot lots canette canettes litre litres kilo kilos gramme grammes".split(" "));
-  const NUMW = { un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10, douze: 12 };
+  const NUMW = { un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10, douze: 12, douzaine: 12, "demi-douzaine": 6 };
   const sizeOfU = (v, u) => (/^k/i.test(u) ? { v: v * 1000, u: "g" } : /^g/i.test(u) ? { v, u: "g" } : /^cl/i.test(u) ? { v: v * 10, u: "ml" } : /^ml/i.test(u) ? { v, u: "ml" } : { v: v * 1000, u: "ml" });
   function parseLine(raw) {
     let s = String(raw).trim().replace(/^[-*•·]+\s*/, "").replace(/^\d+[.)]\s+/, "");
     let n = 1, size = null, m;
+    /* « un litre de lait », « demi-kilo de riz », « une douzaine d'œufs » : en chiffres */
+    s = s.replace(/^(un|une|deux|trois|quatre|cinq|six|dix|douze)\s+(kg|kilos?|g|grammes?|l|litres?|cl|ml)\b/i, (x, w, u) => NUMW[norm(w)] + " " + u)
+      .replace(/^(?:un |une )?demi[- ]?(kg|kilo|l|litre)\b/i, (x, u) => "0,5 " + u)
+      .replace(/^(?:une )?(demi-douzaine|douzaine)\s+(?:de\s+|d['’]\s*)?(.+)$/i, (x, w, rest) => NUMW[norm(w)] + " " + rest);
     if ((m = s.match(/^(.*?)\s*(?:[x×*]\s*(\d{1,2})|\((\d{1,2})\))$/i)) && m[1]) { n = +(m[2] || m[3]); s = m[1]; }
     if ((m = s.match(/^(\d+(?:[.,]\d+)?)\s*(kg|kilos?|g|gr|grammes?|l|litres?|cl|ml)\.?\s+(?:de\s+|d['’]\s*)?(.+)$/i))) { size = sizeOfU(parseFloat(m[1].replace(",", ".")), m[2]); s = m[3]; }
     else if ((m = s.match(/^(\d{1,2}|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze)\s*(?:x|×|fois)?\s+(.+)$/i))) { n = /\d/.test(m[1]) ? +m[1] : NUMW[norm(m[1])]; s = m[2]; }
@@ -1172,6 +1177,8 @@
     (p._b + " " + norm(p.format) + " " + norm((rayon(p.r) || {}).name) + " " + norm((p.tags || []).join(" "))).split(" ").filter(Boolean).forEach((w) => st.add(stem(w)));
     return (p._sw = st);
   }
+  /* tous les mots, ingrédients compris (« thon au naturel », « sardines à l'huile ») */
+  const allW = (p) => p._aw || (p._aw = new Set(p._w.map(stem)));
   const RW = {};
   const rayWords = (r) => RW[r] || (RW[r] = new Set(norm((rayon(r) || {}).name).split(" ").filter(Boolean).map(stem)));
   const qToks = (q) => norm(q).split(" ").filter(Boolean).flatMap((t) => SYN[t] || [t]).map(stem);
@@ -1196,12 +1203,15 @@
     let rel = sc.map((x) => x[1]);
     /* le mot exact plutôt qu'un début de mot (« thon », pas « Thonon ») ; le rayon qui porte ce nom d'abord (« huile » :
        le rayon Huile, pas des sardines à l'huile) ; puis les résultats les plus pertinents */
-    const exact = rel.filter((p) => { const st = strongW(p); return toks.every((t) => st.has(t)); });
+    const exact = rel.filter((p) => { const st = allW(p); return toks.every((t) => st.has(t)); });
     if (exact.length) rel = exact;
+    /* « sardines à l'huile » n'est pas « sauce tomate sans huile » */
+    if (!toks.includes("san")) { const noSans = rel.filter((p) => !toks.some((t) => sig(p).includes("sans " + t))); if (noSans.length) rel = noSans; }
     const inRay = rel.filter((p) => { const rw = rayWords(p.r); return toks.some((t) => rw.has(t)); });
     if (inRay.length) rel = inRay;
     /* d'abord ce qui est vendu par tes enseignes, puis les résultats les plus pertinents parmi ceux-là */
-    const sco = new Map(sc.map((x) => [x[1], x[0]])), sold = rel.filter((p) => pb(p));
+    /* pertinence des mots seulement : la marque qui porte le nom du produit (« Riz du Monde ») ne passe pas devant */
+    const sco = new Map(sc.map((x) => [x[1], x[2]])), sold = rel.filter((p) => pb(p));
     out.cands = (sold.length ? sold : rel).slice(0, 60).map((p) => p.id);
     out.avail = sold.length;
     if (!sold.length) return out;
@@ -1210,9 +1220,13 @@
     const sz = (p) => (p.qty && p.qty.v) || 0;
     /* la variante la plus simple : « coca » est un Coca-Cola, pas un Coca-Cola Cherry, sauf si on l'a écrit */
     const qs = new Set(toks);
-    const extra = (p) => sig(p).split(" ").filter((t) => VARIANT.has(t.replace(/^sans /, "")) && !qs.has(t.replace(/^sans /, ""))).length;
-    const minX = Math.min(...avail.map(extra));
-    const plain = avail.filter((p) => extra(p) === minX);
+    /* « sardines à l'huile » : l'huile d'olive ou de tournesol de la boîte n'est pas une variante de trop */
+    const OILS = new Set(["olive", "tournesol", "colza", "arachide"]);
+    const extra = (p) => sig(p).split(" ").filter((t) => { const w = t.replace(/^sans /, ""); return VARIANT.has(w) && !qs.has(w) && !(qs.has("huile") && p.r !== "huile" && OILS.has(w)); }).length;
+    /* le nom du rayon tout seul (« huile », « lait ») : toutes les variantes se valent, le moins cher l'emporte */
+    const bare = avail.length && toks.every((t) => rayWords(avail[0].r).has(t));
+    const minX = bare ? -1 : Math.min(...avail.map(extra));
+    const plain = bare ? avail : avail.filter((p) => extra(p) === minX);
     let pick = null, n = L.n;
     if (L.size) {
       const same = plain.filter((p) => p.qty && p.qty.u === L.size.u);
@@ -1320,7 +1334,7 @@
   /* Même rayon, même nombre d'unités, contenance à 20 % près et mêmes caractéristiques (variété, forme, parfum, sans
      sucres, eau minérale ou de source, lait frais ou UHT, bio...) : seule la marque change. Comparé sur les prix
      relevés, jamais sur un prix simulé. */
-  const VARIANT = new Set("zero light sucre stevia max cherry vanille citron fraise peche menthe framboise mangue pamplemousse grenade cerise aromatisee decafeine decaf bio lactose croissance vitamine omega chocolat pepite nappee noisette amande caramel gluten complete integrale magnesium humide sensitive hypoallergenique couleur noir marseille brebi chevre soja coco vegetal grec grecque bifidu calcium graine melange isio friture roux cassonade canne morceau fluide sarrasin mais pois".split(" ").map(stem));
+  const VARIANT = new Set("zero light sucre stevia max cherry vanille citron fraise peche menthe framboise mangue pamplemousse grenade cerise aromatisee decafeine decaf bio lactose croissance vitamine omega chocolat pepite nappee noisette amande caramel gluten complete integrale magnesium humide sensitive hypoallergenique couleur noir marseille brebi chevre soja coco vegetal grec grecque bifidu calcium graine melange isio friture roux cassonade canne morceau fluide sarrasin mais pois tournesol colza olive arachide noix sesame pepins avocat lin fondue".split(" ").map(stem));
   const ATTR = new Set(("gazeuse petillante bulle plate aromatisee citron fraise peche menthe framboise mangue pamplemousse grenade cerise vanille " +
     "zero light sucre stevia max cherry pulpe concentre presse orange sanguine multifruit agrume " +
     "bio lactose entier ecreme demi croissance vitamine omega montagne microfiltre " +
@@ -1335,6 +1349,7 @@
     "chocolat pepite nappee noisette amande caramel " +
     "double triple epaisseur compact humide " +
     "capsule poudre gel sensitive hypoallergenique ecolabel couleur noir marseille").split(" ").map(stem));
+  VARIANT.forEach((t) => ATTR.add(t));
   function sig(p) {
     if (p._sig != null) return p._sig;
     /* « sans pulpe » et « avec pulpe » ne sont pas la même chose */
@@ -1566,7 +1581,7 @@
   }
   function cartText() {
     const res = cartResult(), st = res.steps[res.K], bst = st && (st.full || st.partial);
-    const line = (id, q) => { const p = S.prods.get(id); return `- ${q > 1 ? q + " x " : ""}${p.brand} ${p.name}, ${p.format}`; };
+    const line = (id, q) => { const p = S.prods.get(id); return `- ${q > 1 ? q + " x " : ""}${p.brand} ${p.name}${p.format ? ", " + p.format : ""}`; };
     const L = [`Mes courses du ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}, avec Cabas`];
     if (bst) {
       for (const o of bst.orders) {
@@ -1617,7 +1632,7 @@
       const chips = [...groups.entries()].map(([k, r]) => `<button class="chip" type="button" data-act="wret" data-k="${esc(k)}" aria-pressed="${!S.prefs.off[k]}">${esc(r.name)}${r.simulated ? " (prix simulés)" : ""}</button>`).join("");
       const noComp = S.prefs.comp === false, pk = (groupsOf().auchan || []).length ? pickOf("auchan", groupsOf().auchan) : "";
       return {
-        body: `<p>Trois questions pour que les totaux ressemblent à tes courses. Tout se change ensuite dans les réglages.</p>` +
+        body: `<p>Quelques questions pour que les totaux et les repas ressemblent à ta maison. Tout se change ensuite dans les réglages.</p>` +
           `<h3 class="gh">Où fais-tu tes courses\u00a0?</h3><div class="tagset">${chips}</div>` +
           `<h3 class="gh">Peux-tu te déplacer\u00a0?</h3><div class="group">${opt("wmove", "Oui, en magasin ou en point de retrait", !noComp, 'data-v="1"')}${opt("wmove", "Non, je veux tout recevoir chez moi", noComp, 'data-v="0"')}</div>` +
           `<h3 class="gh">Vous êtes combien à la maison\u00a0?</h3><div class="tagset">${[1, 2, 3, 4, 5, 6].map((n) => `<button class="chip" type="button" data-act="wfoyer" data-v="${n}" aria-pressed="${(S.prefs.foyer || 0) === n}">${n}${n === 6 ? " et plus" : ""}</button>`).join("")}</div>` +
@@ -2280,7 +2295,7 @@
       case "guidecopy": {
         const o = guideOrder(id);
         if (!o) break;
-        const tx = o.items.map((x) => { const p = S.prods.get(x.l.id); return `${x.l.q > 1 ? x.l.q + " x " : ""}${p.brand} ${p.name}, ${p.format}`; }).join("\n");
+        const tx = o.items.map((x) => { const p = S.prods.get(x.l.id); return `${x.l.q > 1 ? x.l.q + " x " : ""}${p.brand} ${p.name}${p.format ? ", " + p.format : ""}`; }).join("\n");
         (navigator.clipboard ? navigator.clipboard.writeText(tx) : Promise.reject()).then(() => toast("Liste copiée"), () => toast("Copie impossible sur cet appareil"));
         break;
       }
