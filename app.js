@@ -553,9 +553,12 @@
         `<div class="srow"><button class="search" type="button" data-act="gosearch">${ic("search")}<span>Produits, marques</span></button><a class="icbtn" href="#/scan" aria-label="Scanner un code-barres">${ic("scan")}</a></div>` +
         `<p class="fresh${isStale() ? " old" : ""}">${ic("clock")}<span>${esc(freshText())}${isStale() ? ", ils ont pu changer depuis" : ""}</span></p>` +
         `<a class="wlcta" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>` +
+        ordersCard() +
         savingsCard() +
         installCard() +
         dropsRail() +
+        habitsRail() +
+        promosRail() +
         (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals">${ds.map(dealCard).join("")}</div>` : "") +
         `<div class="sh"><h2>Rayons</h2><a href="#/rayons">Tout voir</a></div><div class="cats">${tiles}</div>` +
         recRail() +
@@ -711,9 +714,9 @@
       `<div class="of"><div class="ln"><span>Articles</span><span>${eurC(o.sub)}</span></div><div class="ln"><span>${pickup(r) ? "Retrait" : "Livraison"}</span><span>${fee > 0 ? eurC(fee) : pickup(r) ? "Gratuit" : "Offerte"}</span></div>` +
       (P.fixed ? `<div class="ln"><span>Frais de service</span><span>${eurC(P.fixed)}</span></div>` : "") +
       `<div class="ln tot"><span>Total ${esc(r.name)}</span><span>${eurC(o.sub + o.fee)}</span></div>` +
-      (nt ? `<p class="hint">Encore ${eurC(nt.need)} chez ${esc(r.name)} et la livraison ${nt.fee > 0 ? "passe à " + eurC(nt.fee) : "devient offerte"}.</p>` : "") +
+      (nt ? `<p class="hint">Encore ${eurC(nt.need)} chez ${esc(r.name)} et la livraison ${nt.fee > 0 ? "passe à " + eurC(nt.fee) : "devient offerte"}.</p><div class="prog thin" aria-hidden="true"><span style="width:${Math.round((100 * o.sub) / (o.sub + nt.need))}%"></span></div>` : "") +
       (r.simulated ? `<p class="hint">Prix simulés, pas relevés : le vrai total s'affiche sur ${esc(r.service)}.</p>` : "") +
-      (S.guide.done[r.id] ? `<button class="btn tint" type="button" data-act="guide" data-id="${esc(r.id)}">${ic("check")}Commande passée</button>` : `<button class="btn" type="button" data-act="guide" data-id="${esc(r.id)}">Passer la commande sur ${esc(r.service)}</button>`) +
+      (S.guide.done[r.id] ? `<button class="btn tint" type="button" data-act="guide" data-id="${esc(r.id)}">${ic("check")}Commande passée</button>` + ((S.guide.when || {})[r.id] && S.guide.when[r.id].d ? `<p class="hint">${pickup(r) ? "Retrait" : "Livraison"} ${esc(whenText(S.guide.when[r.id]))}. <button class="lnk" type="button" data-act="when" data-id="${esc(r.id)}">Modifier</button> <button class="lnk" type="button" data-act="ics" data-id="${esc(r.id)}" data-d="${esc(S.guide.when[r.id].d)}" data-s="${esc(S.guide.when[r.id].s || "")}">Calendrier</button></p>` : `<p class="hint"><button class="lnk" type="button" data-act="when" data-id="${esc(r.id)}">${pickup(r) ? "Quand vas-tu le retirer\u00a0?" : "Quand est-ce livré\u00a0?"}</button></p>`) : `<button class="btn" type="button" data-act="guide" data-id="${esc(r.id)}">Passer la commande sur ${esc(r.service)}</button>`) +
       `</div></section>`;
   }
   function compHtml(r) {
@@ -909,6 +912,7 @@
             `<p class="gf">${noComp ? `« Sans achat en magasin » est coché\u00a0: tout est livré chez toi, pas de retrait. ${[ms.filter((m) => !pickup(m)).length > 1 ? "choisis ta zone de livraison" : "", back ? "en décochant, tu retrouves ton " + (isDrive(S.allMap.get(pickOf(g, ms))) ? "drive" : "point de retrait") : ""].filter(Boolean).join("\u00a0; ").replace(/^./, (c) => c.toUpperCase()).replace(/.$/, (c) => c + ".")}` : `Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.`}</p>`;
         }).join("") +
         `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Sans achat en magasin<small>Tout passe par les commandes en ligne. Décoché, un produit que tes commandes ne prennent pas peut s'acheter en magasin, au prix relevé le plus bas (au plus un quart du panier).</small></span><label class="sw"><input type="checkbox" data-act="nocomp"${S.prefs.comp === false ? " checked" : ""} aria-label="Sans achat en magasin"><span></span></label></div><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
+        `<div class="row"><span class="rt">Personnes à la maison<small>Pour les portions des repas.</small></span><div class="seg" style="width:${6 * 38}px" role="group" aria-label="Personnes à la maison">${[1, 2, 3, 4, 5, 6].map((n) => `<button type="button" data-act="wfoyer" data-v="${n}" aria-pressed="${(S.prefs.foyer || 0) === n}">${n}</button>`).join("")}</div></div>` +
         `<button class="row" type="button" data-act="budget"><span class="rt">Budget par panier<small>Le panier dit ce qu'il reste ou de combien tu dépasses.</small></span><span class="val">${parseFloat(S.prefs.budget) > 0 ? eurR(parseFloat(S.prefs.budget)) : "Aucun"}</span>${ic("chev", "chev")}</button>` +
         (Object.keys(S.prefs.keep || {}).length ? `<div class="row"><span class="rt">Marques gardées<small>${plural(Object.keys(S.prefs.keep).length, "produit n'est", "produits ne sont")} plus proposés au remplacement par un équivalent moins cher.</small></span><button class="btn sm plain" type="button" data-act="keepreset">Tout reproposer</button></div>` : "") +
         `<label class="row" for="extra"><span class="rt">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
@@ -1440,7 +1444,7 @@
     const st = RES.steps[RES.K], bst = st && st.full, G = S.guide, key = JSON.stringify(S.basket);
     if (!bst || G.rec === key) return;
     const total = fullTotal(bst), sp = S.swapPrev, saved = savedOf(bst) + (sp && sp.key === key ? Math.max(0, sp.total - total) : 0);
-    S.hist.push({ d: new Date().toISOString().slice(0, 10), t: total, s: saved, n: count(), o: bst.orders.map((o) => S.retMap.get(o.ch.id).name) });
+    S.hist.push({ d: new Date().toISOString().slice(0, 10), t: total, s: saved, n: count(), o: bst.orders.map((o) => S.retMap.get(o.ch.id).name), items: Object.assign({}, S.basket), when: histWhen(bst) });
     store.set("hist", S.hist);
     G.rec = key; G.saved = saved; saveGuide();
   }
@@ -1455,12 +1459,103 @@
     return {
       title: "Tes économies", grouped: true,
       html: `<h1 class="lt">Tes économies</h1><p class="lt-sub">${H.length ? `${eurC(s)} sur ${plural(H.length, "panier", "paniers")}` : "Aucun panier commandé pour l'instant"}</p>` +
-        (H.length ? `<div class="group">${H.map((x) => `<div class="row"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${x.o && x.o.length ? ", " + esc(joinEt(x.o)) : ""}, ${eurC(x.t)}</small></span><span class="val num">${x.s ? eurC(x.s) : "–"}</span></div>`).join("")}</div>` +
+        (H.length ? `<div class="group">${H.map((x, i) => `<div class="row"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${x.o && x.o.length ? ", " + esc(joinEt(x.o)) : ""}, ${eurC(x.t)}${x.s ? ", " + eurC(x.s) + " économisés" : ""}</small></span>${x.items ? `<button class="btn sm plain" type="button" data-act="reorder" data-id="${S.hist.length - 1 - i}">Recommander</button>` : `<span class="val num">${x.s ? eurC(x.s) : "–"}</span>`}</div>`).join("")}</div>` +
           `<p class="gf">Un panier compte quand toutes ses commandes sont notées comme passées. L'économie d'un panier additionne, pour chaque produit, l'écart entre le prix payé et son prix moyen dans les enseignes qui le vendent, et ce que les remplacements par un équivalent moins cher ont fait gagner. Selon les prix relevés.</p>` +
           `<div class="group" style="margin-top:28px"><button class="row danger" type="button" data-act="histclear">Effacer l'historique</button></div>` :
           `<div class="empty">${emptyArt("coin")}<h2>Rien pour l'instant</h2><p>Dans le panier, touche «\u00a0Passer la commande\u00a0» pour chaque enseigne\u00a0: quand tout est commandé, l'économie s'ajoute ici.</p></div>`),
     };
   };
+
+  /* ---------- suivi des commandes ---------- */
+  /* Quand une commande est notée comme passée, on peut dire quand elle arrive (jour et créneau), comme le suivi d'une
+     commande de repas : le panier et l'accueil affichent la prochaine livraison ou le prochain retrait, et un fichier
+     calendrier (.ics) ajoute le rappel sur le téléphone. Les paniers commandés gardent leurs produits : on peut les
+     recommander en un geste, et l'accueil propose les produits qui reviennent souvent. */
+  const SLOTS = [["matin", "Matin", 8, 12], ["midi", "Midi", 12, 14], ["aprem", "Après-midi", 14, 18], ["soir", "Soir", 18, 22]];
+  const isoDay = (d) => { const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return z.toISOString().slice(0, 10); };
+  function dayLabel(iso, short) {
+    const t = new Date(iso + "T12:00:00"), today = isoDay(new Date()), tom = isoDay(new Date(Date.now() + 864e5));
+    if (iso === today) return "aujourd'hui";
+    if (iso === tom) return "demain";
+    const s = t.toLocaleDateString("fr-FR", short ? { weekday: "short", day: "numeric" } : { weekday: "long", day: "numeric", month: "long" });
+    return s.replace(/\.$/, "");
+  }
+  function whenText(w) {
+    if (!w || !w.d) return "";
+    const sl = SLOTS.find((s) => s[0] === w.s);
+    return `${dayLabel(w.d)}${sl ? ", " + sl[1].toLowerCase() + ` (${sl[2]}h à ${sl[3]}h)` : ""}`;
+  }
+  function whenSheet(rid) {
+    const r = S.retMap.get(rid);
+    if (!r) return;
+    const w = (S.guide.when || {})[rid] || {};
+    const build = () => {
+      const cur = (S.guide.when || {})[rid] || {};
+      const days = Array.from({ length: 8 }, (_, i) => isoDay(new Date(Date.now() + i * 864e5)));
+      return {
+        body: `<p>${pickup(r) ? "Quand vas-tu le retirer\u00a0?" : "Quand est-ce livré\u00a0?"} Cabas te le rappelle sur l'accueil.</p>` +
+          `<h3 class="gh">Jour</h3><div class="tagset">${days.map((d) => `<button class="chip" type="button" data-act="whend" data-id="${esc(rid)}" data-d="${d}" aria-pressed="${cur.d === d}">${esc(dayLabel(d, true).replace(/^./, (c) => c.toUpperCase()))}</button>`).join("")}</div>` +
+          `<h3 class="gh">Créneau</h3><div class="tagset">${SLOTS.map(([k, l, a, b]) => `<button class="chip" type="button" data-act="whens" data-id="${esc(rid)}" data-s="${k}" aria-pressed="${cur.s === k}">${l}, ${a}h à ${b}h</button>`).join("")}</div>`,
+        foot: `<button class="btn plain" type="button" data-act="whenno" data-id="${esc(rid)}" style="flex:1">Plus tard</button><button class="btn" type="button" data-act="close" style="flex:1"${cur.d ? "" : " disabled"}>OK</button>`,
+      };
+    };
+    const o = build();
+    openSheet({ title: `${pickup(r) ? "Retrait" : "Livraison"} ${r.name}`, left: `<span></span>`, right: `<span></span>`, body: o.body, foot: o.foot, build, onClose: () => { if (S.route.name === "panier" || S.route.name === "home") rerender(); } });
+    return w;
+  }
+  /* créneaux des commandes du panier, tels que notés */
+  const histWhen = (bst) => bst.orders.map((o) => { const r = S.retMap.get(o.ch.id), w = (S.guide.when || {})[o.ch.id]; return r && w && w.d ? { rid: r.id, name: r.name, pick: pickup(r), d: w.d, s: w.s || "", where: (r.channel || {}).where || "" } : null; }).filter(Boolean);
+  function saveWhen() {
+    saveGuide();
+    /* le panier est déjà dans l'historique : ses créneaux suivent */
+    const st = RES.steps[RES.K], bst = st && st.full, last = (S.hist || [])[S.hist.length - 1];
+    if (bst && last && S.guide.rec === JSON.stringify(S.basket)) { last.when = histWhen(bst); store.set("hist", S.hist); }
+  }
+  /* commandes passées, à venir : celles du panier en cours, puis celles des paniers d'avant pas encore livrées */
+  function upcoming() {
+    const today = isoDay(new Date()), out = [];
+    const W = S.guide.when || {};
+    for (const rid of Object.keys(S.guide.done || {})) { const w = W[rid]; const r = S.retMap.get(rid) || S.allMap.get(rid); if (r && w && w.d && w.d >= today) out.push({ rid, name: r.name, pick: pickup(r), w, where: (r.channel || {}).where || "" }); }
+    for (const h of S.hist || []) for (const x of h.when || []) if (x.d >= today && !out.some((y) => y.rid === x.rid && y.w.d === x.d)) out.push({ rid: x.rid, name: x.name, pick: x.pick, w: { d: x.d, s: x.s }, where: x.where || "" });
+    return out.sort((a, b) => (a.w.d + a.w.s).localeCompare(b.w.d + b.w.s));
+  }
+  function ordersCard() {
+    const up = upcoming();
+    if (!up.length) return "";
+    return `<div class="orders"><div class="sh" style="padding-left:0;padding-right:0"><h2>Tes commandes</h2></div>${up.map((x) => `<div class="orow"><span class="av sm">${esc(x.name.slice(0, 1))}</span><span class="rt">${esc(x.name)}<small>${x.pick ? "Retrait" : "Livraison"} ${esc(whenText(x.w))}${x.where ? ", " + esc(x.where) : ""}</small></span><button class="btn sm plain" type="button" data-act="ics" data-id="${esc(x.rid)}" data-d="${esc(x.w.d)}" data-s="${esc(x.w.s || "")}" aria-label="Ajouter au calendrier">${ic("cal")}</button></div>`).join("")}</div>`;
+  }
+  function icsFor(name, pick, d, s, where) {
+    const sl = SLOTS.find((x) => x[0] === s) || [null, null, 9, 18];
+    const pad = (n) => String(n).padStart(2, "0"), dt = (h) => d.replace(/-/g, "") + "T" + pad(h) + "0000";
+    const uid = `${d}-${name.replace(/\W/g, "")}@cabas`;
+    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Cabas//FR", "BEGIN:VEVENT", `UID:${uid}`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`, `DTSTART;TZID=Europe/Paris:${dt(sl[2])}`, `DTEND;TZID=Europe/Paris:${dt(sl[3])}`, `SUMMARY:${pick ? "Retrait" : "Livraison"} ${name} (Cabas)`, where ? `LOCATION:${where}` : "", "BEGIN:VALARM", "TRIGGER:-PT60M", "ACTION:DISPLAY", `DESCRIPTION:${pick ? "Retrait" : "Livraison"} ${name} dans une heure`, "END:VALARM", "END:VEVENT", "END:VCALENDAR"].filter(Boolean);
+    return lines.join("\r\n");
+  }
+  function downloadIcs(rid, d, s) {
+    const r = S.retMap.get(rid) || S.allMap.get(rid);
+    if (!r) return;
+    const blob = new Blob([icsFor(r.name, pickup(r), d, s, (r.channel || {}).where || "")], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = `${pickup(r) ? "retrait" : "livraison"}-${r.id}-${d}.ics`; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    toast("Rappel prêt pour ton calendrier");
+  }
+  /* produits qui reviennent dans tes paniers commandés */
+  function habits(n) {
+    const cnt = new Map(), H = (S.hist || []).filter((h) => h.items);
+    if (!H.length) return [];
+    H.forEach((h) => Object.keys(h.items).forEach((id) => cnt.set(id, (cnt.get(id) || 0) + 1)));
+    return [...cnt.entries()].filter(([id]) => S.prods.has(id) && best(S.prods.get(id)) && !S.basket[id]).sort((a, b) => b[1] - a[1]).slice(0, n).map(([id]) => S.prods.get(id));
+  }
+  function promosRail() {
+    const ps = S.list.filter((p) => { const b = best(p); return b && b.promo && !b.sim; }).map((p) => { const os = offers(p, true); return { p, gap: os.length > 1 ? os[os.length - 1].price - os[0].price : 0 }; }).sort((a, b) => b.gap - a.gap).slice(0, 12).map((x) => x.p);
+    return ps.length ? `<div class="sh"><h2>Offres en cours</h2></div><div class="rail">${ps.map(card).join("")}</div>` : "";
+  }
+  function habitsRail() {
+    const ps = habits(10);
+    if (!ps.length) return "";
+    return `<div class="sh"><h2>Tes habitudes</h2>${S.hist.length ? `<button type="button" data-act="reorder" data-id="last">Recommander le dernier panier</button>` : ""}</div><div class="rail">${ps.map(card).join("")}</div>`;
+  }
 
   /* ---------- partager ---------- */
   const b64e = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -1525,6 +1620,7 @@
         body: `<p>Trois questions pour que les totaux ressemblent à tes courses. Tout se change ensuite dans les réglages.</p>` +
           `<h3 class="gh">Où fais-tu tes courses\u00a0?</h3><div class="tagset">${chips}</div>` +
           `<h3 class="gh">Peux-tu te déplacer\u00a0?</h3><div class="group">${opt("wmove", "Oui, en magasin ou en point de retrait", !noComp, 'data-v="1"')}${opt("wmove", "Non, je veux tout recevoir chez moi", noComp, 'data-v="0"')}</div>` +
+          `<h3 class="gh">Vous êtes combien à la maison\u00a0?</h3><div class="tagset">${[1, 2, 3, 4, 5, 6].map((n) => `<button class="chip" type="button" data-act="wfoyer" data-v="${n}" aria-pressed="${(S.prefs.foyer || 0) === n}">${n}${n === 6 ? " et plus" : ""}</button>`).join("")}</div>` +
           `<h3 class="gh">Ton secteur, pour les prix Auchan</h3><div class="group">${SECTEURS.map(([id, l]) => opt("wsect", esc(l), pk === id || (S.allMap.get(id) || {}).livraison === pk, `data-id="${id}"`)).join("")}</div>` +
           `<p class="gf">Les prix Auchan dépendent du magasin. Sans déplacement, Cabas prend la livraison à domicile du même secteur.</p>`,
         foot: `<button class="btn" type="button" data-act="wok">C'est parti</button>`,
@@ -1653,7 +1749,9 @@
   VIEWS.recette = (r) => {
     const rc = (S.recs || []).find((x) => x.id === r.id);
     if (!rc) return notFound();
-    const P = (S.recP && S.recP[rc.id]) || rc.portions, c = recCost(rc, P), k = P / rc.portions;
+    /* portions : le dernier choix, sinon la taille du foyer (arrondie aux choix proposés), sinon celles de la recette */
+    const foyer = S.prefs.foyer ? [2, 4, 6, 8].reduce((a, v) => (Math.abs(v - S.prefs.foyer) < Math.abs(a - S.prefs.foyer) ? v : a), 2) : 0;
+    const P = (S.recP && S.recP[rc.id]) || foyer || rc.portions, c = recCost(rc, P), k = P / rc.portions;
     const line = (x) => {
       const q = k === 1 ? x.g.t : fmtNeed(x.need, x.g.u) + (x.g.u === "pc" ? " " + x.g.q.replace(/^oeufs$/, "œufs") : " de " + x.g.q);
       if (!x.p) return `<div class="row th"><span class="thumb q">${ic("search")}</span><span class="rt">${esc(q)}<small>${x.off ? "Pas vendu par tes enseignes" : "Pas encore dans Cabas"}</small></span></div>`;
@@ -1702,7 +1800,8 @@
   function recItems(id) {
     const rc = (S.recs || []).find((x) => x.id === id);
     if (!rc) return {};
-    const P = (S.recP && S.recP[rc.id]) || rc.portions, items = {};
+    const foyer = S.prefs.foyer ? [2, 4, 6, 8].reduce((a, v) => (Math.abs(v - S.prefs.foyer) < Math.abs(a - S.prefs.foyer) ? v : a), 2) : 0;
+    const P = (S.recP && S.recP[rc.id]) || foyer || rc.portions, items = {};
     recCost(rc, P).ok.forEach((x) => { items[x.p.id] = Math.min(99, (items[x.p.id] || 0) + x.n); });
     return items;
   }
@@ -1865,9 +1964,9 @@
   VIEWS.scan = () => ({
     title: "Scanner", grouped: true,
     html: `<h1 class="lt">Scanner</h1><p class="lt-sub">En magasin, vise le code-barres d'un produit\u00a0: Cabas te dit où il est le moins cher.</p>` +
-      `<div class="scanbox"><video id="scv" playsinline muted autoplay></video><div class="scanguide" aria-hidden="true"></div></div><p class="scst" id="scst">${esc(SC.note || "Ouverture de la caméra…")}</p>` +
+      `<div class="scanbox"><video id="scv" playsinline muted autoplay></video><div class="scanguide" aria-hidden="true"></div></div><p class="scst" id="scst" aria-live="polite">${esc(SC.note || "Ouverture de la caméra…")}</p>` +
       `<div class="pad btns" style="padding-top:12px"><button class="btn tint" type="button" data-act="scantype">Taper le code</button></div>` +
-      `<div id="scres"></div>` +
+      `<div id="scres" aria-live="polite"></div>` +
       `<p class="gf">Cabas lit les codes EAN-13 et EAN-8 des produits. Le nom d'un produit qu'il ne connaît pas vient d'Open Food Facts, données ouvertes (licence ODbL). Rien n'est envoyé ailleurs\u00a0: l'image reste sur ton téléphone.</p>`,
     mount: () => { scanRender(); startScan(); },
   });
@@ -2091,7 +2190,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); break;
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -2102,7 +2201,8 @@
       case "recp": S.recP = Object.assign({}, S.recP, { [id]: +t.dataset.v }); rerender(); break;
       case "menuput": {
         const rc = (S.recs || []).find((x) => x.id === id); if (!rc) break;
-        const P = (S.recP && S.recP[id]) || rc.portions, i = S.menu.findIndex((m) => m.id === id);
+        const foyer = S.prefs.foyer ? [2, 4, 6, 8].reduce((a, v) => (Math.abs(v - S.prefs.foyer) < Math.abs(a - S.prefs.foyer) ? v : a), 2) : 0;
+        const P = (S.recP && S.recP[id]) || foyer || rc.portions, i = S.menu.findIndex((m) => m.id === id);
         if (i >= 0) S.menu[i].portions = P; else S.menu.push({ id, portions: P });
         saveMenu(); rerender(); toast(i >= 0 ? "Portions mises à jour" : "Ajouté à ma semaine", { label: "Voir", run: () => push("#/repas") }); break;
       }
@@ -2118,6 +2218,7 @@
       case "wskip": closeSheet(); break;
       case "wret": { const k = t.dataset.k; if (S.prefs.off[k]) delete S.prefs.off[k]; else S.prefs.off[k] = true; savePrefs(); refreshSheet(); break; }
       case "wmove": S.prefs.comp = t.dataset.v === "1"; savePrefs(); refreshSheet(); break;
+      case "wfoyer": S.prefs.foyer = +t.dataset.v; savePrefs(); if ($("#sheet").hidden) rerender(); else refreshSheet(); break;
       case "wsect": {
         /* même secteur, même façon de recevoir : livraison à domicile si c'était le choix, sinon le point de retrait */
         const G = groupsOf().auchan || [], cur = S.allMap.get(pickOf("auchan", G)), r = S.allMap.get(id);
@@ -2186,7 +2287,19 @@
       case "guidedone": {
         S.guide.done[id] = 1; saveGuide(); closeSheet();
         const st = RES.steps[RES.K], bst = st && st.full;
-        toast(bst && bst.orders.every((o) => S.guide.done[o.ch.id]) ? "Toutes tes commandes sont passées" : "Commande " + retName(id) + " notée"); break;
+        toast(bst && bst.orders.every((o) => S.guide.done[o.ch.id]) ? "Toutes tes commandes sont passées" : "Commande " + retName(id) + " notée");
+        setTimeout(() => whenSheet(id), 350); break;
+      }
+      case "when": whenSheet(id); break;
+      case "whend": S.guide.when = Object.assign({}, S.guide.when, { [id]: Object.assign({}, (S.guide.when || {})[id], { d: t.dataset.d }) }); saveWhen(); refreshSheet(); break;
+      case "whens": S.guide.when = Object.assign({}, S.guide.when, { [id]: Object.assign({}, (S.guide.when || {})[id], { s: t.dataset.s }) }); saveWhen(); refreshSheet(); break;
+      case "whenno": { const W = Object.assign({}, S.guide.when); delete W[id]; S.guide.when = W; saveWhen(); closeSheet(); break; }
+      case "ics": downloadIcs(id, t.dataset.d, t.dataset.s); break;
+      case "reorder": {
+        const h = id === "last" ? (S.hist || []).filter((x) => x.items).slice(-1)[0] : (S.hist || [])[+id];
+        if (!h || !h.items) break;
+        const n = addItems(h.items, false); renderChrome(); bumpBadge();
+        toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier", { label: "Voir", run: () => switchTab("panier") }); break;
       }
       case "guideundo": delete S.guide.done[id]; S.guide.rec = ""; saveGuide(); refreshSheet(); break;
       case "histclear": confirmSheet("Effacer l'historique\u00a0?", "Le total de tes économies repart de zéro sur cet appareil.", "Effacer", "histok"); break;

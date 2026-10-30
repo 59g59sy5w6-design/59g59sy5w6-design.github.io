@@ -532,6 +532,18 @@ body.grouped .empty .art { background: #fff; }
 .shelf input:focus { outline: none; box-shadow: 0 0 0 2px var(--brand) inset; }
 .scanr .df .lnk { font-size: 15px; color: var(--brand); }
 
+.orders { margin: 6px calc(var(--g) + var(--sr)) 8px calc(var(--g) + var(--sl)); padding: 4px 14px 6px; border-radius: 14px; background: #fff; }
+.orders .sh { padding-top: 8px; padding-bottom: 4px; }
+.orders .sh h2 { font-size: 17px; }
+.orow { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+.orow + .orow { border-top: 0.5px solid var(--sep); }
+.orow .rt { flex: 1; min-width: 0; font-size: 16px; letter-spacing: -0.02em; }
+.orow .rt small { display: block; font-size: 13px; color: var(--ink-2); line-height: 17px; }
+.orow .btn.sm { width: 40px; padding: 0; }
+.orow .btn .ic { width: 20px; height: 20px; }
+.prog.thin { height: 4px; margin: 6px 0 2px; }
+.of .hint .lnk { font-size: 13px; color: var(--brand); margin-right: 8px; }
+
 /* ---------- divers ---------- */
 .toast { position: fixed; z-index: 60; left: 50%; bottom: calc(var(--sb) + var(--tab) + 80px); transform: translateX(-50%); max-width: calc(100% - 48px); padding: 11px 18px; border-radius: 22px; background: rgba(28, 28, 30, 0.94); color: #fff; font-size: 15px; letter-spacing: -0.01em; text-align: center; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); animation: fade 0.2s ease; }
 .toast button { color: #7ee2a8; font-weight: 600; margin-left: 10px; }
