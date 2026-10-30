@@ -543,7 +543,6 @@
 
   VIEWS.home = () => {
     const ds = deals(8);
-    const all3 = S.list.filter((p) => offers(p, true).length >= 3).slice(0, 14);
     const tiles = S.rayons.slice(0, 7).map(catTile).join("") + `<a class="cat" href="#/rayons"><span class="ct all">${ic("grid")}</span><span>Tous les rayons</span></a>`;
     const sg = suggestion();
     return {
@@ -560,11 +559,10 @@
         dropsRail() +
         dueRail() +
         habitsRail() +
-        promosRail() +
         (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals">${ds.map(dealCard).join("")}</div>` : "") +
         `<div class="sh"><h2>Rayons</h2><a href="#/rayons">Tout voir</a></div><div class="cats">${tiles}</div>` +
         recRail() +
-        (all3.length ? `<div class="sh"><h2>Comparés dans ${S.rets.length > 3 ? "plusieurs" : "les " + S.rets.length} enseignes</h2></div><div class="rail">${all3.map(card).join("")}</div>` : "") +
+        promosRail() +
         (Object.keys(sg.items).length ? `<div class="sh"><h2>Panier tout prêt</h2></div>${suggestCard(sg)}` : "") +
         footNote(),
     };
@@ -903,7 +901,7 @@
     return {
       title: "Réglages", grouped: true,
       html: `<h1 class="lt">Réglages</h1>` +
-        `<h2 class="gh">Affichage</h2><div class="group"><div class="row"><span class="rt">Taille du texte</span><div class="seg" style="width:252px" role="group" aria-label="Taille du texte">${ZOOMS.map(([v, l]) => `<button type="button" data-act="zoom" data-v="${v}" aria-pressed="${String(S.prefs.zoom || 1) === v}">${l}</button>`).join("")}</div></div><button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
+        `<h2 class="gh">Affichage</h2><div class="group"><div class="row stack"><span class="rt">Taille du texte</span><div class="seg" role="group" aria-label="Taille du texte">${ZOOMS.map(([v, l]) => `<button type="button" data-act="zoom" data-v="${v}" aria-pressed="${String(S.prefs.zoom || 1) === v}">${l}</button>`).join("")}</div></div><button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
         `<h2 class="gh">Livraison</h2><div class="group"><button class="row" type="button" data-act="zip"><span class="rt">Code postal</span><span class="val">${S.prefs.zip ? esc(S.prefs.zip) : "À indiquer"}</span>${ic("chev", "chev")}</button></div>` +
         `<p class="gf">${S.prefs.zip && !inZone() ? "Les enseignes de Cabas livrent en Île-de-France : ton code postal n'est pas encore couvert." : "Les enseignes de Cabas livrent en Île-de-France. Chacune confirme ses créneaux au moment de commander."}</p>` +
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}" style="text-decoration:none">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
