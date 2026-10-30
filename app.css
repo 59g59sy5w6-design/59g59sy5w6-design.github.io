@@ -504,6 +504,10 @@ body.grouped .empty .art { background: #fff; }
 .rcard small { font-size: 13px; color: var(--ink-2); }
 .rsum { margin-top: 4px; }
 .rsum .seg { margin-top: 6px; }
+.rsum .btns.two { grid-template-columns: 1fr 1fr; }
+.rsum .btns.two .btn { padding: 0 10px; min-width: 0; }
+.rsum .btns.two .btn .ic { flex: none; }
+.row .icbtn { margin-left: auto; width: 36px; height: 36px; color: var(--ink-3); }
 .row .thumb.q { display: grid; place-items: center; color: var(--ink-3); }
 .row .thumb.q .ic { width: 22px; height: 22px; }
 

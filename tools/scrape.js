@@ -107,7 +107,9 @@ function extractInPage(cfg) {
     const o = { name, price, was: was != null && was > price ? was : null, unit: um ? um[0] : null, promo: pm || null };
     if (fm && cfg.retailer !== "houra") o.format = fm[0].trim();
     if (cfg.retailer === "auchan") {
-      const chip = lines.find((l) => /^\d+(?:[,.]\d+)?\s?(?:x\s?\d+(?:[,.]\d+)?\s?)?(?:cl|l|ml|g|kg)$/i.test(l));
+      const chip = lines.find((l) => /^\d+(?:[,.]\d+)?\s?(?:x\s?\d+(?:[,.]\d+)?\s?)?(?:cl|l|ml|g|kg)$/i.test(l))
+        /* œufs, papier, lessive : la pastille compte des pièces (« x12 », « 12 pièces », « boîte de 6 ») */
+        || lines.find((l) => /^(?:x\s?\d{1,3}|\d{1,3}\s?(?:x\s?\d{1,3}\s?)?(?:pièces?|pieces?|pcs|œufs|oeufs|unités?|unites?|rouleaux|lavages|dosettes|capsules)|(?:boîte|boite|lot|étui|etui|plateau) de \d{1,3}(?:\s?(?:œufs|oeufs|pièces|pieces))?)$/i.test(l));
       if (chip) o.format = chip;
     }
     if (cfg.retailer === "carrefour") { o.title = name; o.href = new URL(href).pathname; }

@@ -50,6 +50,7 @@
     recent: store.get("recent", []),
     seen: store.get("seen", {}),
     hist: store.get("hist", []),
+    menu: store.get("menu", []),
     guide: Object.assign({ ck: {}, done: {} }, store.get("guide", {})),
     tab: "accueil",
     stacks: { accueil: ["#/"], rayons: ["#/rayons"], recherche: ["#/recherche"], listes: ["#/listes"], panier: ["#/panier"] },
@@ -1195,12 +1196,13 @@
     if (exact.length) rel = exact;
     const inRay = rel.filter((p) => { const rw = rayWords(p.r); return toks.some((t) => rw.has(t)); });
     if (inRay.length) rel = inRay;
-    const sco = new Map(sc.map((x) => [x[1], x[0]])), top = Math.max(...rel.map((p) => sco.get(p)));
-    rel = rel.filter((p) => sco.get(p) >= top - 1.5);
-    const avail = rel.filter((p) => pb(p));
-    out.cands = (avail.length ? avail : rel).slice(0, 60).map((p) => p.id);
-    out.avail = avail.length;
-    if (!avail.length) return out;
+    /* d'abord ce qui est vendu par tes enseignes, puis les résultats les plus pertinents parmi ceux-là */
+    const sco = new Map(sc.map((x) => [x[1], x[0]])), sold = rel.filter((p) => pb(p));
+    out.cands = (sold.length ? sold : rel).slice(0, 60).map((p) => p.id);
+    out.avail = sold.length;
+    if (!sold.length) return out;
+    const top = Math.max(...sold.map((p) => sco.get(p)));
+    const avail = sold.filter((p) => sco.get(p) >= top - 1.5);
     const sz = (p) => (p.qty && p.qty.v) || 0;
     /* la variante la plus simple : « coca » est un Coca-Cola, pas un Coca-Cola Cherry, sauf si on l'a écrit */
     const qs = new Set(toks);
@@ -1314,7 +1316,7 @@
   /* Même rayon, même nombre d'unités, contenance à 20 % près et mêmes caractéristiques (variété, forme, parfum, sans
      sucres, eau minérale ou de source, lait frais ou UHT, bio...) : seule la marque change. Comparé sur les prix
      relevés, jamais sur un prix simulé. */
-  const VARIANT = new Set("zero light sucre stevia max cherry vanille citron fraise peche menthe framboise mangue pamplemousse grenade cerise aromatisee decafeine decaf bio lactose croissance vitamine omega chocolat pepite nappee noisette amande caramel gluten complete integrale magnesium humide sensitive hypoallergenique couleur noir marseille brebi chevre soja coco vegetal grec grecque bifidu calcium".split(" ").map(stem));
+  const VARIANT = new Set("zero light sucre stevia max cherry vanille citron fraise peche menthe framboise mangue pamplemousse grenade cerise aromatisee decafeine decaf bio lactose croissance vitamine omega chocolat pepite nappee noisette amande caramel gluten complete integrale magnesium humide sensitive hypoallergenique couleur noir marseille brebi chevre soja coco vegetal grec grecque bifidu calcium graine melange isio friture roux cassonade canne morceau fluide sarrasin mais pois".split(" ").map(stem));
   const ATTR = new Set(("gazeuse petillante bulle plate aromatisee citron fraise peche menthe framboise mangue pamplemousse grenade cerise vanille " +
     "zero light sucre stevia max cherry pulpe concentre presse orange sanguine multifruit agrume " +
     "bio lactose entier ecreme demi croissance vitamine omega montagne microfiltre " +
@@ -1323,7 +1325,7 @@
     "spaghetti spaghettini penne fusilli coquillette farfalle tagliatelle macaroni torsade lasagne linguine rigatoni tortiglioni conchiglie " +
     "ravioli gnocchi vermicelle cheveux papillon nouille orzo fettuccine mezze tortellini cannelloni pipe perle " +
     "complete integrale gluten fraiche oeuf epeautre lentille chiche " +
-    "huile olive tomate piment arete tournesol colza beurre minerale source magnesium sport frai uht sterilise pur nectar " +
+    "huile olive tomate piment arete tournesol colza beurre minerale source magnesium sport frai uht sterilise pur nectar graine melange isio friture roux cassonade canne morceau fluide sarrasin mais pois pelee concassee coulis pulpe naturel albacore listao miette demi sel plein air sol basmati thai long parfume complet rond " +
     "decafeine decaf arabica robusta intense corse doux " +
     "madeleine quatre quart brownie cookie financier marbre cake moelleux crepe gaufre sable galette palmier biscuit " +
     "chocolat pepite nappee noisette amande caramel " +
@@ -1644,7 +1646,7 @@
     return {
       title: "Repas à petit prix", grouped: true,
       html: `<h1 class="lt">Repas à petit prix</h1><p class="lt-sub">Le coût de chaque portion, au meilleur prix relevé de chaque ingrédient.</p>` +
-        grp("plat", "Plats") + grp("dessert", "Desserts et goûters") +
+        menuHtml() + grp("plat", "Plats") + grp("dessert", "Desserts et goûters") +
         `<p class="gf">Le coût compte la quantité utilisée de chaque produit. Les courses à faire, en paquets entiers, coûtent un peu plus, et il en restera pour une autre fois. Le sel, les épices et la levure ne sont pas comptés.</p>`,
     };
   };
@@ -1663,12 +1665,40 @@
         `<div class="sum rsum"><p class="sl">${c.miss.length ? "Coût des ingrédients comparés" : "Par portion"}</p><div class="st">${px(c.miss.length ? c.used : c.per)}</div>` +
         `<p class="sn">${c.miss.length ? `Pour ${plural(P, "portion", "portions")}, sans ${esc(joinEt(c.miss.map((x) => x.g.q)))}, pas encore dans Cabas.` : `${eur(c.used)} pour ${plural(P, "portion", "portions")}. Les courses, en paquets entiers, font ${eur(c.buy)}\u00a0: il en restera pour une autre fois.`}</p>` +
         `<p class="segl">Portions</p><div class="seg" role="group" aria-label="Nombre de portions">${[2, 4, 6, 8].map((v) => `<button type="button" data-act="recp" data-id="${esc(rc.id)}" data-v="${v}" aria-pressed="${v === P}">${v}</button>`).join("")}</div>` +
-        `<div class="btns" style="margin-top:14px"><button class="btn" type="button" data-act="recadd" data-id="${esc(rc.id)}">${ic("plus")}Ajouter les ingrédients au panier</button></div></div>` +
+        `<div class="btns two" style="margin-top:14px"><button class="btn" type="button" data-act="recadd" data-id="${esc(rc.id)}">${ic("plus")}Au panier</button><button class="btn tint" type="button" data-act="menuput" data-id="${esc(rc.id)}">${S.menu.some((m) => m.id === rc.id) ? "Dans ma semaine" : "Ajouter à ma semaine"}</button></div></div>` +
         `<h2 class="gh">Ingrédients</h2><div class="group">${c.lines.map(line).join("")}${rc.placard ? `<div class="row"><span class="rt">Du placard<small>${esc(rc.placard)}, pas comptés</small></span></div>` : ""}</div>` +
         `<p class="gf">Chaque produit est le moins cher au kilo, au litre ou à la pièce dans tes enseignes, selon les prix relevés. Touche-le pour en voir d'autres.</p>` +
         `<h2 class="gh">Préparation</h2><div class="group" style="padding:14px 0 6px"><ol class="steps">${rc.steps.map((s) => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>`,
     };
   };
+  /* Ma semaine : plusieurs recettes, les ingrédients mis en commun (les œufs de trois recettes font une boîte) */
+  const saveMenu = () => store.set("menu", S.menu);
+  const menuRecs = () => S.menu.map((m) => { const rc = (S.recs || []).find((x) => x.id === m.id); return rc ? { rc, portions: m.portions || rc.portions } : null; }).filter(Boolean);
+  function menuCost() {
+    const need = new Map();
+    for (const { rc, portions } of menuRecs()) {
+      const k = portions / rc.portions;
+      for (const g of rc.ing) { const x = need.get(g.q) || { q: g.q, u: g.u, need: 0 }; x.need += g.need * k; need.set(g.q, x); }
+    }
+    const lines = [...need.values()].map((g) => recIng({ q: g.q, u: g.u, need: g.need, t: g.q }, 1));
+    const ok = lines.filter((x) => x.p), miss = lines.filter((x) => !x.p);
+    const portions = menuRecs().reduce((a, x) => a + x.portions, 0);
+    return { lines, ok, miss, used: ok.reduce((a, x) => a + x.used, 0), buy: ok.reduce((a, x) => a + x.buy, 0), portions };
+  }
+  function menuItems() {
+    const items = {};
+    menuCost().ok.forEach((x) => { items[x.p.id] = Math.min(99, (items[x.p.id] || 0) + x.n); });
+    return items;
+  }
+  function menuHtml() {
+    const rs = menuRecs();
+    if (!rs.length) return `<h2 class="gh">Ma semaine</h2><div class="group"><div class="row"><span class="rt">Aucun repas choisi<small>Ouvre une recette et touche «\u00a0Ajouter à ma semaine\u00a0»\u00a0: les ingrédients sont mis en commun.</small></span></div></div>`;
+    const c = menuCost();
+    return `<h2 class="gh">Ma semaine</h2><div class="sum rsum"><p class="sl">${plural(rs.length, "repas", "repas")}, ${plural(c.portions, "portion", "portions")}</p><div class="st">${px(c.used)}</div>` +
+      `<p class="sn">${c.miss.length ? `Sans ${esc(joinEt(c.miss.map((x) => x.g.q)))}, pas encore dans Cabas. ` : ""}Les courses, en paquets entiers, font ${eur(c.buy)}\u00a0: les ingrédients communs ne sont achetés qu'une fois.</p>` +
+      `<div class="btns" style="margin-top:14px"><button class="btn" type="button" data-act="menuadd">${ic("plus")}Ajouter les courses de la semaine au panier</button></div></div>` +
+      `<div class="group" style="margin-top:12px">${rs.map(({ rc, portions }) => `<div class="row"><a class="rt" href="#/repas/${esc(rc.id)}" style="text-decoration:none">${esc(rc.name)}<small>${plural(portions, "portion", "portions")}</small></a><button class="icbtn" type="button" data-act="menudel" data-id="${esc(rc.id)}" aria-label="Retirer ${esc(rc.name)}">${ic("x")}</button></div>`).join("")}</div>`;
+  }
   function recItems(id) {
     const rc = (S.recs || []).find((x) => x.id === id);
     if (!rc) return {};
@@ -2061,7 +2091,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); break;
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.guide = { ck: {}, done: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -2070,6 +2100,14 @@
       case "scansearch": { S.q = t.dataset.q || ""; addRecent(S.q); S.shown.s = 0; switchTab("recherche"); break; }
       /* repas */
       case "recp": S.recP = Object.assign({}, S.recP, { [id]: +t.dataset.v }); rerender(); break;
+      case "menuput": {
+        const rc = (S.recs || []).find((x) => x.id === id); if (!rc) break;
+        const P = (S.recP && S.recP[id]) || rc.portions, i = S.menu.findIndex((m) => m.id === id);
+        if (i >= 0) S.menu[i].portions = P; else S.menu.push({ id, portions: P });
+        saveMenu(); rerender(); toast(i >= 0 ? "Portions mises à jour" : "Ajouté à ma semaine", { label: "Voir", run: () => push("#/repas") }); break;
+      }
+      case "menudel": S.menu = S.menu.filter((m) => m.id !== id); saveMenu(); rerender(); break;
+      case "menuadd": { const n = addItems(menuItems(), false); renderChrome(); bumpBadge(); toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier", { label: "Voir", run: () => switchTab("panier") }); break; }
       case "recadd": {
         const n = addItems(recItems(id), false);
         renderChrome(); bumpBadge();

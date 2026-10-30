@@ -46,7 +46,7 @@ def hors_rayon(ray, label):
 
 def parse_oeufs(text):
     t = ' ' + key(text) + ' '
-    m = re.search(r'(\d+)\s*(?:gros |moyens |extra |frais )?oeufs', t) or re.search(r'(?:boite|plateau|lot|etui) de\s*(\d+)', t) or re.search(r'\bx\s*(\d+)\b', t)
+    m = re.search(r'(\d+)\s*(?:gros |moyens |extra |frais )?oeufs', t) or re.search(r'(?:boite|plateau|lot|etui) de\s*(\d+)', t) or re.search(r'(\d+)\s*(?:pieces?|pcs|unites?)\b', t) or re.search(r'\bx\s*(\d+)\b', t)
     n = int(m.group(1)) if m else None
     return n if n and 2 <= n <= 60 else None
 
