@@ -605,6 +605,11 @@ body.grouped .empty .art { background: var(--card); }
 .sk { border-radius: 14px; background: var(--shelf); aspect-ratio: 1 / 1; }
 .skl { height: 12px; border-radius: 6px; background: var(--shelf); margin-top: 10px; }
 .skl.s { width: 60%; }
+/* rangée des repas en attendant leurs prix : mêmes hauteurs que les cartes réelles */
+.rcard .skl { background: var(--card); margin: 0; }
+.rcard b.skl { height: 19px; min-height: 19px; width: 82%; margin: 2px 0 17px; }
+.rcard .rp.skl { height: 14px; margin: 3px 0; }
+.rcard small.skl { height: 11px; margin: 2px 0 1px; width: 70%; }
 @media (prefers-reduced-motion: no-preference) { .sk, .skl { animation: pulse 1.3s ease-in-out infinite; } @keyframes pulse { 50% { opacity: 0.55; } } }
 .prose { padding: 0 calc(var(--g) + 4px); font-size: 15px; line-height: 21px; color: var(--ink); letter-spacing: -0.01em; display: grid; gap: 10px; }
 .prose p { color: var(--ink-2); }

@@ -1803,7 +1803,9 @@
   function recRail() {
     if (recsReady() || !(S.recs || []).length) return recRailHtml();
     if (!recTimer) recTimer = setTimeout(() => { recTimer = 0; recs(); const el = $("#recrail"); if (el) el.outerHTML = recRailHtml(); }, 0);
-    return `<div id="recrail"></div>`;
+    /* en attendant, une rangée de la même hauteur : rien ne saute quand les prix arrivent */
+    const sk = `<a class="rcard" aria-hidden="true"><div class="stack"><span></span><span></span><span></span></div><b class="skl"></b><span class="rp skl s"></span><small class="skl s"></small></a>`;
+    return `<div id="recrail"><div class="sh"><h2>Repas à petit prix</h2><a href="#/repas">Tout voir</a></div><div class="rail rails">${sk.repeat(4)}</div></div>`;
   }
   VIEWS.repas = () => {
     const all = recs(), row = (rc) => {
