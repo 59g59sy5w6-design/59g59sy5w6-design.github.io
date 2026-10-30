@@ -185,6 +185,25 @@ const STORE = {
 let STORES = {};
 const brandOf = (retailer) => (STORES[retailer] && STORES[retailer].enseigne) || retailer.split("-")[0];
 
+// Page d'un rayon trouvée depuis la page d'un grand rayon (réglage « from » et « find » de tools/sources.json) : on suit,
+// étape par étape, le premier lien du catalogue dont le texte correspond ; l'adresse trouvée est notée pour build.py.
+const plain = (t) => String(t || "").toLowerCase().replace(/œ/g, "oe").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+async function discover(page, src) {
+  let url = src.from;
+  for (const step of [].concat(src.find)) {
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.waitForTimeout(2000);
+    const re = new RegExp(step, "i");
+    const links = await page.evaluate(() => [...document.querySelectorAll("a[href*='/catalogue/']")].map((a) => ({ href: a.href, text: (a.textContent || "").replace(/\s+/g, " ").trim() })));
+    const hit = links.find((l) => l.text && re.test(l.text.toLowerCase().replace(/œ/g, "oe").normalize("NFD").replace(/[\u0300-\u036f]/g, "")));
+    if (!hit) throw new Error(`aucun lien « ${step} » sur ${url}`);
+    url = hit.href;
+    console.log(`${src.retailer} ${src.rayon} : « ${hit.text} » ${url}`);
+  }
+  const m = /-(B\d+)-\d+\.html/.exec(url);
+  return { url, match: m ? m[1] : url };
+}
+
 async function readPage(page, src) {
   const res = await page.goto(src.url, { waitUntil: "domcontentloaded", timeout: 45000 });
   const status = res ? res.status() : 0;
@@ -220,8 +239,13 @@ async function readPage(page, src) {
   let current = null;
   STORES = conf.magasins || {};
   const queue = sources.map((s) => ({ ...s }));
+  const discovered = [];
   while (queue.length) {
     const src = queue.shift();
+    if (src.from && !src.url) {
+      try { Object.assign(src, await discover(page, src)); discovered.push({ retailer: src.retailer, rayon: src.rayon, host: src.host, match: src.match, url: src.url, prompt: src.prompt || "" }); }
+      catch (e) { summary.push({ retailer: src.retailer, rayon: src.rayon, url: src.from, status: 0, products: 0, error: String(e.message || e).split("\n")[0] }); console.log(`${src.retailer} ${src.rayon} : ${String(e.message || e).split("\n")[0]}`); continue; }
+    }
     const key = STORES[src.retailer] ? src.url : src.url.split("?")[0];
     if (done.has(key)) continue;
     done.add(key);
@@ -258,6 +282,7 @@ async function readPage(page, src) {
   }
   await browser.close();
   fs.writeFileSync(path.join(WORK, "fetches.json"), JSON.stringify(rows));
+  fs.writeFileSync(path.join(WORK, "discovered.json"), JSON.stringify(discovered, null, 1));
   fs.writeFileSync(path.join(WORK, "scrape.json"), JSON.stringify(summary, null, 1));
   const by = {};
   for (const s of summary) { by[s.retailer] = by[s.retailer] || { pages: 0, lues: 0, produits: 0 }; by[s.retailer].pages++; if (s.products) by[s.retailer].lues++; by[s.retailer].produits += s.products; }

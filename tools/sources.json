@@ -1456,6 +1456,104 @@
    "match": "text=sucre#livraison-paris14",
    "url": "https://www.auchan.fr/recherche?text=sucre#livraison-paris14",
    "prompt": ""
+  },
+  {
+   "retailer": "houra",
+   "rayon": "oeufs",
+   "host": "houra.fr",
+   "match": "",
+   "url": "",
+   "from": "https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html",
+   "find": [
+    "^oeufs?( |$)"
+   ],
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "beurre",
+   "host": "houra.fr",
+   "match": "",
+   "url": "",
+   "from": "https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html",
+   "find": [
+    "^beurre"
+   ],
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "riz",
+   "host": "houra.fr",
+   "match": "",
+   "url": "",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "^riz|riz,|riz et|feculent|riz, pates"
+   ],
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "huile",
+   "host": "houra.fr",
+   "match": "",
+   "url": "",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "^huiles?( |,|$)|huile et|huiles,"
+   ],
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "tomates",
+   "host": "houra.fr",
+   "match": "",
+   "url": "",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "conserves? de legumes|^legumes en conserve|^conserves?( |$)",
+    "tomate"
+   ],
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "thon",
+   "host": "houra.fr",
+   "match": "",
+   "url": "",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "conserves? de poisson|poissons? en conserve|^conserves?( |$)",
+    "thon"
+   ],
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "farine",
+   "host": "houra.fr",
+   "match": "",
+   "url": "",
+   "from": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "find": [
+    "^farines?|farine,|farines,|aide.*patisserie|patisserie"
+   ],
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sucre",
+   "host": "houra.fr",
+   "match": "",
+   "url": "",
+   "from": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "find": [
+    "^sucres?( |,|$)|sucre et|sucres,"
+   ],
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
   }
  ],
  "robot": {

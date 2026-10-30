@@ -115,7 +115,11 @@ def route(url):
     """Enseigne et rayon d'une page relue (y compris ses pages suivantes), ou None."""
     global _SOURCES
     if _SOURCES is None:
-        _SOURCES = load_sources()["pages"]
+        _SOURCES = [p for p in load_sources()["pages"] if p.get("url")]
+        # pages trouvées par le robot depuis la page d'un grand rayon (réglage « from » de tools/sources.json)
+        found = os.path.join(WORK, "discovered.json")
+        if os.path.exists(found):
+            _SOURCES += [p for p in json.load(open(found, encoding="utf-8")) if p.get("url")]
     for p in _SOURCES:
         if p["url"] == url:
             return p["retailer"], p["rayon"]
