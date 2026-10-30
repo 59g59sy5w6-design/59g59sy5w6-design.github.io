@@ -20,6 +20,8 @@
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="stylesheet" href="app.css">
+<script>/* premier passage, sans service worker : les prix se téléchargent pendant que l'appli se charge */
+if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) { const l = document.createElement("link"); l.rel = "preload"; l.as = "fetch"; l.href = "data/catalog.json"; l.crossOrigin = "anonymous"; document.head.appendChild(l); }</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -73,7 +75,6 @@
 <noscript><p style="padding:80px 24px;text-align:center">Cabas a besoin de JavaScript pour fonctionner.</p></noscript>
 
 <script src="packs.js"></script>
-<script src="scan.js"></script>
 <script src="optimizer.js"></script>
 <script src="app.js"></script>
 </body>

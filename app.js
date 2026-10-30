@@ -7,7 +7,17 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/œ/g, "oe").replace(/æ/g, "ae").replace(/[^a-z0-9]+/g, " ").trim();
+  /* texte sans accents ni ponctuation ; le résultat est gardé, car marques, formats et noms de rayons reviennent des milliers de fois au chargement */
+  const NORMC = new Map();
+  const norm = (s) => {
+    s = String(s || "");
+    let v = NORMC.get(s);
+    if (v === undefined) {
+      v = s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/œ/g, "oe").replace(/æ/g, "ae").replace(/[^a-z0-9]+/g, " ").trim();
+      if (NORMC.size < 20000) NORMC.set(s, v);
+    }
+    return v;
+  };
   const NB = " ";
   const eur = (v) => (Math.round(v * 100) / 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + NB + "€";
   const eurC = (c) => eur(c / 100);
@@ -162,8 +172,10 @@
     S._sug = null;
   }
 
-  async function load() {
-    const get = (u) => fetch(u, { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
+  /* à l'ouverture, les prix viennent du cache (sw.js les sert tout de suite et les revérifie derrière) ; pour une
+     vérification (fresh), le réseau d'abord */
+  async function load(fresh) {
+    const get = (u) => fetch(fresh ? u + "?fresh=1" : u, { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); });
     const [c, r, m, st, rc] = await Promise.all([get("data/catalog.json"), get("data/retailers.json"), get("data/meta.json"), get("data/status.json").catch(() => null), get("data/recettes.json").catch(() => null)]);
     S.recs = (rc && rc.recettes) || [];
     S.status = st || {};
@@ -211,10 +223,13 @@
     for (const p of S.list) {
       p._b = norm(p.brand);
       p._w = (p._b + " " + norm(p.name) + " " + norm(p.format) + " " + norm(rn.get(p.r)) + " " + norm((p.tags || []).join(" "))).split(" ").filter(Boolean);
+      p._s = p._w.map(stem);
+      p._sw = p._aw = null;
     }
   }
 
   /* ---------- recherche ---------- */
+  /* racine d'un mot (sans pluriel) ; calculée une fois par produit au chargement (p._s), pas à chaque recherche */
   const stem = (w) => (w.length > 3 ? w.replace(/(x|s)$/, "") : w);
   const SYN = { pq: ["papier", "toilette"], coca: ["coca"], sopalin: ["essuie"], yaourt: ["yaourt"], yoghourt: ["yaourt"], yogourt: ["yaourt"], cafe: ["cafe"], emmenthal: ["emmental"], parmesan: ["parmigiano"] };
   const search = (q) => searchScored(q).map((x) => x[1]);
@@ -227,8 +242,10 @@
       let score = 0, ok = true;
       for (const t of toks) {
         let b = 0;
-        for (const w of p._w) {
-          if (w === t || stem(w) === t) { b = 3; break; }
+        const W = p._w, Sx = p._s;
+        for (let i = 0; i < W.length; i++) {
+          const w = W[i];
+          if (w === t || Sx[i] === t) { b = 3; break; }
           if (w.startsWith(t)) b = Math.max(b, 2);
           else if (t.length >= 4 && w.includes(t)) b = Math.max(b, 1);
         }
@@ -510,8 +527,10 @@
     if (has((p) => p.type === "mdd")) s += `<button class="chip" type="button" data-act="quick" data-q="mdd" data-k="${esc(key)}" aria-pressed="${f.type === "mdd"}">Marques distributeur</button>`;
     return s + "</div>";
   }
+  /* grille chargée par étapes de 16 produits (deux colonnes, huit rangées) quand on descend : le premier affichage
+     d'un rayon ne dessine pas ses 150 produits */
   function lazyGrid(key, items, step) {
-    step = step || 24;
+    step = step || 16;
     S.lazy[key] = items;
     const n = Math.min(items.length, Math.max(step, S.shown[key] || step));
     S.shown[key] = n;
@@ -532,7 +551,7 @@
         S.shown[key] = n1;
         if (n1 >= items.length) { lazyObs.unobserve(en.target); en.target.remove(); }
       }
-    }, { rootMargin: "900px 0px" });
+    }, { rootMargin: "600px 0px" });
     sentinels.forEach((s) => lazyObs.observe(s));
   }
   const emptyArt = (n) => `<div class="art">${ic(n)}</div>`;
@@ -1177,7 +1196,7 @@
     return (p._sw = st);
   }
   /* tous les mots, ingrédients compris (« thon au naturel », « sardines à l'huile ») */
-  const allW = (p) => p._aw || (p._aw = new Set(p._w.map(stem)));
+  const allW = (p) => p._aw || (p._aw = new Set(p._s));
   const RW = {};
   const rayWords = (r) => RW[r] || (RW[r] = new Set(norm((rayon(r) || {}).name).split(" ").filter(Boolean).map(stem)));
   const qToks = (q) => norm(q).split(" ").filter(Boolean).flatMap((t) => SYN[t] || [t]).map(stem);
@@ -1733,8 +1752,18 @@
   /* data/recettes.json : recettes simples. Chaque ingrédient est choisi comme une ligne de « Ma liste » (variante
      simple, format courant, le moins cher au kilo, au litre ou à la pièce), sur les prix relevés seulement, puis
      compté pour la quantité utilisée. Les ingrédients du placard (sel, épices) ne sont pas comptés. */
+  /* le même ingrédient (« oeufs », « farine ») revient dans plusieurs recettes : cherché une fois par relevé et par réglage d'enseignes */
+  const recKey = () => JSON.stringify([S.rets.map((r) => r.id), S.prefs.off, S.meta.updatedAt, S.list.length]);
+  let RECM = null;
+  function recMatch(q) {
+    const key = recKey();
+    if (!RECM || RECM.key !== key) RECM = { key, map: new Map() };
+    let m = RECM.map.get(q);
+    if (!m) { m = matchLine({ raw: q, q: norm(q).split(" ").filter((t) => t && !STOP.has(t)).join(" "), n: 1, real: true }); RECM.map.set(q, m); }
+    return m;
+  }
   function recIng(g, k) {
-    const m = matchLine({ raw: g.q, q: norm(g.q).split(" ").filter((t) => t && !STOP.has(t)).join(" "), n: 1, real: true });
+    const m = recMatch(g.q);
     const need = g.need * k;
     if (!m.pick) return { g, need, p: null, off: m.cands.length > 0 };
     const p = S.prods.get(m.pick), b = bestReal(p), v = (p.qty && p.qty.v) || 0;
@@ -1752,7 +1781,7 @@
   }
   /* coût de chaque recette pour les portions prévues, recalculé quand les enseignes ou le catalogue changent */
   function recs() {
-    const key = JSON.stringify([S.rets.map((r) => r.id), S.prefs.off, S.meta.updatedAt, S.list.length]);
+    const key = recKey();
     if (S._recs && S._recs.key === key) return S._recs.list;
     const list = (S.recs || []).map((rc) => Object.assign({ c: recCost(rc) }, rc)).sort((a, b) => a.c.miss.length - b.c.miss.length || a.c.per - b.c.per);
     S._recs = { key, list };
@@ -1763,9 +1792,18 @@
     const c = rc.c, pics = c.ok.slice(0, 4).map((x) => `<span>${img(x.p, 44)}</span>`).join("");
     return `<a class="rcard" href="#/repas/${esc(rc.id)}"><div class="stack">${pics}</div><b>${esc(rc.name)}</b><span class="rp">${c.miss.length ? "Prix partiel" : eur(c.per) + " par portion"}</span><small>${plural(rc.portions, "portion", "portions")}, ${rc.minutes}${NB}min</small></a>`;
   }
-  function recRail() {
+  const recsReady = () => !!(S._recs && S._recs.key === recKey());
+  function recRailHtml() {
     const rs = recs().filter((rc) => !rc.c.miss.length).slice(0, 8);
     return rs.length ? `<div class="sh"><h2>Repas à petit prix</h2><a href="#/repas">Tout voir</a></div><div class="rail rails">${rs.map(recCard).join("")}</div>` : "";
+  }
+  /* sur l'accueil, le coût des repas (chaque ingrédient cherché dans le catalogue) se calcule juste après le premier
+     affichage, pour ne pas le retarder ; la rangée prend sa place dès que c'est prêt */
+  let recTimer = 0;
+  function recRail() {
+    if (recsReady() || !(S.recs || []).length) return recRailHtml();
+    if (!recTimer) recTimer = setTimeout(() => { recTimer = 0; recs(); const el = $("#recrail"); if (el) el.outerHTML = recRailHtml(); }, 0);
+    return `<div id="recrail"></div>`;
   }
   VIEWS.repas = () => {
     const all = recs(), row = (rc) => {
@@ -1949,9 +1987,17 @@
     if (st) st.textContent = SC.note;
   }
   function scanNote(t) { SC.note = t; const st = $("#scst"); if (st) st.textContent = t; }
+  /* le décodeur (scan.js) ne se charge qu'à l'ouverture du scanner ; il est dans le cache hors ligne */
+  let scanP = null;
+  function ensureScan() {
+    if (window.Scan) return Promise.resolve();
+    if (!scanP) scanP = new Promise((ok, ko) => { const s = document.createElement("script"); s.src = "scan.js"; s.onload = ok; s.onerror = () => { scanP = null; ko(new Error("scan.js")); }; document.head.appendChild(s); });
+    return scanP;
+  }
   async function startScan() {
     const v = $("#scv");
     if (!v || SC.stream) return;
+    try { await ensureScan(); } catch (e) { scanNote("Le lecteur de codes-barres n'a pas pu se charger\u00a0: tape le code sous le code-barres."); return; }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { scanNote("Pas de caméra sur cet appareil\u00a0: tape le code sous le code-barres."); return; }
     try {
       SC.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
@@ -2228,7 +2274,7 @@
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
-      case "scantypeok": { const v = (($("#eanIn") || {}).value || "").replace(/\D/g, ""); if (!Scan.valid(v)) { toast("Un code-barres a 13 chiffres, ou 8"); break; } closeSheet(); if (S.route.name !== "scan") push("#/scan"); onCode(v); break; }
+      case "scantypeok": { const v = (($("#eanIn") || {}).value || "").replace(/\D/g, ""); ensureScan().then(() => { if (!Scan.valid(v)) { toast("Un code-barres a 13 chiffres, ou 8"); return; } closeSheet(); if (S.route.name !== "scan") push("#/scan"); onCode(v); }, () => toast("Le lecteur de codes-barres n'a pas pu se charger")); break; }
       case "scanclear": SC.items = []; SC.last = ""; scanRender(); break;
       case "scansearch": { S.q = t.dataset.q || ""; addRecent(S.q); S.shown.s = 0; switchTab("recherche"); break; }
       /* repas */
@@ -2406,11 +2452,11 @@
     if (!S.ready || refreshing) return;
     refreshing = true;
     try {
-      const st = await fetch("data/status.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null));
+      const st = await fetch("data/status.json?fresh=1", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null));
       S.lastCheckFetch = Date.now();
       if (st && JSON.stringify(st) !== JSON.stringify(S.status)) {
-        const m = await fetch("data/meta.json", { cache: "no-cache" }).then((r) => r.json());
-        if (JSON.stringify(m) !== JSON.stringify(S.meta)) await load(); else S.status = st;
+        const m = await fetch("data/meta.json?fresh=1", { cache: "no-cache" }).then((r) => r.json());
+        if (JSON.stringify(m) !== JSON.stringify(S.meta)) await load(true); else S.status = st;
         const typing = document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
         if ($("#sheet").hidden && !typing) rerender();
       }
@@ -2443,5 +2489,13 @@
     let had = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.addEventListener("controllerchange", () => { if (!had) { had = true; return; } toast("Une nouvelle version de Cabas est prête.", { label: "Recharger", run: () => location.reload() }); });
     window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => { /* hors ligne indisponible, l'appli marche quand même */ }); });
+    /* sw.js a servi les prix du cache et en a trouvé de plus récents : on les prend */
+    let dataT = 0;
+    const kick = () => { if (!S.ready) { dataT = setTimeout(kick, 1000); return; } dataT = 0; refreshData(); };
+    navigator.serviceWorker.addEventListener("message", (e) => {
+      if (!e.data || e.data.type !== "data") return;
+      if (/history/.test(e.data.path)) { histP = null; HIST = null; }
+      clearTimeout(dataT); dataT = setTimeout(kick, 400);
+    });
   }
 })();
