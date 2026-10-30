@@ -1554,6 +1554,102 @@
     "^sucres?( |,|$)|sucre et|sucres,"
    ],
    "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20concass%C3%A9es",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20concass%C3%A9es#alesia",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20concass%C3%A9es#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20concass%C3%A9es#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20concass%C3%A9es#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=tomates%20concass%C3%A9es#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#livraison-paris14",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=coulis%20de%20tomates",
+   "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-alesia",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=coulis%20de%20tomates#alesia",
+   "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#alesia",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=coulis%20de%20tomates#bellesfeuilles",
+   "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#bellesfeuilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=coulis%20de%20tomates#livraison-perreux",
+   "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#livraison-perreux",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris16",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=coulis%20de%20tomates#livraison-paris16",
+   "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#livraison-paris16",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan-livraison-paris14",
+   "rayon": "tomates",
+   "host": "auchan.fr",
+   "match": "text=coulis%20de%20tomates#livraison-paris14",
+   "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#livraison-paris14",
+   "prompt": ""
   }
  ],
  "robot": {

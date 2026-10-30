@@ -28,7 +28,7 @@ RAYON_FILTRE = {
     'beurre': (r'\bbeurre\b', r'cacahu|biscuit|sable|cookie|galette|croissant|brioche|madeleine|pain|gateau|sauce|escargot|crepe|palet|caramel|karite|cacao|amande|noisette|pomme de terre|ail|fines herbes|persil'),
     'riz': (r'\briz\b', r'galette|souffle|dessert|au lait|gateau|boisson|vinaigre|feuille|nouille|cake|creme|pudding|semoule|salade|vermicelle|papier|farine|cuisine|plat|poelee|cantonais|paella|risotto prepare|biscuit|chips|crackers|tortilla'),
     'huile': (r'\bhuile\b', r'essentielle|massage|solaire|corps|cheveux|bebe|moteur|thon|sardine|maquereau|anchois|olives |aux olives|piment|spray|vaporisateur|lampe|parfum|seche|tomates sechees|artichaut|poivron|champignon'),
-    'tomates': (r'\btomates?\b', r'ketchup|sauce|soupe|sechee|cerise|chips|thon|sardine|maquereau|jus|ravioli|pizza|farcie|gaspacho|mozzarella|tartin|plat|riz|pates|lasagne|graine|plant|semence'),
+    'tomates': (r'\btomates?\b', r'ketchup|sauce|soupe|sechee|cerise|chips|thon|sardine|maquereau|jus de tomate|ravioli|pizza|farcie|gaspacho|mozzarella|tartin|plat|riz|pates|lasagne|graine|plant|semence|grappe|ronde|vrac|barquette|fraiche|coeur de boeuf|roma|cocktail|allongee|ancienne|olivette|cornue'),
     'thon': (r'\bthon\b', r'rillette|salade|pate |pates|tartin|sauce|pizza|sandwich|croquette|chat|chien|terrine|mousse|tomate|crudites|paella|wrap|bouchee|quiche|pain'),
     'farine': (r'\bfarine\b', r'bebe|lait|pain d epice|prete|gateau|biscuit|preparation|cereale|bouillie|croquette|chien|chat'),
     'sucre': (r'\bsucres?\b', r'sans sucre|bonbon|confiserie|sucre d orge|sucette|chewing|biscuit|gateau|madeleine|crepe|gaufre|chocolat|confiture|sirop|dragee|barbe|caramel|soda|boisson|the |cafe|compote|cereale|yaourt|chantilly|perles de sucre|decor|vermicelle'),
