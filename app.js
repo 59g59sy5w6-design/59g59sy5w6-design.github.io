@@ -558,6 +558,7 @@
         savingsCard() +
         installCard() +
         dropsRail() +
+        dueRail() +
         habitsRail() +
         promosRail() +
         (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals">${ds.map(dealCard).join("")}</div>` : "") +
@@ -1565,6 +1566,26 @@
   function promosRail() {
     const ps = S.list.filter((p) => { const b = best(p); return b && b.promo && !b.sim; }).map((p) => { const os = offers(p, true); return { p, gap: os.length > 1 ? os[os.length - 1].price - os[0].price : 0 }; }).sort((a, b) => b.gap - a.gap).slice(0, 12).map((x) => x.p);
     return ps.length ? `<div class="sh"><h2>Offres en cours</h2></div><div class="rail">${ps.map(card).join("")}</div>` : "";
+  }
+  /* produits achetés à intervalle régulier dont le prochain achat approche (au moins deux paniers, écart médian) */
+  function dueSoon(n) {
+    const seen = new Map();
+    for (const h of (S.hist || []).filter((x) => x.items)) for (const id of Object.keys(h.items)) { if (!seen.has(id)) seen.set(id, []); seen.get(id).push(h.d); }
+    const today = Date.parse(isoDay(new Date())), out = [];
+    for (const [id, ds] of seen) {
+      if (ds.length < 2 || !S.prods.has(id) || S.basket[id] || !best(S.prods.get(id))) continue;
+      const t = [...new Set(ds)].sort().map(Date.parse);
+      if (t.length < 2) continue;
+      const gaps = t.slice(1).map((x, i) => x - t[i]).sort((a, b) => a - b), med = gaps[Math.floor(gaps.length / 2)];
+      if (med < 2 * 864e5) continue;
+      const due = t[t.length - 1] + med;
+      if (today >= due - med * 0.15) out.push({ p: S.prods.get(id), days: Math.round((due - today) / 864e5) });
+    }
+    return out.sort((a, b) => a.days - b.days).slice(0, n);
+  }
+  function dueRail() {
+    const ds = dueSoon(10);
+    return ds.length ? `<div class="sh"><h2>À racheter bientôt</h2></div><div class="rail">${ds.map((d) => card(d.p)).join("")}</div>` : "";
   }
   function habitsRail() {
     const ps = habits(10);
