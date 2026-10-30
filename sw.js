@@ -1,8 +1,8 @@
 /* Cabas hors ligne : l'appli et le dernier relevé de prix restent disponibles sans réseau.
    Changer VERSION à chaque mise en ligne pour que les téléphones récupèrent les nouveaux fichiers. */
-const VERSION = "cabas-2026-10-29-21";
+const VERSION = "cabas-2026-10-29-22";
 const FILES = [
-  "./", "index.html", "app.css", "app.js", "packs.js", "optimizer.js", "worker.js", "manifest.webmanifest",
+  "./", "index.html", "app.css", "app.js", "packs.js", "scan.js", "optimizer.js", "worker.js", "manifest.webmanifest",
   "data/catalog.json", "data/retailers.json", "data/meta.json", "data/status.json",
   "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/favicon-32.png",
 ];

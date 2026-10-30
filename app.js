@@ -194,7 +194,7 @@
     /* un produit qui a changé d'identifiant d'un relevé à l'autre est suivi grâce à c.aliases ;
        un produit absent du relevé reste dans le panier et les listes, sans compter, jusqu'à son retour */
     S.alias = c.aliases || {};
-    CATW = null;
+    CATW = null; S.eanMap = null;
     const follow = (o) => {
       let ch = false;
       for (const id of Object.keys(o)) {
@@ -549,7 +549,7 @@
       left: `<button class="loc" type="button" data-act="zip">${ic("pin")}<span>${S.prefs.zip ? "Livraison à " + esc(S.prefs.zip) : "Où te livrer\u00a0?"}</span>${ic("down", "chev")}</button>`,
       right: `<a class="icbtn" href="#/reglages" aria-label="Réglages">${ic("gear")}</a>`,
       html: `<h1 class="lt wordmark"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</h1>` +
-        `<div class="srow"><button class="search" type="button" data-act="gosearch">${ic("search")}<span>Produits, marques</span></button></div>` +
+        `<div class="srow"><button class="search" type="button" data-act="gosearch">${ic("search")}<span>Produits, marques</span></button><a class="icbtn" href="#/scan" aria-label="Scanner un code-barres">${ic("scan")}</a></div>` +
         `<p class="fresh${isStale() ? " old" : ""}">${ic("clock")}<span>${esc(freshText())}${isStale() ? ", ils ont pu changer depuis" : ""}</span></p>` +
         `<a class="wlcta" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>` +
         savingsCard() +
@@ -641,6 +641,7 @@
   }
   VIEWS.recherche = () => ({
     title: "Recherche",
+    right: `<a class="icbtn" href="#/scan" aria-label="Scanner un code-barres">${ic("scan")}</a>`,
     html: `<h1 class="lt">Recherche</h1><div class="srow"><label class="search">${ic("search")}<input id="q" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Produits, marques" value="${esc(S.q)}" aria-label="Rechercher un produit ou une marque"><button type="button" class="clr" data-act="clearq"${S.q ? "" : " hidden"} aria-label="Effacer la recherche">${ic("xc")}</button></label></div><div id="sres">${searchBody()}</div>`,
     mount: () => { mountLazy(); if (S.focusSearch) { S.focusSearch = false; const i = $("#q"); if (i) { i.focus(); } } },
   });
@@ -969,6 +970,7 @@
       case "partage": return { name: "partage", id };
       case "economies": return { name: "economies" };
       case "repas": return id ? { name: "recette", id } : { name: "repas" };
+      case "scan": return { name: "scan" };
       default: return { name: "home" };
     }
   }
@@ -996,6 +998,7 @@
       case "partage": return "Liste partagée";
       case "economies": return "Économies";
       case "repas": return "Repas";
+      case "scan": return "Scanner";
       case "recette": return ((S.recs || []).find((x) => x.id === r.id) || {}).name || "Recette";
     }
     return "Retour";
@@ -1044,6 +1047,7 @@
     const h = location.hash || "#/";
     S.cur = h;
     const r = parse(h);
+    if (S.route.name === "scan" && r.name !== "scan") stopScan();
     S.route = r;
     const V = (VIEWS[r.name] || VIEWS.home)(r) || notFound();
     lastV = V;
@@ -1704,6 +1708,148 @@
       `<p class="hnote">Le plus bas relevé\u00a0: ${eur(low.v)} chez ${esc(retName(low.r))}, le ${day(low.d)}.</p></div>`;
   }
 
+  /* ---------- scanner un code-barres ---------- */
+  /* En magasin : la caméra lit le code-barres (BarcodeDetector du navigateur s'il existe, sinon scan.js), Cabas retrouve
+     le produit par son code (relevé chez Carrefour), ou demande son nom à Open Food Facts (données ouvertes) et cherche
+     l'équivalent le moins cher. On peut aussi taper le code. Les derniers scans restent affichés pour comparer. */
+  const SC = { stream: null, timer: 0, det: null, pending: null, last: "", lastAt: 0, items: [], busy: false, note: "" };
+  function eanIndex() {
+    if (!S.eanMap) { S.eanMap = new Map(); S.list.forEach((p) => { if (p.ean) S.eanMap.set(String(p.ean).replace(/^0+/, ""), p.id); }); }
+    return S.eanMap;
+  }
+  async function offLookup(code) {
+    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const t = setTimeout(() => ctl && ctl.abort(), 7000);
+    try {
+      const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_fr,brands,quantity`, { signal: ctl ? ctl.signal : undefined });
+      if (!r.ok) return null;
+      const j = await r.json();
+      if (!j || j.status !== 1 || !j.product) return null;
+      const p = j.product;
+      return { name: (p.product_name_fr || p.product_name || "").trim(), brand: (p.brands || "").split(",")[0].trim(), qty: (p.quantity || "").trim() };
+    } catch (e) { return null; } finally { clearTimeout(t); }
+  }
+  async function onCode(code) {
+    code = String(code).replace(/\D/g, "");
+    if (!Scan.valid(code)) return;
+    const now = Date.now();
+    if (code === SC.last && now - SC.lastAt < 4000) return;
+    SC.last = code; SC.lastAt = now;
+    if (navigator.vibrate) navigator.vibrate(50);
+    const id = eanIndex().get(code.replace(/^0+/, ""));
+    const it = { code, at: now, pid: id || null, off: null, near: null, loading: !id };
+    SC.items = [it].concat(SC.items.filter((x) => x.code !== code)).slice(0, 12);
+    scanRender();
+    if (id) return;
+    const off = await offLookup(code);
+    it.off = off; it.loading = false;
+    if (off && (off.name || off.brand)) {
+      const q = [off.brand, off.name, off.qty].filter(Boolean).join(" ");
+      const m = matchLine(parseLine(q));
+      if (m.pick) it.near = { pid: m.pick, cands: m.cands };
+    }
+    scanRender();
+  }
+  const scanOne = (x) => {
+    const shelf = (v, b, code) => `<p class="sn" data-shelfnote="${esc(code)}">${shelfNote(v, b)}</p>`;
+    if (x.pid) {
+      const p = S.prods.get(x.pid), os = offers(p, true), b = os[0] || null;
+      const rows = os.slice(0, 4).map((o, i) => `<li class="${i === 0 ? "low" : ""}"><span>${esc(retName(o.ret))}${o.sim ? " (simulé)" : ""}</span>${i === 0 ? `<span class="sticker">${eur(o.price)}</span>` : `<span class="num">${eur(o.price)}</span>`}</li>`).join("");
+      return `<article class="deal scanr"><div class="dh"><a class="di" href="${hp(p.id)}">${img(p)}</a><div class="dtx"><a class="dt" href="${hp(p.id)}"><b>${esc(p.brand)}</b> ${esc(p.name)}</a><div class="pfmt">${esc(p.format)}, code ${esc(x.code)}</div></div></div>` +
+        (rows ? `<ul class="ladder">${rows}</ul>` : `<p class="sn">Pas vendu par tes enseignes.</p>`) +
+        `<label class="shelf"><span>Prix vu en rayon</span><input type="number" inputmode="decimal" step="0.01" min="0" data-shelf="${esc(x.code)}" value="${esc(x.shelf || "")}" placeholder="0,00"><span>€</span></label>${shelf(x.shelf, b, x.code)}` +
+        `<div class="df"><span></span>${buyCtl(p.id, "flat")}</div></article>`;
+    }
+    if (x.loading) return `<article class="deal scanr"><p class="sn">Code ${esc(x.code)}\u00a0: recherche du produit…</p></article>`;
+    const off = x.off, title = off && (off.name || off.brand) ? `<b>${esc(off.brand)}</b> ${esc(off.name)}${off.qty ? `, ${esc(off.qty)}` : ""}` : `Code ${esc(x.code)}`;
+    if (x.near) {
+      const p = S.prods.get(x.near.pid), b = best(p);
+      return `<article class="deal scanr"><p class="scn">${title}<small>Pas dans Cabas tel quel. L'équivalent le moins cher dans tes enseignes\u00a0:</small></p>` +
+        `<div class="dh"><a class="di" href="${hp(p.id)}">${img(p)}</a><div class="dtx"><a class="dt" href="${hp(p.id)}"><b>${esc(p.brand)}</b> ${esc(p.name)}</a><div class="pfmt">${esc(p.format)}${b ? `, ${eur(b.price)} chez ${esc(retName(b.ret))}${unitPrice(p, b.price) ? ", " + esc(unitPrice(p, b.price)) : ""}` : ""}</div></div></div>` +
+        `<label class="shelf"><span>Prix vu en rayon</span><input type="number" inputmode="decimal" step="0.01" min="0" data-shelf="${esc(x.code)}" value="${esc(x.shelf || "")}" placeholder="0,00"><span>€</span></label>${shelf(x.shelf, b, x.code)}` +
+        `<div class="df"><button class="lnk" type="button" data-act="scansearch" data-q="${esc([off.brand, off.name].filter(Boolean).join(" "))}">Chercher d'autres équivalents</button>${buyCtl(p.id, "flat")}</div></article>`;
+    }
+    return `<article class="deal scanr"><p class="scn">${title}<small>${off ? "Pas dans Cabas, et aucun équivalent trouvé dans ses rayons." : "Produit inconnu\u00a0: Cabas ne couvre que quelques rayons, et le nom n'a pas pu être demandé à Open Food Facts (réseau)."}</small></p>` +
+      (off && (off.name || off.brand) ? `<div class="df"><button class="lnk" type="button" data-act="scansearch" data-q="${esc([off.brand, off.name].filter(Boolean).join(" "))}">Chercher dans Cabas</button><span></span></div>` : "") + `</article>`;
+  };
+  function shelfNote(v, b) {
+    const p = parseFloat(String(v || "").replace(",", "."));
+    if (!(p > 0) || !b) return "";
+    const d = p - b.price;
+    return d > 0.005 ? `${eur(d)} de moins en ligne chez ${esc(retName(b.ret))}, hors livraison.` : d < -0.005 ? `Moins cher ici, de ${eur(-d)}, qu'en ligne.` : "Le même prix qu'en ligne.";
+  }
+  function scanRender() {
+    const el = $("#scres");
+    if (!el) return;
+    el.innerHTML = SC.items.length ? `<div class="sh"><h2>Derniers scans</h2><button type="button" data-act="scanclear">Effacer</button></div>` + SC.items.map(scanOne).join("") : "";
+    const st = $("#scst");
+    if (st) st.textContent = SC.note;
+  }
+  function scanNote(t) { SC.note = t; const st = $("#scst"); if (st) st.textContent = t; }
+  async function startScan() {
+    const v = $("#scv");
+    if (!v || SC.stream) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { scanNote("Pas de caméra sur cet appareil\u00a0: tape le code sous le code-barres."); return; }
+    try {
+      SC.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    } catch (e) {
+      scanNote(e && e.name === "NotAllowedError" ? "Cabas n'a pas accès à la caméra. Autorise-la dans les réglages du téléphone, ou tape le code." : "La caméra n'a pas pu s'ouvrir\u00a0: tape le code sous le code-barres.");
+      return;
+    }
+    if (S.route.name !== "scan") { stopScan(); return; }
+    v.srcObject = SC.stream;
+    try { await v.play(); } catch (e) { /* lecture refusée : la vidéo démarre au premier geste */ }
+    scanNote("Vise le code-barres, bien à plat et à 10 ou 15 cm.");
+    if ("BarcodeDetector" in window) { try { SC.det = new window.BarcodeDetector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e"] }); } catch (e) { SC.det = null; } }
+    const cv = document.createElement("canvas"), cx = cv.getContext("2d", { willReadFrequently: true });
+    const tick = async () => {
+      if (!SC.stream) return;
+      if (v.readyState >= 2 && !SC.busy) {
+        SC.busy = true;
+        try {
+          let code = null;
+          if (SC.det) { try { const r = await SC.det.detect(v); if (r && r.length) code = r[0].rawValue; } catch (e) { SC.det = null; } }
+          if (!code && !SC.det) {
+            const W = Math.min(960, v.videoWidth || 960), H = Math.round(W * (v.videoHeight || 540) / (v.videoWidth || 960));
+            if (W && H) {
+              cv.width = W; cv.height = H; cx.drawImage(v, 0, 0, W, H);
+              const r = Scan.decode(cx.getImageData(0, 0, W, H));
+              /* une lecture sûre sur deux lignes, ou la même lecture à deux images de suite */
+              if (r && ((r.hits >= 2 && r.err < 0.95 && r.margin >= 0.2) || (SC.pending === r.code && r.err < 0.95))) { code = r.code; SC.pending = null; }
+              else SC.pending = r && r.err < 0.95 ? r.code : null;
+            }
+          }
+          if (code) await onCode(code);
+        } finally { SC.busy = false; }
+      }
+      SC.timer = setTimeout(tick, SC.det ? 250 : 160);
+    };
+    tick();
+  }
+  function stopScan() {
+    clearTimeout(SC.timer); SC.timer = 0;
+    if (SC.stream) { SC.stream.getTracks().forEach((t) => t.stop()); SC.stream = null; }
+    const v = $("#scv"); if (v) v.srcObject = null;
+    SC.pending = null; SC.busy = false;
+  }
+  VIEWS.scan = () => ({
+    title: "Scanner", grouped: true,
+    html: `<h1 class="lt">Scanner</h1><p class="lt-sub">En magasin, vise le code-barres d'un produit\u00a0: Cabas te dit où il est le moins cher.</p>` +
+      `<div class="scanbox"><video id="scv" playsinline muted autoplay></video><div class="scanguide" aria-hidden="true"></div></div><p class="scst" id="scst">${esc(SC.note || "Ouverture de la caméra…")}</p>` +
+      `<div class="pad btns" style="padding-top:12px"><button class="btn tint" type="button" data-act="scantype">Taper le code</button></div>` +
+      `<div id="scres"></div>` +
+      `<p class="gf">Cabas lit les codes EAN-13 et EAN-8 des produits. Le nom d'un produit qu'il ne connaît pas vient d'Open Food Facts, données ouvertes (licence ODbL). Rien n'est envoyé ailleurs\u00a0: l'image reste sur ton téléphone.</p>`,
+    mount: () => { scanRender(); startScan(); },
+  });
+  function scanTypeSheet() {
+    openSheet({
+      title: "Code-barres", focus: "#eanIn",
+      left: `<button class="txtbtn" type="button" data-act="close">Annuler</button>`,
+      right: `<button class="txtbtn" type="button" data-act="scantypeok">OK</button>`,
+      body: `<p>Les 13 chiffres (ou 8) écrits sous le code-barres.</p><label class="field"><input id="eanIn" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="14" placeholder="3017620422003" aria-label="Code-barres" enterkeyhint="done"></label>`,
+    });
+  }
+
   /* ---------- feuilles ---------- */
   let sheetCtx = null;
   function openSheet(o) {
@@ -1917,6 +2063,11 @@
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
       case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.guide = { ck: {}, done: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
+      /* scanner */
+      case "scantype": scanTypeSheet(); break;
+      case "scantypeok": { const v = (($("#eanIn") || {}).value || "").replace(/\D/g, ""); if (!Scan.valid(v)) { toast("Un code-barres a 13 chiffres, ou 8"); break; } closeSheet(); if (S.route.name !== "scan") push("#/scan"); onCode(v); break; }
+      case "scanclear": SC.items = []; SC.last = ""; scanRender(); break;
+      case "scansearch": { S.q = t.dataset.q || ""; addRecent(S.q); S.shown.s = 0; switchTab("recherche"); break; }
       /* repas */
       case "recp": S.recP = Object.assign({}, S.recP, { [id]: +t.dataset.v }); rerender(); break;
       case "recadd": {
@@ -2017,12 +2168,21 @@
     if (t.id === "extra") { const v = parseFloat(String(t.value).replace(",", ".")); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; savePrefs(); return; }
     if (t.dataset && t.dataset.fee) { const v = parseFloat(String(t.value).replace(",", ".")); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; savePrefs(); return; }
     if (t.id === "fmax") { F(t.dataset.k).max = t.value; refreshSheet(); }
+
   });
   let qT = null;
   let draftT = null;
   document.addEventListener("input", (e) => {
     const t = e.target;
     if (t.id === "wlIn") { if (S.wl) S.wl.text = t.value; clearTimeout(draftT); draftT = setTimeout(() => store.set("draft", t.value), 400); return; }
+    if (t.dataset && t.dataset.shelf) {
+      const x = SC.items.find((y) => y.code === t.dataset.shelf);
+      if (!x) return;
+      x.shelf = t.value;
+      const p = S.prods.get(x.pid || (x.near && x.near.pid)), b = p && (x.pid ? offers(p, true)[0] : best(p));
+      const n = $(`[data-shelfnote="${CSS.escape(x.code)}"]`); if (n) n.innerHTML = shelfNote(x.shelf, b);
+      return;
+    }
     if (t.id === "q") {
       clearTimeout(qT);
       const c = $(".search .clr"); if (c) c.hidden = !t.value;
@@ -2074,6 +2234,7 @@
   }
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && Date.now() - (S.lastCheckFetch || S.loadedAt || 0) > 5 * 60 * 1000) refreshData();
+    if (S.route.name === "scan") { if (document.visibilityState === "hidden") stopScan(); else startScan(); }
   });
   setInterval(() => { if (document.visibilityState === "visible") refreshData(); }, 10 * 60 * 1000);
 
