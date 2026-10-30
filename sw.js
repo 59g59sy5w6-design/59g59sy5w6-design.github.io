@@ -1,6 +1,6 @@
 /* Cabas hors ligne : l'appli et le dernier relevé de prix restent disponibles sans réseau.
    Changer VERSION à chaque mise en ligne pour que les téléphones récupèrent les nouveaux fichiers. */
-const VERSION = "cabas-2026-10-30-8";
+const VERSION = "cabas-2026-10-30-9";
 /* l'appli : toujours rechargée du réseau à l'installation d'une version */
 const SHELL = [
   "./", "index.html", "app.css", "app.js", "packs.js", "scan.js", "optimizer.js", "worker.js", "manifest.webmanifest",
@@ -51,7 +51,7 @@ async function serveData(e, req, url) {
     }
     return res;
   });
-  e.waitUntil(net.catch(() => {}));
+  try { e.waitUntil(net.catch(() => {})); } catch (err) { /* navigateur qui refuse un waitUntil tardif : la revérification se fait quand même */ }
   if (url.searchParams.has("fresh")) return net.catch(() => hit || Response.error());
   if (hit) return hit;
   return net.catch(() => Response.error());
