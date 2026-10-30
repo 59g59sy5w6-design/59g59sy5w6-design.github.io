@@ -328,6 +328,9 @@ body:not(.grouped) .group { background: var(--group); }
 .sum .alt { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--brand-tint); color: var(--brand-ink); font-size: 15px; line-height: 20px; letter-spacing: -0.01em; }
 .sum .alt b { font-weight: 700; font-variant-numeric: tabular-nums; }
 .sum .alt .btn { margin-top: 10px; }
+.sum .optrow { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 0.5px solid var(--sep, rgba(60, 60, 67, 0.29)); }
+.sum .optrow .ot { flex: 1; font-size: 16px; letter-spacing: -0.02em; line-height: 21px; }
+.sum .optrow .ot small { display: block; font-size: 13px; line-height: 18px; color: var(--ink-2); letter-spacing: -0.005em; }
 .sum .segl { font-size: 13px; color: var(--ink-2); margin-top: 14px; }
 .sum.loading .st .px, .sum.loading .sh2 { opacity: 0.35; }
 .order { margin: 14px calc(var(--g) + var(--sr)) 0 calc(var(--g) + var(--sl)); border-radius: 16px; background: #fff; overflow: hidden; }

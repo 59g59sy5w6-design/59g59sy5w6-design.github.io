@@ -1,7 +1,11 @@
-/* Calcul de la répartition du panier hors du fil principal : chaque nombre de commandes est envoyé dès qu'il est prêt. */
 importScripts("optimizer.js");
+/* modes : les réglages « Sans achat en magasin » à calculer, dans l'ordre ({ mode, compMax }) */
 onmessage = (e) => {
   const { seq, M, Kmax, lambda } = e.data;
-  try { runAll(M, Kmax, lambda, (msg) => postMessage(Object.assign({ seq }, msg)), 12000); }
-  catch (err) { postMessage({ seq, done: true, error: String(err) }); }
+  const modes = e.data.modes || [{ compMax: M.compMax }];
+  for (const { mode, compMax } of modes) {
+    try { runAll(Object.assign({}, M, { compMax }), Kmax, lambda, (msg) => postMessage(Object.assign({ seq, mode }, msg)), 12000); }
+    catch (err) { postMessage({ seq, mode, done: true, error: String(err) }); }
+  }
+  if (e.data.modes) postMessage({ seq, idle: true });
 };

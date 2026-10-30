@@ -161,8 +161,12 @@ function solveSubset(sub, M, lambda, budget, deadline, bestScore) {
   /* bornes : coût minimal des articles (chaque ligne au moins cher) et frais minimaux une fois les minimums atteints */
   let itemsLB = 0;
   for (let i = 0; i < nn; i++) { let c = Infinity; for (const x of cost[i]) if (x >= 0 && x < c) c = x; itemsLB += c; }
+  /* Frais minimaux pour un sous-total d'au moins Lk. Quand les frais baissent avec le montant (cas de toutes les
+     enseignes), ce sont les frais du palier de Lk : un sous-total plus haut, qui tomberait dans un palier moins cher,
+     est examiné avec la combinaison de paliers où il est à sa place. Sinon, le minimum des paliers atteignables. */
   const feeLB = (Pk, Lk) => {
     if (!(Lk > 0)) return 0;
+    if (Pk.tiers.every((t, j) => j === 0 || (t.from >= Pk.tiers[j - 1].from && t.fee <= Pk.tiers[j - 1].fee))) return feeAt(Pk, Lk);
     let j0 = 0;
     for (let j = 0; j < Pk.tiers.length; j++) if (Pk.tiers[j].from <= Lk) j0 = j;
     let f = Infinity;

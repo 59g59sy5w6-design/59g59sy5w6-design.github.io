@@ -143,7 +143,7 @@
     S.rets = (S.allRets || []).filter((x) => !x.group || x.id === pickOf(x.group, G[x.group]));
     S.retMap = new Map(S.rets.map((x) => [x.id, x]));
     S._sug = null;
-    RES.key = "";
+    RES.base = "";
   }
 
   async function load() {
@@ -156,7 +156,7 @@
     S.prods = new Map();
     S.list.forEach((p, i) => { p.rank = i; S.prods.set(p.id, p); });
     S._sug = null;
-    RES.key = "";
+    RES.base = "";
     S.allRets = r.slice().sort((a, b) => a.order - b.order);
     applyGroups();
     S.meta = m || {};
@@ -263,7 +263,11 @@
   function tiersOf(r) {
     const ch = r.channel || {}, ov = S.prefs.fee[r.id] || {};
     const base = ov.base != null ? ov.base : (ch.tiers && ch.tiers[0] ? ch.tiers[0].fee : 0);
-    return (ch.tiers && ch.tiers.length ? ch.tiers : [{ from: 0, fee: 0 }]).map((t, i) => ({ from: t.from || 0, fee: i === 0 ? base : t.half ? base / 2 : t.fee || 0 })).sort((a, b) => a.from - b.from);
+    const T = (ch.tiers && ch.tiers.length ? ch.tiers : [{ from: 0, fee: 0 }]).map((t, i) => ({ from: t.from || 0, fee: i === 0 ? base : t.half ? base / 2 : t.fee || 0 })).sort((a, b) => a.from - b.from);
+    /* les frais ne remontent jamais quand le panier grossit : un créneau moins cher que le palier suivant vaut aussi
+       au-dessus (la répartition du panier compte là-dessus pour rester exacte) */
+    for (let i = 1; i < T.length; i++) T[i].fee = Math.min(T[i].fee, T[i - 1].fee);
+    return T;
   }
   function channels() {
     const out = [];
@@ -274,9 +278,11 @@
     }
     return out;
   }
-  /* « Compléter en magasin » : un produit que les commandes ne prennent pas peut s'acheter dans une enseigne qui a des
+  /* Achat en magasin : un produit que les commandes ne prennent pas peut s'acheter dans une enseigne qui a des
      magasins (réglage « magasin » de data/retailers.json), au prix relevé le plus bas, jamais à un prix simulé.
-     Au plus un quart des produits du panier, pour que la commande reste la base des courses. */
+     Au plus un quart des produits du panier, pour que la commande reste la base des courses.
+     Réglage « Sans achat en magasin » coché (S.prefs.comp === false) : aucun, tout passe par les commandes. */
+  const compMaxFor = (on, n) => (on ? Math.max(1, Math.floor(n / 4)) : 0);
   function model() {
     const chans = channels();
     const store = chans.map((ch) => { const r = S.retMap.get(ch.id); return !!(r && r.magasin && !r.simulated); });
@@ -296,51 +302,81 @@
       });
       if (o.length) { lines.push({ id, q, n: n++ }); offs.push(o); comp.push(c); } else uncovered.push(id);
     }
-    const compMax = S.prefs.comp === false ? 0 : Math.max(1, Math.floor(lines.length / 4));
+    const compMax = compMaxFor(S.prefs.comp !== false, lines.length);
     return { lines, offers: offs, comp, compMax, chans, uncovered };
   }
   /* Répartition du panier : chaque nombre de commandes, de 1 au nombre d'enseignes, est calculé une fois, du plus petit au
      plus grand (optimizer.js, runAll). RES.steps[k] = { full, partial, truncated } : « full » prend tout le panier en
      k commandes au plus, « partial » laisse de côté les produits qu'aucune commande possible ne peut prendre. */
-  const RES = { key: "", M: null, steps: {}, done: false, K: 3, lambda: 0 };
+  /* Les deux réglages « Sans achat en magasin » sont calculés pour le même panier, celui qui est choisi d'abord : le panier
+     dit ce que coûte l'autre, et basculer de l'un à l'autre ne relance pas le calcul. RES.by[mode] = { steps, done },
+     mode true = achat en magasin permis. RES.queue : les réglages en cours de calcul, dans l'ordre. */
+  const RES = {
+    base: "", M: null, by: null, mode: true, queue: [], K: 3, lambda: 0,
+    get steps() { return this.by ? this.by[this.mode].steps : {}; },
+    get done() { return !this.by || this.by[this.mode].done; },
+    get other() { return this.by ? this.by[!this.mode].steps : {}; },
+    get otherDone() { return !this.by || this.by[!this.mode].done; },
+  };
   let W = null, wSeq = 0, wBusy = false, cartTimer = 0;
   function cartResult() {
-    const key = JSON.stringify([S.basket, S.prefs.off, S.prefs.fee, S.prefs.extraCost, S.prefs.comp, S.rets.map((r) => r.id)]);
-    if (RES.key !== key || !RES.M) {
+    const base = JSON.stringify([S.basket, S.prefs.off, S.prefs.fee, S.prefs.extraCost, S.rets.map((r) => r.id)]);
+    const mode = S.prefs.comp !== false;
+    if (!RES.M || RES.base !== base) {
       const M = model();
-      Object.assign(RES, { key, M, steps: {}, done: false, lambda: Math.round((S.prefs.extraCost || 0) * 100) });
-      if (!M.lines.length || !M.chans.length) RES.done = true;
-      else startCalc(M);
+      Object.assign(RES, { base, M, mode, by: { true: { steps: {}, done: false }, false: { steps: {}, done: false } }, queue: [], lambda: Math.round((S.prefs.extraCost || 0) * 100) });
+      if (!M.lines.length || !M.chans.length) RES.by.true.done = RES.by.false.done = true;
+      else startCalc([mode, !mode]);
+    } else if (RES.mode !== mode) {
+      RES.mode = mode;
+      /* le réglage choisi n'est ni calculé ni en cours de calcul : il passe en premier */
+      if (!RES.by[mode].done && RES.queue[0] !== mode) startCalc(RES.by[!mode].done ? [mode] : [mode, !mode]);
     }
+    RES.M.compMax = compMaxFor(mode, RES.M.lines.length);
     RES.K = Math.max(1, Math.min(RES.M.chans.length || 1, S.prefs.maxOrders || 3));
     return RES;
   }
   function collect(seq, msg) {
-    if (seq !== wSeq) return false;
-    if (msg.done) RES.done = true; else RES.steps[msg.k] = msg;
+    if (seq !== wSeq || !RES.by) return false;
+    const mode = msg.mode == null ? RES.mode : msg.mode, r = RES.by[mode];
+    if (msg.done) { r.done = true; RES.queue = RES.queue.filter((x) => x !== mode); }
+    else r.steps[msg.k] = msg;
     return true;
   }
-  function startCalc(M) {
-    const seq = ++wSeq, Kmax = M.chans.length, lambda = RES.lambda;
-    const sync = (ms) => runAll(M, Kmax, lambda, (msg) => collect(seq, msg), ms);
-    if (M.lines.length <= 10 || typeof Worker === "undefined") { sync(1500); return; }
+  function runSync(seq, modes, ms) {
+    const M = RES.M;
+    for (const mode of modes) runAll(Object.assign({}, M, { compMax: compMaxFor(mode, M.lines.length) }), M.chans.length, RES.lambda, (msg) => collect(seq, Object.assign({ mode }, msg)), ms);
+  }
+  function startCalc(modes) {
+    const seq = ++wSeq, M = RES.M;
+    RES.queue = modes.slice();
+    if (M.lines.length <= 10 || typeof Worker === "undefined") {
+      if (W && wBusy) { W.terminate(); W = null; wBusy = false; }
+      runSync(seq, modes, 1500);
+      return;
+    }
     try {
       if (W && wBusy) { W.terminate(); W = null; }
       if (!W) {
         W = new Worker("worker.js");
-        W.onmessage = (ev) => { const d = ev.data; if (d.done) wBusy = false; if (collect(d.seq, d)) cartUpdate(d); };
-        W.onerror = () => { wBusy = false; W = null; if (!RES.done) { const s2 = wSeq; runAll(RES.M, RES.M.chans.length, RES.lambda, (msg) => collect(s2, msg), 3000); cartUpdate({ done: true }); } };
+        W.onmessage = (ev) => { const d = ev.data; if (d.idle) { wBusy = false; return; } if (collect(d.seq, d)) cartUpdate(d); };
+        W.onerror = () => {
+          wBusy = false; W = null;
+          const q = RES.queue.slice();
+          if (q.length) { runSync(++wSeq, q, 3000); cartUpdate({ done: true }); }
+        };
       }
       wBusy = true;
-      W.postMessage({ seq, M, Kmax, lambda });
-    } catch (err) { sync(3000); }
+      W.postMessage({ seq, M, Kmax: M.chans.length, lambda: RES.lambda, modes: modes.map((mode) => ({ mode, compMax: compMaxFor(mode, M.lines.length) })) });
+    } catch (err) { runSync(seq, modes, 3000); }
   }
   /* une étape du calcul est arrivée : le panier n'est redessiné que si le nombre de commandes choisi est concerné */
   function cartUpdate(d) {
     if (S.route.name !== "panier") return;
     const K = RES.K, st = RES.steps[K];
     let redraw = false;
-    if (d.done) redraw = !st || !st.full;
+    if (d.mode != null && d.mode !== RES.mode) redraw = d.k === K || (d.done && !(RES.other[K] || {}).full);
+    else if (d.done) redraw = !st || !st.full;
     else if (d.k === K) redraw = true;
     else if (d.k > K && st && !st.full && d.full) {
       redraw = true;
@@ -656,6 +692,11 @@
       c.map((x) => itemRow(x.l.id, x.cost, x.l.q, "chez " + retName(x.ret))).join("") +
       `<div class="of"><p class="hint" style="color:var(--ink-2)">Tes commandes ne prennent pas ces produits\u00a0: achète-les en magasin, au plus près de chez toi. Ce sont les prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p></div></section>`;
   }
+  /* interrupteur « Sans achat en magasin » du panier (le même que dans les réglages) */
+  const noCompRow = () => {
+    const noComp = S.prefs.comp === false;
+    return `<div class="optrow"><span class="ot">Sans achat en magasin<small>${noComp ? "Tout passe par les commandes en ligne." : "À cocher si tu ne peux pas te déplacer en magasin."}</small></span><label class="sw"><input type="checkbox" data-act="nocomp" aria-label="Sans achat en magasin"${noComp ? " checked" : ""}><span></span></label></div>`;
+  };
   const compPhrase = (r) => (r.completed && r.completed.length ? `, et ${plural(r.completed.length, "produit", "produits")} en magasin` : "");
   VIEWS.panier = () => {
     const ids = Object.keys(S.basket).filter((id) => S.basket[id] > 0 && S.prods.has(id));
@@ -716,11 +757,33 @@
       const sh2 = complete ? where.replace(/^./, (c) => c.toUpperCase()).replace(/^Chez/, "En une commande chez") + compPhrase(bst) : `Sans ${plural(skipped.length, "produit", "produits")}, ${where}${compPhrase(bst)}`;
       const altBox = alt ? `<div class="alt"><p>Tout le panier\u00a0: <b>${eurC(fullTotal(alt))}</b> en ${altK} commandes${cheaper ? `, ou <b>${eurC(fullTotal(cheaper))}</b> en ${cheaper.orders.length} commandes` : ""}${isSim(alt) || (cheaper && isSim(cheaper)) ? ", avec des prix simulés" : ""}.</p><button class="btn sm" type="button" data-act="maxk" data-k="${altK}">Passer à ${altK} commandes</button></div>`
         : searching ? `<p class="sn">Recherche d'une répartition qui prend tout le panier…</p>` : "";
+      /* ce que donne l'autre réglage « Sans achat en magasin » pour tout le panier, au même nombre de commandes si possible */
+      const noComp = S.prefs.comp === false, os = res.other[K];
+      let modeCmp = "";
+      if (os) {
+        let ob = os.full, ok2 = K;
+        if (!ob) for (let k2 = K + 1; k2 <= nRet; k2++) { const s3 = res.other[k2]; if (s3 && s3.full) { ob = s3.full; ok2 = k2; break; } }
+        const at = ok2 === K ? "" : ` en ${ok2} commandes`;
+        const diff = ob && complete ? fullTotal(ob) - money : 0;
+        const soit = !complete || Math.abs(diff) < 1 ? "" : diff > 0 ? `, soit ${eurC(diff)} de plus` : `, soit ${eurC(-diff)} de moins`;
+        if (!noComp && (bst.completed || []).length) {
+          if (ob) modeCmp = `Sans achat en magasin\u00a0: ${eurC(fullTotal(ob))}${at}${soit}.`;
+          else if (res.otherDone) modeCmp = "Sans achat en magasin, tes commandes ne peuvent pas prendre tout le panier.";
+        } else if (noComp && ob && (ob.completed || []).length && (complete ? diff <= -50 : !alt || fullTotal(ob) < fullTotal(alt) - 50)) {
+          modeCmp = `Avec ${plural(ob.completed.length, "produit", "produits")} en magasin${complete ? "" : ", tout le panier"}\u00a0: ${eurC(fullTotal(ob))}${at}${soit}.`;
+        }
+      }
+      /* sans achat en magasin, un point de retrait reste un déplacement : la livraison à domicile se choisit dans les réglages */
+      const pick = noComp ? bst.orders.map((o) => S.retMap.get(o.ch.id)).filter((r) => r && r.group && pickup(r)) : [];
+      const pickNote = !pick.length ? "" : (pick.length === 1 ? `La commande ${esc(pick[0].name)} est à retirer${pick[0].channel.where ? " à " + esc(pick[0].channel.where) : ""}.` : `Les commandes ${esc(joinEt(pick.map((r) => r.name)))} sont à retirer.`) +
+        ` Pour tout recevoir chez toi, choisis la livraison à domicile dans les <a href="#/reglages">réglages</a>.`;
+      const compRow = noCompRow() +
+        (modeCmp ? `<p class="sn">${modeCmp}</p>` : "") + (pickNote ? `<p class="sn">${pickNote}</p>` : "");
       side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${altBox}` +
         (save ? `<p class="sv">${save}</p>` : "") + (why ? `<p class="sn">${why}</p>` : "") + (more ? `<p class="sn">${more}</p>` : "") +
         (notCheapest ? `<p class="sn">Certains produits ne sont pas pris là où ils sont le moins chers\u00a0: avec les minimums d'achat et la livraison, ce regroupement revient moins cher.</p>` : "") +
         (st.truncated ? `<p class="sn">Gros panier\u00a0: le calcul a été écourté, le vrai minimum peut être un peu plus bas.</p>` : "") +
-        (bst.extra ? `<p class="sn">Avec ${eurC(res.lambda)} comptés pour chaque commande en plus (réglages).</p>` : "") + seg + `</div>`;
+        (bst.extra ? `<p class="sn">Avec ${eurC(res.lambda)} comptés pour chaque commande en plus (réglages).</p>` : "") + seg + compRow + `</div>`;
       const opts = singles.map((x) => {
         const s2 = x.s;
         const sub = !s2.ok ? `Minimum de ${eurC(s2.ch.P.min).replace(",00", "")} non atteint, il manque ${eurC(s2.ch.P.min - s2.sub)}` : x.compN ? `Et ${plural(x.compN, "produit", "produits")} en magasin` : s2.missing ? `${plural(s2.missing, "produit manque", "produits manquent")}` : "";
@@ -738,7 +801,7 @@
         const g = singles.map((x) => ({ s: x, gap: x.ch.P.min - x.sub })).sort((x, y) => x.gap - y.gap)[0];
         if (g.gap > 0) hint = ` Chez ${esc(S.retMap.get(g.s.ch.id).name)}, ${g.s.missing ? "les produits disponibles font" : "ton panier fait"} ${eurC(g.s.sub)}\u00a0: il manque ${eurC(g.gap)} pour atteindre le minimum de ${eurC(g.s.ch.P.min).replace(",00", "")}.`;
       }
-      side = `<div class="sum"><p class="sl">Pas encore de commande possible</p><div class="st">${px(subtotal())}</div><p class="sn">Chaque enseigne demande un minimum d'achat.${hint}</p>${seg}</div>`;
+      side = `<div class="sum"><p class="sl">Pas encore de commande possible</p><div class="st">${px(subtotal())}</div><p class="sn">Chaque enseigne demande un minimum d'achat.${hint}</p>${seg}${noCompRow()}</div>`;
       main = `<div class="order">${plainItems(ids.filter((id) => !M.uncovered.includes(id)))}</div>` + uncovered;
     }
     return {
@@ -776,7 +839,7 @@
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}" style="text-decoration:none">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
         `<p class="gf">Le panier n'utilise que les enseignes activées. Touche une enseigne pour voir ses frais et leurs sources.</p>` +
         Object.entries(groupsOf()).map(([g, ms]) => `<h2 class="gh">${esc(ms[0].name)} : livraison ou retrait</h2><div class="group">${ms.map((m) => `<button class="row" type="button" data-act="pick" data-g="${esc(g)}" data-id="${esc(m.id)}" aria-pressed="${m.id === pickOf(g, ms)}"><span class="rt">${esc(optionLabel(m))}<small>${esc(pickup(m) ? (tiersOf(m)[0].fee > 0 ? eur(tiersOf(m)[0].fee) + " par retrait" : "Retrait gratuit") : feeShort(m))}</small></span>${m.id === pickOf(g, ms) ? ic("check", "chk") : ""}</button>`).join("")}</div><p class="gf">Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.</p>`).join("") +
-        `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Compléter en magasin<small>Un produit que tes commandes ne prennent pas est compté au prix relevé le plus bas, à acheter en magasin. Au plus un quart des produits du panier.</small></span><label class="sw"><input type="checkbox" data-act="comp"${S.prefs.comp === false ? "" : " checked"} aria-label="Compléter en magasin"><span></span></label></div><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
+        `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Sans achat en magasin<small>Tout passe par les commandes en ligne. Décoché, un produit que tes commandes ne prennent pas peut s'acheter en magasin, au prix relevé le plus bas (au plus un quart du panier).</small></span><label class="sw"><input type="checkbox" data-act="nocomp"${S.prefs.comp === false ? " checked" : ""} aria-label="Sans achat en magasin"><span></span></label></div><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
         `<label class="row" for="extra"><span class="rt">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
         `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
@@ -1203,7 +1266,7 @@
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.dataset && t.dataset.act === "comp") { S.prefs.comp = t.checked; savePrefs(); RES.key = ""; return; }
+    if (t.dataset && t.dataset.act === "nocomp") { S.prefs.comp = !t.checked; savePrefs(); if (S.route.name === "panier") setTimeout(rerender, 200); return; }
     if (t.dataset && t.dataset.act === "ret") { if (t.checked) delete S.prefs.off[t.dataset.id]; else S.prefs.off[t.dataset.id] = true; savePrefs(); renderChrome(); return; }
     if (t.id === "extra") { const v = parseFloat(String(t.value).replace(",", ".")); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; savePrefs(); return; }
     if (t.dataset && t.dataset.fee) { const v = parseFloat(String(t.value).replace(",", ".")); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; savePrefs(); return; }
