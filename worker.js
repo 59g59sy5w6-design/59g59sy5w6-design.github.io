@@ -1,8 +1,7 @@
-/* Calcul de la répartition du panier hors du fil principal, pour les gros paniers. */
+/* Calcul de la répartition du panier hors du fil principal : chaque nombre de commandes est envoyé dès qu'il est prêt. */
 importScripts("optimizer.js");
 onmessage = (e) => {
-  const { seq, M, K, lambda } = e.data;
-  let R;
-  try { R = solve(M, K, lambda); } catch (err) { R = { best: null, byK: {}, truncated: true, partial: false, error: String(err) }; }
-  postMessage({ seq, R });
+  const { seq, M, Kmax, lambda } = e.data;
+  try { runAll(M, Kmax, lambda, (msg) => postMessage(Object.assign({ seq }, msg)), 12000); }
+  catch (err) { postMessage({ seq, done: true, error: String(err) }); }
 };

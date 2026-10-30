@@ -6,7 +6,7 @@ Appli web installable (PWA) qui compare les prix des courses chez Monoprix, Carr
 
 - `index.html`, `app.css`, `app.js` : l'interface (idiome iOS natif, polices système, onglets, feuilles du bas).
 - `packs.js` : les illustrations des produits, dessinées selon l'emballage. Pas de photos ni de logos.
-- `optimizer.js`, `worker.js` : la répartition du panier (recherche exacte, minimums d'achat, paliers de livraison).
+- `optimizer.js`, `worker.js` : la répartition du panier (recherche exacte, minimums d'achat, paliers de livraison). `runAll` calcule chaque nombre de commandes, de 1 au nombre d'enseignes, du plus petit au plus grand, toujours pour tout le panier : plus de commandes autorisées ne donne jamais un total plus élevé. Quand le nombre choisi ne suffit pas à prendre tout le panier (produits qu'aucune enseigne de la commande ne vend), le panier le dit (« Une seule commande ne suffit pas », total grisé « sans N produits ») et donne le total du panier entier avec le nombre de commandes nécessaire. Les totaux de chaque nombre de commandes s'affichent sous le sélecteur.
 - `sw.js`, `manifest.webmanifest`, `icons/` : installation sur l'écran d'accueil et fonctionnement hors ligne.
 - `data/catalog.json` : rayons et produits, avec pour chaque enseigne le prix, la date du relevé, le nom affiché par l'enseigne et le lien.
 - `data/retailers.json` : enseignes, minimum de commande, paliers de frais de livraison, frais de service, sources.

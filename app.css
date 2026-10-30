@@ -321,6 +321,12 @@ body:not(.grouped) .group { background: var(--group); }
 .sum .sv { font-size: 15px; color: var(--brand-ink); font-weight: 600; margin-top: 6px; letter-spacing: -0.01em; }
 .sum .sn { font-size: 13px; color: var(--ink-2); margin-top: 8px; line-height: 18px; letter-spacing: -0.005em; }
 .sum .seg { margin-top: 16px; }
+.seg.tall button { height: auto; min-height: 44px; padding: 5px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 18px; }
+.seg.tall small { font-size: 11px; line-height: 14px; font-weight: 500; color: var(--ink-2); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; white-space: nowrap; }
+.sum.part .st .px { color: var(--ink-2); }
+.sum .alt { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--brand-tint); color: var(--brand-ink); font-size: 15px; line-height: 20px; letter-spacing: -0.01em; }
+.sum .alt b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.sum .alt .btn { margin-top: 10px; }
 .sum .segl { font-size: 13px; color: var(--ink-2); margin-top: 14px; }
 .sum.loading .st .px, .sum.loading .sh2 { opacity: 0.35; }
 .order { margin: 14px calc(var(--g) + var(--sr)) 0 calc(var(--g) + var(--sl)); border-radius: 16px; background: #fff; overflow: hidden; }

@@ -23,7 +23,7 @@ function tierOptions(P) {
   return out.length ? out : [Math.max(P.min, 1)];
 }
 /* Exact cheapest assignment of every line to one channel of `sub`, for given lower bounds on subtotals. */
-function solveTargets(cost, L, m, budget) {
+function solveTargets(cost, L, m, budget, ub, deadline) {
   const n = cost.length;
   const base = new Int32Array(n), baseCost = new Float64Array(n);
   for (let i = 0; i < n; i++) {
@@ -42,7 +42,7 @@ function solveTargets(cost, L, m, budget) {
     for (let i = 0; i < n; i++) if (base[i] !== t && cost[i][t] >= 0) cand.push(i);
     return knapsackExact(cost, base, baseCost, cand, t, Math.round(L[t] - tot[t]));
   }
-  return branchAndBound(cost, L, m, budget);
+  return branchAndBound(cost, L, m, budget, ub, deadline);
 }
 /* 0/1 covering knapsack: cheapest set of lines to move into channel t so that its subtotal reaches the target. */
 function knapsackExact(cost, base, baseCost, cand, t, cap) {
@@ -68,7 +68,7 @@ function knapsackExact(cost, base, baseCost, cand, t, cap) {
   }
   return { assign, truncated: false };
 }
-function branchAndBound(cost, L, m, budget) {
+function branchAndBound(cost, L, m, budget, ub, deadline) {
   const n = cost.length;
   const opts = cost.map((row) => { const o = []; row.forEach((c, k) => { if (c >= 0) o.push({ k, c }); }); o.sort((a, b) => a.c - b.c); return o; });
   const order = [...Array(n).keys()].sort((a, b) => {
@@ -90,7 +90,8 @@ function branchAndBound(cost, L, m, budget) {
   const sufMin = new Float64Array(n + 1);
   for (let i = n - 1; i >= 0; i--) sufMin[i] = sufMin[i + 1] + opts[order[i]][0].c;
   const tot = new Float64Array(m), pick = new Int32Array(n);
-  let best = Infinity, bestPick = null, nodes = 0, truncated = false;
+  /* ub : coût des articles au-delà duquel cette piste ne peut plus battre la meilleure répartition déjà trouvée */
+  let best = ub == null ? Infinity : ub, bestPick = null, nodes = 0, truncated = false;
   function extraBound(i) {
     let add = 0;
     for (let k = 0; k < m; k++) {
@@ -107,7 +108,7 @@ function branchAndBound(cost, L, m, budget) {
     return add;
   }
   function dfs(i, cur) {
-    if (++nodes > budget) { truncated = true; return; }
+    if (++nodes > budget || ((nodes & 4095) === 0 && deadline && performance.now() > deadline)) { truncated = true; return; }
     const lb = cur + sufMin[i] + extraBound(i);
     if (lb >= best) return;
     if (i === n) { best = cur; bestPick = Array.from(pick); return; }
@@ -125,7 +126,7 @@ function branchAndBound(cost, L, m, budget) {
   for (let i = 0; i < n; i++) assign[order[i]] = bestPick[i];
   return { assign, truncated };
 }
-function solveSubset(sub, M, lambda, budget) {
+function solveSubset(sub, M, lambda, budget, deadline, bestScore) {
   const n = M.lines.length, m = sub.length;
   const pos = new Map(sub.map((c, i) => [c, i]));
   const cost = [];
@@ -137,13 +138,28 @@ function solveSubset(sub, M, lambda, budget) {
   }
   const P = sub.map((c) => M.chans[c].P);
   const spec = []; for (let k = 0; k < m; k++) if (isSpecial(P[k])) spec.push(k);
+  /* bornes : coût minimal des articles (chaque ligne au moins cher) et frais minimaux une fois les minimums atteints */
+  let itemsLB = 0;
+  for (let l = 0; l < n; l++) { let c = Infinity; for (const x of cost[l]) if (x >= 0 && x < c) c = x; itemsLB += c; }
+  const feeLB = (Pk, Lk) => {
+    if (!(Lk > 0)) return 0;
+    let j0 = 0;
+    for (let j = 0; j < Pk.tiers.length; j++) if (Pk.tiers[j].from <= Lk) j0 = j;
+    let f = Infinity;
+    for (let j = j0; j < Pk.tiers.length; j++) f = Math.min(f, Pk.tiers[j].fee);
+    return (f === Infinity ? 0 : f) + Pk.fixed;
+  };
   const opt = spec.map((k) => tierOptions(P[k]));
   const idx = spec.map(() => 0);
   let best = null, truncated = false;
   for (;;) {
+    if (deadline && performance.now() > deadline) { truncated = true; break; }
     const L = new Array(m).fill(0);
     spec.forEach((k, s) => { L[k] = opt[s][idx[s]]; });
-    const r = solveTargets(cost, L, m, budget);
+    const cap = Math.min(best ? best.score : Infinity, bestScore == null ? Infinity : bestScore);
+    let fLB = 0; for (let k = 0; k < m; k++) fLB += feeLB(P[k], L[k]);
+    const hopeless = itemsLB + fLB >= cap;
+    const r = hopeless ? null : solveTargets(cost, L, m, budget, cap === Infinity ? null : cap - fLB, deadline);
     if (r && r.truncated) truncated = true;
     if (r && r.assign) {
       const orders = sub.map((c) => ({ ch: M.chans[c], items: [], sub: 0, fee: 0 }));
@@ -185,7 +201,7 @@ function* subsets(chans, K) {
   }
   yield* rec(0);
 }
-function optimise(M, K, lambda) {
+function optimise(M, K, lambda, budgetMs) {
   const t0 = performance.now();
   const byK = {}; let truncated = false, count = 0;
   if (!M.lines.length || !M.chans.length) return { best: null, byK, truncated, count, ms: 0 };
@@ -194,7 +210,7 @@ function optimise(M, K, lambda) {
     count++;
     if (r && r.truncated) truncated = true;
     if (r && !r.none) { const k = r.orders.length; if (!byK[k] || r.score < byK[k].score) byK[k] = r; }
-    if (performance.now() - t0 > 5000) { truncated = true; break; }
+    if (performance.now() - t0 > (budgetMs || 5000)) { truncated = true; break; }
   }
   let best = null;
   for (const k in byK) if (!best || byK[k].score < best.score) best = byK[k];
@@ -219,4 +235,48 @@ function solve(M, K, lambda) {
   let R = optimise(M, K, lambda), partial = false;
   if (!R.best && M.lines.length) { R = optimise(withSkip(M), K, lambda); partial = true; }
   return { best: R.best, byK: R.byK, truncated: R.truncated, partial };
+}
+
+/* Sous-ensembles d'exactement k enseignes, au plus une par groupe. */
+function* subsetsOfSize(chans, k) {
+  const groups = [], idx = new Map();
+  chans.forEach((c, i) => { if (c.skip) return; const g = c.store.retailer || c.storeId; if (!idx.has(g)) { idx.set(g, groups.length); groups.push([]); } groups[idx.get(g)].push(i); });
+  const cur = [];
+  function* rec(g) {
+    if (cur.length === k) { yield cur.slice(); return; }
+    if (groups.length - g < k - cur.length) return;
+    for (const ci of groups[g]) { cur.push(ci); yield* rec(g + 1); cur.pop(); }
+    yield* rec(g + 1);
+  }
+  if (k > 0) yield* rec(0);
+}
+
+/* Toutes les tailles de commande, de 1 à Kmax, dans l'ordre. Pour chaque k, report() reçoit :
+   - full : la répartition de TOUT le panier la moins chère en k commandes au plus (null s'il n'y en a pas) ;
+   - partial : sinon, la répartition qui laisse le moins de produits de côté, puis la moins chère.
+   « full » est cumulé d'une taille à l'autre : pour le même panier, plus de commandes autorisées ne donne jamais un
+   total plus élevé. Les petites tailles passent d'abord : si le temps manque, seules les grandes sont écourtées. */
+function runAll(M, Kmax, lambda, report, budgetMs) {
+  const deadline = performance.now() + (budgetMs || 9000);
+  const MS = withSkip(M), SK = M.chans.length;
+  let full = null, partial = null, truncated = false;
+  for (let k = 1; k <= Kmax; k++) {
+    for (const sub of subsetsOfSize(M.chans, k)) {
+      if (performance.now() > deadline) { truncated = true; break; }
+      const r = solveSubset(sub, M, lambda, 1e7, deadline, full ? full.score : null);
+      if (r && r.truncated) truncated = true;
+      if (r && !r.none && (!full || r.score < full.score)) full = r;
+    }
+    if (!full) {
+      /* aucune répartition de tout le panier en k commandes au plus : on laisse des produits de côté (1 000 € chacun) */
+      for (const sub of subsetsOfSize(M.chans, k)) {
+        if (performance.now() > deadline) { truncated = true; break; }
+        const r = solveSubset(sub.concat([SK]), MS, lambda, 1e7, deadline, partial ? partial.score : null);
+        if (r && r.truncated) truncated = true;
+        if (r && !r.none && (!partial || r.score < partial.score)) partial = r;
+      }
+    }
+    report({ k, full, partial: full ? null : partial, truncated });
+  }
+  report({ done: true });
 }
