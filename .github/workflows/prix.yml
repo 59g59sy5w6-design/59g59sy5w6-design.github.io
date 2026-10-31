@@ -1,7 +1,9 @@
 name: Relevé des prix
-# Relevé à la demande (onglet Actions, « Run workflow »). Pour le remettre toutes les heures, ajouter :
+# Relevé à la demande (onglet Actions, « Run workflow »). Neuf cibles en parallèle (trois lots Houra, six magasins et
+# zones Auchan), chacune publie ses pages sur main ; un passage complet dure un peu plus de deux heures.
+# Pour le remettre une fois par jour (les prix des enseignes changent le matin), ajouter :
 #   schedule:
-#     - cron: "23 * * * *"
+#     - cron: "23 5 * * *"
 on:
   workflow_dispatch:
     inputs:
@@ -10,7 +12,7 @@ on:
         type: boolean
         default: false
       only:
-        description: "Diagnostic : enseignes à relire (par exemple auchan)"
+        description: "Diagnostic : enseignes à relire (par exemple houra,auchan-alesia)"
         type: string
         default: ""
 permissions:
@@ -21,8 +23,24 @@ concurrency:
   cancel-in-progress: false
 jobs:
   releve:
+    if: ${{ !inputs.diag }}
+    name: ${{ matrix.cible.only }} ${{ matrix.cible.lot }}
+    strategy:
+      fail-fast: false
+      max-parallel: 9
+      matrix:
+        cible:
+          - { only: houra, lot: frais }
+          - { only: houra, lot: epicerie }
+          - { only: houra, lot: nonalim }
+          - { only: auchan, lot: "" }
+          - { only: auchan-alesia, lot: "" }
+          - { only: auchan-bellesfeuilles, lot: "" }
+          - { only: auchan-livraison-perreux, lot: "" }
+          - { only: auchan-livraison-paris16, lot: "" }
+          - { only: auchan-livraison-paris14, lot: "" }
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,6 +52,24 @@ jobs:
       - name: Relever, reconstruire, publier
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DIAG: ${{ inputs.diag || 'false' }}
+          ONLY: ${{ matrix.cible.only }}
+          LOT: ${{ matrix.cible.lot }}
+        run: bash tools/ci.sh
+  diag:
+    if: ${{ inputs.diag }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Diagnostic sur la branche diag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DIAG: "true"
           ONLY: ${{ inputs.only }}
         run: bash tools/ci.sh

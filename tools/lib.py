@@ -254,8 +254,8 @@ def auchan_fragment(ret):
 def load_sources():
     """tools/sources.json, les pages Auchan dépliées : tools/gen_sources.py n'écrit chaque requête Auchan qu'une fois,
     avec "retailer": "auchan*" ; elle est rendue ici pour chaque magasin et zone de la clé magasins (enseigne auchan),
-    avec le fragment du point (auchan_fragment) ajouté à l'url et au repère match. tools/scrape.js doit faire le même
-    dépliage quand il lit sources.json."""
+    avec le fragment du point (auchan_fragment) ajouté à l'url et au repère match. tools/scrape.js fait le même
+    dépliage quand il lit sources.json (unfold)."""
     with open(os.path.join(TOOLS, "sources.json"), encoding="utf-8") as fh:
         src = json.load(fh)
     stores = [m for m, cfg in (src.get("magasins") or {}).items() if cfg.get("enseigne") == "auchan"]
@@ -271,6 +271,37 @@ def load_sources():
     return src
 
 
+DISCOVERED = os.path.join(STATE, "discovered.json")
+
+
+def discovered_key(d):
+    """Clé d'une page Houra trouvée par le robot (réglages « from » et « find ») : enseigne, rayon, page de départ et
+    étapes, la même règle que dans tools/scrape.js."""
+    return (d.get("retailer"), d.get("rayon"), d.get("from") or "", json.dumps(d.get("find"), ensure_ascii=False, separators=(",", ":")))
+
+
+def load_discovered():
+    """tools/state/discovered.json : les pages Houra trouvées par le robot aux passages précédents (liste, ou vide)."""
+    return json.load(open(DISCOVERED, encoding="utf-8")) if os.path.exists(DISCOVERED) else []
+
+
+def merge_discovered(new):
+    """Fusionne les pages trouvées à un passage (tools/work/discovered.json, écrit par tools/scrape.js) dans
+    tools/state/discovered.json : une page trouvée remplace celle de même clé, les autres restent (chaque cible du robot
+    n'en découvre qu'une partie). Écrit le fichier, renvoie la liste fusionnée et fait relire les routes."""
+    global _SOURCES
+    merged = {discovered_key(d): d for d in load_discovered()}
+    for d in new:
+        if d.get("url"):
+            merged[discovered_key(d)] = d
+    out = list(merged.values())
+    os.makedirs(STATE, exist_ok=True)
+    with open(DISCOVERED, "w", encoding="utf-8") as fh:
+        json.dump(out, fh, ensure_ascii=False, indent=1)
+    _SOURCES = None
+    return out
+
+
 _SOURCES = None
 _BY_URL = None
 _BY_HOST = None
@@ -284,9 +315,7 @@ def _load_routes():
     src = load_sources()
     _SOURCES = [p for p in src["pages"] if p.get("url")]
     # pages trouvées par le robot depuis la page d'un grand rayon (réglage « from » de tools/sources.json)
-    found = os.path.join(WORK, "discovered.json")
-    if os.path.exists(found):
-        _SOURCES += [p for p in json.load(open(found, encoding="utf-8")) if p.get("url")]
+    _SOURCES += [p for p in load_discovered() if p.get("url")]
     _BY_URL = collections.defaultdict(list)
     _BY_HOST = collections.defaultdict(list)
     for p in _SOURCES:

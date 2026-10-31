@@ -1,6 +1,6 @@
 # Lot boissons : Boissons, Cave
 
-Relevé Monoprix et Carrefour du lot boissons (66 pages). Suivre CLAUDE.md, « Mettre à jour les prix », avec `python3 tools/dump.py --reset --lot boissons` ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot boissons` après chaque série ; `bash tools/publish.sh claude` à la fin.
+Relevé Monoprix et Carrefour du lot boissons (66 pages). Suivre CLAUDE.md, « Mettre à jour les prix » : `python3 tools/dump.py --reset --lot boissons` (ou `--list --lot boissons` pour la liste seule) ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot boissons` après chaque série ; relire une fois les pages encore sans lecture ; `bash tools/publish.sh claude` à la fin.
 
 - Eaux plates (monoprix) : https://courses.monoprix.fr/categories/boissons-et-lait/eau/eau-plate/cb2210ff-6456-45d2-bbb0-e7f6b16e3b03?sortBy=favorite
   prompt : Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {"name": full product name exactly as written (brand + name), "format": pack size text as written (e.g. "6 x 1,5 L"), "price": current price as a number in euros, "was": previous crossed-out price as number or null, "unit": price per unit text as written (e.g. "0,25 €/l") or null, "promo": promotion text or null, "url": absolute product page URL or null}. Include every product on the page, do not skip any.

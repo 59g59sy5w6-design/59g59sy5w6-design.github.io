@@ -1,6 +1,6 @@
 # Lot maison : Entretien, Animaux
 
-Relevé Monoprix et Carrefour du lot maison (75 pages). Suivre CLAUDE.md, « Mettre à jour les prix », avec `python3 tools/dump.py --reset --lot maison` ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot maison` après chaque série ; `bash tools/publish.sh claude` à la fin.
+Relevé Monoprix et Carrefour du lot maison (75 pages). Suivre CLAUDE.md, « Mettre à jour les prix » : `python3 tools/dump.py --reset --lot maison` (ou `--list --lot maison` pour la liste seule) ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot maison` après chaque série ; relire une fois les pages encore sans lecture ; `bash tools/publish.sh claude` à la fin.
 
 - Lessive liquide (monoprix) : https://courses.monoprix.fr/categories/entretien-nettoyage/lessive-et-soin-du-linge/lessive/lessive-liquide/6f10764c-8c10-4a0e-b825-2105c9d1803e?sortBy=favorite
   prompt : Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {"name": full product name exactly as written (brand + name), "format": pack size text as written (e.g. "6 x 1,5 L"), "price": current price as a number in euros, "was": previous crossed-out price as number or null, "unit": price per unit text as written (e.g. "0,25 €/l") or null, "promo": promotion text or null, "url": absolute product page URL or null}. Include every product on the page, do not skip any.

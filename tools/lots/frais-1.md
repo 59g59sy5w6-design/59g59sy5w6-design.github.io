@@ -1,6 +1,6 @@
 # Lot frais-1 : Fruits et légumes, Viandes et poissons
 
-Relevé Monoprix et Carrefour du lot frais-1 (52 pages). Suivre CLAUDE.md, « Mettre à jour les prix », avec `python3 tools/dump.py --reset --lot frais-1` ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot frais-1` après chaque série ; `bash tools/publish.sh claude` à la fin.
+Relevé Monoprix et Carrefour du lot frais-1 (52 pages). Suivre CLAUDE.md, « Mettre à jour les prix » : `python3 tools/dump.py --reset --lot frais-1` (ou `--list --lot frais-1` pour la liste seule) ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot frais-1` après chaque série ; relire une fois les pages encore sans lecture ; `bash tools/publish.sh claude` à la fin.
 
 - Fruits (monoprix) : https://courses.monoprix.fr/categories/fruits-l%C3%A9gumes/fruits-frais/7e661271-696c-41d7-999c-7a4b40cfe326?sortBy=favorite
   prompt : Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {"name": full product name exactly as written (brand + name), "format": pack size text as written (e.g. "6 x 1,5 L"), "price": current price as a number in euros, "was": previous crossed-out price as number or null, "unit": price per unit text as written (e.g. "0,25 €/l") or null, "promo": promotion text or null, "url": absolute product page URL or null}. Include every product on the page, do not skip any.
