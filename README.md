@@ -22,7 +22,7 @@ Les prix sont relevés sur les pages de rayon publiques des sites des enseignes,
 
 ## Le dépôt
 
-Site statique servi par GitHub Pages : `index.html`, `app.css`, `app.js` (l'interface), `optimizer.js` et `worker.js` (la répartition du panier), `packs.js` (les illustrations, dessinées sans photo ni logo), `scan.js` (la lecture des codes-barres), `sw.js` (hors ligne), `data/` (le catalogue et les enseignes) et `tools/` (la chaîne de relevé des prix). Tout est décrit dans `CLAUDE.md`.
+Site statique servi par GitHub Pages : `index.html`, `app.css`, `app.js` (l'interface), `optimizer.js` et `worker.js` (la répartition du panier), `packs.js` (les illustrations, dessinées sans photo ni logo), `scan.js` (la lecture des codes-barres), `sw.js` (hors ligne), `data/` (le catalogue compact, ses détails par univers et les enseignes) et `tools/` (la chaîne de relevé des prix : `tools/rayons.json` décrit les 155 rayons et leurs pages chez chaque enseigne, `tools/catcheck.py` valide le catalogue). Tout est décrit dans `CLAUDE.md`.
 
 Tester en local : `python3 -m http.server 8000` à la racine, puis `node tools/smoke.js`, `node tools/optcheck.js` et `node tools/perf.js`.
 
