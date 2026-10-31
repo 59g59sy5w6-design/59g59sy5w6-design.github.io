@@ -1,0 +1,14 @@
+{
+  "note": "Réponse inventée de l'API d'Open Food Facts (api/v2/product/<code>.json), pour tools/smoke.js : la forme est celle de l'API, les valeurs ne décrivent aucun produit réel.",
+  "connu": {
+    "status": 1,
+    "product": {
+      "product_name_fr": "Produit d'essai",
+      "nutriscore_grade": "b",
+      "allergens_tags": ["en:milk", "fr:inconnu"],
+      "traces_tags": ["en:nuts"],
+      "labels_tags": ["en:organic", "en:made-in-france", "en:green-dot"]
+    }
+  },
+  "inconnu": { "status": 0, "status_verbose": "product not found" }
+}

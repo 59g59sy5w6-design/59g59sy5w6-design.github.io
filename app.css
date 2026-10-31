@@ -1099,6 +1099,43 @@ button.gt { width: 100%; text-align: left; padding: 0; }
 .spend .bar i { display: block; width: 100%; background: var(--brand); border-radius: var(--r-s) var(--r-s) 0 0; }
 .spend .sm { font-size: 0.875rem; color: var(--ink-2); }
 
+/* ---------- Nutri-Score et allergènes, comparer deux produits, signaler, une semaine de repas ---------- */
+/* Nutri-Score : les cinq lettres en gris, celle du produit en encre pleine (pas les couleurs du logo officiel) */
+.nscore { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; flex: none; }
+.nscore i { display: grid; place-items: center; width: 26px; height: 30px; border-radius: 6px; background: var(--fill); color: var(--ink-2); font: 700 0.875rem/1 var(--round); font-style: normal; }
+.nscore i.on { width: 34px; height: 38px; background: var(--ink); color: var(--paper); font-size: 1.125rem; }
+.cmpt .nscore { margin: 2px 0 0; }
+.cmpt .nscore i { width: 22px; }
+.cmpt .nscore i.on { width: 30px; }
+#pfacts .banner { margin-bottom: 12px; }
+/* comparer : deux colonnes égales ; l'intitulé de chaque ligne au-dessus des deux valeurs */
+.cmpt { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.cmpt th, .cmpt td { padding: 10px 12px; text-align: left; vertical-align: top; font-size: 0.9375rem; line-height: 1.33; overflow-wrap: anywhere; }
+.cmpt thead th { padding-top: 14px; font-weight: 500; }
+.cmpt thead a { display: flex; flex-direction: column; gap: 2px; color: var(--ink); text-decoration: none; border-radius: var(--r-s); }
+.cmpt thead .thumb { position: relative; width: 72px; height: 72px; border-radius: var(--r-s); background: var(--shelf); margin-bottom: 6px; }
+.cmpt thead .thumb img { position: absolute; inset: 4%; width: 92%; height: 92%; }
+.cmpt .cb { font-size: 0.875rem; font-weight: 600; color: var(--ink-2); }
+.cmpt .cn { font-weight: 600; }
+.cmpt thead .tag { margin-top: 8px; }
+.cmpt tr.cl th { padding: 10px 12px 0; font-size: 0.875rem; font-weight: 600; color: var(--ink-2); border-top: var(--hair) solid var(--sep); }
+.cmpt td + td, .cmpt thead th + th { border-left: var(--hair) solid var(--sep); }
+.cmpt td small { display: block; font-size: 0.875rem; color: var(--ink-2); }
+.cmpt td b { font-weight: 700; }
+.cmpt tr.take td { padding: 12px 10px; border-top: var(--hair) solid var(--sep); }
+.cmpt tr.take .btn { width: 100%; padding-left: 8px; padding-right: 8px; }
+.cmpv { margin-bottom: 12px; }
+.cmpv .vt { margin-top: 6px; font: 700 1.5rem/1.2 var(--round); }
+.cmpv .vt small { display: block; margin-top: 4px; font: 600 1rem/1.3 var(--sans); color: var(--brand-ink); }
+/* signaler : le texte qui partira, tel quel ; un champ de plusieurs lignes */
+.repv { margin: 8px var(--g) 0; padding: 12px 14px; border-radius: var(--r-s); background: var(--group); color: var(--ink); font: 0.875rem/1.4 var(--sans); white-space: pre-wrap; overflow-wrap: anywhere; }
+.field .in.ta { align-items: stretch; padding: 10px 14px; }
+.field textarea { flex: 1; min-width: 0; min-height: 6.5rem; border: 0; background: none; resize: vertical; font-size: 1.0625rem; line-height: 1.4; }
+.field textarea:focus { outline: none; }
+.row .rbtns { display: flex; flex-wrap: wrap; gap: 8px; }
+/* une semaine de repas : le formulaire dans une ligne de groupe */
+.row.stack > .btn { margin-top: 4px; }
+
 /* ---------- impression : la page seule, en noir sur blanc, sans barres ni boutons ; la liste du magasin à cocher au stylo ---------- */
 @media print {
   @page { margin: 14mm; }

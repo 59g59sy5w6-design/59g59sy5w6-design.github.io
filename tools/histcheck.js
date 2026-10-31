@@ -41,6 +41,8 @@ const fixture = (name) => JSON.parse(fs.readFileSync(path.join(__dirname, "fixtu
   const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, maxOrders: 3, extraCost: 0, offv: 1 };
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR", timezoneId: "Europe/Paris" });
+  /* la fiche demande Nutri-Score et allergènes à Open Food Facts : réponse simulée « inconnu », rien ne sort du test */
+  await ctx.route(/^https:\/\/world\.openfoodfacts\.org\//, (r) => r.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: '{"status":0}' }));
   const page = await ctx.newPage();
   page.on("pageerror", (e) => fail("erreur JS : " + e.message));
   page.on("console", (m) => { if (m.type() === "error") fail("console : " + m.text()); });

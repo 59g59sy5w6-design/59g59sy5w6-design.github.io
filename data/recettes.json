@@ -1,8 +1,8 @@
 {
-  "note": "Recettes simples du quotidien. Chaque ingrédient est cherché dans le catalogue (q) ; need est la quantité utilisée pour les portions indiquées, en g, ml ou pièces (pc). Les ingrédients du placard (sel, poivre, épices) ne sont pas comptés.",
+  "note": "Recettes simples du quotidien. Chaque ingrédient est cherché dans le catalogue comme une ligne de Ma liste (q) ; need est la quantité utilisée pour les portions indiquées, en g, ml ou pièces (pc), t le texte affiché. Les ingrédients du placard (sel, poivre, épices) ne sont pas comptés. kind : plat, accompagnement ou dessert ; main : l'ingrédient principal, pour varier les repas d'une semaine ; diet : les régimes que la recette suit par nature (veg végétarien, vegan, pork sans porc, alcohol sans alcool, gluten sans gluten, lactose sans lactose), chaque produit restant vérifié par le régime de l'appli ; complete : un plat qui se suffit à lui-même, sinon un accompagnement lui est ajouté dans une semaine composée, de préférence parmi with.",
   "recettes": [
     {
-      "id": "pates-thon-tomate", "name": "Pâtes au thon et à la tomate", "kind": "plat", "portions": 4, "minutes": 20,
+      "id": "pates-thon-tomate", "name": "Pâtes au thon et à la tomate", "kind": "plat", "main": "pates", "diet": ["pork", "alcohol"], "complete": true, "portions": 4, "minutes": 20,
       "ing": [
         { "q": "pâtes", "need": 400, "u": "g", "t": "400 g de pâtes" },
         { "q": "thon", "need": 280, "u": "g", "t": "2 boîtes de thon (280 g)" },
@@ -14,7 +14,7 @@
       "steps": ["Fais cuire les pâtes dans une grande casserole d'eau salée.", "Pendant ce temps, chauffe l'huile dans une poêle, ajoute les tomates en les écrasant et laisse réduire 10 minutes.", "Ajoute le thon émietté, sale, poivre et réchauffe 2 minutes.", "Mélange avec les pâtes égouttées et sers avec le fromage râpé."]
     },
     {
-      "id": "riz-thon-tomate", "name": "Riz au thon et aux tomates", "kind": "plat", "portions": 4, "minutes": 25,
+      "id": "riz-thon-tomate", "name": "Riz au thon et aux tomates", "kind": "plat", "main": "riz", "diet": ["pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 25,
       "ing": [
         { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
         { "q": "thon", "need": 280, "u": "g", "t": "2 boîtes de thon (280 g)" },
@@ -25,7 +25,7 @@
       "steps": ["Fais cuire le riz comme indiqué sur le paquet.", "Chauffe l'huile dans une poêle, ajoute les tomates et laisse mijoter 10 minutes.", "Ajoute le thon émietté et le paprika, puis le riz cuit.", "Mélange, rectifie l'assaisonnement et sers chaud."]
     },
     {
-      "id": "pates-sardines", "name": "Pâtes aux sardines et à la tomate", "kind": "plat", "portions": 4, "minutes": 20,
+      "id": "pates-sardines", "name": "Pâtes aux sardines et à la tomate", "kind": "plat", "main": "pates", "diet": ["pork", "alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 20,
       "ing": [
         { "q": "pâtes", "need": 400, "u": "g", "t": "400 g de pâtes" },
         { "q": "sardines", "need": 270, "u": "g", "t": "2 boîtes de sardines" },
@@ -36,7 +36,7 @@
       "steps": ["Fais cuire les pâtes.", "Fais revenir l'ail dans l'huile, ajoute les tomates écrasées et laisse réduire 8 minutes.", "Ajoute les sardines en morceaux, sans les écraser, et réchauffe doucement.", "Mélange avec les pâtes égouttées et sers aussitôt."]
     },
     {
-      "id": "gratin-coquillettes", "name": "Gratin de coquillettes", "kind": "plat", "portions": 4, "minutes": 35,
+      "id": "gratin-coquillettes", "name": "Gratin de coquillettes", "kind": "plat", "main": "pates", "diet": ["veg", "pork", "alcohol"], "complete": true, "portions": 4, "minutes": 35,
       "ing": [
         { "q": "coquillettes", "need": 300, "u": "g", "t": "300 g de coquillettes" },
         { "q": "lait", "need": 500, "u": "ml", "t": "50 cl de lait" },
@@ -48,7 +48,7 @@
       "steps": ["Fais cuire les coquillettes 2 minutes de moins que le temps indiqué et égoutte-les.", "Fais fondre le beurre, ajoute la farine, puis le lait petit à petit en remuant jusqu'à ce que la sauce épaississe.", "Mélange la sauce, les pâtes et la moitié du fromage dans un plat.", "Couvre du reste de fromage et passe 15 minutes au four à 200 °C."]
     },
     {
-      "id": "pates-fromage", "name": "Pâtes au beurre et au fromage", "kind": "plat", "portions": 4, "minutes": 15,
+      "id": "pates-fromage", "name": "Pâtes au beurre et au fromage", "kind": "plat", "main": "pates", "diet": ["veg", "pork", "alcohol"], "complete": true, "portions": 4, "minutes": 15,
       "ing": [
         { "q": "spaghetti", "need": 400, "u": "g", "t": "400 g de spaghetti" },
         { "q": "parmesan râpé", "need": 100, "u": "g", "t": "100 g de parmesan râpé" },
@@ -58,7 +58,7 @@
       "steps": ["Fais cuire les spaghetti et garde une louche d'eau de cuisson.", "Égoutte, remets dans la casserole hors du feu avec le beurre.", "Ajoute le fromage et un peu d'eau de cuisson en mélangeant jusqu'à obtenir une sauce lisse.", "Poivre généreusement et sers."]
     },
     {
-      "id": "omelette-fromage", "name": "Omelette au fromage", "kind": "plat", "portions": 2, "minutes": 10,
+      "id": "omelette-fromage", "name": "Omelette au fromage", "kind": "plat", "main": "oeufs", "diet": ["veg", "pork", "alcohol", "gluten"], "complete": false, "with": ["salade-verte", "pommes-sautees"], "portions": 2, "minutes": 10,
       "ing": [
         { "q": "oeufs", "need": 6, "u": "pc", "t": "6 œufs" },
         { "q": "emmental râpé", "need": 60, "u": "g", "t": "60 g d'emmental râpé" },
@@ -69,7 +69,7 @@
       "steps": ["Bats les œufs avec le lait, sale et poivre.", "Fais fondre le beurre dans une poêle à feu moyen et verse les œufs.", "Quand l'omelette prend, parsème le fromage, plie-la en deux et sers aussitôt."]
     },
     {
-      "id": "riz-oeufs", "name": "Riz sauté aux œufs", "kind": "plat", "portions": 4, "minutes": 25,
+      "id": "riz-oeufs", "name": "Riz sauté aux œufs", "kind": "plat", "main": "riz", "diet": ["veg", "pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 25,
       "ing": [
         { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
         { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
@@ -79,7 +79,7 @@
       "steps": ["Fais cuire le riz et laisse-le refroidir un peu.", "Chauffe l'huile dans une grande poêle, verse les œufs battus et remue pour les brouiller.", "Ajoute le riz, fais sauter 5 minutes à feu vif.", "Assaisonne et sers chaud."]
     },
     {
-      "id": "crepes", "name": "Crêpes", "kind": "dessert", "portions": 4, "minutes": 30,
+      "id": "crepes", "name": "Crêpes", "kind": "dessert", "main": "farine", "diet": ["veg", "pork", "alcohol"], "complete": false, "portions": 4, "minutes": 30,
       "ing": [
         { "q": "farine", "need": 250, "u": "g", "t": "250 g de farine" },
         { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
@@ -91,7 +91,7 @@
       "steps": ["Mélange la farine, le sucre et le sel, puis ajoute les œufs.", "Verse le lait petit à petit en fouettant pour éviter les grumeaux, puis le beurre fondu.", "Laisse reposer la pâte une heure si tu as le temps.", "Fais cuire les crêpes une à une dans une poêle chaude légèrement beurrée."]
     },
     {
-      "id": "pancakes", "name": "Pancakes", "kind": "dessert", "portions": 4, "minutes": 25,
+      "id": "pancakes", "name": "Pancakes", "kind": "dessert", "main": "farine", "diet": ["veg", "pork", "alcohol"], "complete": false, "portions": 4, "minutes": 25,
       "ing": [
         { "q": "farine", "need": 250, "u": "g", "t": "250 g de farine" },
         { "q": "oeufs", "need": 2, "u": "pc", "t": "2 œufs" },
@@ -100,10 +100,10 @@
         { "q": "beurre", "need": 30, "u": "g", "t": "30 g de beurre" }
       ],
       "placard": "1 sachet de levure chimique, une pincée de sel",
-      "steps": ["Mélange la farine, la levure, le sucre et le sel.", "Ajoute les œufs, puis le lait et le beurre fondu, jusqu'à une pâte épaisse.", "Verse une petite louche dans une poêle chaude et retourne quand des bulles apparaissent.", "Sers avec ce que tu aimes : sucre, confiture, fruits."]
+      "steps": ["Mélange la farine, la levure, le sucre et le sel.", "Ajoute les œufs, puis le lait et le beurre fondu, jusqu'à une pâte épaisse.", "Verse une petite louche dans une poêle chaude et retourne quand des bulles apparaissent.", "Sers avec ce que tu aimes : sucre, confiture, fruits."]
     },
     {
-      "id": "gateau-yaourt", "name": "Gâteau au yaourt", "kind": "dessert", "portions": 8, "minutes": 45,
+      "id": "gateau-yaourt", "name": "Gâteau au yaourt", "kind": "dessert", "main": "farine", "diet": ["veg", "pork", "alcohol"], "complete": false, "portions": 8, "minutes": 45,
       "ing": [
         { "q": "yaourt nature", "need": 125, "u": "g", "t": "1 yaourt nature" },
         { "q": "farine", "need": 200, "u": "g", "t": "3 pots de farine (200 g)" },
@@ -115,7 +115,7 @@
       "steps": ["Préchauffe le four à 180 °C.", "Verse le yaourt dans un saladier et garde le pot pour mesurer.", "Ajoute le sucre, les œufs, la farine, la levure puis l'huile, en mélangeant à chaque fois.", "Verse dans un moule beurré et fais cuire 35 minutes."]
     },
     {
-      "id": "quatre-quarts", "name": "Quatre-quarts", "kind": "dessert", "portions": 8, "minutes": 55,
+      "id": "quatre-quarts", "name": "Quatre-quarts", "kind": "dessert", "main": "farine", "diet": ["veg", "pork", "alcohol"], "complete": false, "portions": 8, "minutes": 55,
       "ing": [
         { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
         { "q": "farine", "need": 220, "u": "g", "t": "220 g de farine" },
@@ -126,7 +126,7 @@
       "steps": ["Préchauffe le four à 180 °C et fais fondre le beurre.", "Fouette les œufs avec le sucre jusqu'à ce que le mélange blanchisse.", "Ajoute le beurre fondu, puis la farine, la levure et le sel.", "Verse dans un moule à cake beurré et fais cuire 40 minutes."]
     },
     {
-      "id": "riz-au-lait", "name": "Riz au lait", "kind": "dessert", "portions": 6, "minutes": 45,
+      "id": "riz-au-lait", "name": "Riz au lait", "kind": "dessert", "main": "lait", "diet": ["veg", "pork", "alcohol", "gluten"], "complete": false, "portions": 6, "minutes": 45,
       "ing": [
         { "q": "riz", "need": 120, "u": "g", "t": "120 g de riz" },
         { "q": "lait", "need": 1000, "u": "ml", "t": "1 litre de lait" },
@@ -136,7 +136,7 @@
       "steps": ["Porte le lait à frémissement avec la vanille.", "Verse le riz en pluie et laisse cuire à feu très doux 35 minutes en remuant souvent.", "Ajoute le sucre en fin de cuisson et laisse refroidir."]
     },
     {
-      "id": "flan-oeufs", "name": "Flan aux œufs", "kind": "dessert", "portions": 6, "minutes": 50,
+      "id": "flan-oeufs", "name": "Flan aux œufs", "kind": "dessert", "main": "oeufs", "diet": ["veg", "pork", "alcohol", "gluten"], "complete": false, "portions": 6, "minutes": 50,
       "ing": [
         { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
         { "q": "lait", "need": 500, "u": "ml", "t": "50 cl de lait" },
@@ -144,6 +144,542 @@
       ],
       "placard": "vanille",
       "steps": ["Préchauffe le four à 160 °C et fais chauffer le lait avec la vanille.", "Fouette les œufs avec le sucre, puis verse le lait chaud en remuant.", "Répartis dans des ramequins et fais cuire 35 minutes au bain-marie."]
+    },
+    {
+      "id": "pates-carbonara", "name": "Pâtes à la carbonara", "kind": "plat", "main": "pates", "diet": ["alcohol"], "complete": true, "portions": 4, "minutes": 20,
+      "ing": [
+        { "q": "spaghetti", "need": 400, "u": "g", "t": "400 g de spaghetti" },
+        { "q": "lardons", "need": 200, "u": "g", "t": "200 g de lardons" },
+        { "q": "oeufs", "need": 3, "u": "pc", "t": "3 œufs" },
+        { "q": "crème fraîche", "need": 200, "u": "ml", "t": "20 cl de crème fraîche" },
+        { "q": "parmesan râpé", "need": 50, "u": "g", "t": "50 g de parmesan râpé" }
+      ],
+      "placard": "poivre",
+      "steps": ["Fais cuire les spaghetti dans une grande casserole d'eau salée.", "Fais dorer les lardons à sec dans une poêle.", "Bats les œufs avec la crème et le parmesan, poivre bien.", "Hors du feu, mélange les pâtes égouttées, les lardons et la crème aux œufs, et sers tout de suite."]
+    },
+    {
+      "id": "spaghetti-bolognaise", "name": "Spaghetti à la bolognaise", "kind": "plat", "main": "pates", "diet": ["pork", "alcohol"], "complete": true, "portions": 4, "minutes": 35,
+      "ing": [
+        { "q": "spaghetti", "need": 400, "u": "g", "t": "400 g de spaghetti" },
+        { "q": "viande hachée", "need": 400, "u": "g", "t": "400 g de viande hachée" },
+        { "q": "sauce tomate", "need": 420, "u": "g", "t": "1 pot de sauce tomate" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" },
+        { "q": "emmental râpé", "need": 50, "u": "g", "t": "50 g d'emmental râpé" }
+      ],
+      "placard": "sel, poivre, herbes de Provence",
+      "steps": ["Émince l'oignon et fais-le revenir dans l'huile.", "Ajoute la viande hachée, fais-la dorer en l'émiettant.", "Verse la sauce tomate et les herbes, laisse mijoter 15 minutes.", "Fais cuire les spaghetti et sers-les avec la sauce et le fromage râpé."]
+    },
+    {
+      "id": "pates-pesto", "name": "Pâtes au pesto et tomates cerises", "kind": "plat", "main": "pates", "diet": ["veg", "pork", "alcohol"], "complete": true, "portions": 4, "minutes": 15,
+      "ing": [
+        { "q": "penne", "need": 400, "u": "g", "t": "400 g de penne" },
+        { "q": "pesto", "need": 190, "u": "g", "t": "1 pot de pesto" },
+        { "q": "tomates cerises", "need": 250, "u": "g", "t": "250 g de tomates cerises" },
+        { "q": "parmesan râpé", "need": 40, "u": "g", "t": "40 g de parmesan râpé" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Fais cuire les penne dans une grande casserole d'eau salée.", "Coupe les tomates cerises en deux.", "Égoutte les pâtes en gardant un peu d'eau de cuisson, mélange-les avec le pesto et cette eau.", "Ajoute les tomates et le parmesan, et sers."]
+    },
+    {
+      "id": "pates-dinde-champignons", "name": "Pâtes à la dinde, crème et champignons", "kind": "plat", "main": "pates", "diet": ["pork", "alcohol"], "complete": true, "portions": 4, "minutes": 25,
+      "ing": [
+        { "q": "pâtes", "need": 400, "u": "g", "t": "400 g de pâtes" },
+        { "q": "escalopes de dinde", "need": 300, "u": "g", "t": "300 g d'escalopes de dinde" },
+        { "q": "champignons blancs", "need": 250, "u": "g", "t": "250 g de champignons" },
+        { "q": "crème fraîche", "need": 200, "u": "ml", "t": "20 cl de crème fraîche" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Fais cuire les pâtes.", "Coupe la dinde en lamelles et fais-la dorer dans l'huile.", "Ajoute les champignons émincés, laisse cuire 5 minutes.", "Verse la crème, sale, poivre, et mélange avec les pâtes égouttées."]
+    },
+    {
+      "id": "coquillettes-jambon", "name": "Coquillettes au jambon", "kind": "plat", "main": "pates", "diet": ["alcohol"], "complete": true, "portions": 4, "minutes": 15,
+      "ing": [
+        { "q": "coquillettes", "need": 400, "u": "g", "t": "400 g de coquillettes" },
+        { "q": "jambon blanc", "need": 160, "u": "g", "t": "4 tranches de jambon" },
+        { "q": "beurre", "need": 20, "u": "g", "t": "20 g de beurre" },
+        { "q": "emmental râpé", "need": 60, "u": "g", "t": "60 g d'emmental râpé" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Fais cuire les coquillettes dans de l'eau salée.", "Coupe le jambon en petits morceaux.", "Égoutte les pâtes, ajoute le beurre, le jambon et le fromage, mélange et sers chaud."]
+    },
+    {
+      "id": "pates-courgettes-chevre", "name": "Pâtes aux courgettes et au chèvre", "kind": "plat", "main": "pates", "diet": ["veg", "pork", "alcohol"], "complete": true, "portions": 4, "minutes": 25,
+      "ing": [
+        { "q": "pâtes", "need": 400, "u": "g", "t": "400 g de pâtes" },
+        { "q": "courgettes", "need": 500, "u": "g", "t": "500 g de courgettes" },
+        { "q": "bûche de chèvre", "need": 180, "u": "g", "t": "1 bûche de chèvre" },
+        { "q": "crème fraîche", "need": 100, "u": "ml", "t": "10 cl de crème fraîche" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, ail",
+      "steps": ["Fais cuire les pâtes.", "Fais revenir les courgettes en rondelles dans l'huile 10 minutes.", "Ajoute la crème et la moitié du chèvre émietté, laisse fondre.", "Mélange avec les pâtes et parsème le reste du chèvre."]
+    },
+    {
+      "id": "salade-pates-thon", "name": "Salade de pâtes au thon", "kind": "plat", "main": "pates", "diet": ["pork", "alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 20,
+      "ing": [
+        { "q": "pâtes", "need": 300, "u": "g", "t": "300 g de pâtes" },
+        { "q": "thon", "need": 160, "u": "g", "t": "1 boîte de thon" },
+        { "q": "maïs", "need": 285, "u": "g", "t": "1 boîte de maïs" },
+        { "q": "tomates cerises", "need": 250, "u": "g", "t": "250 g de tomates cerises" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" }
+      ],
+      "placard": "vinaigre, moutarde, sel, poivre",
+      "steps": ["Fais cuire les pâtes, rince-les à l'eau froide et égoutte-les.", "Coupe les tomates en deux, égoutte le maïs et émiette le thon.", "Prépare une vinaigrette avec l'huile, le vinaigre et la moutarde.", "Mélange le tout et garde au frais jusqu'au repas."]
+    },
+    {
+      "id": "riz-cantonais", "name": "Riz cantonais", "kind": "plat", "main": "riz", "diet": ["alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
+        { "q": "oeufs", "need": 3, "u": "pc", "t": "3 œufs" },
+        { "q": "jambon blanc", "need": 150, "u": "g", "t": "150 g de jambon" },
+        { "q": "petits pois extra fins", "need": 280, "u": "g", "t": "1 boîte de petits pois" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" }
+      ],
+      "placard": "sel, sauce soja si tu en as",
+      "steps": ["Fais cuire le riz et laisse-le refroidir.", "Fais une omelette fine avec les œufs battus, roule-la et coupe-la en lanières.", "Fais sauter le riz dans l'huile avec les petits pois égouttés et le jambon en dés.", "Ajoute l'omelette, assaisonne et sers chaud."]
+    },
+    {
+      "id": "poulet-curry-coco", "name": "Poulet au curry et au lait de coco", "kind": "plat", "main": "poulet", "diet": ["pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 35,
+      "ing": [
+        { "q": "hauts de cuisse de poulet", "need": 600, "u": "g", "t": "600 g de hauts de cuisse de poulet" },
+        { "q": "lait de coco", "need": 400, "u": "ml", "t": "40 cl de lait de coco" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" }
+      ],
+      "placard": "sel, curry en poudre",
+      "steps": ["Coupe le poulet en morceaux et l'oignon en lamelles.", "Fais-les dorer dans l'huile, ajoute 2 cuillères de curry.", "Verse le lait de coco et laisse mijoter 20 minutes à couvert.", "Pendant ce temps, fais cuire le riz et sers ensemble."]
+    },
+    {
+      "id": "boulettes-semoule", "name": "Boulettes de bœuf à la tomate et semoule", "kind": "plat", "main": "boeuf", "diet": ["pork", "alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 35,
+      "ing": [
+        { "q": "viande hachée", "need": 400, "u": "g", "t": "400 g de viande hachée" },
+        { "q": "oeufs", "need": 1, "u": "pc", "t": "1 œuf" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "sauce tomate", "need": 420, "u": "g", "t": "1 pot de sauce tomate" },
+        { "q": "semoule", "need": 300, "u": "g", "t": "300 g de semoule" }
+      ],
+      "placard": "sel, poivre, cumin",
+      "steps": ["Mélange la viande, l'œuf, l'oignon haché finement, le sel et le cumin, et forme des boulettes.", "Fais-les dorer dans une poêle sur toutes les faces.", "Verse la sauce tomate et laisse mijoter 15 minutes.", "Prépare la semoule avec de l'eau bouillante salée et sers avec les boulettes."]
+    },
+    {
+      "id": "riz-champignons", "name": "Riz crémeux aux champignons", "kind": "plat", "main": "riz", "diet": ["veg", "pork", "alcohol", "gluten"], "complete": true, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
+        { "q": "champignons blancs", "need": 250, "u": "g", "t": "250 g de champignons" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "crème fraîche", "need": 100, "u": "ml", "t": "10 cl de crème fraîche" },
+        { "q": "parmesan râpé", "need": 50, "u": "g", "t": "50 g de parmesan râpé" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, un cube de bouillon",
+      "steps": ["Fais revenir l'oignon émincé dans l'huile, ajoute le riz et remue 2 minutes.", "Verse un litre de bouillon chaud peu à peu, en remuant, pendant 18 minutes.", "Fais revenir les champignons émincés à part.", "Hors du feu, ajoute les champignons, la crème et le parmesan, et sers."]
+    },
+    {
+      "id": "dahl-lentilles", "name": "Dahl de lentilles corail", "kind": "plat", "main": "legumineuses", "diet": ["veg", "vegan", "pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "lentilles corail", "need": 250, "u": "g", "t": "250 g de lentilles corail" },
+        { "q": "lait de coco", "need": 400, "u": "ml", "t": "40 cl de lait de coco" },
+        { "q": "tomates pelées", "need": 400, "u": "g", "t": "1 boîte de tomates pelées" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "riz", "need": 250, "u": "g", "t": "250 g de riz" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" }
+      ],
+      "placard": "sel, curry, cumin",
+      "steps": ["Fais revenir l'oignon dans l'huile avec le curry et le cumin.", "Ajoute les lentilles rincées, les tomates, le lait de coco et 40 cl d'eau.", "Laisse cuire 20 minutes à feu doux en remuant, jusqu'à ce que les lentilles fondent.", "Sers avec le riz."]
+    },
+    {
+      "id": "hachis-parmentier", "name": "Hachis parmentier", "kind": "plat", "main": "boeuf", "diet": ["pork", "alcohol", "gluten"], "complete": true, "portions": 4, "minutes": 50,
+      "ing": [
+        { "q": "pommes de terre", "need": 1000, "u": "g", "t": "1 kg de pommes de terre" },
+        { "q": "viande hachée", "need": 400, "u": "g", "t": "400 g de viande hachée" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "lait", "need": 200, "u": "ml", "t": "20 cl de lait" },
+        { "q": "beurre", "need": 30, "u": "g", "t": "30 g de beurre" },
+        { "q": "emmental râpé", "need": 60, "u": "g", "t": "60 g d'emmental râpé" }
+      ],
+      "placard": "sel, poivre, muscade",
+      "steps": ["Fais cuire les pommes de terre épluchées 20 minutes dans l'eau salée, puis écrase-les avec le lait chaud et le beurre.", "Fais revenir l'oignon et la viande, sale et poivre.", "Étale la viande dans un plat, couvre de purée et de fromage râpé.", "Fais gratiner 20 minutes au four à 200 °C."]
+    },
+    {
+      "id": "tartiflette", "name": "Tartiflette", "kind": "plat", "main": "pommes-de-terre", "diet": ["alcohol", "gluten"], "complete": true, "portions": 4, "minutes": 55,
+      "ing": [
+        { "q": "pommes de terre", "need": 1000, "u": "g", "t": "1 kg de pommes de terre" },
+        { "q": "lardons", "need": 200, "u": "g", "t": "200 g de lardons" },
+        { "q": "reblochon", "need": 450, "u": "g", "t": "1 reblochon" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "crème fraîche", "need": 100, "u": "ml", "t": "10 cl de crème fraîche" }
+      ],
+      "placard": "poivre",
+      "steps": ["Fais cuire les pommes de terre 20 minutes, épluche-les et coupe-les en rondelles.", "Fais revenir l'oignon et les lardons.", "Mélange les pommes de terre, les lardons et la crème dans un plat, pose le reblochon coupé en deux, croûte en haut.", "Fais cuire 25 minutes au four à 200 °C."]
+    },
+    {
+      "id": "saucisses-pommes-de-terre", "name": "Saucisses et pommes de terre au four", "kind": "plat", "main": "porc", "diet": ["alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 45,
+      "ing": [
+        { "q": "saucisses de Toulouse", "need": 400, "u": "g", "t": "4 saucisses de Toulouse" },
+        { "q": "pommes de terre", "need": 1000, "u": "g", "t": "1 kg de pommes de terre" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, thym",
+      "steps": ["Préchauffe le four à 200 °C.", "Coupe les pommes de terre en quartiers et l'oignon en lamelles, mélange-les avec l'huile, le sel et le thym.", "Pose les saucisses par-dessus.", "Fais cuire 35 minutes en retournant les saucisses à mi-cuisson."]
+    },
+    {
+      "id": "omelette-pommes-de-terre", "name": "Omelette aux pommes de terre", "kind": "plat", "main": "oeufs", "diet": ["veg", "pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 35,
+      "ing": [
+        { "q": "oeufs", "need": 6, "u": "pc", "t": "6 œufs" },
+        { "q": "pommes de terre", "need": 500, "u": "g", "t": "500 g de pommes de terre" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "huile", "need": 50, "u": "ml", "t": "5 cl d'huile" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Coupe les pommes de terre en fines rondelles et l'oignon en lamelles.", "Fais-les cuire doucement dans l'huile 20 minutes.", "Verse les œufs battus et salés, laisse prendre à feu doux.", "Retourne l'omelette à l'aide d'une assiette et laisse cuire encore 3 minutes."]
+    },
+    {
+      "id": "quiche-lorraine", "name": "Quiche lorraine", "kind": "plat", "main": "oeufs", "diet": ["alcohol"], "complete": false, "with": ["salade-verte"], "portions": 6, "minutes": 50,
+      "ing": [
+        { "q": "pâte brisée", "need": 230, "u": "g", "t": "1 pâte brisée" },
+        { "q": "lardons", "need": 200, "u": "g", "t": "200 g de lardons" },
+        { "q": "oeufs", "need": 3, "u": "pc", "t": "3 œufs" },
+        { "q": "crème fraîche", "need": 200, "u": "ml", "t": "20 cl de crème fraîche" },
+        { "q": "lait", "need": 100, "u": "ml", "t": "10 cl de lait" },
+        { "q": "emmental râpé", "need": 70, "u": "g", "t": "70 g d'emmental râpé" }
+      ],
+      "placard": "sel, poivre, muscade",
+      "steps": ["Préchauffe le four à 180 °C et étale la pâte dans un moule.", "Fais revenir les lardons à sec et répartis-les sur la pâte.", "Bats les œufs avec la crème, le lait, le poivre et la muscade, verse sur les lardons.", "Parsème de fromage et fais cuire 35 minutes."]
+    },
+    {
+      "id": "tarte-poireaux", "name": "Tarte aux poireaux", "kind": "plat", "main": "legumes", "diet": ["veg", "pork", "alcohol"], "complete": false, "with": ["salade-verte"], "portions": 6, "minutes": 50,
+      "ing": [
+        { "q": "pâte brisée", "need": 230, "u": "g", "t": "1 pâte brisée" },
+        { "q": "poireaux botte", "need": 500, "u": "g", "t": "500 g de poireaux" },
+        { "q": "oeufs", "need": 3, "u": "pc", "t": "3 œufs" },
+        { "q": "crème fraîche", "need": 200, "u": "ml", "t": "20 cl de crème fraîche" },
+        { "q": "emmental râpé", "need": 60, "u": "g", "t": "60 g d'emmental râpé" },
+        { "q": "beurre", "need": 20, "u": "g", "t": "20 g de beurre" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Préchauffe le four à 180 °C et étale la pâte dans un moule.", "Émince les poireaux et fais-les fondre dans le beurre 15 minutes.", "Bats les œufs avec la crème, sale et poivre, ajoute les poireaux.", "Verse sur la pâte, parsème de fromage et fais cuire 35 minutes."]
+    },
+    {
+      "id": "poulet-pommes-de-terre", "name": "Poulet rôti et pommes de terre", "kind": "plat", "main": "poulet", "diet": ["pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 55,
+      "ing": [
+        { "q": "hauts de cuisse de poulet", "need": 800, "u": "g", "t": "800 g de hauts de cuisse de poulet" },
+        { "q": "pommes de terre", "need": 800, "u": "g", "t": "800 g de pommes de terre" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, thym, ail",
+      "steps": ["Préchauffe le four à 200 °C.", "Coupe les pommes de terre en quartiers et mets-les dans un plat avec l'huile, le sel et le thym.", "Pose le poulet par-dessus, sale et poivre.", "Fais cuire 45 minutes en arrosant le poulet de son jus à mi-cuisson."]
+    },
+    {
+      "id": "dinde-creme-champignons", "name": "Escalopes de dinde à la crème", "kind": "plat", "main": "poulet", "diet": ["pork", "alcohol", "gluten"], "complete": false, "with": ["riz-nature", "puree-maison", "haricots-verts"], "portions": 4, "minutes": 25,
+      "ing": [
+        { "q": "escalopes de dinde", "need": 480, "u": "g", "t": "4 escalopes de dinde" },
+        { "q": "champignons blancs", "need": 250, "u": "g", "t": "250 g de champignons" },
+        { "q": "crème fraîche", "need": 200, "u": "ml", "t": "20 cl de crème fraîche" },
+        { "q": "beurre", "need": 15, "u": "g", "t": "15 g de beurre" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Fais dorer les escalopes dans le beurre 4 minutes de chaque côté, puis réserve-les.", "Fais revenir les champignons émincés dans la même poêle.", "Verse la crème, sale, poivre et laisse épaissir 3 minutes.", "Remets les escalopes dans la sauce et sers."]
+    },
+    {
+      "id": "wraps-poulet", "name": "Wraps au poulet", "kind": "plat", "main": "poulet", "diet": ["pork", "alcohol"], "complete": true, "portions": 4, "minutes": 15,
+      "ing": [
+        { "q": "tortillas de blé", "need": 320, "u": "g", "t": "8 tortillas" },
+        { "q": "blanc de poulet", "need": 360, "u": "g", "t": "360 g de blanc de poulet" },
+        { "q": "laitue iceberg", "need": 200, "u": "g", "t": "un peu de salade" },
+        { "q": "tomates cerises", "need": 250, "u": "g", "t": "250 g de tomates cerises" },
+        { "q": "fromage blanc", "need": 150, "u": "g", "t": "150 g de fromage blanc" }
+      ],
+      "placard": "sel, poivre, ciboulette si tu en as",
+      "steps": ["Mélange le fromage blanc avec le sel, le poivre et la ciboulette.", "Coupe le poulet en lanières, les tomates en quartiers et émince la salade.", "Tartine chaque tortilla de sauce, garnis et roule bien serré."]
+    },
+    {
+      "id": "poulet-basquaise", "name": "Poulet basquaise", "kind": "plat", "main": "poulet", "diet": ["pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 50,
+      "ing": [
+        { "q": "hauts de cuisse de poulet", "need": 800, "u": "g", "t": "800 g de hauts de cuisse de poulet" },
+        { "q": "poivrons", "need": 500, "u": "g", "t": "500 g de poivrons" },
+        { "q": "tomates pelées", "need": 400, "u": "g", "t": "1 boîte de tomates pelées" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, ail, piment doux",
+      "steps": ["Fais dorer le poulet dans l'huile dans une cocotte, puis réserve-le.", "Fais revenir l'oignon et les poivrons en lanières 10 minutes.", "Ajoute les tomates et le poulet, couvre et laisse mijoter 30 minutes.", "Fais cuire le riz et sers avec le poulet et sa sauce."]
+    },
+    {
+      "id": "steak-frites", "name": "Steak haché et frites au four", "kind": "plat", "main": "boeuf", "diet": ["pork", "alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "steak haché pur boeuf", "need": 500, "u": "g", "t": "4 steaks hachés" },
+        { "q": "frites", "need": 750, "u": "g", "t": "750 g de frites surgelées" }
+      ],
+      "placard": "sel, poivre, ketchup ou moutarde",
+      "steps": ["Fais cuire les frites au four comme indiqué sur le paquet.", "Quelques minutes avant la fin, fais cuire les steaks à la poêle, 3 minutes de chaque côté.", "Sale, poivre et sers aussitôt."]
+    },
+    {
+      "id": "burger-maison", "name": "Burgers maison", "kind": "plat", "main": "boeuf", "diet": ["pork", "alcohol"], "complete": true, "portions": 4, "minutes": 20,
+      "ing": [
+        { "q": "pains burger", "need": 330, "u": "g", "t": "4 pains à burger" },
+        { "q": "steak haché pur boeuf", "need": 500, "u": "g", "t": "4 steaks hachés" },
+        { "q": "cheddar râpé", "need": 100, "u": "g", "t": "100 g de cheddar râpé" },
+        { "q": "laitue iceberg", "need": 100, "u": "g", "t": "quelques feuilles de salade" },
+        { "q": "tomates cerises", "need": 250, "u": "g", "t": "250 g de tomates cerises" }
+      ],
+      "placard": "ketchup, moutarde, sel, poivre",
+      "steps": ["Fais toaster les pains coupés en deux.", "Fais cuire les steaks à la poêle et pose le cheddar dessus en fin de cuisson pour qu'il fonde.", "Garnis chaque pain de salade, de tomates en rondelles et d'un steak, avec la sauce de ton choix."]
+    },
+    {
+      "id": "saucisses-lentilles", "name": "Saucisses aux lentilles", "kind": "plat", "main": "porc", "diet": ["alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 45,
+      "ing": [
+        { "q": "saucisses de Toulouse", "need": 400, "u": "g", "t": "4 saucisses de Toulouse" },
+        { "q": "lentilles vertes", "need": 300, "u": "g", "t": "300 g de lentilles vertes" },
+        { "q": "carottes extra fines", "need": 265, "u": "g", "t": "1 boîte de carottes" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" }
+      ],
+      "placard": "sel, poivre, thym, laurier",
+      "steps": ["Mets les lentilles rincées, l'oignon émincé, le thym et le laurier dans une casserole d'eau froide.", "Porte à ébullition et laisse cuire 25 minutes.", "Pendant ce temps, fais dorer les saucisses à la poêle.", "Ajoute les carottes égouttées et les saucisses aux lentilles, réchauffe 5 minutes et sale en fin de cuisson."]
+    },
+    {
+      "id": "poisson-pane-puree", "name": "Poisson pané et purée", "kind": "plat", "main": "poisson", "diet": ["pork", "alcohol"], "complete": true, "portions": 4, "minutes": 35,
+      "ing": [
+        { "q": "poisson pané", "need": 450, "u": "g", "t": "450 g de poisson pané" },
+        { "q": "pommes de terre", "need": 1000, "u": "g", "t": "1 kg de pommes de terre" },
+        { "q": "lait", "need": 250, "u": "ml", "t": "25 cl de lait" },
+        { "q": "beurre", "need": 40, "u": "g", "t": "40 g de beurre" }
+      ],
+      "placard": "sel, citron si tu en as",
+      "steps": ["Fais cuire les pommes de terre épluchées 20 minutes dans l'eau salée.", "Écrase-les avec le lait chaud et le beurre.", "Fais cuire le poisson pané au four ou à la poêle comme indiqué sur le paquet.", "Sers avec la purée."]
+    },
+    {
+      "id": "colin-creme-riz", "name": "Colin à la crème et riz", "kind": "plat", "main": "poisson", "diet": ["pork", "alcohol", "gluten"], "complete": true, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "colin sans arête", "need": 500, "u": "g", "t": "500 g de filets de colin" },
+        { "q": "crème fraîche", "need": 200, "u": "ml", "t": "20 cl de crème fraîche" },
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" }
+      ],
+      "placard": "sel, poivre, citron ou aneth si tu en as",
+      "steps": ["Fais cuire le riz.", "Pose le poisson dans une poêle, couvre et fais-le cuire 8 minutes à feu doux.", "Ajoute la crème, sale, poivre et laisse chauffer 3 minutes.", "Sers avec le riz."]
+    },
+    {
+      "id": "salade-nicoise", "name": "Salade niçoise", "kind": "plat", "main": "poisson", "diet": ["pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "thon", "need": 280, "u": "g", "t": "2 boîtes de thon" },
+        { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
+        { "q": "pommes de terre", "need": 400, "u": "g", "t": "400 g de pommes de terre" },
+        { "q": "tomates cerises", "need": 250, "u": "g", "t": "250 g de tomates cerises" },
+        { "q": "laitue iceberg", "need": 200, "u": "g", "t": "une salade" },
+        { "q": "olives noires", "need": 100, "u": "g", "t": "100 g d'olives noires" },
+        { "q": "huile d'olive", "need": 40, "u": "ml", "t": "4 cuillères à soupe d'huile d'olive" }
+      ],
+      "placard": "vinaigre, sel, poivre",
+      "steps": ["Fais cuire les pommes de terre 20 minutes et les œufs 10 minutes, puis laisse refroidir.", "Coupe les pommes de terre, les œufs et les tomates.", "Dispose sur la salade avec le thon et les olives.", "Arrose d'huile et d'un trait de vinaigre au moment de servir."]
+    },
+    {
+      "id": "curry-pois-chiches", "name": "Curry de pois chiches", "kind": "plat", "main": "legumineuses", "diet": ["veg", "vegan", "pork", "alcohol", "lactose", "gluten"], "complete": true, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "pois chiches", "need": 530, "u": "g", "t": "2 boîtes de pois chiches" },
+        { "q": "lait de coco", "need": 400, "u": "ml", "t": "40 cl de lait de coco" },
+        { "q": "tomates pelées", "need": 400, "u": "g", "t": "1 boîte de tomates pelées" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" }
+      ],
+      "placard": "sel, curry en poudre",
+      "steps": ["Fais revenir l'oignon dans l'huile avec 2 cuillères de curry.", "Ajoute les pois chiches égouttés, les tomates et le lait de coco.", "Laisse mijoter 15 minutes.", "Sers avec le riz."]
+    },
+    {
+      "id": "soupe-legumes", "name": "Soupe de légumes", "kind": "plat", "main": "legumes", "diet": ["veg", "vegan", "pork", "alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 40,
+      "ing": [
+        { "q": "pommes de terre", "need": 500, "u": "g", "t": "500 g de pommes de terre" },
+        { "q": "poireaux botte", "need": 500, "u": "g", "t": "500 g de poireaux" },
+        { "q": "carottes extra fines", "need": 265, "u": "g", "t": "1 boîte de carottes" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" }
+      ],
+      "placard": "sel, poivre, un cube de bouillon",
+      "steps": ["Épluche et coupe les pommes de terre, les poireaux et l'oignon.", "Mets-les dans une casserole avec 1,5 litre d'eau et le cube de bouillon.", "Laisse cuire 25 minutes, ajoute les carottes égouttées 5 minutes avant la fin.", "Mixe, rectifie l'assaisonnement et sers chaud."]
+    },
+    {
+      "id": "couscous-legumes", "name": "Couscous aux légumes", "kind": "plat", "main": "semoule", "diet": ["veg", "vegan", "pork", "alcohol", "lactose"], "complete": true, "portions": 4, "minutes": 45,
+      "ing": [
+        { "q": "semoule", "need": 400, "u": "g", "t": "400 g de semoule" },
+        { "q": "pois chiches", "need": 400, "u": "g", "t": "1 boîte de pois chiches" },
+        { "q": "courgettes", "need": 500, "u": "g", "t": "500 g de courgettes" },
+        { "q": "carottes extra fines", "need": 265, "u": "g", "t": "1 boîte de carottes" },
+        { "q": "tomates pelées", "need": 400, "u": "g", "t": "1 boîte de tomates pelées" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, ras el hanout ou cumin",
+      "steps": ["Fais revenir l'oignon dans l'huile avec les épices.", "Ajoute les courgettes, les tomates et 50 cl d'eau, laisse mijoter 20 minutes.", "Ajoute les pois chiches et les carottes égouttés, réchauffe 5 minutes.", "Prépare la semoule avec la même quantité d'eau bouillante salée et sers avec les légumes."]
+    },
+    {
+      "id": "taboule", "name": "Taboulé", "kind": "accompagnement", "main": "semoule", "diet": ["veg", "vegan", "pork", "alcohol", "lactose"], "complete": false, "portions": 4, "minutes": 20,
+      "ing": [
+        { "q": "semoule", "need": 250, "u": "g", "t": "250 g de semoule" },
+        { "q": "tomates cerises", "need": 250, "u": "g", "t": "250 g de tomates cerises" },
+        { "q": "concombre", "need": 400, "u": "g", "t": "1 concombre" },
+        { "q": "citron", "need": 30, "u": "ml", "t": "le jus d'un citron" },
+        { "q": "huile d'olive", "need": 40, "u": "ml", "t": "4 cuillères à soupe d'huile d'olive" }
+      ],
+      "placard": "sel, poivre, menthe ou persil si tu en as",
+      "steps": ["Verse la même quantité d'eau bouillante salée sur la semoule, couvre 5 minutes et égraine à la fourchette.", "Coupe les tomates et le concombre en petits dés.", "Mélange avec la semoule, le jus de citron, l'huile et les herbes.", "Laisse au frais une heure avant de servir."]
+    },
+    {
+      "id": "ratatouille", "name": "Ratatouille", "kind": "plat", "main": "legumes", "diet": ["veg", "vegan", "pork", "alcohol", "lactose", "gluten"], "complete": false, "with": ["riz-nature", "pommes-sautees"], "portions": 4, "minutes": 50,
+      "ing": [
+        { "q": "courgettes", "need": 500, "u": "g", "t": "500 g de courgettes" },
+        { "q": "aubergine", "need": 300, "u": "g", "t": "1 aubergine" },
+        { "q": "poivrons", "need": 500, "u": "g", "t": "500 g de poivrons" },
+        { "q": "tomates pelées", "need": 400, "u": "g", "t": "1 boîte de tomates pelées" },
+        { "q": "oignons", "need": 120, "u": "g", "t": "1 oignon" },
+        { "q": "huile d'olive", "need": 40, "u": "ml", "t": "4 cuillères à soupe d'huile d'olive" }
+      ],
+      "placard": "sel, poivre, ail, herbes de Provence",
+      "steps": ["Coupe tous les légumes en dés.", "Fais revenir l'oignon et les poivrons dans l'huile, puis l'aubergine et les courgettes.", "Ajoute les tomates et les herbes, couvre et laisse mijoter 35 minutes.", "Sers chaud ou froid."]
+    },
+    {
+      "id": "pizza-maison", "name": "Pizza maison au jambon", "kind": "plat", "main": "pain", "diet": ["alcohol"], "complete": true, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "pâte à pizza fraîche", "need": 385, "u": "g", "t": "1 pâte à pizza" },
+        { "q": "sauce tomate", "need": 200, "u": "g", "t": "un demi-pot de sauce tomate" },
+        { "q": "mozzarella", "need": 125, "u": "g", "t": "1 mozzarella" },
+        { "q": "jambon blanc", "need": 120, "u": "g", "t": "3 tranches de jambon" },
+        { "q": "champignons blancs", "need": 200, "u": "g", "t": "200 g de champignons" }
+      ],
+      "placard": "herbes de Provence, huile d'olive",
+      "steps": ["Préchauffe le four à 220 °C et déroule la pâte sur la plaque.", "Étale la sauce tomate, puis le jambon, les champignons émincés et la mozzarella en morceaux.", "Parsème d'herbes et fais cuire 15 minutes."]
+    },
+    {
+      "id": "gratin-chou-fleur", "name": "Gratin de chou-fleur", "kind": "plat", "main": "legumes", "diet": ["veg", "pork", "alcohol"], "complete": false, "with": ["salade-verte"], "portions": 4, "minutes": 45,
+      "ing": [
+        { "q": "chou fleur", "need": 1000, "u": "g", "t": "1 kg de chou-fleur" },
+        { "q": "lait", "need": 500, "u": "ml", "t": "50 cl de lait" },
+        { "q": "beurre", "need": 40, "u": "g", "t": "40 g de beurre" },
+        { "q": "farine", "need": 40, "u": "g", "t": "40 g de farine" },
+        { "q": "emmental râpé", "need": 80, "u": "g", "t": "80 g d'emmental râpé" }
+      ],
+      "placard": "sel, poivre, muscade",
+      "steps": ["Fais cuire le chou-fleur 10 minutes dans l'eau salée et égoutte-le.", "Fais fondre le beurre, ajoute la farine, puis le lait en fouettant jusqu'à ce que la sauce épaississe.", "Mets le chou-fleur dans un plat, couvre de sauce et de fromage.", "Fais gratiner 20 minutes au four à 200 °C."]
+    },
+    {
+      "id": "puree-maison", "name": "Purée maison", "kind": "accompagnement", "main": "pommes-de-terre", "diet": ["veg", "pork", "alcohol", "gluten"], "complete": false, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "pommes de terre", "need": 1000, "u": "g", "t": "1 kg de pommes de terre" },
+        { "q": "lait", "need": 250, "u": "ml", "t": "25 cl de lait" },
+        { "q": "beurre", "need": 40, "u": "g", "t": "40 g de beurre" }
+      ],
+      "placard": "sel, muscade",
+      "steps": ["Épluche les pommes de terre et fais-les cuire 20 minutes dans l'eau salée.", "Égoutte-les et écrase-les avec le beurre.", "Ajoute le lait chaud peu à peu jusqu'à la consistance que tu aimes."]
+    },
+    {
+      "id": "haricots-verts", "name": "Haricots verts au beurre", "kind": "accompagnement", "main": "legumes", "diet": ["veg", "pork", "alcohol", "gluten"], "complete": false, "portions": 4, "minutes": 15,
+      "ing": [
+        { "q": "haricots verts", "need": 600, "u": "g", "t": "600 g de haricots verts surgelés" },
+        { "q": "beurre", "need": 20, "u": "g", "t": "20 g de beurre" }
+      ],
+      "placard": "sel, poivre, ail",
+      "steps": ["Fais cuire les haricots 8 minutes dans l'eau bouillante salée.", "Égoutte-les et fais-les sauter 2 minutes dans le beurre avec un peu d'ail."]
+    },
+    {
+      "id": "salade-verte", "name": "Salade verte", "kind": "accompagnement", "main": "legumes", "diet": ["veg", "vegan", "pork", "alcohol", "lactose", "gluten"], "complete": false, "portions": 4, "minutes": 10,
+      "ing": [
+        { "q": "laitue iceberg", "need": 300, "u": "g", "t": "une salade" },
+        { "q": "huile", "need": 30, "u": "ml", "t": "2 cuillères à soupe d'huile" },
+        { "q": "vinaigre de vin", "need": 10, "u": "ml", "t": "1 cuillère à soupe de vinaigre" }
+      ],
+      "placard": "moutarde, sel, poivre",
+      "steps": ["Lave et essore la salade.", "Mélange la moutarde, le vinaigre, le sel et le poivre, puis l'huile.", "Assaisonne la salade au moment de servir."]
+    },
+    {
+      "id": "pommes-sautees", "name": "Pommes de terre sautées", "kind": "accompagnement", "main": "pommes-de-terre", "diet": ["veg", "vegan", "pork", "alcohol", "lactose", "gluten"], "complete": false, "portions": 4, "minutes": 30,
+      "ing": [
+        { "q": "pommes de terre", "need": 1000, "u": "g", "t": "1 kg de pommes de terre" },
+        { "q": "huile", "need": 40, "u": "ml", "t": "4 cuillères à soupe d'huile" }
+      ],
+      "placard": "sel, poivre, ail, persil",
+      "steps": ["Coupe les pommes de terre en dés.", "Fais-les dorer dans l'huile à feu moyen 25 minutes en remuant souvent.", "Sale, poivre et ajoute l'ail et le persil à la fin."]
+    },
+    {
+      "id": "gratin-dauphinois", "name": "Gratin dauphinois", "kind": "accompagnement", "main": "pommes-de-terre", "diet": ["veg", "pork", "alcohol", "gluten"], "complete": false, "portions": 6, "minutes": 75,
+      "ing": [
+        { "q": "pommes de terre", "need": 1000, "u": "g", "t": "1 kg de pommes de terre" },
+        { "q": "crème fraîche", "need": 200, "u": "ml", "t": "20 cl de crème fraîche" },
+        { "q": "lait", "need": 300, "u": "ml", "t": "30 cl de lait" }
+      ],
+      "placard": "sel, poivre, muscade, ail",
+      "steps": ["Préchauffe le four à 160 °C.", "Coupe les pommes de terre en fines rondelles et range-les dans un plat frotté d'ail.", "Mélange le lait, la crème, le sel, le poivre et la muscade, et verse sur les pommes de terre.", "Fais cuire une heure, jusqu'à ce que le dessus soit doré."]
+    },
+    {
+      "id": "riz-nature", "name": "Riz nature", "kind": "accompagnement", "main": "riz", "diet": ["veg", "vegan", "pork", "alcohol", "lactose", "gluten"], "complete": false, "portions": 4, "minutes": 15,
+      "ing": [
+        { "q": "riz", "need": 300, "u": "g", "t": "300 g de riz" }
+      ],
+      "placard": "sel, un peu de beurre ou d'huile si tu veux",
+      "steps": ["Fais cuire le riz dans une grande casserole d'eau bouillante salée, le temps indiqué sur le paquet.", "Égoutte-le et sers aussitôt."]
+    },
+    {
+      "id": "poelee-legumes", "name": "Poêlée de légumes", "kind": "accompagnement", "main": "legumes", "diet": ["veg", "vegan", "pork", "alcohol", "lactose"], "complete": false, "portions": 4, "minutes": 15,
+      "ing": [
+        { "q": "poêlée de légumes", "need": 750, "u": "g", "t": "750 g de poêlée de légumes surgelée" },
+        { "q": "huile", "need": 15, "u": "ml", "t": "1 cuillère à soupe d'huile" }
+      ],
+      "placard": "sel, poivre",
+      "steps": ["Fais chauffer l'huile dans une grande poêle.", "Ajoute les légumes encore surgelés et fais-les cuire 12 minutes à feu vif en remuant."]
+    },
+    {
+      "id": "mousse-chocolat", "name": "Mousse au chocolat", "kind": "dessert", "main": "chocolat", "diet": ["veg", "pork", "alcohol", "gluten"], "complete": false, "portions": 6, "minutes": 20,
+      "ing": [
+        { "q": "oeufs", "need": 6, "u": "pc", "t": "6 œufs" },
+        { "q": "tablette chocolat noir", "need": 200, "u": "g", "t": "200 g de chocolat noir" }
+      ],
+      "placard": "une pincée de sel",
+      "steps": ["Fais fondre le chocolat au bain-marie et laisse tiédir.", "Sépare les blancs des jaunes et mélange les jaunes au chocolat.", "Monte les blancs en neige ferme avec le sel et incorpore-les délicatement.", "Laisse prendre au frais au moins 3 heures."]
+    },
+    {
+      "id": "compote-pommes", "name": "Compote de pommes", "kind": "dessert", "main": "fruits", "diet": ["veg", "vegan", "pork", "alcohol", "lactose", "gluten"], "complete": false, "portions": 6, "minutes": 30,
+      "ing": [
+        { "q": "pommes gala", "need": 1000, "u": "g", "t": "1 kg de pommes" },
+        { "q": "sucre en poudre", "need": 50, "u": "g", "t": "50 g de sucre" }
+      ],
+      "placard": "cannelle si tu en as",
+      "steps": ["Épluche les pommes et coupe-les en morceaux.", "Fais-les cuire à couvert avec un fond d'eau et le sucre 20 minutes.", "Écrase à la fourchette et laisse refroidir."]
+    },
+    {
+      "id": "pain-perdu", "name": "Pain perdu", "kind": "dessert", "main": "pain", "diet": ["veg", "pork", "alcohol"], "complete": false, "portions": 4, "minutes": 20,
+      "ing": [
+        { "q": "baguette", "need": 250, "u": "g", "t": "1 baguette rassise" },
+        { "q": "oeufs", "need": 2, "u": "pc", "t": "2 œufs" },
+        { "q": "lait", "need": 250, "u": "ml", "t": "25 cl de lait" },
+        { "q": "sucre en poudre", "need": 40, "u": "g", "t": "40 g de sucre" },
+        { "q": "beurre", "need": 20, "u": "g", "t": "20 g de beurre" }
+      ],
+      "placard": "cannelle si tu en as",
+      "steps": ["Coupe la baguette en tranches.", "Bats les œufs avec le lait et la moitié du sucre.", "Trempe chaque tranche et fais-la dorer dans le beurre des deux côtés.", "Saupoudre du reste de sucre et sers tiède."]
+    },
+    {
+      "id": "crumble-pommes", "name": "Crumble aux pommes", "kind": "dessert", "main": "fruits", "diet": ["veg", "pork", "alcohol"], "complete": false, "portions": 6, "minutes": 45,
+      "ing": [
+        { "q": "pommes gala", "need": 800, "u": "g", "t": "800 g de pommes" },
+        { "q": "farine", "need": 150, "u": "g", "t": "150 g de farine" },
+        { "q": "sucre en poudre", "need": 100, "u": "g", "t": "100 g de sucre" },
+        { "q": "beurre", "need": 100, "u": "g", "t": "100 g de beurre" }
+      ],
+      "placard": "cannelle si tu en as",
+      "steps": ["Préchauffe le four à 180 °C.", "Coupe les pommes en morceaux dans un plat.", "Mélange du bout des doigts la farine, le sucre et le beurre mou jusqu'à obtenir du sable.", "Répartis sur les pommes et fais cuire 30 minutes."]
+    },
+    {
+      "id": "gateau-chocolat", "name": "Gâteau au chocolat", "kind": "dessert", "main": "chocolat", "diet": ["veg", "pork", "alcohol"], "complete": false, "portions": 8, "minutes": 40,
+      "ing": [
+        { "q": "tablette chocolat noir", "need": 200, "u": "g", "t": "200 g de chocolat noir" },
+        { "q": "beurre", "need": 150, "u": "g", "t": "150 g de beurre" },
+        { "q": "sucre en poudre", "need": 150, "u": "g", "t": "150 g de sucre" },
+        { "q": "oeufs", "need": 4, "u": "pc", "t": "4 œufs" },
+        { "q": "farine", "need": 60, "u": "g", "t": "60 g de farine" }
+      ],
+      "placard": "",
+      "steps": ["Préchauffe le four à 180 °C.", "Fais fondre le chocolat avec le beurre.", "Fouette les œufs avec le sucre, ajoute le chocolat fondu puis la farine.", "Verse dans un moule beurré et fais cuire 22 minutes : le cœur reste fondant."]
     }
   ]
 }

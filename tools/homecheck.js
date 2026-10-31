@@ -9,7 +9,8 @@
 // quantités habituelles, cadences), carte « C'est l'heure des courses » le bon jour et pas un autre, qui remplace
 // « Tes prochaines courses », « À racheter bientôt » et « Tes habitudes » ; « Remplir mon panier » en un geste avec
 // « Annuler », « Pas cette fois » (cabas.prepSnooze), « Voir le panier type » (liste gardée, rythme modifiable), le jour
-// des courses dans les réglages (prefs.shopDay) ; trois rangées au plus sur l'accueil d'un habitué.
+// des courses dans les réglages (prefs.shopDay) ; trois rangées au plus sur l'accueil d'un habitué ; enfin les seuils de
+// prix (F26, cabas.watch) : « Ton seuil est atteint » dès l'ouverture, « C'est vu », nouvelle baisse, fiche et réglages.
 // Code de sortie 1 en cas de problème. Usage : node tools/homecheck.js [--shots=dossier]
 const http = require("http");
 const fs = require("fs");
@@ -236,11 +237,50 @@ function histOf() {
     if (((await stored("prefs")) || {}).shopDay !== 1) fail("réglages : prefs.shopDay " + JSON.stringify(((await stored("prefs")) || {}).shopDay));
     await page.click('#sheet [data-act=shopday][data-v="-1"]'); await page.waitForTimeout(250);
     if (((await stored("prefs")) || {}).shopDay !== null) fail("réglages : « D'après mes commandes » devrait remettre prefs.shopDay à null");
+
+    /* 10. préviens-moi (F26) : un seuil au-dessus du prix relevé le plus bas est atteint dès l'ouverture, l'accueil le
+       dit (« Ton seuil est atteint », aux prix relevés, avec le seuil), dans la limite des trois rangées ; « C'est vu » le
+       range, une nouvelle baisse le ramène ; un seuil sous le prix ne dit rien */
+    const W0 = await page.evaluate(() => {
+      const D = window.cabasDebug(), ps = D.S.list.filter((p) => D.bestReal(p) && Object.keys(p.offers).length > 1).slice(0, 3);
+      return ps.map((p) => ({ id: p.id, c: Math.round(D.bestReal(p).price * 100), name: p.brand + " " + p.name }));
+    });
+    const [wa, wb] = W0;
+    const watchState = (w, hits) => ({ seen: { welcome: 1 }, prefs: PREFS, watch: w, watchHits: hits || {}, hist: histOf(), drops: [{ id: "candia-lait-1-2-ecreme-6-x-1-l", old: 99, now: 1, until: plus(3) }], lists: [{ id: "l1", name: "Courses", items: { "candia-lait-1-2-ecreme-6-x-1-l": 1, "barilla-pates-capellini-n-1-500-g": 2 }, at: plus(-3) }] });
+    await load(watchState({ [wa.id]: { max: wa.c + 50, at: plus(-5), from: wa.c + 80 }, [wb.id]: { max: Math.max(1, wb.c - 100), at: plus(-5), from: wb.c } }));
+    const hits = await stored("watchHits");
+    if (!hits || !hits[wa.id] || hits[wa.id].c !== wa.c) fail("seuil atteint : cabas.watchHits " + JSON.stringify(hits));
+    if (hits && hits[wb.id]) fail("seuil pas atteint : le produit est quand même dans cabas.watchHits");
+    const wsec = await text('#view [aria-label="Ton seuil est atteint"]');
+    if (!wsec.includes(wa.name) || !/sous ton seuil de/.test(wsec)) fail("accueil : « Ton seuil est atteint » « " + wsec.slice(0, 120) + " »");
+    if (wsec.includes(wb.name)) fail("accueil : un seuil pas atteint est annoncé");
+    const heads10 = await page.$$eval("#view .sh h2", (els) => els.map((e) => e.textContent));
+    if (heads10[0] !== "Ton seuil est atteint") fail("accueil : le seuil atteint n'est pas en tête des rangées " + JSON.stringify(heads10));
+    rails = await page.locator('#view .rail, #view [aria-label="Ton seuil est atteint"]').count();
+    if (rails > 3) fail(`seuil atteint : ${rails} rangées, 3 au plus`);
+    await shot("7-seuil-atteint");
+    await page.click("#view [data-act=watchseen]"); await page.waitForTimeout(400);
+    if (await page.locator('#view [aria-label="Ton seuil est atteint"]').count()) fail("« C'est vu » ne range pas la rangée");
+    if (!((await stored("watchHits")) || {})[wa.id].seen) fail("« C'est vu » non enregistré");
+    await load(watchState({ [wa.id]: { max: wa.c + 50, at: plus(-5), from: wa.c + 80 } }, { [wa.id]: { c: wa.c + 20, ret: "carrefour", at: plus(-2), seen: true } }));
+    if (!(await page.locator('#view [aria-label="Ton seuil est atteint"]').count())) fail("une nouvelle baisse sous le seuil n'est pas annoncée");
+    await load(watchState({ [wa.id]: { max: wa.c + 50, at: plus(-5), from: wa.c + 80 } }, { [wa.id]: { c: wa.c, ret: "carrefour", at: plus(-2), seen: true } }));
+    if (await page.locator('#view [aria-label="Ton seuil est atteint"]').count()) fail("un seuil déjà vu, au même prix, revient");
+    /* la fiche dit le seuil ; les réglages listent les alertes et en retirent une, avec « Annuler » */
+    await go("#/produit/" + encodeURIComponent(wa.id));
+    if (!/Prévenu sous/.test(await text("#view .pacts"))) fail("fiche : le seuil n'est pas dit");
+    await go("#/reglages");
+    await page.click("[data-act=watchlist]"); await page.waitForTimeout(400);
+    if ((await page.locator("#sheet [data-act=watchrm]").count()) !== 1) fail("réglages : « Mes alertes de prix » devrait lister une alerte");
+    await page.click("#sheet [data-act=watchrm]"); await page.waitForTimeout(300);
+    if (Object.keys((await stored("watch")) || {}).length) fail("retirer une alerte : cabas.watch garde le produit");
+    await page.click("#toast button"); await page.waitForTimeout(300);
+    if (!((await stored("watch")) || {})[wa.id]) fail("« Annuler » ne remet pas l'alerte");
   } catch (e) {
     fail("parcours interrompu : " + e.message.split("\n")[0]);
   }
   await browser.close();
   server.close();
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Accueil vérifié : arrivée, il manquait, à racheter, prochaines courses, commande avant, total payé, remplissage en cours, trois rangées au plus, panier de la semaine.");
+  console.log("Accueil vérifié : arrivée, il manquait, à racheter, prochaines courses, commande avant, total payé, remplissage en cours, trois rangées au plus, panier de la semaine, seuil de prix atteint.");
 })();

@@ -10,6 +10,7 @@ const { chromium } = require("playwright");
 
 const ROOT = path.resolve(__dirname, "..");
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml" };
+const OFF = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "openfoodfacts.json"), "utf8"));
 const ARGS = Object.fromEntries(process.argv.slice(2).map((a) => { const m = /^--([^=]+)(?:=(.*))?$/.exec(a); return m ? [m[1], m[2] == null ? true : m[2]] : [a, true]; }));
 
 const server = http.createServer((req, res) => {
@@ -68,13 +69,15 @@ const ROUTES = [
   ["recette", "#/repas/pates-thon-tomate"], ["scan", "#/scan"], ["partage", PARTAGE], ["inconnu", "#/nimportequoi"],
   ["remplir", "#/remplir"], ["remplir-guide", "#/remplir/monoprix"], ["remplir-fin", "#/remplir/houra"], ["remplir-avant", "#/remplir/carrefour"], ["recommander", "#/recommander"],
   ["magasin", "#/magasin"], ["mouvements", "#/mouvements"], ["transfert", TRANSFERT],
+  ["comparer", "#/comparer/barilla-pates-capellini-n-1-500-g/barilla-pates-spaghetti-n-5-500-g"],
 ];
 /* écrans mesurés aussi à l'état vide (première visite) */
 const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander", "magasin", "mouvements"];
 /* feuilles ouvertes depuis chaque écran : nom, bouton qui l'ouvre ; celles du panier demandent un gros panier
    (14 produits vendus par plusieurs enseignes, en deux exemplaires), qui atteint les minimums de commande */
 const SHEETS = {
-  reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"], ["jour-courses", "[data-act=shopdays]"]],
+  reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"], ["jour-courses", "[data-act=shopdays]"], ["alertes", "[data-act=watchlist]"], ["signaler-demander", "#view [data-act=report]"], ["regime", "[data-act=diet]"]],
+  produit: [["comparer", "#view [data-act=cmppick]"], ["previens-moi", "#view [data-act=watch]"], ["signaler", "#view [data-act=report]"]],
   /* « Remplir mes paniers » est un écran (#/remplir), plus une feuille : ses feuilles sont mesurées depuis le mode guidé */
   "panier-gros": [["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"], ["ou-le-prendre", "[data-act=itemopt]"], ["panier-souple", "[data-act=flex]"]],
   "remplir-guide": [["pas-trouve", "#view [data-act=fillmiss]"]],
@@ -222,6 +225,8 @@ async function ready(page, route) {
       const state = JSON.parse(JSON.stringify(STATES[st]));
       if (mode.cran !== "1") state.prefs = Object.assign({ off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {} }, state.prefs || {}, { zoom: mode.cran });
       const ctx = await browser.newContext({ viewport: mode.vp, deviceScaleFactor: 1, colorScheme: mode.scheme, isMobile: mode.mobile, hasTouch: mode.mobile, locale: "fr-FR", timezoneId: "Europe/Paris", serviceWorkers: "block" });
+      /* Open Food Facts simulé (tools/fixtures/openfoodfacts.json) : la fiche montre Nutri-Score, allergènes et labels */
+      await ctx.route(/^https:\/\/world\.openfoodfacts\.org\//, (r) => r.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(OFF.connu) }));
       await ctx.addInitScript((s) => { try { localStorage.clear(); for (const k of Object.keys(s)) localStorage.setItem("cabas." + k, JSON.stringify(s[k])); const g = sessionStorage.getItem("a11yGros"); if (g) localStorage.setItem("cabas.basket", g); } catch (e) { /* stockage indisponible */ } }, state);
       const page = await ctx.newPage();
       const errs = [];

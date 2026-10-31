@@ -81,15 +81,16 @@
      pin : produit épinglé à une enseigne ({ id: groupe }) ; ban : produit exclu d'enseignes ({ id: { groupe: true } }) ;
      budgetMode : budget « panier » (chaque panier) ou « mois » (les paniers commandés du mois) ; shopDay : jour des
      courses (0 dimanche à 6 samedi, null d'après les commandes) ; voice : lecture à voix haute « slow » ou « normal » ;
-     wake : écran gardé allumé en mode magasin */
-  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, maxOrders: 3, extraCost: 0, manualCk: false, badge: true, theme: "auto", contrast: null, simple: false, budgetMode: "panier", shopDay: null, voice: "normal", wake: true };
+     wake : écran gardé allumé en mode magasin ; allergens : allergènes à éviter (clés d'Open Food Facts) ; facts : Nutri-Score
+     et allergènes demandés à Open Food Facts à l'ouverture d'une fiche (sinon d'un geste) */
+  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, maxOrders: 3, extraCost: 0, manualCk: false, badge: true, theme: "auto", contrast: null, simple: false, budgetMode: "panier", shopDay: null, voice: "normal", wake: true, allergens: [], facts: true };
   const ROOTS = { accueil: "#/", rayons: "#/rayons", recherche: "#/recherche", listes: "#/listes", panier: "#/panier" };
   const S = {
     ready: false, failed: false,
     rayons: [], prods: new Map(), list: [], rets: [], retMap: new Map(), meta: {},
     basket: store.get("basket", {}),
     /* premier lancement : E.Leclerc, aux prix simulés, est proposé mais pas choisi d'office (questions de départ, réglages) */
-    prefs: Object.assign({}, PREFS0, { off: store.get("prefs", null) ? {} : { leclerc: true }, fee: {}, pick: {}, pickManual: store.get("prefs", null) ? undefined : {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, offv: store.get("prefs", null) ? undefined : 1 }, store.get("prefs", {})),
+    prefs: Object.assign({}, PREFS0, { off: store.get("prefs", null) ? {} : { leclerc: true }, fee: {}, pick: {}, pickManual: store.get("prefs", null) ? undefined : {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: store.get("prefs", null) ? undefined : 1 }, store.get("prefs", {})),
     lists: store.get("lists", []),
     recent: store.get("recent", []),
     seen: store.get("seen", {}),
@@ -903,7 +904,7 @@
   const DIETV = { v: 0 };
   const dietSet = () => S.prefs.diet || {};
   /* un régime strict est réglé (le bio n'en est pas un) */
-  const dietOn = () => DIETS.some(([k]) => k !== "bio" && dietSet()[k]);
+  const dietOn = () => DIETS.some(([k]) => k !== "bio" && dietSet()[k]) || allergSet().length > 0;
   /* mots du nom (own) et du rayon, chacun avec « sans » devant quand c'est le cas (« sans porc », « sans alcool ») */
   function dietWords(p) {
     const mk = (txt) => { const w = norm(txt).split(" ").filter(Boolean), out = new Set(); w.forEach((t, i) => out.add(w[i - 1] === "sans" ? "sans " + t : t)); return out; };
@@ -928,19 +929,22 @@
     if (ok && d.pork && (hasAny(EXCL.pork, words().own) || (!hasAny(EXCL.nopork, words().own) && hasAny(EXCL.porkish, words().all)))) ok = false;
     if (ok && d.alcohol && (p.u === "cave" || (!hasAny(EXCL.noalc, words().own) && hasAny(EXCL.alcohol, words().all)))) ok = false;
     if (ok && d.sugar && !tags.some((t) => /^sans sucre/.test(t))) ok = false;
+    /* allergènes à éviter : seulement quand Open Food Facts connaît le produit (fiche ouverte une fois sur ce téléphone) */
+    if (ok && !arguments[1] && allergHit(p).length) ok = false;
     if (!arguments[1]) { p._diet = ok; p._dv = DIETV.v; }
     return ok;
   }
   /* bio d'abord à prix au kilo égal à 10 % près, quand « Bio de préférence » est coché */
   const bioFirst = (a, b, va, vb) => (dietSet().bio && Math.abs(va - vb) <= 0.1 * Math.max(va, vb) ? +(b.regimes || []).includes("bio") - +(a.regimes || []).includes("bio") : 0);
-  const dietLabel = () => { const on = DIETS.filter(([k]) => dietSet()[k]).map(([, l]) => l.toLowerCase().replace(/ de préférence$/, "")); return on.length ? joinEt(on) : "aucun"; };
+  const dietLabel = () => { const on = DIETS.filter(([k]) => dietSet()[k]).map(([, l]) => l.toLowerCase().replace(/ de préférence$/, "")).concat(allergSet().map((a) => "sans " + ALLERG.get(a).toLowerCase())); return on.length ? joinEt(on) : "aucun"; };
   /* ce que le régime écarte, en un mot, pour une ligne de Ma liste ou un ingrédient (« halal », « sans porc ») */
-  const dietWhy = () => DIETS.filter(([k]) => k !== "bio" && dietSet()[k]).map(([, l]) => l.toLowerCase()).join(", ");
+  const dietWhy = () => DIETS.filter(([k]) => k !== "bio" && dietSet()[k]).map(([, l]) => l.toLowerCase()).concat(allergSet().map((a) => "sans " + ALLERG.get(a).toLowerCase())).join(", ");
   function dietSheet(fromWelcome) {
     const build = () => {
       const d = dietSet();
       const chips = DIETS.map(([k, l]) => { const on = !!d[k]; const n = on && k !== "bio" ? S.list.reduce((a, p) => a + (dietOk(p, { [k]: true }) ? 1 : 0), 0) : null; return `<button class="chip dietchip" type="button" data-act="dietchip" data-k="${k}" aria-pressed="${on}">${l}${n != null ? `<small>${plural(n, "produit", "produits")}</small>` : ""}</button>`; }).join("");
-      return { body: `<p>Cabas ne te propose plus que ce qui correspond, partout : recherche, rayons, Ma liste, repas et remplacements.</p><div class="tagset diet" role="group" aria-label="Mon régime">${chips}</div><p class="gf">Cabas se fie à ce qui est écrit sur le produit par l'enseigne : son nom et ses mentions. Rien n'est garanti, vérifie toujours l'emballage.</p>` };
+      const A = allergSet(), achips = ALLERGENS.map(([k, l]) => `<button class="chip" type="button" data-act="allergchip" data-k="${k}" aria-pressed="${A.includes(k)}">${l}</button>`).join("");
+      return { body: `<p>Cabas ne te propose plus que ce qui correspond, partout : recherche, rayons, Ma liste, repas et remplacements.</p><div class="tagset diet" role="group" aria-label="Mon régime">${chips}</div><p class="gf">Cabas se fie à ce qui est écrit sur le produit par l'enseigne : son nom et ses mentions. Rien n'est garanti, vérifie toujours l'emballage.</p><h3 class="gh" id="allergL">Allergènes à éviter</h3><div class="tagset" role="group" aria-labelledby="allergL">${achips}</div><p class="gf">Cabas écarte un produit qui en contient ou peut en contenir (traces) quand Open Food Facts le dit, pour les produits dont la fiche a été ouverte sur ce téléphone. Pour les autres, rien n'est vérifié\u00a0: lis toujours l'emballage.</p>` };
     };
     const o = build();
     openSheet({ title: "Mon régime", body: o.body, build, onClose: () => { if (!fromWelcome && S.route.name === "reglages") rerender(); } });
@@ -1411,11 +1415,11 @@
     const first = newcomer();
     /* le jour des courses, la carte du panier de la semaine remplace « Tes prochaines courses », « À racheter bientôt »
        et « Tes habitudes » ;
-       trois rangées au plus : les plus personnelles d'abord (baisses de tes produits, à racheter, habitudes), puis les
+       trois rangées au plus : les plus personnelles d'abord (seuils atteints, baisses de tes produits, à racheter, habitudes), puis les
        écarts de prix, les repas et les offres */
     const prep = first ? null : prepNow();
     const upper = [], lower = [];
-    for (const f of [dropsRail, prep ? () => "" : dueRail, prep ? () => "" : habitsRail, () => (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals" role="region" aria-label="Même produit, pas le même prix">${ds.map(dealCard).join("")}</div>` : "")]) { if (upper.length < 3) { const h = f(); if (h) upper.push(h); } }
+    for (const f of [watchRail, dropsRail, prep ? () => "" : dueRail, prep ? () => "" : habitsRail, () => (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals" role="region" aria-label="Même produit, pas le même prix">${ds.map(dealCard).join("")}</div>` : "")]) { if (upper.length < 3) { const h = f(); if (h) upper.push(h); } }
     for (const f of simpleOn() ? [] : [recRail, promosRail]) if (upper.length + lower.length < 3) { const h = f(); if (h) lower.push(h); }
     /* le panier type de la personne remplace le panier tout prêt des débuts */
     const tpl = !simpleOn() && Object.keys(sg.items).length && !weekTpl();
@@ -1488,6 +1492,14 @@
     };
   };
 
+  /* comparer, préviens-moi, signaler : les gestes de la fiche, en lignes */
+  function pActs(p) {
+    const w = watchOf(p.id), hit = w && watchHits().some((x) => x.id === p.id);
+    return `<div class="group pacts" style="margin-top:24px">` +
+      `<button class="row" type="button" data-act="cmppick" data-id="${esc(p.id)}">${ic("cmp", "ext")}<span class="rt">Comparer avec un autre produit<small>Prix au kilo, contenance, régimes</small></span>${ic("chev", "chev")}</button>` +
+      `<button class="row" type="button" data-act="watch" data-id="${esc(p.id)}">${ic("bell", "ext")}<span class="rt">${w ? `Prévenu sous ${eurC(w.max)}` : "Préviens-moi quand le prix baisse"}<small>${w ? (hit ? "C'est le cas aujourd'hui" : "L'accueil te le dira") : "Choisis ton prix, l'accueil te le dira"}</small></span>${ic("chev", "chev")}</button>` +
+      `<button class="row" type="button" data-act="report" data-id="${esc(p.id)}">${ic("flag", "ext")}<span class="rt">Signaler une erreur<small>Prix, nom, contenance, lien ou rayon</small></span>${ic("chev", "chev")}</button></div>`;
+  }
   VIEWS.produit = (r) => {
     const p = S.prods.get(r.id) || S.prods.get((S.alias || {})[r.id]);
     if (!p) return notFound();
@@ -1507,7 +1519,7 @@
     const toks = norm(p.name).split(" ").filter((t) => t.length > 3 && !/^\d/.test(t)).slice(0, 4);
     const sim = inRayon(p.r).filter((x) => x.id !== p.id && toks.some((t) => norm(x.name).includes(t)) && (!dietOn() || dietOk(x))).slice(0, 60)
       .map((x) => ({ x, b: best(x) })).filter((y) => y.b).sort((a, c) => a.b.price - c.b.price).slice(0, 10).map((y) => y.x);
-    const dietLine = dietOn() ? (dietOk(p) ? "Correspond à ton régime, d'après ce que l'enseigne indique" : "Ne correspond pas à ton régime (" + dietWhy() + "), d'après ce que l'enseigne indique") : "";
+    const dietLine = dietOn() ? (dietOk(p) ? "Correspond à ton régime, d'après ce que l'enseigne indique" + (allergSet().length ? (factsOf(p) && factsOf(p).ok ? " et Open Food Facts" : ". Allergènes pas connus pour ce produit\u00a0: vérifie l'emballage") : "") : "Ne correspond pas à ton régime (" + dietWhy() + "), d'après ce que l'enseigne" + (allergHit(p).length ? " et Open Food Facts indiquent" : " indique")) : "";
     const spec = [["Marque", p.brand], ["Contenance", p.format + (p.approx ? ", estimée" : "")], ["Description", p.desc && !/^Contenance/.test(p.desc) ? p.desc : ""], ["Mentions", (p.tags || []).join(", ")], ["Mon régime", dietLine], ["Rayon", ray ? ray.name + (ray.u ? ", " + univName(ray.u).toLowerCase() : "") : ""], ["Type", p.type === "mdd" ? "Marque distributeur, vendue chez " + joinEt(Object.keys(p.offers || {}).filter((k) => S.retMap.has(k)).map(retName)) : "Grande marque"], ["Code EAN", p.ean]].filter((x) => x[1]);
     const promo = !!(b && b.promo);
     const det0 = detailsNow(p);
@@ -1517,13 +1529,15 @@
         const here = () => S.route.name === "produit" && S.prods.get(S.route.id) === p;
         if (!HIST) loadHist().then(() => { const el = $("#phist"); if (el && here()) el.innerHTML = histHtml(p); });
         if (!det0) details(p).then((det) => { const el = $("#poffers"); if (el && here()) el.innerHTML = rows(det); });
+        /* Nutri-Score et allergènes : demandés à Open Food Facts une fois, la section suit */
+        if (factsAuto()) factsLoad(p, () => { const el = $("#pfacts"); if (el && here()) el.innerHTML = factsHtml(p); });
       },
       right: `<button class="icbtn" type="button" data-act="share" data-id="${esc(p.id)}" aria-label="Partager">${ic("share")}</button>`,
       html: `<div class="pdp"><div class="pimg">${img(p, 480)}${promo ? '<span class="badge promo">Offre</span>' : ""}</div>` +
         `<div class="pmain"><div class="ph"><p class="pb">${esc(p.brand)}</p><h1>${esc(p.name)}</h1><p class="pf">${esc(p.format)}${p.approx ? " (contenance estimée)" : ""}${u ? ", " + (p.approx ? "environ " : "") + esc(u) : ""}${p.frais ? ", prix ajusté à la pesée" : ""}</p>` +
         (b ? `<div class="pprice">${px(b.price)}${b.sim ? '<span class="tag sim lg">Prix simulé</span>' : on.length > 1 ? '<span class="sticker lg">Prix le plus bas</span>' : ""}<p class="pw">chez <b>${esc(retName(b.ret))}</b>${b.sim ? " (prix simulé)" : ""}${hi && hi.price - b.price >= 0.01 ? `, ${eur(hi.price - b.price)} de moins que chez ${esc(retName(hi.ret))}` : ""}</p></div>` : `<p class="pw" style="margin-top:14px">Ce produit n'est vendu par aucune de tes enseignes activées.</p>`) +
         `<div class="pinline">${buyCtl(p.id, "bar")}</div></div></div>` +
-        `<div class="pmore"><h2 class="gh">Prix dans ${all.length > 1 ? "les enseignes" : "l'enseigne"}</h2><div class="group" id="poffers">${rows(det0)}</div><p class="gf">Touche une enseigne pour ouvrir le produit sur son site. Les offres (2e à moitié prix, cagnotte) ne sont pas déduites des totaux.${p.eq ? " Produits sans marque rapprochés entre enseignes : équivalents, pas la même référence." : ""}</p><div id="phist">${histHtml(p)}</div>` +
+        `<div class="pmore"><h2 class="gh">Prix dans ${all.length > 1 ? "les enseignes" : "l'enseigne"}</h2><div class="group" id="poffers">${rows(det0)}</div><p class="gf">Touche une enseigne pour ouvrir le produit sur son site. Les offres (2e à moitié prix, cagnotte) ne sont pas déduites des totaux.${p.eq ? " Produits sans marque rapprochés entre enseignes : équivalents, pas la même référence." : ""}</p><div id="phist">${histHtml(p)}</div><div id="pfacts">${factsHtml(p)}</div>` + pActs(p) +
         `<h2 class="gh">Caractéristiques</h2><div class="group"><dl class="spec">${spec.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div></div>` +
         (sim.length ? `<div class="pfull"><div class="sh"><h2>Dans le même rayon</h2>${ray ? `<a class="act" href="${hr(ray.id)}">Tout voir${ic("chev")}</a>` : ""}</div><div class="rail" role="region" aria-label="Dans le même rayon">${sim.map((x) => card(x)).join("")}</div></div>` : "") + `</div>`,
     };
@@ -1572,7 +1586,7 @@
     const rq = norm(S.fixed ? S.fixed.to : q).split(" ").filter((t) => t && !STOP.has(t)).map(stem);
     const rhit = rq.length ? S.rayons.filter((r) => r.count && rq.every((t) => norm(r.name).split(" ").some((w) => w === t || stem(w) === t || (t.length >= 4 && w.startsWith(t))))).slice(0, 2) : [];
     const rcard = rhit.map((r) => `<a class="hcard" href="${hr(r.id)}"><span class="thumb">${repOf(r) ? img(repOf(r), 48) : ""}</span><span><b>Rayon ${esc(r.name)}</b><small>${plural(r.count, "produit", "produits")}${r.u ? ", " + esc(univName(r.u).toLowerCase()) : ""}</small></span>${ic("chev", "chev")}</a>`).join("");
-    if (!base.length) return head + rcard + `<div class="empty">${emptyArt("search")}<h2>Aucun résultat</h2><p>Rien ne correspond à «\u00a0${esc(q)}\u00a0». Vérifie l'orthographe ou cherche une marque, par exemple Lactel ou Barilla.</p></div>`;
+    if (!base.length) return head + rcard + `<div class="empty">${emptyArt("search")}<h2>Aucun résultat</h2><p>Rien ne correspond à «\u00a0${esc(q)}\u00a0». Vérifie l'orthographe ou cherche une marque, par exemple Lactel ou Barilla.</p><button class="btn plain" type="button" data-act="report" data-k="demande" data-q="${esc(q)}">Demander ce produit</button></div>`;
     /* un mot corrigé : la correction est toujours dite */
     const dietCut = dietOn() && f.diet !== false && list.length !== base.length;
     const count = S.fixed ? `Résultats pour «\u00a0${esc(S.fixed.to)}\u00a0»\u00a0: ${plural(dietCut ? base.length : list.length, "produit", "produits")}` : plural(dietCut ? base.length : list.length, "résultat", "résultats");
@@ -1943,9 +1957,11 @@
         `<button class="row" type="button" data-act="budget"><span class="rt">Budget<small>${byMonth() ? "Par mois\u00a0: le panier dit ce qu'il te reste ce mois-ci, paniers commandés compris." : "Par panier\u00a0: le panier dit ce qu'il reste ou de combien tu dépasses."}</small></span><span class="val">${parseFloat(S.prefs.budget) > 0 ? eurR(parseFloat(S.prefs.budget)) + (byMonth() ? " par mois" : "") : "Aucun"}</span>${ic("chev", "chev")}</button>` +
         `<div class="row stack"><span class="rt" id="extraL">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><div class="field" data-field="extra"><span class="in"><input id="extra" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="${esc(frNum(S.prefs.extraCost || 0))}" aria-labelledby="extraL"><span class="suf">€</span></span><small></small></div></div></div>` +
         commandesHtml() +
-        `<h2 class="gh">Alimentation</h2><div class="group"><button class="row" type="button" data-act="diet"><span class="rt">Mon régime<small>Filtre la recherche, les rayons, Ma liste, les repas et les remplacements, d'après ce que les enseignes indiquent.</small></span><span class="val">${esc(dietLabel())}</span>${ic("chev", "chev")}</button></div>` +
+        `<h2 class="gh">Alimentation</h2><div class="group"><button class="row" type="button" data-act="diet"><span class="rt">Mon régime<small>Filtre la recherche, les rayons, Ma liste, les repas et les remplacements, d'après ce que les enseignes indiquent.</small></span><span class="val">${esc(dietLabel())}</span>${ic("chev", "chev")}</button>` +
+        `<div class="row"><span class="rt" id="factsL">Nutri-Score et allergènes<small>Demandés à Open Food Facts à l'ouverture d'une fiche, avec le seul code-barres, et gardés 30 jours sur ce téléphone. Décoché, d'un geste sur la fiche.</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="factsauto" aria-labelledby="factsL"${S.prefs.facts !== false ? " checked" : ""}><span></span></label></div>` +
+        `<button class="row" type="button" data-act="watchlist"><span class="rt">Mes alertes de prix<small>${Object.keys(watchAll()).length ? "L'accueil te dit quand un prix passe sous ton seuil." : "Sur la fiche d'un produit\u00a0: «\u00a0Préviens-moi quand le prix baisse\u00a0»."}</small></span>${Object.keys(watchAll()).length ? `<span class="val num">${Object.keys(watchAll()).length}</span>` : ""}${ic("chev", "chev")}</button></div>` +
         `<h2 class="gh">Mes choix et mes marques</h2><div class="group"><button class="row" type="button" data-act="usual"><span class="rt">Mes choix habituels<small>${usualCount() ? "Ce que tu as choisi dans Ma liste revient d'office, tant que le prix suit." : "Choisis un produit dans Ma liste : Cabas s'en souvient."}</small></span>${usualCount() ? `<span class="val num">${usualCount()}</span>` : ""}${ic("chev", "chev")}</button></div>` +
-        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/comment"><span class="rt">Comment ça marche</span>${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="${installEvt ? "installnow" : "install"}"><span class="rt">${isIOS ? "Installer Cabas sur l'iPhone" : "Installer Cabas sur le téléphone"}</span>${ic("chev", "chev")}</button>`}<button class="row" type="button" data-act="shareapp"><span class="rt">Faire connaître Cabas<small>Une image et un lien à envoyer à qui fait ses courses</small></span>${ic("share", "chev")}</button><div class="row"><span class="rt">Version</span><span class="val">1.2</span></div></div>` +
+        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/comment"><span class="rt">Comment ça marche</span>${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="${installEvt ? "installnow" : "install"}"><span class="rt">${isIOS ? "Installer Cabas sur l'iPhone" : "Installer Cabas sur le téléphone"}</span>${ic("chev", "chev")}</button>`}<button class="row" type="button" data-act="shareapp"><span class="rt">Faire connaître Cabas<small>Une image et un lien à envoyer à qui fait ses courses</small></span>${ic("share", "chev")}</button><button class="row" type="button" data-act="report"><span class="rt">Signaler ou demander<small>Un produit qui manque, une enseigne, quelque chose qui ne va pas</small></span>${ic("chev", "chev")}</button>${reportsAll().length ? `<button class="row" type="button" data-act="reports"><span class="rt">Mes signalements</span><span class="val num">${reportsAll().length}</span>${ic("chev", "chev")}</button>` : ""}<div class="row"><span class="rt">Version</span><span class="val">1.2</span></div></div>` +
         dataHtml() +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
     };
@@ -2103,6 +2119,7 @@
       case "mouvements": return { name: "mouvements" };
       case "magasin": return { name: "magasin" };
       case "transfert": return { name: "transfert", id: seg[1] || "" };
+      case "comparer": return { name: "comparer", id, id2: seg[2] ? decodeURIComponent(seg[2]) : "" };
       default: return { name: "home" };
     }
   }
@@ -2139,6 +2156,7 @@
       case "mouvements": return "Prix";
       case "magasin": return "Magasin";
       case "transfert": return "Transfert";
+      case "comparer": return "Comparer";
     }
     return "Retour";
   }
@@ -2369,8 +2387,8 @@
     return CATW;
   }
   /* un mot qui change la nature du produit (lingettes pour « papier toilette », culotte pour « couches », pâtée pour
-     « croquettes », nectar pour « jus ») l'écarte, sauf s'il est écrit */
-  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "leger", "culotte", "patee", "sauce", "aromatise", "sirop", "concentre", "mousse", "margarine", "boire"], JUICE_ONLY = new Set(["boisson", "nectar"]);
+     « croquettes », nectar pour « jus », rissolées pour « pommes de terre ») l'écarte, sauf s'il est écrit */
+  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "leger", "culotte", "patee", "sauce", "aromatise", "sirop", "concentre", "mousse", "margarine", "boire", "rissolee"], JUICE_ONLY = new Set(["boisson", "nectar"]);
   /* variétés d'un même rayon : huile d'olive ou de tournesol, sucre blanc ou roux, riz complet, pâtes complètes, yaourt au lait de chèvre,
      bière blonde ou ambrée, vin de telle région, croquettes au poulet ou au saumon */
   const VARIETY = new Set("olive tournesol colza arachide noix sesame pepins avocat lin isio friture melange graine chevre brebi soja coco grec grecque complete integrale sarrasin mais pois roux cassonade canne morceau fluide blonde blond ambree brune bordeaux bourgogne rhone languedoc loire provence beaujolais merlot cabernet syrah grenache chardonnay sauvignon pinot basmati thai long rond nature campagne cereales tradition".split(" ").map(stem));
@@ -2383,6 +2401,14 @@
     return /%/.test(p.name) && /\b(1[0-9]|[2-6][0-9]|7[0-4])\b(?! ?(g|kg|cl|ml|l|x|portions?|pieces?|unites?|oeufs?|par|min|cm)\b)/.test(n);
   };
   /* le mot est dans le produit lui-même (marque, nom, format, étiquettes), pas seulement dans le nom de son rayon */
+  /* rayon qui nomme plusieurs produits (« Sardines, maquereaux et poissons en conserve ») : le premier mot de chacun ;
+     le produit qui répond à l'un d'eux doit le dire lui-même (une baguette est un pain, une mouline une soupe) */
+  const HEADS = {};
+  const headsOf = (r) => { if (!HEADS[r]) { const segs = String((rayon(r) || {}).name || "").split(/,| et /); HEADS[r] = new Set(segs.length > 1 ? segs.map((x) => stem(norm(x).split(" ")[0] || "")).filter(Boolean) : []); } return HEADS[r]; };
+  const KIND = { pain: ["baguette", "ficelle", "flute", "batard", "boule", "fougasse"], soupe: ["mouline", "veloute", "potage", "gaspacho"] };
+  const ownPre = (p, t) => { if (ownHas(p, t)) return true; for (const w of p._ow) if (w.startsWith(t)) return true; return (KIND[t] || []).some((k) => ownHas(p, k)); };
+  /* mots d'ingrédient de la ligne elle-même (« sardines à l'huile », « thon au naturel ») */
+  const weakQ = (raw) => { const nt = norm(raw || "").split(" ").filter(Boolean), out = new Set(); const mark = (i) => ING.has(nt[i]) || nt[i] === "a" || ((nt[i] === "la" || nt[i] === "l") && nt[i - 1] === "a"); nt.forEach((w, i) => { if (i && mark(i - 1)) out.add(stem(w)); }); return out; };
   const ownHas = (p, t) => { if (!p._ow) p._ow = new Set((idx(p)._b + " " + norm(p.name).replace(/\b1 2 /g, "demi ") + " " + norm(p.format) + " " + norm((p.tags || []).join(" "))).split(" ").filter(Boolean).map(stem)); return p._ow.has(t); };
   function matchLine(L) {
     const out = { raw: L.raw, q: L.q, n: L.n, nGiven: !!L.nGiven, cands: [], avail: 0, pick: null };
@@ -2397,16 +2423,25 @@
        le rayon Huile, pas des sardines à l'huile) ; puis les résultats les plus pertinents */
     const exact = rel.filter((p) => { const st = allW(p); return toks.every((t) => st.has(t)); });
     if (exact.length) rel = exact;
+    /* chaque mot désigne le produit lui-même, pas un ingrédient (« lentilles corail », pas des tranches végétales aux
+       lentilles corail), quand certains produits le font */
+    const wq = weakQ(L.raw), sToks = toks.filter((t) => !wq.has(t));
+    const strongAll = rel.filter((p) => { const st = strongW(p); return sToks.every((t) => st.has(t)); });
+    if (strongAll.length) rel = strongAll;
     /* « sardines à l'huile » n'est pas « sauce tomate sans huile » */
     if (!toks.includes("san")) { const noSans = rel.filter((p) => !toks.some((t) => sig(p).includes("sans " + t))); if (noSans.length) rel = noSans; }
     /* « jus d'orange » n'est pas une boisson au jus, « papier toilette » n'est pas des lingettes : un mot qui change la
        nature du produit l'écarte, sauf si on l'a écrit */
     const dn = NOTSAME.filter((w) => !toks.includes(w)), light = ["leger", "allege", "light"].some((w) => toks.includes(w));
     /* « boisson au jus » et « nectar » ne valent que pour les jus : un cola est, de son nom légal, une « boisson gazeuse » */
-    const noDown = rel.filter((p) => !dn.some((w) => allW(p).has(w) && (p.r === "jus" || !JUICE_ONLY.has(w))) && (light || !lowFat(p)));
+    /* le mot doit être dans le produit lui-même : le rayon « Beurre et margarine » n'écarte pas le beurre */
+    const noDown = rel.filter((p) => !dn.some((w) => ownHas(p, w) && (/^jus/.test(p.r) || !JUICE_ONLY.has(w))) && (light || !lowFat(p)));
     if (noDown.length) rel = noDown;
     const inRay = rel.filter((p) => { const rw = rayWords(p.r); return toks.some((t) => rw.has(t)); });
     if (inRay.length) rel = inRay;
+    /* rayon qui en nomme plusieurs (« Pommes de terre, carottes, oignons et ail ») : « oignons » veut un produit qui le
+       dit lui-même, pas le moins cher du rayon */
+    rel = rel.filter((p) => { const H = headsOf(p.r); return toks.every((t) => !H.has(t) || ownPre(p, t)); });
     /* mon régime : seuls les produits conformes, d'après ce que l'enseigne indique ; sans aucun, la ligne le dit et
        garde le meilleur produit (dietMiss) */
     if (dietOn()) { const fit = rel.filter((p) => dietOk(p)); if (fit.length) rel = fit; else out.dietMiss = true; }
@@ -2497,7 +2532,7 @@
   /* La liste entière, livraison comprise : pour chaque ensemble d'une à trois enseignes, chaque ligne prend le produit
      du vivier le moins cher dans ces enseignes ; une enseigne dont la commande n'atteint pas son minimum disqualifie
      l'ensemble ; frais de livraison et de service comptés. Renvoie le meilleur plan : lignes couvertes, puis total. */
-  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems });
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems, composeMenu, ghIssueUrl, ghBody, scrub, watchCheck, watchHits, factsOf, factsFetch, allergHit, cmpVerdict, recFits });
   /* jeu d'essai (tests) : un petit catalogue v2 ajouté au catalogue chargé, rayons et produits compris */
   function mergeCatalog(extra) {
     const c = unpack(extra), seen = new Set(S.list.map((p) => p.id));
@@ -4318,9 +4353,9 @@
      se restaure depuis ce fichier, ou passe d'un téléphone à l'autre par un lien #/transfert/<x> : les données sont
      dans le lien lui-même, après le #, que le navigateur n'envoie à aucun serveur. Tout ce qui arrive est vérifié
      (importCheck : clés connues, types, tailles) et ne remplace rien sans confirmation, avec « Annuler ». */
-  const DKEYS = ["basket", "lists", "prefs", "free", "flex", "hist", "menu", "todo", "seen", "recent", "guide", "draft", "seenp", "drops", "ups", "seenAt", "univ", "prepSnooze"];
+  const DKEYS = ["basket", "lists", "prefs", "free", "flex", "hist", "menu", "todo", "seen", "recent", "guide", "draft", "seenp", "drops", "ups", "seenAt", "univ", "prepSnooze", "watch", "watchHits", "reports"];
   /* le lien ne porte que l'essentiel : pas de remplissage en cours, de brouillon ni de mémoire des prix vus */
-  const XKEYS = ["basket", "lists", "prefs", "free", "flex", "hist", "menu", "todo", "seen", "recent"];
+  const XKEYS = ["basket", "lists", "prefs", "free", "flex", "hist", "menu", "todo", "seen", "recent", "watch"];
   function packState(keys) {
     const data = {};
     for (const k of keys || DKEYS) { const v = store.get(k, undefined); if (v !== undefined && v !== null) data[k] = v; }
@@ -4383,7 +4418,8 @@
           else if (k === "budgetMode") { if (x === "panier" || x === "mois") o.budgetMode = x; }
           else if (k === "zoom") { if (typeof x === "string" && /^[01](\.\d{1,2})?$/.test(x)) o.zoom = x; }
           else if (k === "contrast") { if (x === null || typeof x === "boolean") o.contrast = x; }
-          else if (["comp", "wake", "simple", "manualCk", "badge"].includes(k)) { if (typeof x === "boolean") o[k] = x; }
+          else if (["comp", "wake", "simple", "manualCk", "badge", "facts"].includes(k)) { if (typeof x === "boolean") o[k] = x; }
+          else if (k === "allergens") { if (Array.isArray(x)) o.allergens = [...new Set(x.filter((a) => typeof a === "string" && ALLERG.has(a)))]; }
           else if (k === "offv") { if (Number.isInteger(x) && x >= 0 && x <= 9) o.offv = x; }
           else if (isObj(d) || ["off", "fee", "pick", "pickManual", "liv", "keep", "usual", "qty1", "diet", "lead", "pin", "ban"].includes(k)) { if (isObj(x) && json(x, 200000)) { const m = map(x, (y) => ["string", "number", "boolean"].includes(typeof y) || (isObj(y) && json(y, 2000)), 3000); if (m) o[k] = m; } }
           else skip.push("prefs." + k);
@@ -4405,6 +4441,9 @@
       seenAt: (v) => (str(v, 40) ? v : null),
       univ: (v) => map(v, (x) => typeof x === "boolean", 40),
       prepSnooze: (v) => (str(v, 12) ? v : null),
+      watch: (v) => map(v, (w) => isObj(w) && cents(w.max) && w.max > 0 && (w.from == null || cents(w.from)) && (w.at == null || iso(w.at)), 300),
+      watchHits: (v) => map(v, (h) => isObj(h) && cents(h.c) && (h.ret == null || str(h.ret, 40)) && (h.seen == null || typeof h.seen === "boolean"), 300),
+      reports: (v) => (Array.isArray(v) ? v.slice(-50).filter((r) => isObj(r) && str(r.id, 40) && iso(r.at) && str(r.k, 20) && (r.pid == null || str(r.pid, 200)) && (r.ret == null || str(r.ret, 40)) && (r.text == null || str(r.text, 500))).map((r) => ({ id: r.id, at: r.at, k: r.k, pid: r.pid || "", ret: r.ret || "", text: r.text || "", sent: iso(r.sent) ? r.sent : undefined })) : null),
     };
     for (const k of Object.keys(D)) {
       if (!V[k]) { skip.push(k); continue; }
@@ -4432,8 +4471,8 @@
     S.basket = store.get("basket", {}); S.lists = store.get("lists", []); S.recent = store.get("recent", []); S.seen = store.get("seen", {});
     S.hist = store.get("hist", []); S.menu = store.get("menu", []); S.todo = store.get("todo", []); S.free = store.get("free", {}); S.flex = store.get("flex", {});
     S.guide = Object.assign({ ck: {}, done: {} }, store.get("guide", {}));
-    S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {} }, pr);
-    S.wl = null; S.undo = null; S._sug = null; S._ask = null; S._compose = null; S.filt = {}; DIETV.v++; RECM = null;
+    S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [] }, pr);
+    S.wl = null; S.undo = null; S._sug = null; S._ask = null; S._compose = null; S.filt = {}; DIETV.v++; RECM = null; S.facts = null; S.compose = null;
     applyLook(); applyGroups(); renderChrome();
   }
   /* remplace les données de l'appareil ; « Annuler » remet exactement ce qu'il y avait */
@@ -4590,7 +4629,7 @@
      simple, format courant, le moins cher au kilo, au litre ou à la pièce), sur les prix relevés seulement, puis
      compté pour la quantité utilisée. Les ingrédients du placard (sel, épices) ne sont pas comptés. */
   /* le même ingrédient (« oeufs », « farine ») revient dans plusieurs recettes : cherché une fois par relevé et par réglage d'enseignes */
-  const recKey = () => JSON.stringify([S.rets.map((r) => r.id), S.prefs.off, S.meta.updatedAt, S.list.length, S.prefs.diet || {}]);
+  const recKey = () => JSON.stringify([S.rets.map((r) => r.id), S.prefs.off, S.meta.updatedAt, S.list.length, S.prefs.diet || {}, DIETV.v]);
   let RECM = null;
   function recMatch(q) {
     const key = recKey();
@@ -4610,10 +4649,20 @@
     /* ingrédient qui ne correspond pas au régime (aucun produit conforme) : la recette le dit, elle reste ouvrable */
     return { g, need, p, b, n, used, buy: b.price * n, bad: !!m.dietMiss };
   }
+  /* un ingrédient vraiment hors régime : un mot d'exclusion (viande, porc, alcool), un allergène connu, ou une étiquette
+     qui manque (végan, sans gluten, halal...) quand la recette ne suit pas ce régime par nature ; du riz sans étiquette
+     « végan » va dans un plat végan */
+  const LABEL_DIETS = { vegan: ["veg", "vegan"], gluten: ["gluten"], lactose: ["lactose"], halal: ["veg", "alcohol"], kosher: ["veg", "alcohol"], sugar: ["-"] };
+  function recBad(rc, x) {
+    if (!x.p || !x.bad) return false;
+    const d = dietSet();
+    if (allergHit(x.p).length || !dietOk(x.p, { veg: d.veg || d.vegan, pork: d.pork || d.halal || d.kosher, alcohol: d.alcohol || d.halal || d.kosher })) return true;
+    return Object.keys(LABEL_DIETS).some((k) => d[k] && !dietOk(x.p, { [k]: true }) && !LABEL_DIETS[k].every((t) => (rc.diet || []).includes(t)));
+  }
   function recCost(rc, portions) {
     const k = (portions || rc.portions) / rc.portions;
     const lines = rc.ing.map((g) => recIng(g, k));
-    const ok = lines.filter((x) => x.p), miss = lines.filter((x) => !x.p), bad = lines.filter((x) => x.bad);
+    const ok = lines.filter((x) => x.p), miss = lines.filter((x) => !x.p), bad = lines.filter((x) => recBad(rc, x));
     const used = ok.reduce((a, x) => a + x.used, 0), buy = ok.reduce((a, x) => a + x.buy, 0);
     return { lines, ok, miss, bad, used, buy, per: used / (portions || rc.portions), portions: portions || rc.portions };
   }
@@ -4654,7 +4703,7 @@
     return {
       title: "Repas à petit prix", grouped: true,
       html: `<h1 class="lt">Repas à petit prix</h1><p class="lt-sub">Le coût de chaque portion, au meilleur prix relevé de chaque ingrédient.</p>` +
-        menuHtml() + grp("plat", "Plats") + grp("dessert", "Desserts et goûters") +
+        weekForm() + menuHtml() + grp("plat", "Plats") + grp("accompagnement", "Accompagnements") + grp("dessert", "Desserts et goûters") +
         `<p class="gf">Le coût compte la quantité utilisée de chaque produit. Les courses à faire, en paquets entiers, coûtent un peu plus, et il en restera pour une autre fois. Le sel, les épices et la levure ne sont pas comptés.</p>`,
     };
   };
@@ -4667,11 +4716,11 @@
     const line = (x) => {
       const q = k === 1 ? x.g.t : fmtNeed(x.need, x.g.u) + (x.g.u === "pc" ? " " + x.g.q.replace(/^oeufs$/, "œufs") : " de " + x.g.q);
       if (!x.p) return `<div class="row th"><span class="thumb q">${ic("search")}</span><span class="rt">${esc(q)}<small>${x.off ? "Pas vendu par tes enseignes" : "Pas encore dans Cabas"}</small></span></div>`;
-      return `<a class="row th" href="${hp(x.p.id)}"><span class="thumb">${img(x.p, 48)}</span><span class="rt">${esc(q)}<small>${esc(x.p.brand + " " + x.p.name)}, ${esc(x.p.format)}, ${eur(x.b.price)} chez ${esc(retName(x.b.ret))}${x.n > 1 ? `, ${x.n} à acheter` : ""}${x.bad ? ". Pas pour ton régime, d'après ce que l'enseigne indique" : ""}</small></span><span class="val num">${eur(x.used)}</span></a>`;
+      return `<a class="row th" href="${hp(x.p.id)}"><span class="thumb">${img(x.p, 48)}</span><span class="rt">${esc(q)}<small>${esc(x.p.brand + " " + x.p.name)}, ${esc(x.p.format)}, ${eur(x.b.price)} chez ${esc(retName(x.b.ret))}${x.n > 1 ? `, ${x.n} à acheter` : ""}${recBad(rc, x) ? ". Pas pour ton régime, d'après ce que l'enseigne indique" : ""}</small></span><span class="val num">${eur(x.used)}</span></a>`;
     };
     return {
       title: rc.name, grouped: true,
-      html: `<h1 class="lt">${esc(rc.name)}</h1><p class="lt-sub">${rc.kind === "plat" ? "Plat" : "Dessert"}, ${rc.minutes}${NB}min</p>` +
+      html: `<h1 class="lt">${esc(rc.name)}</h1><p class="lt-sub">${REC_KIND[rc.kind] || "Plat"}, ${rc.minutes}${NB}min${(rc.diet || []).includes("vegan") ? ", végan" : (rc.diet || []).includes("veg") ? ", végétarien" : ""}</p>` +
         `<div class="sum rsum"><p class="sl">${c.miss.length ? "Coût des ingrédients comparés" : "Par portion"}</p><div class="st">${px(c.miss.length ? c.used : c.per)}</div>` +
         `<p class="sn">${c.miss.length ? `Pour ${plural(P, "portion", "portions")}, sans ${esc(joinEt(c.miss.map((x) => x.g.q)))}, pas encore dans Cabas.` : `${eur(c.used)} pour ${plural(P, "portion", "portions")}. Les courses, en paquets entiers, font ${eur(c.buy)}\u00a0: il en restera pour une autre fois.`}</p>` +
         `<p class="segl" id="portL">Portions</p><div class="seg" role="radiogroup" aria-labelledby="portL">${[2, 4, 6, 8].map((v) => `<button type="button" role="radio" data-act="recp" data-id="${esc(rc.id)}" data-v="${v}" aria-checked="${v === P}">${v}</button>`).join("")}</div>` +
@@ -4684,16 +4733,96 @@
   /* Ma semaine : plusieurs recettes, les ingrédients mis en commun (les œufs de trois recettes font une boîte) */
   const saveMenu = () => store.set("menu", S.menu);
   const menuRecs = () => S.menu.map((m) => { const rc = (S.recs || []).find((x) => x.id === m.id); return rc ? { rc, portions: m.portions || rc.portions } : null; }).filter(Boolean);
-  function menuCost() {
+  function menuCost(list) {
+    list = list || menuRecs();
     const need = new Map();
-    for (const { rc, portions } of menuRecs()) {
+    for (const { rc, portions } of list) {
       const k = portions / rc.portions;
       for (const g of rc.ing) { const x = need.get(g.q) || { q: g.q, u: g.u, need: 0 }; x.need += g.need * k; need.set(g.q, x); }
     }
     const lines = [...need.values()].map((g) => recIng({ q: g.q, u: g.u, need: g.need, t: g.q }, 1));
     const ok = lines.filter((x) => x.p), miss = lines.filter((x) => !x.p);
-    const portions = menuRecs().reduce((a, x) => a + x.portions, 0);
+    const portions = list.reduce((a, x) => a + x.portions, 0);
     return { lines, ok, miss, used: ok.reduce((a, x) => a + x.used, 0), buy: ok.reduce((a, x) => a + x.buy, 0), portions };
+  }
+
+  /* ---------- une semaine de repas à X € ---------- */
+  /* Des plats variés (deux au plus par ingrédient principal, pas deux fois de suite), un accompagnement pour un plat qui
+     ne se suffit pas (complete, de préférence ceux de with), le régime respecté par la recette (diet) et par chaque produit, les ingrédients mis en
+     commun et comptés en paquets entiers, aux prix relevés. Chaque plat est pris pour ce qu'il ajoute au total : le
+     paquet de pâtes entamé sert deux fois. Un plat dont un ingrédient manque au catalogue ne vient qu'en dernier, et le
+     coût le dit. Au-delà du budget, la semaine la moins chère, puis moins de repas. o : { budget en centimes (0 sans),
+     meals, people, seed (0 la moins chère, sinon une autre semaine) } */
+  const REC_KIND = { plat: "Plat", accompagnement: "Accompagnement", dessert: "Dessert" };
+  const DIET_TAGS = { veg: ["veg"], vegan: ["veg", "vegan"], pork: ["pork"], alcohol: ["alcohol"], gluten: ["gluten"], lactose: ["lactose"], halal: ["pork", "alcohol"], kosher: ["pork", "alcohol"] };
+  const recFits = (rc) => { const d = dietSet(); return Object.keys(DIET_TAGS).every((k) => !d[k] || DIET_TAGS[k].every((t) => (rc.diet || []).includes(t))) && !recCost(rc).bad.length; };
+  const jitter = (seed, id) => { if (!seed) return 0; let h = (seed * 2654435761) >>> 0; for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619) >>> 0; return (h % 1000) / 1000; };
+  function composeOnce(o, meals, P) {
+    /* ce qu'une ou deux recettes ajoutent aux courses déjà prévues (centimes), produit par produit, paquets entiers */
+    const need = new Map();
+    const pk = (q) => { if (!P.M.has(q)) { const m = recMatch(q), p = m.pick && S.prods.get(m.pick), b = p && bestReal(p); P.M.set(q, b ? { c: Math.round(b.price * 100), v: (p.qty && p.qty.v) || 0, u: p.qty && p.qty.u } : null); } return P.M.get(q); };
+    const buyQ = (q, u, n) => { const x = pk(q); if (!x || !(n > 0)) return 0; return x.c * (x.v && x.u === u ? Math.max(1, Math.ceil(n / x.v - 1e-9)) : 1); };
+    const adds = (rcs) => { const d = new Map(); for (const rc of rcs) for (const g of rc.ing) { const y = d.get(g.q) || { u: g.u, n: 0 }; y.n += (g.need * o.people) / rc.portions; d.set(g.q, y); } let c = 0; d.forEach((y, q) => { const n0 = (need.get(q) || { n: 0 }).n; c += buyQ(q, y.u, n0 + y.n) - buyQ(q, y.u, n0); }); return { c, d }; };
+    const picks = [], mains = {}, sideUse = {};
+    let out = false;
+    for (let i = 0; i < meals; i++) {
+      const last = picks.length ? picks[picks.length - 1].rc.main : "";
+      let pick = null;
+      for (const rc of P.plats) {
+        if (picks.some((x) => x.rc.id === rc.id) || (mains[rc.main] || 0) >= 2) continue;
+        /* l'accompagnement : parmi ceux que la recette propose (with), sinon tous, deux fois au plus dans la semaine */
+        const okS = P.sides.filter((x) => (sideUse[x.id] || 0) < 2), pref = okS.filter((x) => (rc.with || []).includes(x.id));
+        const side = rc.complete ? null : (pref.length ? pref : okS).map((x) => ({ x, c: adds([rc, x]).c })).sort((a, b) => a.c - b.c)[0] || null;
+        const add = side ? side.c : adds([rc]).c;
+        const score = add * (1 + 0.6 * jitter(o.seed, rc.id)) + P.miss.get(rc.id) * 1e7 + (rc.main === last ? 1e6 : 0);
+        if (!pick || score < pick.score) pick = { rc, side: side && side.x, score };
+      }
+      if (!pick) { out = true; break; }
+      picks.push({ rc: pick.rc, side: pick.side });
+      adds(pick.side ? [pick.rc, pick.side] : [pick.rc]).d.forEach((y, q) => { const x = need.get(q) || { u: y.u, n: 0 }; x.n += y.n; need.set(q, x); });
+      mains[pick.rc.main] = (mains[pick.rc.main] || 0) + 1;
+      if (pick.side) sideUse[pick.side.id] = (sideUse[pick.side.id] || 0) + 1;
+    }
+    /* la semaine telle qu'elle ira dans « Ma semaine » : une ligne par recette, portions additionnées */
+    const list = [];
+    picks.forEach(({ rc, side }) => [rc, side].filter(Boolean).forEach((x) => { const e = list.find((y) => y.rc.id === x.id); if (e) e.portions += o.people; else list.push({ rc: x, portions: o.people }); }));
+    const c = menuCost(list);
+    return { picks, list, out, total: Math.round(c.buy * 100), used: Math.round(c.used * 100), miss: [...new Set(c.miss.map((x) => x.g.q))] };
+  }
+  function composeMenu(o) {
+    o = Object.assign({ budget: 0, meals: 7, people: Math.max(1, Math.min(8, +S.prefs.foyer || 2)), seed: 0 }, o || {});
+    const all = S.recs || [], P = { M: new Map(), miss: new Map() };
+    P.plats = all.filter((rc) => rc.kind === "plat" && recFits(rc));
+    P.sides = all.filter((rc) => rc.kind === "accompagnement" && recFits(rc));
+    P.plats.forEach((rc) => P.miss.set(rc.id, recCost(rc).miss.length));
+    const cheap = Object.assign({}, o, { seed: 0 });
+    let r = composeOnce(o, o.meals, P);
+    if (o.budget && r.total > o.budget && o.seed) r = composeOnce(cheap, o.meals, P);
+    while (o.budget && r.total > o.budget && r.picks.length > 1) r = composeOnce(cheap, r.picks.length - 1, P);
+    return Object.assign(r, { asked: o.meals, people: o.people, budget: o.budget, seed: o.seed, fits: !o.budget || r.total <= o.budget });
+  }
+  /* le bloc de « Repas à petit prix » : budget, nombre de repas et de personnes, puis la semaine proposée */
+  function weekForm() {
+    const C = S.compose || (S.compose = { bud: "", meals: 7, people: Math.max(1, Math.min(6, +S.prefs.foyer || 2)), seed: 0, res: null });
+    const R = C.res;
+    const form = `<h2 class="gh">Une semaine de repas</h2><div class="group"><div class="row stack"><span class="rt">Cabas choisit des plats variés qui tiennent dans ton budget, ingrédients mis en commun, aux prix relevés${dietOn() ? ", pour ton régime" : ""}.</span>` +
+      `${field("cmBud", "Budget des courses", `type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="Par exemple 40" value="${esc(C.bud)}"`, "Sans les frais de livraison\u00a0: le panier les compte ensuite. Vide, la semaine la moins chère.", "€")}` +
+      `<p class="segl" id="cmML">Repas</p><div class="seg" role="radiogroup" aria-labelledby="cmML">${[5, 7, 10, 14].map((v) => `<button type="button" role="radio" data-act="cmmeals" data-v="${v}" aria-checked="${v === C.meals}">${v}</button>`).join("")}</div>` +
+      `<p class="segl" id="cmPL">Personnes</p><div class="seg" role="radiogroup" aria-labelledby="cmPL">${[1, 2, 3, 4, 5, 6].map((v) => `<button type="button" role="radio" data-act="cmpeople" data-v="${v}" aria-checked="${v === C.people}">${v}</button>`).join("")}</div>` +
+      `<button class="btn tint" type="button" data-act="compose">Composer ma semaine</button></div></div>`;
+    if (!R) return form + `<div id="cmres" aria-live="polite"></div>`;
+    return form + `<div id="cmres" aria-live="polite">${weekRes(R)}</div>`;
+  }
+  function weekRes(R) {
+    const n = R.picks.length, pp = plural(R.people, "personne", "personnes");
+    if (!n) return `<div class="empty"><h2>Aucun plat pour ton régime</h2><p>Aucune recette de Cabas ne correspond à ton régime avec les produits de tes enseignes. Change ton régime ou tes enseignes dans les réglages.</p></div>`;
+    const bud = !R.budget ? "Sans budget\u00a0: la semaine la moins chère." : R.fits ? `Dans ton budget de ${eurR(R.budget / 100)}\u00a0: il te reste ${eurC(R.budget - R.total)}.` : `Même un seul repas dépasse ton budget de ${eurR(R.budget / 100)}.`;
+    const fewer = n < R.asked && R.fits ? (R.out ? `Cabas n'a que ${plural(n, "plat différent", "plats différents")} pour ton régime et tes enseignes. ` : `Ton budget tient pour ${plural(n, "repas", "repas")}, pas ${R.asked}. `) : "";
+    const rows = R.picks.map((x) => { const c = recCost(x.rc, R.people), cs = x.side ? recCost(x.side, R.people) : null, p0 = c.ok[0], per = (c.used + (cs ? cs.used : 0)) / R.people; return `<a class="row th" href="#/repas/${esc(x.rc.id)}"><span class="thumb">${p0 ? img(p0.p, 48) : ""}</span><span class="rt">${esc(x.rc.name)}<small>${x.side ? "Avec " + esc(x.side.name.toLowerCase()) + ". " : ""}${c.miss.length || (cs && cs.miss.length) ? "Prix partiel" : eur(per) + " par personne"}</small></span>${ic("chev", "chev")}</a>`; }).join("");
+    return `<div class="sum rsum" style="margin-top:12px"><p class="sl">${plural(n, "repas", "repas")} pour ${pp}, courses en paquets entiers</p><div class="st">${px(R.total / 100)}</div>` +
+      `<p class="sn">${fewer}${bud}${R.miss.length ? ` Prix partiel\u00a0: sans ${esc(joinEt(R.miss))}, pas encore dans Cabas.` : ""} Les ingrédients communs ne sont achetés qu'une fois\u00a0; le sel et les épices ne sont pas comptés.</p>` +
+      `<div class="btns two" style="margin-top:14px"><button class="btn tint" type="button" data-act="cmtake">Prendre cette semaine</button><button class="btn plain" type="button" data-act="cmagain">Une autre semaine</button></div></div>` +
+      `<div class="group" style="margin-top:12px">${rows}</div>`;
   }
   function menuItems() {
     const items = {};
@@ -4716,6 +4845,303 @@
     const P = (S.recP && S.recP[rc.id]) || foyer || rc.portions, items = {};
     recCost(rc, P).ok.forEach((x) => { items[x.p.id] = Math.min(99, (items[x.p.id] || 0) + x.n); });
     return items;
+  }
+
+  /* ---------- fiche produit : Nutri-Score, allergènes et labels, d'après Open Food Facts ---------- */
+  /* Demandés à l'API publique d'Open Food Facts (données ouvertes, licence ODbL) à l'ouverture de la fiche d'un produit
+     qui a un code-barres : seul le code part, 7 s au plus. Gardés 30 jours sur le téléphone (cabas.facts), « inconnu »
+     compris ; réglage « Nutri-Score et allergènes » décoché (prefs.facts), ils ne sont demandés que d'un geste. Le régime
+     s'en sert (allergènes à éviter, prefs.allergens) seulement quand le fait est connu, et le dit. */
+  const ALLERGENS = [["gluten", "Gluten"], ["milk", "Lait"], ["eggs", "Œufs"], ["peanuts", "Arachides"], ["nuts", "Fruits à coque"], ["soybeans", "Soja"], ["fish", "Poisson"], ["crustaceans", "Crustacés"], ["molluscs", "Mollusques"], ["sesame-seeds", "Sésame"], ["celery", "Céleri"], ["mustard", "Moutarde"], ["sulphur-dioxide-and-sulphites", "Sulfites"], ["lupin", "Lupin"]];
+  const ALLERG = new Map(ALLERGENS);
+  /* labels connus, dits en texte (jamais de logo) ; les autres ne sont pas affichés */
+  const LABELS = [["Agriculture biologique", /^(en:organic|en:eu-organic|fr:ab-agriculture-biologique)$/], ["Végan", /^en:vegan$/], ["Végétarien", /^en:vegetarian$/], ["Sans gluten", /^en:no-gluten$/], ["Sans lactose", /^en:no-lactose$/], ["Label Rouge", /^(en|fr):label-rouge$/], ["Commerce équitable", /^(en:fair-trade|en:fairtrade-international|en:max-havelaar|fr:max-havelaar)$/], ["AOP", /^en:pdo$/], ["IGP", /^en:pgi$/], ["Pêche durable MSC", /^en:(msc|sustainable-seafood-msc)$/], ["Aquaculture responsable ASC", /^en:asc$/], ["Halal", /^en:halal$/], ["Casher", /^en:kosher$/], ["Sans huile de palme", /^en:(no-palm-oil|palm-oil-free)$/], ["Sans sucres ajoutés", /^en:no-added-sugar$/], ["Plein air", /^en:free-range(-chicken-eggs)?$/], ["Fabriqué en France", /^en:made-in-france$/]];
+  const FACT_MS = 30 * 864e5;
+  const eanKey = (e) => String(e || "").replace(/\D/g, "").replace(/^0+/, "");
+  /* demandes en cours et codes restés sans réponse pendant cette visite */
+  const FX = { pend: new Map(), fail: new Set() };
+  const factsAll = () => S.facts || (S.facts = store.get("facts", {}));
+  function factsOf(p) { const k = p && eanKey(p.ean), f = k && factsAll()[k]; return f && Date.now() - f.t < FACT_MS ? f : null; }
+  const factsAuto = () => S.prefs.facts !== false && navigator.onLine !== false;
+  function factsSave(k, f) {
+    const all = factsAll();
+    all[k] = f;
+    const ks = Object.keys(all);
+    if (ks.length > 600) ks.sort((a, b) => all[a].t - all[b].t).slice(0, ks.length - 600).forEach((x) => delete all[x]);
+    store.set("facts", all);
+  }
+  /* Open Food Facts, 7 s au plus : le produit, false s'il est inconnu, null sans réponse */
+  async function offGet(code, fields) {
+    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const t = setTimeout(() => ctl && ctl.abort(), 7000);
+    try {
+      const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=${fields}`, { signal: ctl ? ctl.signal : undefined, credentials: "omit" });
+      if (r.status === 404) return false;
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j && j.status === 1 && j.product ? j.product : false;
+    } catch (e) { return null; } finally { clearTimeout(t); }
+  }
+  function factsFetch(p) {
+    const k = eanKey(p && p.ean);
+    if (!k) return Promise.resolve(null);
+    if (FX.pend.has(k)) return FX.pend.get(k);
+    const tags = (a) => [...new Set((Array.isArray(a) ? a : []).map((x) => String(x).replace(/^en:/, "")).filter((x) => ALLERG.has(x)))];
+    const pr = offGet(k, "product_name,product_name_fr,nutriscore_grade,allergens_tags,traces_tags,labels_tags").then((x) => {
+      FX.pend.delete(k);
+      if (x === null) { FX.fail.add(k); return null; }
+      FX.fail.delete(k);
+      const lb = (Array.isArray(x && x.labels_tags) ? x.labels_tags : []).map(String);
+      const f = x ? { t: Date.now(), ok: 1, ns: /^[a-e]$/.test(x.nutriscore_grade || "") ? x.nutriscore_grade : "", al: tags(x.allergens_tags), tr: tags(x.traces_tags), lb: LABELS.filter(([, re]) => lb.some((y) => re.test(y))).map(([l]) => l), nm: String(x.product_name_fr || x.product_name || "").trim().slice(0, 120) } : { t: Date.now(), ok: 0 };
+      factsSave(k, f);
+      /* le régime de ce produit est revu avec ce qu'on sait maintenant */
+      p._dv = -1;
+      return f;
+    });
+    FX.pend.set(k, pr);
+    return pr;
+  }
+  /* allergènes à éviter que le produit contient ou peut contenir, d'après Open Food Facts ; rien quand ce n'est pas connu */
+  const allergSet = () => (Array.isArray(S.prefs.allergens) ? S.prefs.allergens : []).filter((a) => ALLERG.has(a));
+  function allergHit(p) {
+    const A = allergSet();
+    if (!A.length) return [];
+    const f = factsOf(p);
+    return f && f.ok ? A.filter((a) => f.al.includes(a) || f.tr.includes(a)) : [];
+  }
+  const allergWords = (xs) => joinEt(xs.map((a) => ALLERG.get(a).toLowerCase()));
+  /* Nutri-Score : les cinq lettres, celle du produit marquée (texte, sans les couleurs du logo officiel) */
+  const nsHtml = (l) => `<span class="nscore" role="img" aria-label="Nutri-Score ${esc(l.toUpperCase())}">${"abcde".split("").map((x) => `<i${x === l ? ' class="on"' : ""} aria-hidden="true">${x.toUpperCase()}</i>`).join("")}</span>`;
+  function factsHtml(p) {
+    const k = eanKey(p.ean);
+    if (!k) return "";
+    const f = factsOf(p), src = "https://world.openfoodfacts.org/product/" + encodeURIComponent(k);
+    const head = `<h2 class="gh">Nutrition et allergènes</h2>`;
+    if (!f) {
+      if (FX.pend.has(k) || (factsAuto() && !FX.fail.has(k))) return head + `<div class="group" aria-busy="true"><div class="row"><span class="rt">Demande à Open Food Facts…<small>Seul le code-barres est envoyé.</small></span></div></div>`;
+      const failed = FX.fail.has(k);
+      return head + `<div class="group"><div class="row stack"><span class="rt">${failed ? "Open Food Facts n'a pas répondu" : "Nutri-Score, allergènes et labels"}<small>${failed ? "Vérifie ta connexion, puis réessaie." : "D'après Open Food Facts, base ouverte et collaborative. Seul le code-barres est envoyé."}</small></span><button class="btn tint" type="button" data-act="factsget" data-id="${esc(p.id)}">${failed ? "Réessayer" : "Voir le Nutri-Score et les allergènes"}</button></div></div>`;
+    }
+    if (!f.ok) return head + `<div class="group"><div class="row"><span class="rt">Pas encore dans Open Food Facts<small>Ce code-barres n'y est pas encore décrit. Vérifie l'emballage.</small></span></div></div><p class="gf"><a href="${src}" target="_blank" rel="noopener">Décrire ce produit sur Open Food Facts</a></p>`;
+    const mine = allergHit(p);
+    const warn = mine.length ? `<div class="banner warn" role="note">${ic("info")}<span><b>${esc(allergWords(mine).replace(/^./, (c) => c.toUpperCase()))}</b>Tu l'évites, et ce produit en contient ou peut en contenir, d'après Open Food Facts.</span></div>` : "";
+    const ns = `<div class="row"><span class="rt">Nutri-Score<small>${f.ns ? "De A, le meilleur, à E" : "Pas calculé pour ce produit"}</small></span>${f.ns ? nsHtml(f.ns) : ""}</div>`;
+    const al = `<div class="row"><span class="rt">Allergènes<small>${f.al.length ? "Contient : " + esc(allergWords(f.al)) : "Aucun indiqué"}${f.tr.length ? ". Traces possibles : " + esc(allergWords(f.tr)) : ""}</small></span></div>`;
+    const lb = f.lb.length ? `<div class="row"><span class="rt">Labels<small>${esc(f.lb.join(", "))}</small></span></div>` : "";
+    return head + warn + `<div class="group${warn ? " gap" : ""}">${ns}${al}${lb}</div><p class="gf">D'après Open Food Facts${f.nm ? `, fiche « ${esc(f.nm)} »` : ""}, base collaborative sous licence ODbL. À vérifier sur l'emballage. <a href="${src}" target="_blank" rel="noopener">Voir la fiche</a></p>`;
+  }
+  /* la fiche ouverte demande ses faits une fois ; la section se met à jour quand ils arrivent */
+  function factsLoad(p, then) {
+    const k = eanKey(p && p.ean);
+    if (!k || factsOf(p) || FX.fail.has(k)) return;
+    factsFetch(p).then(then, then);
+    then();
+  }
+
+  /* ---------- comparer deux produits ---------- */
+  /* #/comparer/<a>/<b> : côte à côte, le prix le plus bas et son enseigne (simulé dit), le prix au kilo ou au litre, la
+     contenance, le prix chez chaque enseigne activée, les régimes et, quand Open Food Facts les connaît, Nutri-Score et
+     allergènes. Le verdict compare les prix relevés au kilo ou au litre, jamais un prix simulé. « Prendre celui-ci »
+     remplace l'autre au panier, à la même quantité, avec « Annuler ». */
+  const hc = (a, b) => "#/comparer/" + encodeURIComponent(a) + (b ? "/" + encodeURIComponent(b) : "");
+  const REG_FR = { bio: "Bio", halal: "Halal", casher: "Casher", vegan: "Végan", vegetarien: "Végétarien", "sans-gluten": "Sans gluten", "sans-lactose": "Sans lactose" };
+  function cmpCands(p, q) {
+    const nq = norm(q || "");
+    if (nq) return searchScored(q).map((x) => x[1]).filter((x) => x.id !== p.id && best(x)).slice(0, 12);
+    const toks = norm(p.name).split(" ").filter((t) => t.length > 3 && !/^\d/.test(t)).slice(0, 4);
+    const sc = (x) => ((S.basket[x.id] || 0) > 0 ? 0 : 2) + (toks.some((t) => norm(x.name).includes(t)) ? 0 : 1);
+    return inRayon(p.r).filter((x) => x.id !== p.id && best(x)).map((x) => ({ x, s: sc(x), v: valOf(x) })).sort((a, b) => a.s - b.s || a.v - b.v).slice(0, 12).map((y) => y.x);
+  }
+  function cmpList(p, q) {
+    const L = cmpCands(p, q);
+    if (!L.length) return `<div class="row"><span class="rt">Aucun produit<small>Essaie un autre mot, une marque ou un rayon.</small></span></div>`;
+    return L.map((x) => { const b = best(x), u = b ? unitPrice(x, b.price) : ""; return `<a class="row th" href="${hc(p.id, x.id)}"><span class="thumb">${img(x, 48)}</span><span class="rt">${esc(pname(x))}<small>${esc(x.format)}${b ? ", " + eur(b.price) + (u ? ", " + esc(u) : "") + (b.sim ? ", prix simulé" : "") : ""}</small></span>${ic("chev", "chev")}</a>`; }).join("");
+  }
+  function cmpSheet(id) {
+    const p = S.prods.get(id);
+    if (!p) return;
+    S.cmp = { from: p.id, q: "" };
+    const build = () => ({ body: `<p>Avec quel produit comparer ${esc(pname(p))} ? Les plus proches d'abord, ceux de ton panier en tête.</p>` + field("cmpq", "Chercher un autre produit", `type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Un produit, une marque" value="${esc(S.cmp.q)}"`, "") + `<div class="group" id="cmplist">${cmpList(p, S.cmp.q)}</div>` });
+    openSheet({ title: "Comparer", body: build().body, build, right: `<span></span>` });
+  }
+  /* le verdict : au kilo, au litre ou à l'unité, aux prix relevés de tes enseignes */
+  function cmpVerdict(a, b) {
+    const ra = bestReal(a), rb = bestReal(b);
+    if (!ra || !rb) return { t: "Pas de verdict", n: "Un des deux produits n'a pas de prix relevé dans tes enseignes." };
+    const ua = perUnit(a, ra.price), ub = perUnit(b, rb.price), same = ua != null && ub != null && a.qty.u === b.qty.u;
+    const per = same ? (a.qty.u === "g" ? "Au kilo" : a.qty.u === "ml" ? "Au litre" : "À l'unité") : "Au paquet";
+    const va = same ? ua : ra.price, vb = same ? ub : rb.price, lo = va <= vb ? a : b, hi = lo === a ? b : a, d = Math.abs(va - vb) / Math.max(va, vb);
+    const fmt = (p, r) => (same ? unitPrice(p, r.price) : eur(r.price));
+    const note = `${esc(pname(a))} : ${esc(fmt(a, ra))}, ${esc(pname(b))} : ${esc(fmt(b, rb))}, aux prix relevés.${same ? "" : " Les contenances ne se comparent pas au kilo : regarde la quantité."}`;
+    if (d < 0.01) return { t: `${per}, le même prix`, n: note };
+    return { t: `${per}, ${Math.round(d * 100)}${NB}% moins cher`, n: note, lo: lo.id, hi: hi.id };
+  }
+  VIEWS.comparer = (r) => {
+    const get = (id) => S.prods.get(id) || S.prods.get((S.alias || {})[id]);
+    const a = get(r.id), b = r.id2 ? get(r.id2) : null;
+    if (!a) return notFound();
+    if (!b || b === a) {
+      return { title: "Comparer", grouped: true, html: `<h1 class="lt">Comparer</h1><p class="lt-sub">${esc(pname(a))}, ${esc(a.format)}, avec :</p><div class="group" id="cmplist">${cmpList(a, "")}</div><p class="gf">Ou cherche un autre produit depuis sa fiche.</p>` };
+    }
+    const P = [a, b], ids = ["cmpA", "cmpB"];
+    const V = cmpVerdict(a, b);
+    const cell = (i, h) => `<td headers="${ids[i]} %R">${h}</td>`;
+    let n = 0;
+    const row = (label, f) => { const rid = "cmpR" + ++n; return `<tr class="cl"><th colspan="2" scope="colgroup" id="${rid}">${label}</th></tr><tr>${P.map((p, i) => cell(i, f(p, i)).replace("%R", rid)).join("")}</tr>`; };
+    const bb = P.map((p) => best(p));
+    const rets = S.rets.filter((x) => retOn(x.id) && (a.offers[x.id] || b.offers[x.id]));
+    const F = P.map(factsOf), anyF = F.some((f) => f && f.ok);
+    const thead = `<thead><tr>${P.map((p, i) => `<th scope="col" id="${ids[i]}"><a href="${hp(p.id)}"><span class="thumb">${img(p, 72)}</span><span class="cb">${esc(p.brand)}</span><span class="cn">${esc(p.name)}</span></a>${V.lo === p.id ? '<span class="tag low">Le moins cher</span>' : ""}</th>`).join("")}</tr></thead>`;
+    const body = row("Prix le plus bas", (p, i) => (bb[i] ? `<b class="num">${eur(bb[i].price)}</b><small>chez ${esc(retName(bb[i].ret))}${bb[i].sim ? ", prix simulé" : ""}</small>` : "<small>Pas dans tes enseignes</small>")) +
+      row("Au kilo, au litre ou à l'unité", (p, i) => (bb[i] && unitPrice(p, bb[i].price) ? esc((p.approx ? "environ " : "") + unitPrice(p, bb[i].price)) + (bb[i].sim ? "<small>Prix simulé</small>" : "") : "<small>Pas indiqué</small>")) +
+      row("Contenance", (p) => esc(p.format) + (p.approx ? "<small>estimée</small>" : "")) +
+      rets.map((x) => row(`Chez ${esc(x.name)}`, (p) => { const o = p.offers[x.id], other = (p === a ? b : a).offers[x.id]; if (!o) return "<small>Pas vendu</small>"; const lower = other && o.price < other.price; return `${lower ? "<b class=\"num\">" : "<span class=\"num\">"}${eur(o.price)}${lower ? "</b>" : "</span>"}${o.sim ? "<small>Prix simulé</small>" : ""}`; })).join("") +
+      row("Régimes et mentions", (p) => { const t = (p.regimes || []).map((x) => REG_FR[x]).filter(Boolean); return t.length ? esc(t.join(", ")) : "<small>Aucun indiqué</small>"; }) +
+      (dietOn() ? row("Mon régime", (p) => (dietOk(p) ? "Correspond" : "Ne correspond pas")) : "") +
+      (anyF ? row("Nutri-Score", (p, i) => (F[i] && F[i].ok && F[i].ns ? nsHtml(F[i].ns) : "<small>Pas connu</small>")) + row("Allergènes", (p, i) => (F[i] && F[i].ok ? (F[i].al.length ? esc(allergWords(F[i].al)) : "<small>Aucun indiqué</small>") : "<small>Pas connus</small>")) : "") +
+      row("Marque", (p) => (p.type === "mdd" ? "Marque distributeur" : "Grande marque")) +
+      `<tr class="take">${P.map((p, i) => cell(i, `<button class="btn tint" type="button" data-act="cmptake" data-id="${esc(p.id)}" data-o="${esc(P[1 - i].id)}" aria-label="Prendre ${esc(pname(p))}">Prendre celui-ci</button>`).replace(" %R", "")).join("")}</tr>`;
+    return {
+      title: "Comparer", grouped: true,
+      mount: () => {
+        if (!factsAuto()) return;
+        const here = () => S.route.name === "comparer" && S.route.id === r.id && S.route.id2 === r.id2;
+        P.forEach((p) => factsLoad(p, () => { if (here() && !FX.pend.size) rerender(); }));
+      },
+      html: `<h1 class="lt">Comparer</h1>` +
+        `<div class="sum cmpv"><p class="sl">Aux prix relevés de tes enseignes</p><p class="vt">${esc(V.t)}${V.lo ? `<small>${esc(pname(S.prods.get(V.lo)))}</small>` : ""}</p><p class="sn">${V.n}</p></div>` +
+        `<div class="group cmpw"><table class="cmpt"><caption class="sr">Comparaison de ${esc(pname(a))} et de ${esc(pname(b))}</caption>${thead}<tbody>${body}</tbody></table></div>` +
+        `<p class="gf"><button class="act" type="button" data-act="cmppick" data-id="${esc(a.id)}">Comparer avec un autre produit${ic("chev")}</button></p>` +
+        (anyF ? `<p class="gf">Nutri-Score et allergènes d'après Open Food Facts, base collaborative sous licence ODbL. À vérifier sur l'emballage.</p>` : ""),
+    };
+  };
+
+  /* ---------- préviens-moi ---------- */
+  /* Un seuil de prix par produit (cabas.watch : { id: { max, at, from } }, en centimes). À l'ouverture et à chaque nouveau
+     relevé, le prix relevé le plus bas de tes enseignes (jamais un prix simulé) lui est comparé : dessous, le produit
+     entre dans cabas.watchHits ({ id: { c, ret, at, seen } }) et l'accueil le dit, « Ton seuil est atteint », jusqu'à
+     « C'est vu » (il revient si le prix baisse encore). Pas de notification : rien ne part du téléphone. */
+  const watchAll = () => store.get("watch", {});
+  const watchOf = (id) => watchAll()[id] || null;
+  function watchCheck() {
+    const W = watchAll(), H = store.get("watchHits", {}), out = {};
+    for (const id of Object.keys(W)) {
+      const lid = liveId(id), p = lid && S.prods.get(lid), b = p && bestReal(p);
+      if (!b) continue;
+      const c = Math.round(b.price * 100);
+      if (c > W[id].max) continue;
+      const old = H[id];
+      out[id] = { c, ret: b.ret, at: b.at || "", seen: !!(old && old.seen && c >= old.c) };
+    }
+    store.set("watchHits", out);
+    return out;
+  }
+  function watchHits() {
+    const H = store.get("watchHits", {}), W = watchAll();
+    return Object.keys(H).filter((id) => W[id]).map((id) => {
+      const lid = liveId(id), p = lid && S.prods.get(lid), b = p && bestReal(p);
+      return b && Math.round(b.price * 100) <= W[id].max ? { id, p, b, w: W[id], seen: !!H[id].seen } : null;
+    }).filter(Boolean);
+  }
+  function watchRail() {
+    const xs = watchHits().filter((x) => !x.seen);
+    if (!xs.length) return "";
+    return `<div class="sh"><h2>Ton seuil est atteint</h2><button class="act" type="button" data-act="watchseen">C'est vu</button></div><div class="group" role="region" aria-label="Ton seuil est atteint">${xs.map((x) => `<a class="row th" href="${hp(x.p.id)}"><span class="thumb">${img(x.p, 48)}</span><span class="rt">${esc(pname(x.p))}<small>${eur(x.b.price)} chez ${esc(retName(x.b.ret))}, sous ton seuil de ${eurC(x.w.max)}${x.w.from > x.b.price * 100 + 0.5 ? `, il était à ${eurC(x.w.from)}` : ""}</small></span>${ic("chev", "chev")}</a>`).join("")}</div>`;
+  }
+  /* le plus bas relevé pour ce produit dans data/history.json (centimes), quand l'historique est chargé */
+  function histLow(p) {
+    const H = HIST && HIST.p && HIST.p[p.id];
+    if (!H) return 0;
+    let lo = 0;
+    Object.keys(H).filter((r) => S.retMap.has(r)).forEach((r) => H[r].forEach(([, v]) => { const c = Math.round(v * 100); if (c > 0 && (!lo || c < lo)) lo = c; }));
+    return lo;
+  }
+  function watchSheet(id) {
+    const p = S.prods.get(id);
+    if (!p) return;
+    const b = bestReal(p), w = watchOf(p.id), cur = b ? Math.round(b.price * 100) : 0, low = histLow(p);
+    const def = w ? w.max : cur ? Math.max(5, Math.round((cur * 0.9) / 5) * 5) : 0;
+    const chip = (v, l) => `<button class="chip" type="button" data-act="watchset" data-v="${v}">${l}</button>`;
+    const body = `<p>${esc(pname(p))}, ${esc(p.format)}. ${b ? `Aujourd'hui : ${eur(b.price)} chez ${esc(retName(b.ret))}, le prix relevé le plus bas de tes enseignes.` : "Pas de prix relevé dans tes enseignes en ce moment."}${low && low < cur ? ` Le plus bas relevé : ${eurC(low)}.` : ""}</p>` +
+      field("watchIn", "Préviens-moi sous", `type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="${esc(def ? frNum(def / 100) : "")}"`, "À chaque ouverture et à chaque nouveau relevé, aux prix relevés de tes enseignes. Pas de notification : l'accueil te le dit.", "€") +
+      (cur ? `<div class="tagset" role="group" aria-label="Seuils proposés">${chip(Math.round(cur * 0.95), "5 % de moins")}${chip(Math.round(cur * 0.9), "10 % de moins")}${chip(Math.round(cur * 0.8), "20 % de moins")}${low && low < cur ? chip(low, "Le plus bas relevé") : ""}</div>` : "");
+    const foot = w ? `<button class="btn plain" type="button" data-act="watchdel" data-id="${esc(p.id)}">Ne plus suivre</button><button class="btn" type="button" data-act="watchok" data-id="${esc(p.id)}">Enregistrer</button>` : `<button class="btn" type="button" data-act="watchok" data-id="${esc(p.id)}">Me prévenir</button>`;
+    openSheet({ title: "Préviens-moi", body, foot, focus: "#watchIn", right: `<span></span>` });
+  }
+  function watchListSheet() {
+    const build = () => {
+      const W = watchAll(), ids = Object.keys(W).filter((id) => liveId(id));
+      if (!ids.length) return { body: `<p>Aucun seuil de prix. Sur la fiche d'un produit, touche « Préviens-moi quand le prix baisse ».</p>` };
+      return { body: `<p>Cabas regarde ces prix à chaque ouverture et à chaque nouveau relevé.</p><div class="group">${ids.map((id) => { const p = S.prods.get(liveId(id)), b = bestReal(p); return `<div class="row th"><span class="thumb">${img(p, 48)}</span><a class="rt" href="${hp(p.id)}">${esc(pname(p))}<small>Sous ${eurC(W[id].max)}${b ? `, aujourd'hui ${eur(b.price)}` : ""}</small></a><button class="icbtn" type="button" data-act="watchrm" data-id="${esc(id)}" aria-label="Ne plus suivre ${esc(pname(p))}">${ic("x")}</button></div>`; }).join("")}</div>` };
+    };
+    openSheet({ title: "Mes alertes de prix", body: build().body, build, right: `<span></span>`, onClose: () => { if (S.route.name === "reglages") rerender(); } });
+  }
+
+  /* ---------- signaler ou demander ---------- */
+  /* Le signalement reste dans le téléphone (cabas.reports). S'il le veut, après confirmation, la personne l'ouvre en
+     ticket sur la page publique du projet (GitHub) : titre et texte pré-remplis, sans rien de personnel (adresse
+     électronique, téléphone et code postal retirés du message), et c'est elle qui l'envoie. */
+  const GH_NEW = "https://github.com/59g59sy5w6-design/59g59sy5w6-design.github.io/issues/new";
+  const REP_P = [["prix", "Le prix n'est pas le bon"], ["produit", "Le nom ou la contenance n'est pas le bon"], ["lien", "Le lien ne mène pas au bon produit"], ["rayon", "Il n'est pas dans le bon rayon"], ["autre", "Autre chose"]];
+  const REP_G = [["demande", "Demander un produit ou un rayon"], ["enseigne", "Demander une enseigne ou une ville"], ["bug", "Quelque chose ne marche pas"], ["idee", "Une idée pour Cabas"]];
+  const repLabel = (k) => (REP_P.concat(REP_G).find((x) => x[0] === k) || [k, "Signalement"])[1];
+  const reportsAll = () => { const r = store.get("reports", []); return Array.isArray(r) ? r : []; };
+  const scrub = (t) => String(t || "").replace(/[^\s@]+@[^\s@]+/g, "[retiré]").replace(/(?:\+33|0033|\b0)[\s.-]*[1-9](?:[\s.-]*\d{2}){4}\b/g, "[retiré]").replace(/\b\d{5}\b/g, "[retiré]").trim().slice(0, 600);
+  function ghBody(rep) {
+    const lid = rep.pid && liveId(rep.pid), p = lid ? S.prods.get(lid) : null, o = p && rep.ret ? p.offers[rep.ret] : null, ray = p && rayon(p.r);
+    const L = ["Envoyé depuis Cabas.", "", `Type : ${repLabel(rep.k)}`];
+    if (p) L.push(`Produit : ${p.brand} ${p.name}, ${p.format}`, `Identifiant : ${p.id}`);
+    if (p && p.ean) L.push(`Code EAN : ${p.ean}`);
+    if (ray) L.push(`Rayon : ${ray.name}`);
+    if (rep.ret && S.allMap.has(rep.ret)) L.push(`Enseigne : ${S.allMap.get(rep.ret).name}`);
+    if (o) L.push(`Prix affiché par Cabas : ${eur(o.price)}, relevé du ${dateFr(o.at)}${o.sim ? ", prix simulé" : ""}`);
+    if (rep.text) L.push("", "Message :", scrub(rep.text));
+    if (S.meta && S.meta.updatedAt) L.push("", `Relevé du catalogue : ${dateFr(String(S.meta.updatedAt).slice(0, 10))}`);
+    return L.join("\n");
+  }
+  function ghIssueUrl(rep) {
+    const lid = rep.pid && liveId(rep.pid), p = lid ? S.prods.get(lid) : null;
+    const title = (repLabel(rep.k) + (p ? ` : ${p.brand} ${p.name}` : rep.text ? ` : ${scrub(rep.text).split("\n")[0]}` : "")).slice(0, 110);
+    return GH_NEW + "?title=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(ghBody(rep));
+  }
+  /* rid : un signalement déjà gardé, ouvert directement à l'étape de l'envoi */
+  function reportSheet(pid, k0, text0, rid) {
+    const p = pid ? S.prods.get(pid) : null, kinds = p ? REP_P : REP_G;
+    S.rep = { pid: p ? p.id : "", k: k0 || kinds[0][0], ret: "", text: text0 || "", id: rid || "" };
+    const build = () => {
+      const R = S.rep;
+      if (R.id) {
+        const rep = reportsAll().find((x) => x.id === R.id);
+        if (!rep) return { body: `<p>Ce signalement a été retiré.</p>`, foot: `<button class="btn" type="button" data-act="close">Fermer</button>` };
+        return {
+          body: `<div class="banner good" role="status">${ic("check")}<span><b>Gardé sur ce téléphone</b>Tu le retrouves dans les réglages, « Mes signalements ».</span></div>` +
+            `<p style="padding-top:12px">Tu peux aussi l'envoyer à l'équipe de Cabas. Il sera publié sur GitHub, la page publique du projet, où il faut un compte. C'est toi qui l'envoies, et seul ce texte part :</p><pre class="repv">${esc(ghBody(rep))}</pre>`,
+          foot: `<button class="btn plain" type="button" data-act="close">Pas maintenant</button><a class="btn" href="${esc(ghIssueUrl(rep))}" target="_blank" rel="noopener" data-act="repsent" data-id="${esc(rep.id)}">Ouvrir GitHub</a>`,
+        };
+      }
+      const rets = p ? S.rets.filter((r) => p.offers[r.id]) : [];
+      const chip = (v, l) => `<button class="chip" type="button" role="radio" aria-checked="${R.ret === v}" data-act="repret" data-v="${esc(v)}">${esc(l)}</button>`;
+      return {
+        body: (p ? `<p>${esc(pname(p))}, ${esc(p.format)}.</p>` : `<p>Un produit qui manque, une enseigne à ajouter, quelque chose qui ne va pas : dis-le, Cabas s'améliore avec.</p>`) +
+          `<div class="group gap" role="radiogroup" aria-label="Ce que tu signales">${kinds.map(([k, l]) => `<button class="opt" type="button" role="radio" aria-checked="${R.k === k}" data-act="repk" data-k="${k}"><span>${l}</span>${R.k === k ? ic("check", "chk") : ""}</button>`).join("")}</div>` +
+          ((R.k === "prix" || R.k === "lien") && rets.length ? `<h3 class="gh" id="repRL">Chez quelle enseigne</h3><div class="tagset" role="radiogroup" aria-labelledby="repRL">${chip("", "Je ne sais pas")}${rets.map((r) => chip(r.id, r.name)).join("")}</div>` : "") +
+          `<div class="field" data-field="repT" style="padding-top:14px"><label for="repT">Ton message, si tu veux</label><span class="in ta"><textarea id="repT" rows="4" maxlength="500" aria-describedby="repTH">${esc(R.text)}</textarea></span><small id="repTH">N'écris ni ton nom, ni ton adresse, ni ton téléphone : si tu l'envoies, ce texte sera public.</small></div>`,
+        foot: `<button class="btn" type="button" data-act="repok">Garder ce signalement</button>`,
+      };
+    };
+    const o = build();
+    openSheet({ title: rid ? "Envoyer le signalement" : p ? "Signaler une erreur" : "Signaler ou demander", body: o.body, foot: o.foot, build, right: `<span></span>`, onClose: () => { S.rep = null; if (S.route.name === "reglages") rerender(); } });
+  }
+  function reportsSheet() {
+    const build = () => {
+      const L = reportsAll().slice().reverse();
+      if (!L.length) return { body: `<p>Aucun signalement gardé sur ce téléphone.</p>`, foot: `<button class="btn" type="button" data-act="report">Signaler ou demander</button>` };
+      return {
+        body: `<p>Ils restent sur ce téléphone. «\u00a0Envoyer\u00a0» te montre le texte avant de l'ouvrir sur GitHub, la page publique du projet.</p><div class="group">${L.map((r) => { const lid = r.pid && liveId(r.pid), p = lid ? S.prods.get(lid) : null; return `<div class="row stack"><span class="rt">${esc(repLabel(r.k))}<small>${p ? esc(pname(p)) + ", " : ""}${esc(dayFr(String(r.at).slice(0, 10)))}${r.sent ? ", ouvert sur GitHub" : ", gardé ici"}${r.text ? "<br>" + esc(r.text.slice(0, 140)) : ""}</small></span><span class="rbtns"><button class="btn sm tint" type="button" data-act="repsend" data-id="${esc(r.id)}">Envoyer</button><button class="btn sm plain" type="button" data-act="reprm" data-id="${esc(r.id)}">Retirer</button></span></div>`; }).join("")}</div>`,
+      };
+    };
+    const o = build();
+    openSheet({ title: "Mes signalements", body: o.body, foot: o.foot, build, right: `<span></span>`, onClose: () => { if (S.route.name === "reglages") rerender(); } });
   }
 
   /* ---------- historique des prix ---------- */
@@ -4850,16 +5276,8 @@
     return S.eanMap;
   }
   async function offLookup(code) {
-    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
-    const t = setTimeout(() => ctl && ctl.abort(), 7000);
-    try {
-      const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_fr,brands,quantity`, { signal: ctl ? ctl.signal : undefined });
-      if (!r.ok) return null;
-      const j = await r.json();
-      if (!j || j.status !== 1 || !j.product) return null;
-      const p = j.product;
-      return { name: (p.product_name_fr || p.product_name || "").trim(), brand: (p.brands || "").split(",")[0].trim(), qty: (p.quantity || "").trim() };
-    } catch (e) { return null; } finally { clearTimeout(t); }
+    const p = await offGet(code, "product_name,product_name_fr,brands,quantity");
+    return p ? { name: String(p.product_name_fr || p.product_name || "").trim(), brand: String(p.brands || "").split(",")[0].trim(), qty: String(p.quantity || "").trim() } : null;
   }
   async function onCode(code) {
     code = String(code).replace(/\D/g, "");
@@ -5057,9 +5475,11 @@
     const sh = $("#sheet .sheet");
     const f = $$("button:not([disabled]), a[href], input:not([disabled]), textarea, select, [tabindex]:not([tabindex='-1'])", sh).filter((el) => el.offsetParent !== null);
     if (!f.length) { e.preventDefault(); $("#sheetT").focus(); return; }
-    const first = f[0], last = f[f.length - 1], ae = document.activeElement;
-    if (e.shiftKey && (ae === first || !sh.contains(ae))) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && (ae === last || !sh.contains(ae))) { e.preventDefault(); first.focus(); }
+    /* rien de focalisable après (ou avant) l'élément qui a le focus, le titre compris : on boucle dans la feuille */
+    const first = f[0], last = f[f.length - 1], ae = document.activeElement, inside = sh.contains(ae);
+    const more = (dir) => f.some((el) => el !== ae && ae.compareDocumentPosition(el) & dir);
+    if (e.shiftKey && (!inside || !more(Node.DOCUMENT_POSITION_PRECEDING))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && (!inside || !more(Node.DOCUMENT_POSITION_FOLLOWING))) { e.preventDefault(); first.focus(); }
   }
   if (window.visualViewport) {
     const vv = window.visualViewport;
@@ -5306,7 +5726,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": { const undo = snap("lists"); S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); undoable("Liste supprimée", undo, 5000); break; }
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports"].forEach((x) => store.del(x)); S.facts = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"), f = el._act; el.hidden = true; el._act = null; S.undo = null; if (f) f(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -5328,6 +5748,90 @@
         const n = addItems(recItems(id), false);
         renderChrome(); bumpBadge();
         toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier", { label: "Voir", run: () => switchTab("panier") }); break;
+      }
+      /* une semaine de repas à X € : composer, une autre semaine, la prendre dans « Ma semaine » (avec « Annuler ») */
+      case "compose": case "cmagain": {
+        const C = S.compose, inp = $("#cmBud"), raw = String(inp ? inp.value : C.bud).trim(), v = numOf(raw);
+        if (raw && !(v > 0)) { fieldError("cmBud", "Un montant en euros, par exemple 40"); break; }
+        C.bud = raw; C.seed = act === "cmagain" ? C.seed + 1 : 0;
+        C.res = composeMenu({ budget: v > 0 ? Math.round(Math.min(v, 2000) * 100) : 0, meals: C.meals, people: C.people, seed: C.seed });
+        const el = $("#cmres"); if (el) { el.innerHTML = weekRes(C.res); markEnds(); }
+        if (act === "compose" && el && el.firstElementChild) el.firstElementChild.scrollIntoView({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" });
+        break;
+      }
+      case "cmmeals": case "cmpeople": { const C = S.compose; C[act === "cmmeals" ? "meals" : "people"] = +t.dataset.v; C.res = null; rerenderKeep(t); break; }
+      case "cmtake": {
+        const R = S.compose && S.compose.res; if (!R || !R.list.length) break;
+        const undo = snap("menu");
+        S.menu = R.list.map((x) => ({ id: x.rc.id, portions: Math.min(40, x.portions) }));
+        saveMenu(); S.compose.res = null; rerender();
+        undoable(`Ta semaine\u00a0: ${plural(R.picks.length, "repas", "repas")}`, undo, 6000); break;
+      }
+      /* Nutri-Score et allergènes demandés d'un geste (réglage décoché, ou après un échec) */
+      case "factsget": {
+        const p = S.prods.get(id); if (!p) break;
+        FX.fail.delete(eanKey(p.ean));
+        const upd = () => { const el = $("#pfacts"); if (el && S.route.name === "produit") el.innerHTML = factsHtml(p); };
+        factsFetch(p).then(upd, upd); upd(); break;
+      }
+      case "allergchip": {
+        const A = allergSet(), k2 = t.dataset.k; if (!ALLERG.has(k2)) break;
+        S.prefs.allergens = A.includes(k2) ? A.filter((x) => x !== k2) : A.concat([k2]);
+        savePrefs(); DIETV.v++; S._sug = null; RECM = null;
+        for (const k of Object.keys(S.filt)) S.filt[k].diet = undefined;
+        if (S.wl && S.wl.lines) { S.wl.lines = readList(S.wl.text); S.wl.planApplied = false; }
+        refreshSheet(); break;
+      }
+      /* comparer deux produits */
+      case "cmppick": cmpSheet(id); break;
+      case "cmptake": {
+        const o = t.dataset.o, p = S.prods.get(id); if (!p) break;
+        const undo = snap("basket"), q = (S.basket[o] || 0) > 0 ? S.basket[o] : 0;
+        if (q) { S.basket[id] = Math.min(99, (S.basket[id] || 0) + q); delete S.basket[o]; } else S.basket[id] = Math.max(1, S.basket[id] || 0);
+        saveBasket(); renderChrome(); bumpBadge(); rerender();
+        undoable(q ? `${pname(p)} remplace l'autre au panier` : `${pname(p)} au panier`, undo, 6000); break;
+      }
+      /* préviens-moi : seuil de prix par produit */
+      case "watch": watchSheet(id); break;
+      case "watchlist": watchListSheet(); break;
+      case "watchset": { const i = $("#watchIn"); if (i) { i.value = frNum(+t.dataset.v / 100); i.focus(); } break; }
+      case "watchok": {
+        const p = S.prods.get(id); if (!p) break;
+        const raw = String(($("#watchIn") || {}).value || "").trim(), v = numOf(raw);
+        if (!(v > 0 && v < 1000)) { fieldError("watchIn", "Un prix en euros, par exemple 1,50"); break; }
+        const W = watchAll(), b = bestReal(p), max = Math.round(v * 100);
+        W[p.id] = { max, at: isoDay(new Date()), from: b ? Math.round(b.price * 100) : max };
+        store.set("watch", W);
+        const hit = watchCheck()[p.id];
+        closeSheet(); rerender();
+        toast(hit ? `C'est déjà le cas\u00a0: ${eurC(hit.c)} chez ${retName(hit.ret)}` : `Cabas te préviendra sous ${eurC(max)}`, null, "check"); break;
+      }
+      case "watchdel": case "watchrm": {
+        const W = watchAll(), before = JSON.parse(JSON.stringify(W)), key = Object.keys(W).find((k) => k === id || liveId(k) === id); if (!key) break;
+        delete W[key]; store.set("watch", W); watchCheck();
+        if (act === "watchdel") closeSheet(); else refreshSheet();
+        rerender();
+        undoable("Tu ne suis plus ce prix", () => { store.set("watch", before); watchCheck(); }, 5000); break;
+      }
+      case "watchseen": { const H = store.get("watchHits", {}); Object.keys(H).forEach((k) => { H[k].seen = true; }); store.set("watchHits", H); rerender(); break; }
+      /* signaler ou demander : gardé sur le téléphone, puis, si la personne le veut, ouvert sur GitHub */
+      case "report": reportSheet(id || null, t.dataset.k, t.dataset.q); break;
+      case "reports": reportsSheet(); break;
+      case "repk": S.rep.k = t.dataset.k; refreshSheet(); break;
+      case "repret": S.rep.ret = t.dataset.v; refreshSheet(); break;
+      case "repok": {
+        const R = S.rep; if (!R) break;
+        R.text = String(($("#repT") || {}).value || "").trim().slice(0, 500);
+        if (!R.pid && !R.text) { fieldError("repT", "Dis en quelques mots ce que tu demandes"); break; }
+        const rep = { id: "r" + Date.now().toString(36), at: new Date().toISOString(), k: R.k, pid: R.pid || "", ret: R.ret || "", text: R.text };
+        store.set("reports", reportsAll().concat([rep]).slice(-50));
+        R.id = rep.id; refreshSheet(); buzz("add"); break;
+      }
+      case "repsend": closeSheet(); { const r = reportsAll().find((x) => x.id === id); if (r) reportSheet(r.pid && liveId(r.pid), r.k, r.text, r.id); } break;
+      case "repsent": { const L = reportsAll(), r = L.find((x) => x.id === id); if (r) { r.sent = new Date().toISOString(); store.set("reports", L); } setTimeout(closeSheet, 300); break; }
+      case "reprm": {
+        const before = reportsAll(); store.set("reports", before.filter((x) => x.id !== id)); refreshSheet();
+        undoable("Signalement retiré", () => store.set("reports", before), 5000); break;
       }
       /* premier lancement */
       case "welcome": welcomeSheet(); break;
@@ -5813,6 +6317,7 @@
     if (t.dataset && t.dataset.act === "contrast") { S.prefs.contrast = t.checked; savePrefs(); applyLook(); return; }
     if (t.dataset && t.dataset.act === "simple") { S.prefs.simple = t.checked; savePrefs(); applyLook(); S.shown = {}; rerenderKeep(t); return; }
     if (t.dataset && t.dataset.act === "badge") { S.prefs.badge = t.checked; savePrefs(); renderChrome(); return; }
+    if (t.dataset && t.dataset.act === "factsauto") { S.prefs.facts = t.checked; savePrefs(); return; }
     if (t.id === "impIn") {
       const f = t.files && t.files[0];
       if (!f) return;
@@ -5853,6 +6358,14 @@
         /* complétion : quatre pastilles au plus, repliées dès que le champ se vide ou qu'une est choisie */
         const sg = $("#sugg"); if (sg) { const L = t.value.trim() ? suggestions(t.value) : []; sg.innerHTML = suggHtml(L); sg.hidden = !L.length; }
       }, 120);
+    } else if (t.id === "cmpq") {
+      /* comparer : la liste suit ce qui est tapé */
+      clearTimeout(qT);
+      qT = setTimeout(() => { if (!S.cmp) return; S.cmp.q = t.value; const p = S.prods.get(S.cmp.from), el = $("#cmplist"); if (p && el) el.innerHTML = cmpList(p, t.value); }, 150);
+    } else if (t.id === "cmBud") {
+      if (S.compose) S.compose.bud = t.value;
+    } else if (t.id === "repT") {
+      if (S.rep) S.rep.text = t.value;
     } else if (t.id === "freeT" || t.id === "freeP") {
       if (S.freeEdit) S.freeEdit[t.id === "freeT" ? "t" : "price"] = t.value;
     } else if (t.id === "fbq") {
@@ -5892,6 +6405,9 @@
     if (e.key === "Enter") {
       if (e.target.id === "q") { e.preventDefault(); addRecent(e.target.value); e.target.blur(); }
       else if (e.target.id === "zipIn" || e.target.id === "nameIn" || e.target.id === "budIn" || e.target.id === "eanIn" || /^paid\d+$/.test(e.target.id)) { e.preventDefault(); const b = $('#sheet .sheet-h [data-act$="ok"]'); if (b) b.click(); }
+      else if (e.target.id === "watchIn") { e.preventDefault(); const b = $('#sheet [data-act="watchok"]'); if (b) b.click(); }
+      else if (e.target.id === "cmBud") { e.preventDefault(); const b = $('#view [data-act="compose"]'); if (b) b.click(); }
+      else if (e.target.id === "cmpq") { e.preventDefault(); e.target.blur(); }
       else if (e.target.id === "freeT" || e.target.id === "freeP") { e.preventDefault(); const b = $('#sheet [data-act="freeok"]'); if (b) b.click(); }
       else if (e.target.id === "fmax" || e.target.id === "extra" || e.target.id === "wzip" || e.target.id === "famt" || (e.target.dataset && e.target.dataset.fee)) { e.preventDefault(); e.target.blur(); }
       return;
@@ -6049,7 +6565,8 @@
       S.lastCheckFetch = Date.now();
       if (st && JSON.stringify(st) !== JSON.stringify(S.status)) {
         const m = await fetch("data/meta.json?fresh=1", { cache: "no-cache" }).then((r) => r.json());
-        if (JSON.stringify(m) !== JSON.stringify(S.meta)) await load(true); else S.status = st;
+        /* un nouveau relevé : baisses de tes produits et seuils atteints, comme à l'ouverture */
+        if (JSON.stringify(m) !== JSON.stringify(S.meta)) { await load(true); try { trackDrops(); watchCheck(); } catch (e) { /* stockage indisponible */ } } else S.status = st;
         const typing = document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
         if ($("#sheet").hidden && !typing) rerender();
       }
@@ -6116,7 +6633,7 @@
       useCatalog(await pc);
       S.loadedAt = Date.now(); S.ready = true;
     } catch (err) { S.failed = true; }
-    if (S.ready) { try { trackDrops(); } catch (e) { /* stockage indisponible */ } }
+    if (S.ready) { try { trackDrops(); watchCheck(); } catch (e) { /* stockage indisponible */ } }
     render();
     if (S.ready && shared) listFrom(shared);
     /* l'appli a été fermée pendant qu'un produit était ouvert sur le site d'une enseigne : il est coché au retour */

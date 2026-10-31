@@ -1,7 +1,10 @@
 // Test rapide de l'appli après une mise à jour : sert le dépôt en local, ouvre les écrans principaux
 // au format iPhone (accueil, Rayons par univers, un rayon par univers, fiche produit avec ses détails, panier, Remplir
 // mes paniers, Recommander, recherche, guide des frais, À propos, mode magasin, Ce qui a bougé, listes par profil, lien
-// de transfert abîmé) et vérifie qu'ils s'affichent sans erreur ; puis
+// de transfert abîmé) et vérifie qu'ils s'affichent sans erreur ; la fiche avec Nutri-Score, allergènes et labels
+// d'après Open Food Facts (réponse simulée, tools/fixtures/openfoodfacts.json : seul le code part, gardé sur le
+// téléphone, réglage décoché), #/comparer, le signalement (gardé, lien GitHub sans donnée personnelle) et un seuil de
+// prix atteint ; puis
 // l'affichage (thème, contraste renforcé, mode confort et taille du texte posés avant le premier rendu, cibles de 60 px
 // en confort) et le bon Auchan d'après le code postal. Code de sortie 1 en cas de problème.
 // Usage : node tools/smoke.js
@@ -32,9 +35,20 @@ const server = http.createServer((req, res) => {
   const problems = [];
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block" });
+  /* Open Food Facts simulé (tools/fixtures/openfoodfacts.json) : le code choisi est connu, les autres répondent 404 ;
+     chaque demande est notée, pour vérifier qu'elle ne porte que le code-barres */
+  const OFF = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "openfoodfacts.json"), "utf8")), offReq = [];
+  let offKnown = "";
+  await ctx.route(/^https:\/\/world\.openfoodfacts\.org\//, (r) => {
+    const u = new URL(r.request().url()), code = (/\/product\/(\d+)\.json$/.exec(u.pathname) || [])[1] || "";
+    offReq.push({ url: u.href, code, keys: [...u.searchParams.keys()], cookie: r.request().headers().cookie || "" });
+    const ok = code && code === offKnown;
+    r.fulfill({ status: ok ? 200 : 404, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(ok ? OFF.connu : OFF.inconnu) });
+  });
   const page = await ctx.newPage();
   page.on("pageerror", (e) => problems.push("erreur JS : " + e.message));
-  page.on("console", (m) => { if (m.type() === "error") problems.push("console : " + m.text()); });
+  /* un code inconnu d'Open Food Facts répond 404 : le navigateur le note, ce n'est pas une erreur de l'appli */
+  page.on("console", (m) => { if (m.type() === "error" && !/openfoodfacts\.org/.test((m.location() || {}).url || "")) problems.push("console : " + m.text()); });
   const ready = () => page.waitForFunction(() => !document.querySelector("#view .sk") && document.querySelector("#view .wrap > *"), null, { timeout: 20000 });
   const check = async (name, sel, min) => {
     await page.waitForTimeout(350);
@@ -117,6 +131,98 @@ const server = http.createServer((req, res) => {
     await page.goto(base + "#/transfert/jabc"); await ready(); await page.waitForTimeout(300);
     await check("transfert abîmé", "#view .empty", 1);
     if (!/"data\/listes\.json"/.test(fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"))) problems.push("sw.js : data/listes.json absent de DATA");
+
+    /* fiche produit : Nutri-Score, allergènes et labels d'après Open Food Facts (réponse simulée), à la demande, gardés
+       sur le téléphone ; le régime (allergènes) s'en sert quand le fait est connu */
+    const eans = cat.products.filter((p) => p.e && (p.o || []).some((o) => !(o[3] & 2)));
+    const PE = eans[0], PU = eans[1];
+    offKnown = String(PE.e).replace(/^0+/, "");
+    await page.evaluate(() => { localStorage.clear(); localStorage.setItem("cabas.prefs", JSON.stringify({ zip: "94120", off: { leclerc: true }, offv: 1, allergens: ["nuts"] })); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); });
+    await page.goto(base + "#/produit/" + encodeURIComponent(PE.i)); await page.reload(); await ready();
+    await page.waitForSelector("#pfacts .nscore", { timeout: 9000 }).catch(() => problems.push("faits : le Nutri-Score n'apparaît pas sur la fiche"));
+    const fx = await page.evaluate(() => { const el = document.getElementById("pfacts"); return { t: el.textContent.replace(/\s+/g, " "), ns: (el.querySelector(".nscore") || {}).getAttribute ? el.querySelector(".nscore").getAttribute("aria-label") : "", warn: !!el.querySelector(".banner.warn"), link: (el.querySelector('a[href^="https://world.openfoodfacts.org/product/"]') || {}).rel || "" }; });
+    if (fx.ns !== "Nutri-Score B") problems.push("faits : Nutri-Score « " + fx.ns + " »");
+    for (const w of ["Contient : lait", "Traces possibles : fruits à coque", "Agriculture biologique", "Fabriqué en France", "ODbL", "vérifier sur l'emballage"]) if (!fx.t.includes(w)) problems.push("faits : « " + w + " » absent de la fiche");
+    if (/green|inconnu/i.test(fx.t)) problems.push("faits : un label ou un allergène inconnu est affiché");
+    if (!fx.warn) problems.push("faits : l'allergène évité (fruits à coque) n'est pas signalé");
+    if (fx.link !== "noopener") problems.push("faits : le lien vers Open Food Facts sans rel=noopener");
+    const req1 = offReq.filter((x) => x.code === offKnown);
+    if (req1.length !== 1 || req1.some((x) => x.keys.join() !== "fields" || x.cookie)) problems.push("faits : demandes à Open Food Facts " + JSON.stringify(offReq));
+    const fst = await page.evaluate((k) => (JSON.parse(localStorage.getItem("cabas.facts") || "{}") || {})[k], offKnown);
+    if (!fst || fst.ok !== 1 || fst.ns !== "b" || fst.al.join() !== "milk" || fst.tr.join() !== "nuts") problems.push("faits : cabas.facts " + JSON.stringify(fst));
+    const dk = await page.evaluate(([a, b]) => { const D = cabasDebug(); return [D.dietOk(D.S.prods.get(a)), D.dietOk(D.S.prods.get(b)), D.allergHit(D.S.prods.get(a)).join()]; }, [PE.i, PU.i]);
+    if (dk.join("|") !== "false|true|nuts") problems.push("régime et allergènes : " + dk.join("|") + " (le fait connu écarte, l'inconnu ne juge pas)");
+    await page.reload(); await ready(); await page.waitForTimeout(600);
+    if (offReq.filter((x) => x.code === offKnown).length !== 1) problems.push("faits : redemandés alors qu'ils sont gardés 30 jours");
+    await page.goto(base + "#/produit/" + encodeURIComponent(PU.i)); await ready();
+    await page.waitForFunction(() => /Pas encore dans Open Food Facts/.test(document.getElementById("pfacts").textContent), null, { timeout: 9000 }).catch(() => problems.push("faits : un code inconnu d'Open Food Facts n'est pas dit"));
+    /* réglage décoché : rien n'est demandé sans un geste */
+    await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("cabas.prefs")); p.facts = false; localStorage.setItem("cabas.prefs", JSON.stringify(p)); localStorage.removeItem("cabas.facts"); });
+    const n0 = offReq.length;
+    await page.goto(base + "#/produit/" + encodeURIComponent(PE.i)); await page.reload(); await ready(); await page.waitForTimeout(700);
+    if (offReq.length !== n0) problems.push("faits : demandés alors que le réglage est décoché");
+    await page.click('#pfacts [data-act="factsget"]');
+    await page.waitForSelector("#pfacts .nscore", { timeout: 9000 }).catch(() => problems.push("faits : « Voir le Nutri-Score » ne les demande pas"));
+
+    /* comparer deux produits : #/comparer/<a>/<b>, verdict aux prix relevés, « Prendre celui-ci » remplace l'autre */
+    const PB = cat.products.find((p) => p.r === PE.r && p.i !== PE.i && (p.o || []).some((o) => !(o[3] & 2)));
+    await page.evaluate((b) => localStorage.setItem("cabas.basket", JSON.stringify(b)), { [PB.i]: 2 });
+    await page.goto(base + "#/comparer/" + encodeURIComponent(PE.i) + "/" + encodeURIComponent(PB.i)); await page.reload(); await ready();
+    await check("comparer", ".cmpt thead th", 2);
+    await check("comparer", ".cmpt tr.cl", 4);
+    const vt = await page.$eval(".cmpv .vt", (e) => e.textContent);
+    if (!/moins cher|le même prix|Pas de verdict/.test(vt)) problems.push("comparer : verdict « " + vt + " »");
+    if (!/Nutri-Score/.test(await page.$eval(".cmpt", (e) => e.textContent))) problems.push("comparer : les faits connus ne sont pas comparés");
+    await page.click(`.cmpt [data-act="cmptake"][data-id="${PE.i}"]`); await page.waitForTimeout(400);
+    let bk = await page.evaluate(() => JSON.parse(localStorage.getItem("cabas.basket")));
+    if (bk[PE.i] !== 2 || bk[PB.i]) problems.push("comparer : « Prendre celui-ci » " + JSON.stringify(bk));
+    await page.click("#toast button"); await page.waitForTimeout(400);
+    bk = await page.evaluate(() => JSON.parse(localStorage.getItem("cabas.basket")));
+    if (bk[PB.i] !== 2 || bk[PE.i]) problems.push("comparer : « Annuler » " + JSON.stringify(bk));
+    await page.goto(base + "#/comparer/" + encodeURIComponent(PE.i)); await ready();
+    await check("comparer, choix", "#cmplist a.row", 1);
+    await page.goto(base + "#/produit/" + encodeURIComponent(PE.i)); await ready();
+    await page.click('#view [data-act="cmppick"]'); await page.waitForTimeout(500);
+    await check("comparer, feuille", "#sheet #cmplist a.row", 1);
+    await page.fill("#cmpq", "lait"); await page.waitForTimeout(500);
+    if (!(await page.$$eval("#sheet #cmplist a.row", (a) => a.length))) problems.push("comparer : la recherche de la feuille ne trouve rien pour « lait »");
+    await page.click("#sheet .sheet-h [data-act=close]"); await page.waitForTimeout(400);
+
+    /* signaler : gardé sur le téléphone ; le lien GitHub, ouvert seulement après confirmation, sans donnée personnelle */
+    await page.click('#view [data-act="report"]'); await page.waitForTimeout(500);
+    await page.click('#sheet [data-act="repk"][data-k="prix"]'); await page.waitForTimeout(250);
+    await page.click('#sheet [data-act="repret"]:not([data-v=""])'); await page.waitForTimeout(250);
+    await page.fill("#repT", "Le prix a changé. Écris-moi à jean.dupont@example.com ou au 06 12 34 56 78, j'habite au 94120.");
+    await page.click('#sheet [data-act="repok"]'); await page.waitForTimeout(400);
+    const reps = await page.evaluate(() => JSON.parse(localStorage.getItem("cabas.reports") || "[]"));
+    if (reps.length !== 1 || reps[0].k !== "prix" || reps[0].pid !== PE.i || !reps[0].ret) problems.push("signaler : cabas.reports " + JSON.stringify(reps));
+    const gh = await page.evaluate(() => { const a = document.querySelector('#sheet a[data-act="repsent"]'), pre = document.querySelector("#sheet .repv"); return a ? { href: a.getAttribute("href"), rel: a.rel, target: a.target, pre: pre ? pre.textContent : "" } : null; });
+    if (!gh) problems.push("signaler : pas de confirmation avant GitHub");
+    else {
+      const u = new URL(gh.href), body = u.searchParams.get("body") || "", title = u.searchParams.get("title") || "";
+      if (u.origin + u.pathname !== "https://github.com/59g59sy5w6-design/59g59sy5w6-design.github.io/issues/new") problems.push("signaler : adresse " + u.origin + u.pathname);
+      if (gh.rel !== "noopener" || gh.target !== "_blank") problems.push("signaler : lien sans rel=noopener ou target=_blank");
+      if (/jean|example|06 12|94120/.test(body + title + gh.pre)) problems.push("signaler : une donnée personnelle part dans le ticket");
+      if (!body.includes(PE.i) || !body.includes("[retiré]") || !/^Le prix n'est pas le bon/.test(title)) problems.push("signaler : ticket « " + title + " » " + body.slice(0, 160));
+      if (gh.pre.trim() !== body.trim()) problems.push("signaler : le texte montré n'est pas celui qui part");
+      await page.evaluate(() => { const a = document.querySelector('#sheet a[data-act="repsent"]'); a.addEventListener("click", (e) => e.preventDefault(), { once: true }); a.click(); });
+      await page.waitForTimeout(500);
+      const sent = await page.evaluate(() => JSON.parse(localStorage.getItem("cabas.reports") || "[]")[0].sent);
+      if (!sent) problems.push("signaler : l'envoi sur GitHub n'est pas noté");
+    }
+    const gen = await page.evaluate(() => decodeURIComponent(cabasDebug().ghIssueUrl({ k: "demande", text: "rillettes de thon, 75011" })));
+    if (!/title=Demander un produit ou un rayon\u00a0: rillettes de thon, \[retiré\]/.test(gen)) problems.push("ghIssueUrl : " + gen.slice(0, 200));
+
+    /* préviens-moi : le seuil sur la fiche, atteint tout de suite quand il est au-dessus du prix relevé */
+    const cur = await page.evaluate((id) => { const D = cabasDebug(); return Math.round(D.bestReal(D.S.prods.get(id)).price * 100); }, PE.i);
+    await page.click('#view [data-act="watch"]'); await page.waitForTimeout(500);
+    await page.fill("#watchIn", "0"); await page.click('#sheet [data-act="watchok"]'); await page.waitForTimeout(250);
+    if (!(await page.$('[data-field="watchIn"].err'))) problems.push("préviens-moi : un seuil nul n'est pas refusé");
+    await page.fill("#watchIn", String((cur + 100) / 100).replace(".", ",")); await page.click('#sheet [data-act="watchok"]'); await page.waitForTimeout(400);
+    const wst = await page.evaluate(() => [JSON.parse(localStorage.getItem("cabas.watch") || "{}"), JSON.parse(localStorage.getItem("cabas.watchHits") || "{}")]);
+    if (!wst[0][PE.i] || wst[0][PE.i].max !== cur + 100 || !wst[1][PE.i]) problems.push("préviens-moi : " + JSON.stringify(wst));
+    await page.goto(base + "#/"); await ready(); await page.waitForTimeout(400);
+    await check("accueil, seuil atteint", '#view [aria-label="Ton seuil est atteint"] a.row', 1);
 
     /* le bon Auchan d'après le code postal (données publiques de data/retailers.json, code postal sur le téléphone) */
     const ap = await page.evaluate(() => { const D = cabasDebug(); return ["94120", "75015", "75116", "92100", "93100", "78000", "91300", "13001", "123"].map((z) => { const a = D.autoPick(z, "auchan"); return a ? a.id + (a.exact ? "" : "~") : null; }); });
