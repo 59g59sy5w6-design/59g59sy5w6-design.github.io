@@ -1,0 +1,3360 @@
+{
+ "cible": "auchan-bellesfeuilles",
+ "debut": "2026-10-31T15:26:57.379Z",
+ "fin": "2026-10-31T16:24:14.350Z",
+ "only": [
+  "auchan-bellesfeuilles"
+ ],
+ "lot": [],
+ "max": 0,
+ "pages": [
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fruits",
+   "url": "https://www.auchan.fr/recherche?text=fruits%20frais#bellesfeuilles",
+   "final": "https://www.auchan.fr/fruits-legumes/fruits/ca-n0301?redirect_keywords=fruits%20frais&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Fruits frais pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "legumes",
+   "url": "https://www.auchan.fr/recherche?text=l%C3%A9gumes%20frais#bellesfeuilles",
+   "final": "https://www.auchan.fr/fruits-legumes/legumes/ca-n0302?redirect_keywords=l%C3%A9gumes%20frais&lark-cioSessionId=1+1793460446162&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Légumes frais, légumes de saison pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pommes-de-terre",
+   "url": "https://www.auchan.fr/recherche?text=pommes%20de%20terre#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pommes%20de%20terre&page=2",
+   "status": 200,
+   "products": 52,
+   "error": null,
+   "title": "Votre recherche pommes de terre sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pommes-de-terre",
+   "url": "https://www.auchan.fr/recherche?text=oignons#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=oignons#bellesfeuilles",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Votre recherche oignons sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "salades-herbes",
+   "url": "https://www.auchan.fr/recherche?text=salade%20en%20sachet#bellesfeuilles",
+   "final": "https://www.auchan.fr/fruits-legumes/fruits-legumes-pret-a-consommer/salades-en-sachet/ca-n03021901?redirect_keywords=salade%20en%20sachet&lark-cioSessionId=1+1793460475291&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 53,
+   "error": null,
+   "title": "Salades en sachet pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "salades-herbes",
+   "url": "https://www.auchan.fr/recherche?text=herbes%20aromatiques#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=herbes%20aromatiques&page=2",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Votre recherche herbes aromatiques sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fruits-secs",
+   "url": "https://www.auchan.fr/recherche?text=fruits%20secs#bellesfeuilles",
+   "final": "https://www.auchan.fr/fruits-legumes/fruits-secs-graines/ca-n030115?redirect_keywords=fruits%20secs&lark-cioSessionId=1+1793460501659&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=6",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Fruits secs, graines pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fruits-secs",
+   "url": "https://www.auchan.fr/recherche?text=cacahu%C3%A8tes#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cacahu%C3%A8tes&page=3",
+   "status": 200,
+   "products": 94,
+   "error": null,
+   "title": "Votre recherche cacahuètes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "boeuf",
+   "url": "https://www.auchan.fr/recherche?text=boeuf#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=boeuf&page=5",
+   "status": 200,
+   "products": 141,
+   "error": null,
+   "title": "Votre recherche boeuf sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "porc",
+   "url": "https://www.auchan.fr/recherche?text=porc#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=porc&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Votre recherche porc sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "veau-agneau",
+   "url": "https://www.auchan.fr/recherche?text=agneau#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=agneau#bellesfeuilles",
+   "status": 200,
+   "products": 1,
+   "error": null,
+   "title": "Votre recherche agneau sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "veau-agneau",
+   "url": "https://www.auchan.fr/recherche?text=veau#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=veau#bellesfeuilles",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Votre recherche veau sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "volaille",
+   "url": "https://www.auchan.fr/recherche?text=poulet#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=poulet&page=4",
+   "status": 200,
+   "products": 120,
+   "error": null,
+   "title": "Votre recherche poulet sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "volaille",
+   "url": "https://www.auchan.fr/recherche?text=dinde#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=dinde&page=2",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Votre recherche dinde sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "viande-hachee",
+   "url": "https://www.auchan.fr/recherche?text=steak%20hach%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=steak%20hach%C3%A9#bellesfeuilles",
+   "status": 200,
+   "products": 43,
+   "error": null,
+   "title": "Votre recherche steak haché sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "saucisses-merguez",
+   "url": "https://www.auchan.fr/recherche?text=merguez#bellesfeuilles",
+   "final": "https://www.auchan.fr/boucherie-volaille-poissonnerie/boucherie/saucisses-merguez/merguez/ca-n02010802?redirect_keywords=merguez&lark-cioSessionId=1+1793460599654&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Merguez pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "saucisses-merguez",
+   "url": "https://www.auchan.fr/recherche?text=brochettes#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=brochettes#bellesfeuilles",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Votre recherche brochettes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "poissons",
+   "url": "https://www.auchan.fr/recherche?text=poisson%20frais#bellesfeuilles",
+   "final": "https://www.auchan.fr/boucherie-volaille-poissonnerie/poissons-crustaces/ca-n0203?redirect_keywords=poisson%20frais&lark-cioSessionId=1+1793460615654&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Poissonnerie Auchan. Poisson et crustacés de qualité pas cher"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "crustaces",
+   "url": "https://www.auchan.fr/recherche?text=crevettes#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=crevettes#bellesfeuilles",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Votre recherche crevettes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "crustaces",
+   "url": "https://www.auchan.fr/recherche?text=moules#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=moules&page=2",
+   "status": 200,
+   "products": 48,
+   "error": null,
+   "title": "Votre recherche moules sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "traiteur-mer",
+   "url": "https://www.auchan.fr/recherche?text=saumon%20fum%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/boucherie-volaille-poissonnerie/traiteur-de-la-mer/saumons-truites-fumes/saumon-fume/ca-n02040201?redirect_keywords=saumon%20fum%C3%A9&lark-cioSessionId=1+1793460649509&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Saumon fumé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "traiteur-mer",
+   "url": "https://www.auchan.fr/recherche?text=surimi#bellesfeuilles",
+   "final": "https://www.auchan.fr/boucherie-volaille-poissonnerie/traiteur-de-la-mer/batonnets-surimi/ca-n020404?redirect_keywords=surimi&lark-cioSessionId=1+1793460656348&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Surimi, bâtonnets pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "traiteur-mer",
+   "url": "https://www.auchan.fr/recherche?text=tarama#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tarama#bellesfeuilles",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Votre recherche tarama sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lait",
+   "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/lait-demi-ecreme/ca-n01010101?redirect_keywords=lait%20demi-%C3%A9cr%C3%A9m%C3%A9&lark-cioSessionId=1+1793460674677&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Lait demi-écrémé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "laits-autres",
+   "url": "https://www.auchan.fr/recherche?text=lait%20entier#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/lait-entier/ca-n01010103?redirect_keywords=lait%20entier&lark-cioSessionId=1+1793460687024&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Lait entier pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "laits-autres",
+   "url": "https://www.auchan.fr/recherche?text=lait%20%C3%A9cr%C3%A9m%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/lait-ecreme/ca-n01010102?redirect_keywords=lait%20%C3%A9cr%C3%A9m%C3%A9&lark-cioSessionId=1+1793460693695&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Lait écrémé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "laits-autres",
+   "url": "https://www.auchan.fr/recherche?text=lait%20sans%20lactose#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=lait%20sans%20lactose#bellesfeuilles",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Votre recherche lait sans lactose sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "yaourts",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20nature#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/yaourts-fromages-blancs/yaourts-nature/ca-n01020103?redirect_keywords=yaourt%20nature&lark-cioSessionId=1+1793460712066&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 81,
+   "error": null,
+   "title": "Yaourts nature pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "yaourts-fruits",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20aux%20fruits#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=yaourt%20aux%20fruits&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche yaourt aux fruits sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "yaourts-fruits",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20%C3%A0%20boire#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/yaourts-fromages-blancs/yaourts-a-boire/ca-n010207?redirect_keywords=yaourt%20%C3%A0%20boire&lark-cioSessionId=1+1793460736011&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Yaourts à boire pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromage-blanc",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20blanc#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/yaourts-fromages-blancs/fromages-blancs/ca-n01020102?redirect_keywords=fromage%20blanc&lark-cioSessionId=1+1793460745176&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Fromage blanc, fromage frais, faisselle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromage-blanc",
+   "url": "https://www.auchan.fr/recherche?text=skyr#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/yaourts-fromages-blancs/yaourts-alleges-bien-etre-skyr/skyr/ca-n01020604?redirect_keywords=skyr&lark-cioSessionId=1+1793460762054&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Skyr pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desserts-frais",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20dessert#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20dessert&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche crème dessert sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desserts-frais",
+   "url": "https://www.auchan.fr/recherche?text=compote%20fra%C3%AEche#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=compote%20fra%C3%AEche&page=2",
+   "status": 200,
+   "products": 55,
+   "error": null,
+   "title": "Votre recherche compote fraîche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "beurre",
+   "url": "https://www.auchan.fr/recherche?text=beurre#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=beurre&page=2",
+   "status": 200,
+   "products": 66,
+   "error": null,
+   "title": "Votre recherche beurre sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "creme",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20fra%C3%AEche#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-beurres-margarines/cremes-fraiches/ca-n010104?redirect_keywords=cr%C3%A8me%20fra%C3%AEche&lark-cioSessionId=1+1793460797600&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 67,
+   "error": null,
+   "title": "Crèmes fraîches et UHT pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "creme",
+   "url": "https://www.auchan.fr/recherche?text=chantilly#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-beurres-margarines/chantilly-cremes-fouettees/ca-n01010405?redirect_keywords=chantilly&lark-cioSessionId=1+1793460808687&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Chantilly, crèmes fouettées pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "oeufs",
+   "url": "https://www.auchan.fr/recherche?text=oeufs#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/oeufs/ca-n010103?redirect_keywords=oeufs&lark-cioSessionId=1+1793460814592&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 56,
+   "error": null,
+   "title": "Oeufs pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/fromages-a-deguster-a-la-coupe/fromages-rapes/ca-n010604?redirect_keywords=fromage%20r%C3%A2p%C3%A9&lark-cioSessionId=1+1793460826265&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 52,
+   "error": null,
+   "title": "Fromages râpés, parmesan pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-pate-molle",
+   "url": "https://www.auchan.fr/recherche?text=camembert#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=camembert#bellesfeuilles",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Votre recherche camembert sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-pate-molle",
+   "url": "https://www.auchan.fr/recherche?text=roquefort#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/fromages-a-deguster-a-la-coupe/bleu-roquefort-gorgonzola/roquefort/ca-n01080302?redirect_keywords=roquefort&lark-cioSessionId=1+1793460844996&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Roquefort pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-pate-pressee",
+   "url": "https://www.auchan.fr/recherche?text=comt%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=comt%C3%A9&page=2",
+   "status": 200,
+   "products": 66,
+   "error": null,
+   "title": "Votre recherche comté sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-pate-pressee",
+   "url": "https://www.auchan.fr/recherche?text=emmental#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=emmental&page=3",
+   "status": 200,
+   "products": 71,
+   "error": null,
+   "title": "Votre recherche emmental sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chevre-brebis",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20de%20ch%C3%A8vre#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=fromage%20de%20ch%C3%A8vre&page=2",
+   "status": 200,
+   "products": 63,
+   "error": null,
+   "title": "Votre recherche fromage de chèvre sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-tartiner",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20%C3%A0%20tartiner#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/fromages-a-deguster-a-la-coupe/fromages-a-tartiner/ca-n010605?redirect_keywords=fromage%20%C3%A0%20tartiner&lark-cioSessionId=1+1793460890851&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 61,
+   "error": null,
+   "title": "Fromages à tartiner pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-tartiner",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20portions#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=fromage%20portions#bellesfeuilles",
+   "status": 200,
+   "products": 34,
+   "error": null,
+   "title": "Votre recherche fromage portions sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-cuisiner",
+   "url": "https://www.auchan.fr/recherche?text=mozzarella#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=mozzarella#bellesfeuilles",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Votre recherche mozzarella sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-cuisiner",
+   "url": "https://www.auchan.fr/recherche?text=raclette#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/fromages-a-deguster-a-la-coupe/fromages-a-fondre-raclette-tartiflette/raclette/ca-n01060301?redirect_keywords=raclette&lark-cioSessionId=1+1793460919474&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Fromages à raclette pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "fromages-coupe",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20%C3%A0%20la%20coupe#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=fromage%20%C3%A0%20la%20coupe#bellesfeuilles",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche fromage à la coupe sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jambon-blanc",
+   "url": "https://www.auchan.fr/recherche?text=jambon%20blanc#bellesfeuilles",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/charcuterie/jambon-blanc-roti-haches/jambon-blanc/ca-n12010101?redirect_keywords=jambon%20blanc&lark-cioSessionId=1+1793460935344&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 87,
+   "error": null,
+   "title": "Jambon blanc pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jambon-blanc",
+   "url": "https://www.auchan.fr/recherche?text=blanc%20de%20poulet#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=blanc%20de%20poulet&page=2",
+   "status": 200,
+   "products": 53,
+   "error": null,
+   "title": "Votre recherche blanc de poulet sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jambon-cru",
+   "url": "https://www.auchan.fr/recherche?text=jambon%20cru#bellesfeuilles",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/charcuterie/jambon-cru-charcuteries-en-tranche/jambon-cru-sec-fume/ca-n12010201?redirect_keywords=jambon%20cru&lark-cioSessionId=1+1793460959632&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Jambon cru, sec, fumé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jambon-cru",
+   "url": "https://www.auchan.fr/recherche?text=charcuterie%20tranch%C3%A9e#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=charcuterie%20tranch%C3%A9e#bellesfeuilles",
+   "status": 200,
+   "products": 1,
+   "error": null,
+   "title": "Votre recherche charcuterie tranchée sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "saucisson",
+   "url": "https://www.auchan.fr/recherche?text=saucisson#bellesfeuilles",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/charcuterie/saucissons-chorizos-entiers/ca-n120103?redirect_keywords=saucisson&lark-cioSessionId=1+1793460974781&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 84,
+   "error": null,
+   "title": "Saucissons, chorizos, rosette pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "saucisson",
+   "url": "https://www.auchan.fr/recherche?text=chorizo#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=chorizo&page=2",
+   "status": 200,
+   "products": 46,
+   "error": null,
+   "title": "Votre recherche chorizo sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lardons",
+   "url": "https://www.auchan.fr/recherche?text=lardons#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=lardons#bellesfeuilles",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Votre recherche lardons sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "saucisses-boudins",
+   "url": "https://www.auchan.fr/recherche?text=knacki#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=knacki#bellesfeuilles",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Votre recherche knacki sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "saucisses-boudins",
+   "url": "https://www.auchan.fr/recherche?text=boudin#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=boudin#bellesfeuilles",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Votre recherche boudin sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pates-rillettes",
+   "url": "https://www.auchan.fr/recherche?text=rillettes#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=rillettes#bellesfeuilles",
+   "status": 200,
+   "products": 46,
+   "error": null,
+   "title": "Votre recherche rillettes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pates-rillettes",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2t%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=p%C3%A2t%C3%A9&page=4",
+   "status": 200,
+   "products": 113,
+   "error": null,
+   "title": "Votre recherche pâté sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aperitif-frais",
+   "url": "https://www.auchan.fr/recherche?text=tartinable#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tartinable&page=5",
+   "status": 200,
+   "products": 150,
+   "error": null,
+   "title": "Votre recherche tartinable sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aperitif-frais",
+   "url": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20frais#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20frais&page=4",
+   "status": 200,
+   "products": 107,
+   "error": null,
+   "title": "Votre recherche apéritif frais sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "plats-cuisines-frais",
+   "url": "https://www.auchan.fr/recherche?text=plat%20cuisin%C3%A9%20frais#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=plat%20cuisin%C3%A9%20frais&page=3",
+   "status": 200,
+   "products": 89,
+   "error": null,
+   "title": "Votre recherche plat cuisiné frais sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "plats-cuisines-frais",
+   "url": "https://www.auchan.fr/recherche?text=soupe%20fra%C3%AEche#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=soupe%20fra%C3%AEche#bellesfeuilles",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Votre recherche soupe fraîche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pizzas-quiches-fraiches",
+   "url": "https://www.auchan.fr/recherche?text=pizza%20fra%C3%AEche#bellesfeuilles",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/traiteur/pizza/ca-n12020201?redirect_keywords=pizza%20fra%C3%AEche&lark-cioSessionId=1+1793461086098&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Pizza pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pizzas-quiches-fraiches",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2te%20%C3%A0%20tarte#bellesfeuilles",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/traiteur/pates-a-tartes-a-pizzas-galettes/ca-n120203?redirect_keywords=p%C3%A2te%20%C3%A0%20tarte&lark-cioSessionId=1+1793461097646&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 40,
+   "error": null,
+   "title": "Pâtes à tartes, à pizzas, galettes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pates-fraiches",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes%20fra%C3%AEches#bellesfeuilles",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/traiteur/pates-fraiches-gnocchis-quenelles/ca-n120205?redirect_keywords=p%C3%A2tes%20fra%C3%AEches&lark-cioSessionId=1+1793461107436&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 84,
+   "error": null,
+   "title": "Pâtes fraiches, gnocchi, quenelles pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pates-fraiches",
+   "url": "https://www.auchan.fr/recherche?text=gnocchi#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=gnocchi#bellesfeuilles",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Votre recherche gnocchi sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "salades-sandwichs",
+   "url": "https://www.auchan.fr/recherche?text=sandwich#bellesfeuilles",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/snacking-salade-plats-cuisines/sandwich-wraps/ca-n120401?redirect_keywords=sandwich&lark-cioSessionId=1+1793461127332&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 62,
+   "error": null,
+   "title": "Sandwich, wraps pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "salades-sandwichs",
+   "url": "https://www.auchan.fr/recherche?text=sushi#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sushi#bellesfeuilles",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Votre recherche sushi sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "salades-sandwichs",
+   "url": "https://www.auchan.fr/recherche?text=salade%20compos%C3%A9e#bellesfeuilles",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/snacking-salade-plats-cuisines/salades-composees/ca-n120404?redirect_keywords=salade%20compos%C3%A9e&lark-cioSessionId=1+1793461148535&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 40,
+   "error": null,
+   "title": "Salades repas pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "traiteur-vegetal",
+   "url": "https://www.auchan.fr/recherche?text=v%C3%A9g%C3%A9tarien#bellesfeuilles",
+   "final": "https://www.auchan.fr/bio-et-nutrition/vegetarien-vegetal/ca-b0201?redirect_keywords=v%C3%A9g%C3%A9tarien&lark-cioSessionId=1+1793461160620&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 150,
+   "error": null,
+   "title": "Produits végétariens et vegan pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "traiteur-vegetal",
+   "url": "https://www.auchan.fr/recherche?text=tofu#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tofu#bellesfeuilles",
+   "status": 200,
+   "products": 43,
+   "error": null,
+   "title": "Votre recherche tofu sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pain",
+   "url": "https://www.auchan.fr/recherche?text=pain#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pain&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche pain sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pain",
+   "url": "https://www.auchan.fr/recherche?text=baguette#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=baguette#bellesfeuilles",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Votre recherche baguette sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pain-de-mie",
+   "url": "https://www.auchan.fr/recherche?text=pain%20de%20mie#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pain%20de%20mie&page=2",
+   "status": 200,
+   "products": 62,
+   "error": null,
+   "title": "Votre recherche pain de mie sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pain-de-mie",
+   "url": "https://www.auchan.fr/recherche?text=pain%20burger#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pain%20burger#bellesfeuilles",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche pain burger sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "viennoiseries",
+   "url": "https://www.auchan.fr/recherche?text=brioche#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=brioche&page=2",
+   "status": 200,
+   "products": 55,
+   "error": null,
+   "title": "Votre recherche brioche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "viennoiseries",
+   "url": "https://www.auchan.fr/recherche?text=croissants#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=croissants#bellesfeuilles",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Votre recherche croissants sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "patisseries",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tisserie%20fra%C3%AEche#bellesfeuilles",
+   "final": "https://www.auchan.fr/les-halles-d-auchan/mon-boulanger/patisseries-gateaux/ca-b202512181611?redirect_keywords=p%C3%A2tisserie%20fra%C3%AEche&lark-cioSessionId=1+1793461240653&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 93,
+   "error": null,
+   "title": "Pâtisseries, gâteaux pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "patisseries",
+   "url": "https://www.auchan.fr/recherche?text=tarte%20aux%20pommes#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tarte%20aux%20pommes#bellesfeuilles",
+   "status": 200,
+   "products": 1,
+   "error": null,
+   "title": "Votre recherche tarte aux pommes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "glaces",
+   "url": "https://www.auchan.fr/recherche?text=glace#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/glaces-viennoiseries/ca-n0408?redirect_keywords=glace&lark-cioSessionId=1+1793461261525&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=6",
+   "status": 200,
+   "products": 176,
+   "error": null,
+   "title": "Glaces et sorbets pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "glaces",
+   "url": "https://www.auchan.fr/recherche?text=sorbet#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/glaces-viennoiseries/bacs-sorbets-cremes-glacees/sorbets/ca-n04081001?redirect_keywords=sorbet&lark-cioSessionId=1+1793461279035&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Bacs sorbets pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "legumes-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=l%C3%A9gumes%20surgel%C3%A9s#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/legumes/ca-n0404?redirect_keywords=l%C3%A9gumes%20surgel%C3%A9s&lark-cioSessionId=1+1793461284493&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Légumes et fruits surgelés pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "legumes-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=po%C3%AAl%C3%A9e%20de%20l%C3%A9gumes%20surgel%C3%A9s#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=po%C3%AAl%C3%A9e%20de%20l%C3%A9gumes%20surgel%C3%A9s#bellesfeuilles",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Votre recherche poêlée de légumes surgelés sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "frites",
+   "url": "https://www.auchan.fr/recherche?text=frites#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=frites#bellesfeuilles",
+   "status": 200,
+   "products": 41,
+   "error": null,
+   "title": "Votre recherche frites sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "frites",
+   "url": "https://www.auchan.fr/recherche?text=pommes%20noisettes#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pommes%20noisettes#bellesfeuilles",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Votre recherche pommes noisettes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pizzas-surgelees",
+   "url": "https://www.auchan.fr/recherche?text=pizza%20surgel%C3%A9e#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/pizzas/ca-n04010201?redirect_keywords=pizza%20surgel%C3%A9e&lark-cioSessionId=1+1793461321743&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Pizzas surgelées pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pizzas-surgelees",
+   "url": "https://www.auchan.fr/recherche?text=quiche%20surgel%C3%A9e#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=quiche%20surgel%C3%A9e#bellesfeuilles",
+   "status": 200,
+   "products": 1,
+   "error": null,
+   "title": "Votre recherche quiche surgelée sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "plats-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=plat%20cuisin%C3%A9%20surgel%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=plat%20cuisin%C3%A9%20surgel%C3%A9&page=3",
+   "status": 200,
+   "products": 89,
+   "error": null,
+   "title": "Votre recherche plat cuisiné surgelé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "plats-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=lasagnes%20surgel%C3%A9es#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=lasagnes%20surgel%C3%A9es#bellesfeuilles",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche lasagnes surgelées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "poissons-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=poisson%20surgel%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/poissons-fruits-de-mer/ca-n0407?redirect_keywords=poisson%20surgel%C3%A9&lark-cioSessionId=1+1793461358813&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 59,
+   "error": null,
+   "title": "Poissons et fruits de mer surgelés"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "poissons-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=poisson%20pan%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=poisson%20pan%C3%A9&page=2",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Votre recherche poisson pané sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "poissons-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=crevettes%20surgel%C3%A9es#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/poissons-fruits-de-mer/crustaces-mollusques/ca-n040608?redirect_keywords=crevettes%20surgel%C3%A9es&lark-cioSessionId=1+1793461381628&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Coquillages et crustacés surgelés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "viandes-surgelees",
+   "url": "https://www.auchan.fr/recherche?text=viande%20surgel%C3%A9e#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/viandes/ca-n0406?redirect_keywords=viande%20surgel%C3%A9e&lark-cioSessionId=1+1793461389122&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 41,
+   "error": null,
+   "title": "Viande surgelée pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "viandes-surgelees",
+   "url": "https://www.auchan.fr/recherche?text=steak%20hach%C3%A9%20surgel%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/viandes/steaks-haches/ca-n04060101?redirect_keywords=steak%20hach%C3%A9%20surgel%C3%A9&lark-cioSessionId=1+1793461401348&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Steaks hachés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aperitifs-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20surgel%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20surgel%C3%A9#bellesfeuilles",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Votre recherche apéritif surgelé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aperitifs-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=nems%20surgel%C3%A9s#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=nems%20surgel%C3%A9s#bellesfeuilles",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche nems surgelés sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desserts-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=dessert%20surgel%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=dessert%20surgel%C3%A9&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche dessert surgelé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desserts-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=viennoiseries%20surgel%C3%A9es#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=viennoiseries%20surgel%C3%A9es#bellesfeuilles",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche viennoiseries surgelées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desserts-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=fruits%20surgel%C3%A9s#bellesfeuilles",
+   "final": "https://www.auchan.fr/surgeles/legumes/fruits-coulis/ca-n040806?redirect_keywords=fruits%20surgel%C3%A9s&lark-cioSessionId=1+1793461443723&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Fruits et coulis de fruits surgelés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pates",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/pates/ca-n060501?redirect_keywords=p%C3%A2tes&lark-cioSessionId=1+1793461452185&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Pâtes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "riz",
+   "url": "https://www.auchan.fr/recherche?text=riz#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/pates-riz-legumes-secs/riz/ca-n060502?redirect_keywords=riz&lark-cioSessionId=1+1793461464062&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 120,
+   "error": null,
+   "title": "Riz pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "semoule-cereales",
+   "url": "https://www.auchan.fr/recherche?text=semoule#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/pates-riz-legumes-secs/couscous-semoule/ca-n060505?redirect_keywords=semoule&lark-cioSessionId=1+1793461476083&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 23,
+   "error": null,
+   "title": "Couscous, semoule pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "semoule-cereales",
+   "url": "https://www.auchan.fr/recherche?text=quinoa#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=quinoa#bellesfeuilles",
+   "status": 200,
+   "products": 42,
+   "error": null,
+   "title": "Votre recherche quinoa sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "semoule-cereales",
+   "url": "https://www.auchan.fr/recherche?text=pur%C3%A9e%20mousseline#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pur%C3%A9e%20mousseline#bellesfeuilles",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche purée mousseline sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "legumes-secs",
+   "url": "https://www.auchan.fr/recherche?text=lentilles#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=lentilles&page=3",
+   "status": 200,
+   "products": 99,
+   "error": null,
+   "title": "Votre recherche lentilles sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "legumes-secs",
+   "url": "https://www.auchan.fr/recherche?text=pois%20chiches#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pois%20chiches#bellesfeuilles",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Votre recherche pois chiches sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "legumes-secs",
+   "url": "https://www.auchan.fr/recherche?text=haricots%20rouges#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=haricots%20rouges#bellesfeuilles",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Votre recherche haricots rouges sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "tomates",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#bellesfeuilles",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche tomates pelées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "tomates",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#bellesfeuilles",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Votre recherche tomates concassées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "tomates",
+   "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates&page=2",
+   "status": 200,
+   "products": 51,
+   "error": null,
+   "title": "Votre recherche coulis de tomates sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conserves-legumes",
+   "url": "https://www.auchan.fr/recherche?text=haricots%20verts%20conserve#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/conserves-soupes/haricots-flageolets/haricots-verts/ca-n0607010101?redirect_keywords=haricots%20verts%20conserve&lark-cioSessionId=1+1793461558367&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Haricots verts pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conserves-legumes",
+   "url": "https://www.auchan.fr/recherche?text=petits%20pois%20conserve#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=petits%20pois%20conserve#bellesfeuilles",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche petits pois conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conserves-legumes",
+   "url": "https://www.auchan.fr/recherche?text=ma%C3%AFs%20conserve#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=ma%C3%AFs%20conserve#bellesfeuilles",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Votre recherche maïs conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conserves-legumes",
+   "url": "https://www.auchan.fr/recherche?text=champignons%20conserve#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=champignons%20conserve#bellesfeuilles",
+   "status": 200,
+   "products": 1,
+   "error": null,
+   "title": "Votre recherche champignons conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "thon",
+   "url": "https://www.auchan.fr/recherche?text=thon#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=thon&page=3",
+   "status": 200,
+   "products": 96,
+   "error": null,
+   "title": "Votre recherche thon sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conserves",
+   "url": "https://www.auchan.fr/recherche?text=sardines#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sardines#bellesfeuilles",
+   "status": 200,
+   "products": 41,
+   "error": null,
+   "title": "Votre recherche sardines sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conserves",
+   "url": "https://www.auchan.fr/recherche?text=maquereaux#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=maquereaux#bellesfeuilles",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Votre recherche maquereaux sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conserves",
+   "url": "https://www.auchan.fr/recherche?text=saumon%20conserve#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=saumon%20conserve#bellesfeuilles",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche saumon conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "plats-conserve",
+   "url": "https://www.auchan.fr/recherche?text=cassoulet#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cassoulet#bellesfeuilles",
+   "status": 200,
+   "products": 41,
+   "error": null,
+   "title": "Votre recherche cassoulet sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "plats-conserve",
+   "url": "https://www.auchan.fr/recherche?text=raviolis#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=raviolis#bellesfeuilles",
+   "status": 200,
+   "products": 41,
+   "error": null,
+   "title": "Votre recherche raviolis sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "plats-conserve",
+   "url": "https://www.auchan.fr/recherche?text=couscous%20conserve#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=couscous%20conserve&page=6",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Votre recherche couscous conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soupes",
+   "url": "https://www.auchan.fr/recherche?text=soupe%20brique#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/soupes-croutons/soupes-liquides-croutons/ca-n060704?redirect_keywords=soupe%20brique&lark-cioSessionId=1+1793461668162&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 114,
+   "error": null,
+   "title": "Soupes liquides pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soupes",
+   "url": "https://www.auchan.fr/recherche?text=soupe%20d%C3%A9shydrat%C3%A9e#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/soupes-croutons/soupes-deshydratees-instantanees/ca-n060705?redirect_keywords=soupe%20d%C3%A9shydrat%C3%A9e&lark-cioSessionId=1+1793461679002&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 69,
+   "error": null,
+   "title": "Soupes deshydratées, instantanées pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soupes",
+   "url": "https://www.auchan.fr/recherche?text=cro%C3%BBtons#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cro%C3%BBtons&page=2",
+   "status": 200,
+   "products": 49,
+   "error": null,
+   "title": "Votre recherche croûtons sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "huile",
+   "url": "https://www.auchan.fr/recherche?text=huile%20d%27olive#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/huiles/huiles-d-olive/ca-n06080101?redirect_keywords=huile%20d%27olive&lark-cioSessionId=1+1793461702399&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Huile d'olive pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "huile",
+   "url": "https://www.auchan.fr/recherche?text=huile%20de%20tournesol#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/huiles/huiles-de-tournesol/ca-n06080102?redirect_keywords=huile%20de%20tournesol&lark-cioSessionId=1+1793461712033&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Huiles de tournesol pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "huile",
+   "url": "https://www.auchan.fr/recherche?text=huile%20de%20coco#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=huile%20de%20coco#bellesfeuilles",
+   "status": 200,
+   "products": 12,
+   "error": null,
+   "title": "Votre recherche huile de coco sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vinaigre-vinaigrette",
+   "url": "https://www.auchan.fr/recherche?text=vinaigre#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=vinaigre&page=2",
+   "status": 200,
+   "products": 64,
+   "error": null,
+   "title": "Votre recherche vinaigre sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vinaigre-vinaigrette",
+   "url": "https://www.auchan.fr/recherche?text=vinaigrette#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=vinaigrette#bellesfeuilles",
+   "status": 200,
+   "products": 22,
+   "error": null,
+   "title": "Votre recherche vinaigrette sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vinaigre-vinaigrette",
+   "url": "https://www.auchan.fr/recherche?text=jus%20de%20citron#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=jus%20de%20citron#bellesfeuilles",
+   "status": 200,
+   "products": 43,
+   "error": null,
+   "title": "Votre recherche jus de citron sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "epices",
+   "url": "https://www.auchan.fr/recherche?text=%C3%A9pices#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/epices/ca-n06080406?redirect_keywords=%C3%A9pices&lark-cioSessionId=1+1793461757790&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 150,
+   "error": null,
+   "title": "Epices pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "epices",
+   "url": "https://www.auchan.fr/recherche?text=sel#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sel#bellesfeuilles",
+   "status": 200,
+   "products": 35,
+   "error": null,
+   "title": "Votre recherche sel sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "epices",
+   "url": "https://www.auchan.fr/recherche?text=poivre#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/poivre-et-melanges-de-baies/ca-n06080404?redirect_keywords=poivre&lark-cioSessionId=1+1793461780454&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Poivre, mélange de baies pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "epices",
+   "url": "https://www.auchan.fr/recherche?text=herbes%20de%20provence#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=herbes%20de%20provence#bellesfeuilles",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Votre recherche herbes de provence sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "bouillons",
+   "url": "https://www.auchan.fr/recherche?text=bouillon#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/bouillons-fonds-de-sauce/bouillons-cube-poudre/ca-n06080801?redirect_keywords=bouillon&lark-cioSessionId=1+1793461798185&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Bouillons cube, poudre pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "bouillons",
+   "url": "https://www.auchan.fr/recherche?text=fond%20de%20veau#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=fond%20de%20veau#bellesfeuilles",
+   "status": 200,
+   "products": 4,
+   "error": null,
+   "title": "Votre recherche fond de veau sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mayonnaise-ketchup",
+   "url": "https://www.auchan.fr/recherche?text=mayonnaise#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=mayonnaise#bellesfeuilles",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Votre recherche mayonnaise sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mayonnaise-ketchup",
+   "url": "https://www.auchan.fr/recherche?text=ketchup#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/sauces/ketchup/ca-n06080702?redirect_keywords=ketchup&lark-cioSessionId=1+1793461828069&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Ketchup pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mayonnaise-ketchup",
+   "url": "https://www.auchan.fr/recherche?text=moutarde#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/sauces/moutarde-piccalilli/ca-n06080703?redirect_keywords=moutarde&lark-cioSessionId=1+1793461834979&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Moutarde pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sauces-chaudes",
+   "url": "https://www.auchan.fr/recherche?text=sauce%20tomate#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sauce%20tomate&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche sauce tomate sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sauces-chaudes",
+   "url": "https://www.auchan.fr/recherche?text=pesto#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pesto#bellesfeuilles",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Votre recherche pesto sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sauces-chaudes",
+   "url": "https://www.auchan.fr/recherche?text=sauce%20bolognaise#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-salee/sauces/sauces-bolognaise/ca-n06080901?redirect_keywords=sauce%20bolognaise&lark-cioSessionId=1+1793461864395&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Sauces bolognaise pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sauces-monde",
+   "url": "https://www.auchan.fr/recherche?text=sauce%20soja#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sauce%20soja#bellesfeuilles",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Votre recherche sauce soja sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sauces-monde",
+   "url": "https://www.auchan.fr/recherche?text=sauce%20barbecue#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sauce%20barbecue&page=2",
+   "status": 200,
+   "products": 59,
+   "error": null,
+   "title": "Votre recherche sauce barbecue sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sauces-monde",
+   "url": "https://www.auchan.fr/recherche?text=lait%20de%20coco#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=lait%20de%20coco&page=2",
+   "status": 200,
+   "products": 64,
+   "error": null,
+   "title": "Votre recherche lait de coco sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cornichons-olives",
+   "url": "https://www.auchan.fr/recherche?text=cornichons#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cornichons&page=2",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Votre recherche cornichons sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cornichons-olives",
+   "url": "https://www.auchan.fr/recherche?text=olives#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=olives&page=4",
+   "status": 200,
+   "products": 101,
+   "error": null,
+   "title": "Votre recherche olives sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chips",
+   "url": "https://www.auchan.fr/recherche?text=chips#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=chips&page=6",
+   "status": 200,
+   "products": 179,
+   "error": null,
+   "title": "Votre recherche chips sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscuits-aperitif",
+   "url": "https://www.auchan.fr/recherche?text=biscuits%20ap%C3%A9ritifs#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=biscuits%20ap%C3%A9ritifs&page=6",
+   "status": 200,
+   "products": 157,
+   "error": null,
+   "title": "Votre recherche biscuits apéritifs sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscuits-aperitif",
+   "url": "https://www.auchan.fr/recherche?text=crackers#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=crackers&page=2",
+   "status": 200,
+   "products": 63,
+   "error": null,
+   "title": "Votre recherche crackers sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cafe",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/cafe-moulu/ca-n05020502?redirect_keywords=caf%C3%A9%20moulu&lark-cioSessionId=1+1793461967371&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 63,
+   "error": null,
+   "title": "Café moulu pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cafe",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20en%20grains#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/cafe-en-grains/ca-n05020503?redirect_keywords=caf%C3%A9%20en%20grains&lark-cioSessionId=1+1793461977770&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 43,
+   "error": null,
+   "title": "Café en grains pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cafe",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20soluble#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/cafe-soluble/ca-n05020701?redirect_keywords=caf%C3%A9%20soluble&lark-cioSessionId=1+1793461987698&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Café soluble pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "capsules",
+   "url": "https://www.auchan.fr/recherche?text=capsules%20caf%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/ca-n0502?redirect_keywords=capsules%20caf%C3%A9&lark-cioSessionId=1+1793461997484&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=6",
+   "status": 200,
+   "products": 180,
+   "error": null,
+   "title": "Café pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "capsules",
+   "url": "https://www.auchan.fr/recherche?text=dosettes%20senseo#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/dosettes-compatibles-senseo/ca-n050204?redirect_keywords=dosettes%20senseo&lark-cioSessionId=1+1793462014516&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Dosettes café compatibles Senseo pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "capsules",
+   "url": "https://www.auchan.fr/recherche?text=dolce%20gusto#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=dolce%20gusto&page=2",
+   "status": 200,
+   "products": 56,
+   "error": null,
+   "title": "Votre recherche dolce gusto sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "the",
+   "url": "https://www.auchan.fr/recherche?text=th%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=th%C3%A9&page=6",
+   "status": 200,
+   "products": 170,
+   "error": null,
+   "title": "Votre recherche thé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "infusions",
+   "url": "https://www.auchan.fr/recherche?text=infusion#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/boissons-chaudes/tisanes-infusions/ca-n050304?redirect_keywords=infusion&lark-cioSessionId=1+1793462044383&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 99,
+   "error": null,
+   "title": "Tisanes, infusions pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "infusions",
+   "url": "https://www.auchan.fr/recherche?text=tisane#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/boissons-chaudes/tisanes-infusions/ca-n050304?redirect_keywords=tisane&lark-cioSessionId=1+1793462055530&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 99,
+   "error": null,
+   "title": "Tisanes, infusions pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chocolat-poudre",
+   "url": "https://www.auchan.fr/recherche?text=chocolat%20en%20poudre#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/boissons-chaudes/chocolat-en-poudre/ca-n050305?redirect_keywords=chocolat%20en%20poudre&lark-cioSessionId=1+1793462066416&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Chocolat en poudre pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chocolat-poudre",
+   "url": "https://www.auchan.fr/recherche?text=nesquik#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=nesquik#bellesfeuilles",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche nesquik sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cereales",
+   "url": "https://www.auchan.fr/recherche?text=c%C3%A9r%C3%A9ales%20petit%20d%C3%A9jeuner#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=c%C3%A9r%C3%A9ales%20petit%20d%C3%A9jeuner&page=4",
+   "status": 200,
+   "products": 120,
+   "error": null,
+   "title": "Votre recherche céréales petit déjeuner sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cereales",
+   "url": "https://www.auchan.fr/recherche?text=muesli#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/cereales-barres/muesli/ca-n05041001?redirect_keywords=muesli&lark-cioSessionId=1+1793462097664&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 49,
+   "error": null,
+   "title": "Muesli pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "barres-cereales",
+   "url": "https://www.auchan.fr/recherche?text=barres%20de%20c%C3%A9r%C3%A9ales#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/barres-de-cereales/ca-n050402?redirect_keywords=barres%20de%20c%C3%A9r%C3%A9ales&lark-cioSessionId=1+1793462107259&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 62,
+   "error": null,
+   "title": "Barres de céréales pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "barres-cereales",
+   "url": "https://www.auchan.fr/recherche?text=barres%20prot%C3%A9in%C3%A9es#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=barres%20prot%C3%A9in%C3%A9es#bellesfeuilles",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Votre recherche barres protéinées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "confitures",
+   "url": "https://www.auchan.fr/recherche?text=confiture#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/confitures/ca-n050303?redirect_keywords=confiture&lark-cioSessionId=1+1793462126293&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Confitures pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "confitures",
+   "url": "https://www.auchan.fr/recherche?text=miel#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/miel-sirop-d-erable/ca-n05040702?redirect_keywords=miel&lark-cioSessionId=1+1793462141339&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Miel pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "pate-a-tartiner",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2te%20%C3%A0%20tartiner#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/pates-a-tartiner/ca-n05040701?redirect_keywords=p%C3%A2te%20%C3%A0%20tartiner&lark-cioSessionId=1+1793462150213&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 70,
+   "error": null,
+   "title": "Pâtes à tartiner pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscottes",
+   "url": "https://www.auchan.fr/recherche?text=biscottes#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/biscottes-biscuits-petit-dejeuner/ca-n050411?redirect_keywords=biscottes&lark-cioSessionId=1+1793462160680&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 73,
+   "error": null,
+   "title": "Biscottes, pains grillés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscottes",
+   "url": "https://www.auchan.fr/recherche?text=galettes%20de%20riz#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=galettes%20de%20riz#bellesfeuilles",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche galettes de riz sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "gateaux",
+   "url": "https://www.auchan.fr/recherche?text=madeleines#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=madeleines#bellesfeuilles",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Votre recherche madeleines sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscuits-secs",
+   "url": "https://www.auchan.fr/recherche?text=petit%20beurre#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/biscuits-gateaux/petits-beurres/ca-n05050405?redirect_keywords=petit%20beurre&lark-cioSessionId=1+1793462192444&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 22,
+   "error": null,
+   "title": "Petits beurres pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscuits-secs",
+   "url": "https://www.auchan.fr/recherche?text=biscuits%20petit%20d%C3%A9jeuner#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/biscuits-petit-dejeuner/ca-n050403?redirect_keywords=biscuits%20petit%20d%C3%A9jeuner&lark-cioSessionId=1+1793462199155&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Biscuits petit déjeuner pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscuits-secs",
+   "url": "https://www.auchan.fr/recherche?text=sabl%C3%A9s#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sabl%C3%A9s&page=5",
+   "status": 200,
+   "products": 147,
+   "error": null,
+   "title": "Votre recherche sablés sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscuits-chocolat",
+   "url": "https://www.auchan.fr/recherche?text=biscuits%20chocolat#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=biscuits%20chocolat&page=5",
+   "status": 200,
+   "products": 150,
+   "error": null,
+   "title": "Votre recherche biscuits chocolat sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "biscuits-chocolat",
+   "url": "https://www.auchan.fr/recherche?text=go%C3%BBters%20fourr%C3%A9s#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=go%C3%BBters%20fourr%C3%A9s&page=2",
+   "status": 200,
+   "products": 53,
+   "error": null,
+   "title": "Votre recherche goûters fourrés sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "crepes-gaufres",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%AApes#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%AApes#bellesfeuilles",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Votre recherche crêpes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "crepes-gaufres",
+   "url": "https://www.auchan.fr/recherche?text=gaufres#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=gaufres#bellesfeuilles",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Votre recherche gaufres sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "crepes-gaufres",
+   "url": "https://www.auchan.fr/recherche?text=cake#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cake&page=2",
+   "status": 200,
+   "products": 56,
+   "error": null,
+   "title": "Votre recherche cake sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chocolat-tablettes",
+   "url": "https://www.auchan.fr/recherche?text=chocolat%20tablette#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/chocolats-confiseries/tablettes-de-chocolat/ca-n050701?redirect_keywords=chocolat%20tablette&lark-cioSessionId=1+1793462274821&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Tablettes de chocolat pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chocolat-tablettes",
+   "url": "https://www.auchan.fr/recherche?text=chocolat%20noir#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=chocolat%20noir&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Votre recherche chocolat noir sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chocolat-bouchees",
+   "url": "https://www.auchan.fr/recherche?text=rochers%20chocolat#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=rochers%20chocolat#bellesfeuilles",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Votre recherche rochers chocolat sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chocolat-bouchees",
+   "url": "https://www.auchan.fr/recherche?text=barres%20chocolat%C3%A9es#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=barres%20chocolat%C3%A9es&page=3",
+   "status": 200,
+   "products": 93,
+   "error": null,
+   "title": "Votre recherche barres chocolatées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "chocolat-bouchees",
+   "url": "https://www.auchan.fr/recherche?text=bo%C3%AEte%20de%20chocolats#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=bo%C3%AEte%20de%20chocolats&page=3",
+   "status": 200,
+   "products": 72,
+   "error": null,
+   "title": "Votre recherche boîte de chocolats sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "bonbons",
+   "url": "https://www.auchan.fr/recherche?text=bonbons#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/bonbons/ca-n050706?redirect_keywords=bonbons&lark-cioSessionId=1+1793462327397&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 89,
+   "error": null,
+   "title": "Bonbons, confiseries pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "bonbons",
+   "url": "https://www.auchan.fr/recherche?text=chewing-gum#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/bonbons/chewing-gums/ca-n050707?redirect_keywords=chewing-gum&lark-cioSessionId=1+1793462339548&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 57,
+   "error": null,
+   "title": "Chewing-gums pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "compotes",
+   "url": "https://www.auchan.fr/recherche?text=compote#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=compote&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche compote sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "compotes",
+   "url": "https://www.auchan.fr/recherche?text=fruits%20au%20sirop#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/fruits-au-sirop/ca-n050804?redirect_keywords=fruits%20au%20sirop&lark-cioSessionId=1+1793462359888&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 34,
+   "error": null,
+   "title": "Fruits au sirop pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "farine",
+   "url": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#bellesfeuilles",
+   "status": 200,
+   "products": 23,
+   "error": null,
+   "title": "Votre recherche farine de blé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sucre",
+   "url": "https://www.auchan.fr/recherche?text=sucre#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/sucres-edulcorants/ca-n050904?redirect_keywords=sucre&lark-cioSessionId=1+1793462375562&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 75,
+   "error": null,
+   "title": "Sucres, édulcorants pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sucre",
+   "url": "https://www.auchan.fr/recherche?text=%C3%A9dulcorant#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/sucres-edulcorants/edulcorants/ca-n050905?redirect_keywords=%C3%A9dulcorant&lark-cioSessionId=1+1793462389775&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Edulcorants pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aide-patisserie",
+   "url": "https://www.auchan.fr/recherche?text=levure#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/levures/ca-n0509020302?redirect_keywords=levure&lark-cioSessionId=1+1793462397087&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Levures pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aide-patisserie",
+   "url": "https://www.auchan.fr/recherche?text=chocolat%20p%C3%A2tissier#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/chocolats-confiseries/tablettes-de-chocolat/chocolat-patissier/ca-n050703?redirect_keywords=chocolat%20p%C3%A2tissier&lark-cioSessionId=1+1793462406398&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 23,
+   "error": null,
+   "title": "Chocolat pâtissier pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aide-patisserie",
+   "url": "https://www.auchan.fr/recherche?text=pr%C3%A9paration%20g%C3%A2teau#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/preparations-pour-desserts/ca-n050901?redirect_keywords=pr%C3%A9paration%20g%C3%A2teau&lark-cioSessionId=1+1793462415850&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Préparations pour desserts pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aide-patisserie",
+   "url": "https://www.auchan.fr/recherche?text=lait%20concentr%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/lait-en-poudre-lait-concentre/ca-n050208?redirect_keywords=lait%20concentr%C3%A9&lark-cioSessionId=1+1793462428900&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Lait en poudre, lait concentré pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "eaux",
+   "url": "https://www.auchan.fr/recherche?text=eau%20plate#bellesfeuilles",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/eaux-laits/eaux-plates-natures/ca-n070101?redirect_keywords=eau%20plate&lark-cioSessionId=1+1793462436901&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 51,
+   "error": null,
+   "title": "Eaux plates natures pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "eaux-gazeuses",
+   "url": "https://www.auchan.fr/recherche?text=eau%20gazeuse#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=eau%20gazeuse&page=2",
+   "status": 200,
+   "products": 66,
+   "error": null,
+   "title": "Votre recherche eau gazeuse sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "eaux-gazeuses",
+   "url": "https://www.auchan.fr/recherche?text=eau%20aromatis%C3%A9e#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=eau%20aromatis%C3%A9e&page=2",
+   "status": 200,
+   "products": 68,
+   "error": null,
+   "title": "Votre recherche eau aromatisée sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jus",
+   "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=jus%20d%27orange&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche jus d'orange sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jus-autres",
+   "url": "https://www.auchan.fr/recherche?text=jus%20de%20pomme#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=jus%20de%20pomme#bellesfeuilles",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Votre recherche jus de pomme sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jus-autres",
+   "url": "https://www.auchan.fr/recherche?text=jus%20multifruits#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=jus%20multifruits&page=3",
+   "status": 200,
+   "products": 83,
+   "error": null,
+   "title": "Votre recherche jus multifruits sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jus-autres",
+   "url": "https://www.auchan.fr/recherche?text=nectar#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=nectar&page=2",
+   "status": 200,
+   "products": 57,
+   "error": null,
+   "title": "Votre recherche nectar sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "jus-autres",
+   "url": "https://www.auchan.fr/recherche?text=jus%20frais#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=jus%20frais&page=3",
+   "status": 200,
+   "products": 91,
+   "error": null,
+   "title": "Votre recherche jus frais sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sirops",
+   "url": "https://www.auchan.fr/recherche?text=sirop#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sirop&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche sirop sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sirops",
+   "url": "https://www.auchan.fr/recherche?text=teisseire#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=teisseire#bellesfeuilles",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Votre recherche teisseire sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sodas",
+   "url": "https://www.auchan.fr/recherche?text=cola#bellesfeuilles",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/colas-boissons-gazeuses-energisantes/colas/ca-n070601?sort=default&brand=brandcocacola&redirect_keywords=cola&lark-cioSessionId=1+1793462541245&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Colas, Coca-Cola, Pepsi pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "limonades",
+   "url": "https://www.auchan.fr/recherche?text=limonade#bellesfeuilles",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/colas-boissons-gazeuses-energisantes/limonades-limes-tonic/limonades/ca-n07060301?redirect_keywords=limonade&lark-cioSessionId=1+1793462553063&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Limonades pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "limonades",
+   "url": "https://www.auchan.fr/recherche?text=tonic#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tonic#bellesfeuilles",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Votre recherche tonic sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "limonades",
+   "url": "https://www.auchan.fr/recherche?text=orangina#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=orangina#bellesfeuilles",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Votre recherche orangina sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "boissons-plates",
+   "url": "https://www.auchan.fr/recherche?text=th%C3%A9%20glac%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/thes-boissons-plates-aux-fruits-sirops/thes-infusions-glacees/ca-n070501?redirect_keywords=th%C3%A9%20glac%C3%A9&lark-cioSessionId=1+1793462576523&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 51,
+   "error": null,
+   "title": "Thés, infusions glacées pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "boissons-plates",
+   "url": "https://www.auchan.fr/recherche?text=boisson%20%C3%A9nergisante#bellesfeuilles",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/colas-boissons-gazeuses-energisantes/boissons-energisantes/ca-n070604?redirect_keywords=boisson%20%C3%A9nergisante&lark-cioSessionId=1+1793462587654&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 62,
+   "error": null,
+   "title": "Boissons énergisantes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "boissons-plates",
+   "url": "https://www.auchan.fr/recherche?text=oasis#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=oasis#bellesfeuilles",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Votre recherche oasis sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "boissons-vegetales",
+   "url": "https://www.auchan.fr/recherche?text=boisson%20v%C3%A9g%C3%A9tale#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/boissons-vegetales/ca-n010102?redirect_keywords=boisson%20v%C3%A9g%C3%A9tale&lark-cioSessionId=1+1793462607647&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 53,
+   "error": null,
+   "title": "Boissons végétales, laits végétaux d'amande et de coco pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "boissons-vegetales",
+   "url": "https://www.auchan.fr/recherche?text=lait%20d%27amande#bellesfeuilles",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/boissons-vegetales/boissons-amande/ca-n01010201?redirect_keywords=lait%20d%27amande&lark-cioSessionId=1+1793462619936&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Boissons, laits amande pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "bieres",
+   "url": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20blonde#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/bieres-futs-cidres/bieres-blondes/ca-n070701?redirect_keywords=bi%C3%A8re%20blonde&lark-cioSessionId=1+1793462626698&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=6",
+   "status": 200,
+   "products": 180,
+   "error": null,
+   "title": "Bières blondes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "bieres",
+   "url": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20ipa#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/bieres-futs-cidres/cave-a-bieres/ipa/ca-n07070406?redirect_keywords=bi%C3%A8re%20ipa&lark-cioSessionId=1+1793462643245&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Bières IPA de qualité à petit prix | Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "bieres",
+   "url": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20belge#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20belge#bellesfeuilles",
+   "status": 200,
+   "products": 24,
+   "error": null,
+   "title": "Votre recherche bière belge sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cidres-sans-alcool",
+   "url": "https://www.auchan.fr/recherche?text=cidre#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/bieres-futs-cidres/cidres/ca-n070705?redirect_keywords=cidre&lark-cioSessionId=1+1793462656190&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Cidre de qualité à petit prix - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "cidres-sans-alcool",
+   "url": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20sans%20alcool#bellesfeuilles",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/bieres-vins-et-aperitifs-sans-alcool/bieres-sans-alcool/ca-n070707?redirect_keywords=bi%C3%A8re%20sans%20alcool&lark-cioSessionId=1+1793462664135&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Bières sans alcool pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vin-rouge",
+   "url": "https://www.auchan.fr/recherche?text=vin%20rouge#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/vins/vins-rouges/ca-n070923?redirect_keywords=vin%20rouge&lark-cioSessionId=1+1793462673296&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=6",
+   "status": 200,
+   "products": 180,
+   "error": null,
+   "title": "Vins rouges de qualité à petit prix - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vin-blanc",
+   "url": "https://www.auchan.fr/recherche?text=vin%20blanc#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/vins/vins-blancs/ca-n070921?redirect_keywords=vin%20blanc&lark-cioSessionId=1+1793462690726&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Vins blancs de qualité à petit prix"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vin-rose",
+   "url": "https://www.auchan.fr/recherche?text=vin%20ros%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/vins/vins-roses/ca-n070922?redirect_keywords=vin%20ros%C3%A9&lark-cioSessionId=1+1793462699189&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=7",
+   "status": 200,
+   "products": 188,
+   "error": null,
+   "title": "Vins rosés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "champagne",
+   "url": "https://www.auchan.fr/recherche?text=champagne#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=champagne&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche champagne sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "champagne",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A9mant#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A9mant#bellesfeuilles",
+   "status": 200,
+   "products": 23,
+   "error": null,
+   "title": "Votre recherche crémant sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "champagne",
+   "url": "https://www.auchan.fr/recherche?text=prosecco#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=prosecco#bellesfeuilles",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Votre recherche prosecco sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aperitifs",
+   "url": "https://www.auchan.fr/recherche?text=pastis#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pastis#bellesfeuilles",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Votre recherche pastis sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aperitifs",
+   "url": "https://www.auchan.fr/recherche?text=porto#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=porto&page=2",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Votre recherche porto sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "aperitifs",
+   "url": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20sans%20alcool#bellesfeuilles",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/bieres-vins-et-aperitifs-sans-alcool/aperitifs-cocktails-sans-alcool/ca-n070814?redirect_keywords=ap%C3%A9ritif%20sans%20alcool&lark-cioSessionId=1+1793462757960&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Apéritifs, cocktails sans alcool pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "spiritueux",
+   "url": "https://www.auchan.fr/recherche?text=whisky#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/aperitifs-spiritueux/whisky/ca-n070801?redirect_keywords=whisky&lark-cioSessionId=1+1793462765556&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 80,
+   "error": null,
+   "title": "Whisky, whiskey, bourbon pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "spiritueux",
+   "url": "https://www.auchan.fr/recherche?text=rhum#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/aperitifs-spiritueux/rhums-punchs/ca-n070802?redirect_keywords=rhum&lark-cioSessionId=1+1793462779317&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 67,
+   "error": null,
+   "title": "Rhum de qualité pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "spiritueux",
+   "url": "https://www.auchan.fr/recherche?text=vodka#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/aperitifs-spiritueux/vodka-tequila-gin/vodka/ca-n070803?redirect_keywords=vodka&lark-cioSessionId=1+1793462792905&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 42,
+   "error": null,
+   "title": "Vodka de qualité à petit prix - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "spiritueux",
+   "url": "https://www.auchan.fr/recherche?text=gin#bellesfeuilles",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/aperitifs-spiritueux/vodka-tequila-gin/gin/ca-n070805?redirect_keywords=gin&lark-cioSessionId=1+1793462803258&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Gin pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lait-infantile",
+   "url": "https://www.auchan.fr/recherche?text=lait%20infantile#bellesfeuilles",
+   "final": "https://www.auchan.fr/bebe/laits-petits-dejeuners-de-bebe/ca-n0801?redirect_keywords=lait%20infantile&lark-cioSessionId=1+1793462810274&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 81,
+   "error": null,
+   "title": "Laits infantiles, céréales bébé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lait-infantile",
+   "url": "https://www.auchan.fr/recherche?text=lait%20de%20croissance#bellesfeuilles",
+   "final": "https://www.auchan.fr/bebe/laits-petits-dejeuners-de-bebe/laits-de-croissance-junior-des-10-mois/ca-n080103?redirect_keywords=lait%20de%20croissance&lark-cioSessionId=1+1793462823678&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Laits de croissance, junior (dès 10 mois) pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "repas-bebe",
+   "url": "https://www.auchan.fr/recherche?text=petits%20pots%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=petits%20pots%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Votre recherche petits pots bébé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "repas-bebe",
+   "url": "https://www.auchan.fr/recherche?text=repas%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/bebe/repas-desserts-gouters-de-bebe/ca-n0802?redirect_keywords=repas%20b%C3%A9b%C3%A9&lark-cioSessionId=1+1793462841393&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 127,
+   "error": null,
+   "title": "Alimentation bébé, repas et petits pots pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desserts-bebe",
+   "url": "https://www.auchan.fr/recherche?text=compote%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/bebe/desserts-gouters-jus/compotes/ca-n080302?redirect_keywords=compote%20b%C3%A9b%C3%A9&lark-cioSessionId=1+1793462858360&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Compotes bébé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desserts-bebe",
+   "url": "https://www.auchan.fr/recherche?text=c%C3%A9r%C3%A9ales%20infantiles#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=c%C3%A9r%C3%A9ales%20infantiles&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche céréales infantiles sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desserts-bebe",
+   "url": "https://www.auchan.fr/recherche?text=biscuits%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/bebe/desserts-gouters-jus/biscuits-bebe/ca-n080304?redirect_keywords=biscuits%20b%C3%A9b%C3%A9&lark-cioSessionId=1+1793462877378&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Biscuits bébé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "couches",
+   "url": "https://www.auchan.fr/recherche?text=couches%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=couches%20b%C3%A9b%C3%A9&page=2",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Votre recherche couches bébé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "couches",
+   "url": "https://www.auchan.fr/recherche?text=lingettes%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=lingettes%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Votre recherche lingettes bébé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "toilette-bebe",
+   "url": "https://www.auchan.fr/recherche?text=soin%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=soin%20b%C3%A9b%C3%A9#bellesfeuilles",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Votre recherche soin bébé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "toilette-bebe",
+   "url": "https://www.auchan.fr/recherche?text=biberon#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=biberon&page=5",
+   "status": 200,
+   "products": 95,
+   "error": null,
+   "title": "Votre recherche biberon sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "gel-douche",
+   "url": "https://www.auchan.fr/recherche?text=gel%20douche#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=gel%20douche&page=5",
+   "status": 200,
+   "products": 149,
+   "error": null,
+   "title": "Votre recherche gel douche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "gel-douche",
+   "url": "https://www.auchan.fr/recherche?text=savon#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=savon&page=6",
+   "status": 200,
+   "products": 179,
+   "error": null,
+   "title": "Votre recherche savon sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "deodorants",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9odorant#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=d%C3%A9odorant&page=4",
+   "status": 200,
+   "products": 120,
+   "error": null,
+   "title": "Votre recherche déodorant sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "shampoing",
+   "url": "https://www.auchan.fr/recherche?text=shampooing#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=shampooing&page=6",
+   "status": 200,
+   "products": 177,
+   "error": null,
+   "title": "Votre recherche shampooing sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-cheveux",
+   "url": "https://www.auchan.fr/recherche?text=apr%C3%A8s-shampooing#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=apr%C3%A8s-shampooing#bellesfeuilles",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Votre recherche après-shampooing sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-cheveux",
+   "url": "https://www.auchan.fr/recherche?text=coloration%20cheveux#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/soins-des-cheveux/coloration/ca-n090306?redirect_keywords=coloration%20cheveux&lark-cioSessionId=1+1793462987116&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Coloration des cheveux pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-cheveux",
+   "url": "https://www.auchan.fr/recherche?text=laque#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/soins-des-cheveux/laques-mousses-coiffantes/laques/ca-n09030701?redirect_keywords=laque&lark-cioSessionId=1+1793463001312&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Laques pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "dentifrice",
+   "url": "https://www.auchan.fr/recherche?text=dentifrice#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=dentifrice&page=4",
+   "status": 200,
+   "products": 117,
+   "error": null,
+   "title": "Votre recherche dentifrice sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "dentifrice",
+   "url": "https://www.auchan.fr/recherche?text=brosse%20%C3%A0%20dents#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=brosse%20%C3%A0%20dents&page=3",
+   "status": 200,
+   "products": 74,
+   "error": null,
+   "title": "Votre recherche brosse à dents sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "dentifrice",
+   "url": "https://www.auchan.fr/recherche?text=bain%20de%20bouche#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=bain%20de%20bouche#bellesfeuilles",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche bain de bouche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "rasage",
+   "url": "https://www.auchan.fr/recherche?text=rasoir#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=rasoir&page=3",
+   "status": 200,
+   "products": 84,
+   "error": null,
+   "title": "Votre recherche rasoir sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "rasage",
+   "url": "https://www.auchan.fr/recherche?text=mousse%20%C3%A0%20raser#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/hygiene-soins-homme/barbe-rasage/mousses-gels-a-raser-homme/ca-n09080204?redirect_keywords=mousse%20%C3%A0%20raser&lark-cioSessionId=1+1793463053980&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 22,
+   "error": null,
+   "title": "Mousses, gels à raser homme pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "rasage",
+   "url": "https://www.auchan.fr/recherche?text=cire%20%C3%A9pilation#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/hygiene-soins-du-corps/epilation-rasage/cires-bandes/ca-n09020702?redirect_keywords=cire%20%C3%A9pilation&lark-cioSessionId=1+1793463061823&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Cires, bandes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "hygiene-feminine",
+   "url": "https://www.auchan.fr/recherche?text=serviettes%20hygi%C3%A9niques#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/protections-hygiene-feminine/serviettes-hygieniques/ca-n09090302?redirect_keywords=serviettes%20hygi%C3%A9niques&lark-cioSessionId=1+1793463070196&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 61,
+   "error": null,
+   "title": "Serviettes hygiéniques pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "hygiene-feminine",
+   "url": "https://www.auchan.fr/recherche?text=tampons#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/protections-hygiene-feminine/tampons-avec-applicateur/ca-n09090305?redirect_keywords=tampons&lark-cioSessionId=1+1793463084199&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 12,
+   "error": null,
+   "title": "Tampons hygiéniques avec ou sans applicateur pas cher- Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "hygiene-feminine",
+   "url": "https://www.auchan.fr/recherche?text=incontinence#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/protections-hygiene-feminine/incontinence/ca-n090904?redirect_keywords=incontinence&lark-cioSessionId=1+1793463090708&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 49,
+   "error": null,
+   "title": "Protections urinaires, incontinence - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-corps",
+   "url": "https://www.auchan.fr/recherche?text=lait%20corps#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=lait%20corps&page=7",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Votre recherche lait corps sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-corps",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20mains#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20mains#bellesfeuilles",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Votre recherche crème mains sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-corps",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20solaire#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20solaire#bellesfeuilles",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche crème solaire sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-visage",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20visage#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20visage&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche crème visage sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-visage",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9maquillant#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=d%C3%A9maquillant&page=2",
+   "status": 200,
+   "products": 58,
+   "error": null,
+   "title": "Votre recherche démaquillant sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "soins-visage",
+   "url": "https://www.auchan.fr/recherche?text=maquillage#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/soins-du-visage-hygiene-dentaire-maquillage/maquillage/ca-n090416?redirect_keywords=maquillage&lark-cioSessionId=1+1793463155143&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Maquillage, manucure pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "papier",
+   "url": "https://www.auchan.fr/recherche?text=papier%20toilette#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/papier-toilette-essuie-tout-mouchoir/papier-toilette/ca-n100203?redirect_keywords=papier%20toilette&lark-cioSessionId=1+1793463168901&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 34,
+   "error": null,
+   "title": "Papier toilette pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mouchoirs-cotons",
+   "url": "https://www.auchan.fr/recherche?text=mouchoirs#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/papier-toilette-essuie-tout-mouchoir/mouchoirs/ca-n100204?redirect_keywords=mouchoirs&lark-cioSessionId=1+1793463177834&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Mouchoirs papier pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mouchoirs-cotons",
+   "url": "https://www.auchan.fr/recherche?text=coton#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=coton#bellesfeuilles",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Votre recherche coton sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mouchoirs-cotons",
+   "url": "https://www.auchan.fr/recherche?text=cotons-tiges#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/soins-du-visage-hygiene-dentaire-maquillage/cotons-cotons-tiges-lingettes/cotons-tiges/ca-n09040303?redirect_keywords=cotons-tiges&lark-cioSessionId=1+1793463193772&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Cotons tiges pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "premiers-soins",
+   "url": "https://www.auchan.fr/recherche?text=pansements#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=pansements&page=2",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Votre recherche pansements sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "premiers-soins",
+   "url": "https://www.auchan.fr/recherche?text=gel%20hydroalcoolique#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=gel%20hydroalcoolique#bellesfeuilles",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Votre recherche gel hydroalcoolique sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "premiers-soins",
+   "url": "https://www.auchan.fr/recherche?text=pr%C3%A9servatifs#bellesfeuilles",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/petite-parapharmacie/preservatifs-gels-de-massage/ca-n090905?redirect_keywords=pr%C3%A9servatifs&lark-cioSessionId=1+1793463219955&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 22,
+   "error": null,
+   "title": "Préservatifs, lubrifiants, gels intimes pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "complements",
+   "url": "https://www.auchan.fr/recherche?text=compl%C3%A9ments%20alimentaires#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=compl%C3%A9ments%20alimentaires&page=3",
+   "status": 200,
+   "products": 97,
+   "error": null,
+   "title": "Votre recherche compléments alimentaires sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "complements",
+   "url": "https://www.auchan.fr/recherche?text=vitamines#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=vitamines&page=5",
+   "status": 200,
+   "products": 115,
+   "error": null,
+   "title": "Votre recherche vitamines sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "complements",
+   "url": "https://www.auchan.fr/recherche?text=magn%C3%A9sium#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=magn%C3%A9sium#bellesfeuilles",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Votre recherche magnésium sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lessive",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/lessives/liquide/ca-n10030101?redirect_keywords=lessive%20liquide&lark-cioSessionId=1+1793463261448&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Lessives liquides pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lessive-capsules-poudre",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20capsules#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/lessives/capsules/ca-n10030102?redirect_keywords=lessive%20capsules&lark-cioSessionId=1+1793463274337&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 59,
+   "error": null,
+   "title": "Capsules lessive pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lessive-capsules-poudre",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20poudre#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/lessives/poudre-et-tablettes/ca-n10030103?redirect_keywords=lessive%20poudre&lark-cioSessionId=1+1793463284512&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 12,
+   "error": null,
+   "title": "Lessives en poudre et tablette pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "adoucissant",
+   "url": "https://www.auchan.fr/recherche?text=adoucissant#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/assouplissants-adoucissants/ca-n100302?redirect_keywords=adoucissant&lark-cioSessionId=1+1793463291653&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 65,
+   "error": null,
+   "title": "Adoucissants, parfums de linge pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "adoucissant",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9tachant#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/detachants-anti-decoloration/ca-n100303?redirect_keywords=d%C3%A9tachant&lark-cioSessionId=1+1793463305119&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Détachants, anti-décoloration pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "adoucissant",
+   "url": "https://www.auchan.fr/recherche?text=anticalcaire%20lave-linge#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=anticalcaire%20lave-linge#bellesfeuilles",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Votre recherche anticalcaire lave-linge sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vaisselle",
+   "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/vaisselle-entretien-lave-vaisselle/liquide-vaisselle/ca-n100601?redirect_keywords=liquide%20vaisselle&lark-cioSessionId=1+1793463320703&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 41,
+   "error": null,
+   "title": "Liquide vaisselle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lave-vaisselle",
+   "url": "https://www.auchan.fr/recherche?text=tablettes%20lave-vaisselle#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/vaisselle-entretien-lave-vaisselle/gels-pastilles-lave-vaisselle/pastilles-lave-vaisselle/ca-n10060202?redirect_keywords=tablettes%20lave-vaisselle&lark-cioSessionId=1+1793463333321&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 43,
+   "error": null,
+   "title": "Tablettes et pastilles lave-vaisselle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "lave-vaisselle",
+   "url": "https://www.auchan.fr/recherche?text=sel%20lave-vaisselle#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/vaisselle-entretien-lave-vaisselle/entretien-lave-vaisselle/sels-regenerant-lave-vaisselle/ca-n10060206?redirect_keywords=sel%20lave-vaisselle&lark-cioSessionId=1+1793463343436&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Sels régénérant lave vaisselle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=nettoyant%20multi-usages#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=nettoyant%20multi-usages#bellesfeuilles",
+   "status": 200,
+   "products": 40,
+   "error": null,
+   "title": "Votre recherche nettoyant multi-usages sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=nettoyant%20vitres#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=nettoyant%20vitres#bellesfeuilles",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Votre recherche nettoyant vitres sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=nettoyant%20sol#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/nettoyants-multi-usage-vitres-sols/nettoyants-sols/ca-n10040502?redirect_keywords=nettoyant%20sol&lark-cioSessionId=1+1793463367326&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Nettoyants sols pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=javel#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/desinfectants-lingettes-javel/javel/ca-n10041003?redirect_keywords=javel&lark-cioSessionId=1+1793463375852&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Javel pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9graissant#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=d%C3%A9graissant#bellesfeuilles",
+   "status": 200,
+   "products": 31,
+   "error": null,
+   "title": "Votre recherche dégraissant sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "wc-deboucheurs",
+   "url": "https://www.auchan.fr/recherche?text=nettoyant%20wc#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/wc-canalisations/gels-nettoyants/ca-n1004060208?redirect_keywords=nettoyant%20wc&lark-cioSessionId=1+1793463396783&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Gels nettoyants, détartrants pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "wc-deboucheurs",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9boucheur#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=d%C3%A9boucheur#bellesfeuilles",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Votre recherche déboucheur sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "wc-deboucheurs",
+   "url": "https://www.auchan.fr/recherche?text=bloc%20wc#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/wc-canalisations/blocs-cuvettes/ca-n1004060201?redirect_keywords=bloc%20wc&lark-cioSessionId=1+1793463412591&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Blocs cuvettes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "essuie-tout",
+   "url": "https://www.auchan.fr/recherche?text=essuie-tout#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/papier-toilette-essuie-tout-mouchoir/essuie-tout/ca-n100202?redirect_keywords=essuie-tout&lark-cioSessionId=1+1793463425579&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Papier essuie-tout, Sopalin pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sacs-poubelle",
+   "url": "https://www.auchan.fr/recherche?text=sacs%20poubelle#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/accessoires-menagers-maison/sacs-poubelle/ca-n101101?redirect_keywords=sacs%20poubelle&lark-cioSessionId=1+1793463433218&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Sacs poubelle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sacs-poubelle",
+   "url": "https://www.auchan.fr/recherche?text=%C3%A9ponges#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/accessoires-menagers-maison/eponges-gants-serpillieres/eponges/ca-n10110201?redirect_keywords=%C3%A9ponges&lark-cioSessionId=1+1793463446154&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 35,
+   "error": null,
+   "title": "Éponges pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sacs-poubelle",
+   "url": "https://www.auchan.fr/recherche?text=gants%20m%C3%A9nage#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=gants%20m%C3%A9nage#bellesfeuilles",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Votre recherche gants ménage sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conservation",
+   "url": "https://www.auchan.fr/recherche?text=sac%20cong%C3%A9lation#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sac%20cong%C3%A9lation#bellesfeuilles",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Votre recherche sac congélation sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conservation",
+   "url": "https://www.auchan.fr/recherche?text=papier%20aluminium#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/papiers-alu-emballages-ustensiles-vaisselle/papiers-aluminium/ca-n10110002?redirect_keywords=papier%20aluminium&lark-cioSessionId=1+1793463471967&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Papiers aluminium pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "conservation",
+   "url": "https://www.auchan.fr/recherche?text=film%20alimentaire#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/papiers-alu-emballages-ustensiles-vaisselle/films-alimentaires-etirables/ca-n10110001?redirect_keywords=film%20alimentaire&lark-cioSessionId=1+1793463481180&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Films alimentaires, sacs de conservation pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desodorisants-insecticides",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9sodorisant#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/desodorisants/ca-n101104?redirect_keywords=d%C3%A9sodorisant&lark-cioSessionId=1+1793463490263&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 119,
+   "error": null,
+   "title": "Désodorisants pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desodorisants-insecticides",
+   "url": "https://www.auchan.fr/recherche?text=insecticide#bellesfeuilles",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/insecticides/ca-n101106?redirect_keywords=insecticide&lark-cioSessionId=1+1793463504556&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Insecticides pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "desodorisants-insecticides",
+   "url": "https://www.auchan.fr/recherche?text=anti-moustique#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=anti-moustique&page=3",
+   "status": 200,
+   "products": 70,
+   "error": null,
+   "title": "Votre recherche anti-moustique sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "croquettes-chat",
+   "url": "https://www.auchan.fr/recherche?text=croquettes%20chat#bellesfeuilles",
+   "final": "https://www.auchan.fr/animalerie/chat/croquettes-chat/ca-n110105?redirect_keywords=croquettes%20chat&lark-cioSessionId=1+1793463527672&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 68,
+   "error": null,
+   "title": "Croquettes chat pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "patee-chat",
+   "url": "https://www.auchan.fr/recherche?text=sachets%20fra%C3%AEcheur%20chat#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sachets%20fra%C3%AEcheur%20chat#bellesfeuilles",
+   "status": 200,
+   "products": 47,
+   "error": null,
+   "title": "Votre recherche sachets fraîcheur chat sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "patee-chat",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2t%C3%A9e%20chat#bellesfeuilles",
+   "final": "https://www.auchan.fr/animalerie/chat/boites-pates-sachets-chat/ca-n110102?redirect_keywords=p%C3%A2t%C3%A9e%20chat&lark-cioSessionId=1+1793463548214&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 97,
+   "error": null,
+   "title": "Pâtée, sachets repas, boîtes chat pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "patee-chat",
+   "url": "https://www.auchan.fr/recherche?text=friandises%20chat#bellesfeuilles",
+   "final": "https://www.auchan.fr/animalerie/chat/friandises-chat/ca-n110101?redirect_keywords=friandises%20chat&lark-cioSessionId=1+1793463559831&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 22,
+   "error": null,
+   "title": "Friandises, laits chat pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "litiere",
+   "url": "https://www.auchan.fr/recherche?text=liti%C3%A8re%20chat#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=liti%C3%A8re%20chat&page=5",
+   "status": 200,
+   "products": 102,
+   "error": null,
+   "title": "Votre recherche litière chat sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "croquettes-chien",
+   "url": "https://www.auchan.fr/recherche?text=croquettes%20chien#bellesfeuilles",
+   "final": "https://www.auchan.fr/animalerie/chien/croquettes-chien/ca-n110205?redirect_keywords=croquettes%20chien&lark-cioSessionId=1+1793463582504&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Croquettes chien pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "patee-chien",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2t%C3%A9e%20chien#bellesfeuilles",
+   "final": "https://www.auchan.fr/animalerie/chien/boites-pates-sachets-chien/ca-n110203?redirect_keywords=p%C3%A2t%C3%A9e%20chien&lark-cioSessionId=1+1793463589259&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Pâtée, sachets repas, boîtes chien pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "patee-chien",
+   "url": "https://www.auchan.fr/recherche?text=friandises%20chien#bellesfeuilles",
+   "final": "https://www.auchan.fr/animalerie/chien/hygiene-dentaire-friandises-chien/ca-n110201?redirect_keywords=friandises%20chien&lark-cioSessionId=1+1793463598976&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=#bellesfeuilles",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Hygiène dentaire, friandises chien pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "patee-chien",
+   "url": "https://www.auchan.fr/recherche?text=os%20%C3%A0%20m%C3%A2cher#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=os%20%C3%A0%20m%C3%A2cher#bellesfeuilles",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche os à mâcher sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "autres-animaux",
+   "url": "https://www.auchan.fr/recherche?text=graines%20oiseaux#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=graines%20oiseaux#bellesfeuilles",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Votre recherche graines oiseaux sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "autres-animaux",
+   "url": "https://www.auchan.fr/recherche?text=rongeurs#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=rongeurs&page=3",
+   "status": 200,
+   "products": 57,
+   "error": null,
+   "title": "Votre recherche rongeurs sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "autres-animaux",
+   "url": "https://www.auchan.fr/recherche?text=aquarium#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=aquarium&page=4",
+   "status": 200,
+   "products": 49,
+   "error": null,
+   "title": "Votre recherche aquarium sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "autres-animaux",
+   "url": "https://www.auchan.fr/recherche?text=poules#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=poules&page=6",
+   "status": 200,
+   "products": 127,
+   "error": null,
+   "title": "Votre recherche poules sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "halal",
+   "url": "https://www.auchan.fr/recherche?text=halal#bellesfeuilles",
+   "final": "https://www.auchan.fr/produits-de-nos-regions-et-du-monde/moyen-orient-halal/ca-b0805?sort=default&phalal=phalal_oui&redirect_keywords=halal&lark-cioSessionId=1+1793463668445&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 64,
+   "error": null,
+   "title": "Alimentation Moyen-Orient, halal pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "halal",
+   "url": "https://www.auchan.fr/recherche?text=charcuterie%20halal#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=charcuterie%20halal&page=2",
+   "status": 200,
+   "products": 52,
+   "error": null,
+   "title": "Votre recherche charcuterie halal sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "halal",
+   "url": "https://www.auchan.fr/recherche?text=viande%20halal#bellesfeuilles",
+   "final": "https://www.auchan.fr/produits-de-nos-regions-et-du-monde/moyen-orient-halal/viande-charcuterie-halal/ca-b0800?redirect_keywords=viande%20halal&lark-cioSessionId=1+1793463687009&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 58,
+   "error": null,
+   "title": "Viande et charcuterie halal pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "casher",
+   "url": "https://www.auchan.fr/recherche?text=casher#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=casher#bellesfeuilles",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche casher sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "casher",
+   "url": "https://www.auchan.fr/recherche?text=cacher#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=cacher#bellesfeuilles",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche cacher sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "sans-gluten",
+   "url": "https://www.auchan.fr/recherche?text=sans%20gluten#bellesfeuilles",
+   "final": "https://www.auchan.fr/bio-et-nutrition/sans-gluten/ca-b020201?redirect_keywords=sans%20gluten&lark-cioSessionId=1+1793463698108&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 120,
+   "error": null,
+   "title": "Aliments et produits sans gluten pas cher | Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vegan",
+   "url": "https://www.auchan.fr/recherche?text=vegan#bellesfeuilles",
+   "final": "https://www.auchan.fr/bio-et-nutrition/vegetarien-vegetal/100-vegan/ca-b020108?redirect_keywords=vegan&lark-cioSessionId=1+1793463728407&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=6",
+   "status": 200,
+   "products": 172,
+   "error": null,
+   "title": "100% Vegan pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "vegan",
+   "url": "https://www.auchan.fr/recherche?text=v%C3%A9g%C3%A9tal#bellesfeuilles",
+   "final": "https://www.auchan.fr/bio-et-nutrition/vegetarien-vegetal/ca-b0201?redirect_keywords=v%C3%A9g%C3%A9tal&lark-cioSessionId=1+1793463744290&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 150,
+   "error": null,
+   "title": "Produits végétariens et vegan pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "asie",
+   "url": "https://www.auchan.fr/recherche?text=cuisine%20asiatique#bellesfeuilles",
+   "final": "https://www.auchan.fr/produits-de-nos-regions-et-du-monde/asie/ca-b0801?redirect_keywords=cuisine%20asiatique&lark-cioSessionId=1+1793463755665&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=7",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Epicerie et cuisine asiatique - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "asie",
+   "url": "https://www.auchan.fr/recherche?text=nouilles%20asiatiques#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=nouilles%20asiatiques&page=4",
+   "status": 200,
+   "products": 92,
+   "error": null,
+   "title": "Votre recherche nouilles asiatiques sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "asie",
+   "url": "https://www.auchan.fr/recherche?text=sushi%20kit#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=sushi%20kit#bellesfeuilles",
+   "status": 200,
+   "products": 1,
+   "error": null,
+   "title": "Votre recherche sushi kit sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mexique-usa",
+   "url": "https://www.auchan.fr/recherche?text=tortillas#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tortillas&page=2",
+   "status": 200,
+   "products": 51,
+   "error": null,
+   "title": "Votre recherche tortillas sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mexique-usa",
+   "url": "https://www.auchan.fr/recherche?text=tacos%20kit#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=tacos%20kit#bellesfeuilles",
+   "status": 200,
+   "products": 1,
+   "error": null,
+   "title": "Votre recherche tacos kit sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "mexique-usa",
+   "url": "https://www.auchan.fr/recherche?text=saveurs%20am%C3%A9ricaines#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=saveurs%20am%C3%A9ricaines#bellesfeuilles",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Votre recherche saveurs américaines sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "oriental",
+   "url": "https://www.auchan.fr/recherche?text=couscous#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=couscous&page=2",
+   "status": 200,
+   "products": 62,
+   "error": null,
+   "title": "Votre recherche couscous sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "oriental",
+   "url": "https://www.auchan.fr/recherche?text=cuisine%20orientale#bellesfeuilles",
+   "final": "https://www.auchan.fr/produits-de-nos-regions-et-du-monde/moyen-orient-halal/ca-b0805?redirect_keywords=cuisine%20orientale&lark-cioSessionId=1+1793463826613&lark-cioClientId=60323a5f-4e72-4eb5-8a09-5b0d666d69d4&lark-engineRolloutSessionId=12d589dd-1da7-4796-9978-e8f2ed361925&storeCateringSellerId=&storeCateringSelectedDate=&page=6",
+   "status": 200,
+   "products": 174,
+   "error": null,
+   "title": "Alimentation Moyen-Orient, halal pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-bellesfeuilles",
+   "rayon": "oriental",
+   "url": "https://www.auchan.fr/recherche?text=harissa#bellesfeuilles",
+   "final": "https://www.auchan.fr/recherche?text=harissa#bellesfeuilles",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Votre recherche harissa sur Auchan.fr"
+  }
+ ],
+ "decouvertes": [],
+ "bilan": {
+  "auchan-bellesfeuilles": {
+   "pages": 334,
+   "lues": 330,
+   "produits": 17559
+  }
+ }
+}
