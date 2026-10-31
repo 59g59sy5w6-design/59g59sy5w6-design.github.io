@@ -1,0 +1,1064 @@
+{
+ "cible": "houra-epicerie",
+ "debut": "2026-10-31T15:26:38.975Z",
+ "fin": "2026-10-31T15:41:05.359Z",
+ "only": [
+  "houra"
+ ],
+ "lot": [
+  "epicerie"
+ ],
+ "max": 0,
+ "pages": [
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-seches-B1558616-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/pates-seches-B1558616-1.html",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Pâtes sèches en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-coquillettes-et-pipe-rigate-B1558701-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/pates-coquillettes-et-pipe-rigate-B1558701-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Pâtes coquillettes et pipe rigate en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-fusilli-torti-et-torsades-B1558705-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/pates-fusilli-torti-et-torsades-B1558705-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Pâtes fusilli, torti et torsades en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-penne-et-macaroni-B1558704-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/pates-penne-et-macaroni-B1558704-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Pâtes penne et macaroni en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "pates",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-spaghetti-B1558684-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/pates-spaghetti-B1558684-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Pâtes spaghetti en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "riz",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-riz-cereales-et-purees-B1557058-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/pates-riz-cereales-et-purees-B1557058-1.html",
+   "status": 200,
+   "products": 192,
+   "error": null,
+   "title": "Pâtes, riz, céréales et purées en ligne Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "semoule-cereales",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/ble-boulgour-et-epeautre-B1558640-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/ble-boulgour-et-epeautre-B1558640-1.html",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Blé, boulgour et épeautre en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "semoule-cereales",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « semoule|polenta|flocons de pomme de terre » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "legumes-secs",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-riz-cereales-et-purees/pois-chiches-haricots-et-legumes-secs-B1557065-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/pates-riz-cereales-et-purees/pois-chiches-haricots-et-legumes-secs-B1557065-1.html",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Pois chiches, haricots et légumes secs en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "legumes-secs",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « legumes secs en conserve » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "tomates",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/tomates-poivrons-autres-legumes-chauds-B1557112-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/tomates-poivrons-autres-legumes-chauds-B1557112-1.html",
+   "status": 200,
+   "products": 47,
+   "error": null,
+   "title": "Livraison Tomates, Poivrons, Autres Légumes Chauds dans Conserves de légumes – Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "tomates",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/ratatouille-puree-legumes-cuisines-B1557109-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/ratatouille-puree-legumes-cuisines-B1557109-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Livraison Ratatouille, Purée, Légumes Cuisinés dans Conserves de légumes – Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "conserves-legumes",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-legumes-B1557101-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-legumes-B1557101-1.html",
+   "status": 200,
+   "products": 191,
+   "error": null,
+   "title": "Conserves de Légumes : Large Choix en Ligne Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "thon",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/thon-a-l-huile-prepare-en-sauce-B1557090-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/thon-a-l-huile-prepare-en-sauce-B1557090-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Thon en conserve à l'huile, préparé et en sauce en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "conserves",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-sardines-B1557087-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-sardines-B1557087-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Conserves de sardines en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "conserves",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-poissons-pates-foie-gras-B1557080-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-poissons-pates-foie-gras-B1557080-1.html",
+   "status": 200,
+   "products": 84,
+   "error": null,
+   "title": "Conserves de poissons, pâtés, foie gras : achat en ligne – Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "plats-conserve",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/couscous-paella-cuisine-du-monde-B1557043-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/couscous-paella-cuisine-du-monde-B1557043-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Couscous, paëlla et cuisine du monde en conserve en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "plats-conserve",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/plats-cuisines-repas-express-B1557038-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/plats-cuisines-repas-express-B1557038-1.html",
+   "status": 200,
+   "products": 193,
+   "error": null,
+   "title": "Plats cuisinés repas express : choix rapide Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "soupes",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons/soupe-bouteille-refermable-conserve-B1557094-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons/soupe-bouteille-refermable-conserve-B1557094-1.html",
+   "status": 200,
+   "products": 47,
+   "error": null,
+   "title": "Soupes en bouteille, refermables et conserves en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "soupes",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons-B1557093-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons-B1557093-1.html",
+   "status": 200,
+   "products": 192,
+   "error": null,
+   "title": "Soupes, potages et croûtons en livraison Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "huile",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/huile-herbes-aide-culinaire-B1558081-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/huile-herbes-aide-culinaire-B1558081-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Huiles, herbes et aides culinaires d'épicerie fine en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "vinaigre-vinaigrette",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/assaisonnements-et-condiments-B1557016-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/assaisonnements-et-condiments-B1557016-1.html",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Assaisonnements et condiments : huiles, vinaigres, épices Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "epices",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/epices-B1557018-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/epices-B1557018-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Épices en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "epices",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/sel-et-poivre-B1557027-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/sel-et-poivre-B1557027-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Sel et poivre en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "epices",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/herbes-et-aromates-B1558087-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/herbes-et-aromates-B1558087-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Herbes et aromates en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "mayonnaise-ketchup",
+   "url": "https://www.houra.fr/catalogue/cora/epicerie/condiments-B1421924-1.html",
+   "final": "https://www.houra.fr/catalogue/cora/epicerie/condiments-B1421924-1.html",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Livraison à domicile Condiments dans Epicerie sur houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sauces-chaudes",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/sauces-chaudes-condiments-B1557033-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/sauces-chaudes-condiments-B1557033-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Sauces chaudes et condiments d'épicerie fine en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sauces-monde",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « cuisine du monde|produits du monde|sauces du monde » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cornichons-olives",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/olives-pickles-antipasti-B1557056-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/olives-pickles-antipasti-B1557056-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Olives, pickles et antipasti pour apéritif en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "chips",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/chips-B1557053-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/chips-B1557053-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Chips en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-aperitif",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/aperitif-chips-antipasti-tartinable/crackers-B1558475-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/aperitif-chips-antipasti-tartinable/crackers-B1558475-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Crackers apéritif en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-aperitif",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/gressins-B1558474-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/gressins-B1558474-1.html",
+   "status": 200,
+   "products": 43,
+   "error": null,
+   "title": "Gressins en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-aperitif",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/tuiles-aperitives-B1558476-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/tuiles-aperitives-B1558476-1.html",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Tuiles apéritives en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-aperitif",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/aperitif-chips-antipasti-tartinable-B1557050-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/aperitif-chips-antipasti-tartinable-B1557050-1.html",
+   "status": 200,
+   "products": 131,
+   "error": null,
+   "title": "Apéritif chips : tartinables, antipasti et snacks Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cafe",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/cafe-moulu-B1557671-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/cafe-moulu-B1557671-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Café moulu en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cafe",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/cafe-soluble-B1557672-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/cafe-soluble-B1557672-1.html",
+   "status": 200,
+   "products": 46,
+   "error": null,
+   "title": "Café soluble en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cafe",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « cafe en grains? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "capsules",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « capsules? compatibles? nespresso|^capsules?|dosettes? senseo|^dosettes? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "the",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/the-en-vrac-B1557684-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/the-en-vrac-B1557684-1.html",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Thé en vrac en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "the",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « ^thes?( |$)|thes? vert » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "infusions",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « ^infusions? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "chocolat-poudre",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/boissons-chocolatees-en-poudre-B1557669-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/boissons-chocolatees-en-poudre-B1557669-1.html",
+   "status": 200,
+   "products": 40,
+   "error": null,
+   "title": "Boissons chocolatées en poudre en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cereales",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/biscotte-cereales-barre-de-cereales/cereales-chocolatees-pour-petit-dejeuner-B1557654-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/biscotte-cereales-barre-de-cereales/cereales-chocolatees-pour-petit-dejeuner-B1557654-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Céréales chocolatées pour petit-déjeuner en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cereales",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/biscotte-cereales-barre-de-cereales-B1557650-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/biscotte-cereales-barre-de-cereales-B1557650-1.html",
+   "status": 200,
+   "products": 199,
+   "error": null,
+   "title": "Biscottes, Céréales & Barres de Céréales Livraison Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "confitures",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/confitures-pates-a-tartiner-et-miels-B1557704-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/confitures-pates-a-tartiner-et-miels-B1557704-1.html",
+   "status": 200,
+   "products": 193,
+   "error": null,
+   "title": "Confitures, pâtes à tartiner et miels en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "confitures",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/miel-confiture-pate-a-tartiner-B1557728-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/miel-confiture-pate-a-tartiner-B1557728-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Miels, confitures et pâtes à tartiner fins en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "gateaux",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/madeleines-et-financiers-B1557690-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/madeleines-et-financiers-B1557690-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Madeleines et financiers en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-secs",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/sables-galettes-et-petits-beurre-B1557702-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/sables-galettes-et-petits-beurre-B1557702-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Sablés, galettes et petits beurre en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-secs",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/biscuits/biscuits-pour-le-petit-dejeuner-B1557701-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/biscuits/biscuits-pour-le-petit-dejeuner-B1557701-1.html",
+   "status": 200,
+   "products": 35,
+   "error": null,
+   "title": "Biscuits pour le petit-déjeuner en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-secs",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/biscuits/emballages-indivuiduels-B1557696-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/biscuits/emballages-indivuiduels-B1557696-1.html",
+   "status": 200,
+   "products": 170,
+   "error": null,
+   "title": "Biscuits et goûters en emballage individuel en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-chocolat",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/gouters-et-biscuits-fourres-B1558489-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/gouters-et-biscuits-fourres-B1558489-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Goûters et biscuits fourrés en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "crepes-gaufres",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « madeleines?, cakes? et crepes?|crepes?|gaufres? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "chocolat-tablettes",
+   "url": "https://www.houra.fr/catalogue/epicerie/confiseries-chocolats-tablette/chocolat-tablette-B1450865-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "status": 200,
+   "products": 55,
+   "error": null,
+   "title": "Epicerie salée en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "chocolat-tablettes",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « tablettes? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "chocolat-bouchees",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « chocolats? et confiseries|rochers?|bouchees?|barres? chocolatees? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "bonbons",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/chocolats-et-confiseries/bonbons-acidules-B1558136-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/chocolats-et-confiseries/bonbons-acidules-B1558136-1.html",
+   "status": 200,
+   "products": 38,
+   "error": null,
+   "title": "Bonbons acidulés en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "bonbons",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/chocolats-bonbons-et-confiseries/sucette-bonbon-de-poche-B1558486-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/chocolats-bonbons-et-confiseries/sucette-bonbon-de-poche-B1558486-1.html",
+   "status": 200,
+   "products": 38,
+   "error": null,
+   "title": "Sucettes et bonbons de poche en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "compotes",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/compote-fruit-au-sirop-creme-dessert-B1557642-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/compote-fruit-au-sirop-creme-dessert-B1557642-1.html",
+   "status": 200,
+   "products": 147,
+   "error": null,
+   "title": "Compotes, fruits au sirop et crèmes dessert en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "farine",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/sucres-farines-et-aides-a-la-patisserie-B1557657-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/sucres-farines-et-aides-a-la-patisserie-B1557657-1.html",
+   "status": 200,
+   "products": 189,
+   "error": null,
+   "title": "Sucres, farines & aides à la pâtisserie ? Épicerie sucrée Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sucre",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/sucre-en-poudre-et-edulcorants-B1557666-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/sucre-en-poudre-et-edulcorants-B1557666-1.html",
+   "status": 200,
+   "products": 38,
+   "error": null,
+   "title": "Sucre en poudre et édulcorants en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "aide-patisserie",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/aides-a-la-patisserie-fine-B1557714-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-sucree/aides-a-la-patisserie-fine-B1557714-1.html",
+   "status": 200,
+   "products": 35,
+   "error": null,
+   "title": "Aides à la pâtisserie fine en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "eaux",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/eau-en-bouteille/eau-plate-B1557242-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/eau-en-bouteille/eau-plate-B1557242-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Eau Plate en Ligne : Evian, Volvic, Contrex Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "eaux",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/eaux-en-bouteille-de-verre-B1557238-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/eaux-en-bouteille-de-verre-B1557238-1.html",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Eaux en bouteille de verre en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "eaux-gazeuses",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/eau-gazeuse-B1557241-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/eau-gazeuse-B1557241-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Livraison de packs d'eau gazeuse à domicile sans limite de poids – Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "eaux-gazeuses",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/eaux/eaux-aromatisees-gazeuses-B1557239-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/eaux/eaux-aromatisees-gazeuses-B1557239-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Eaux gazeuses aromatisées en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "eaux-gazeuses",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/eaux-plates-aromatisees-B1557240-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/eaux-plates-aromatisees-B1557240-1.html",
+   "status": 200,
+   "products": 48,
+   "error": null,
+   "title": "Eaux plates aromatisées en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "eaux-gazeuses",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/eau-de-coco-B1558275-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/eau-de-coco-B1558275-1.html",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Eau de coco en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "jus",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/jus-d-orange-B1557247-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/jus-d-orange-B1557247-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Jus d'orange en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "jus-autres",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/jus-multifruits-B1557251-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/jus-multifruits-B1557251-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Jus multifruits en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "jus-autres",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/autres-jus-de-fruits-B1557245-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/autres-jus-de-fruits-B1557245-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Autres jus de fruits en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "jus-autres",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/jus-de-fruits-B1557244-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/jus-de-fruits-B1557244-1.html",
+   "status": 200,
+   "products": 128,
+   "error": null,
+   "title": "Jus de fruits en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sirops",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/sirop-B1557228-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/sirop-B1557228-1.html",
+   "status": 200,
+   "products": 102,
+   "error": null,
+   "title": "Sirop en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sirops",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/sirops-autres-parfums-B1557229-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/sirops-autres-parfums-B1557229-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Sirops autres parfums en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sodas",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/boissons-cola-B1557279-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/boissons-cola-B1557279-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Boissons cola en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "limonades",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/boissons-aux-fruits-gazeuses-B1557277-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/boissons-aux-fruits-gazeuses-B1557277-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Boissons aux fruits gazeuses en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "limonades",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/sodas-et-boissons-aromatisees/sans-sucre-B1557281-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/sodas-et-boissons-aromatisees/sans-sucre-B1557281-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Sodas et boissons sans sucre en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "limonades",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/sodas-et-boissons-bien-etre-B1557275-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/sodas-et-boissons-bien-etre-B1557275-1.html",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Sodas et boissons bien-être en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "boissons-plates",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/sodas-et-boissons-aromatisees/boisson-au-the-B1557276-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/sodas-et-boissons-aromatisees/boisson-au-the-B1557276-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Boissons au thé (froides) en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "boissons-vegetales",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/boissons-vegetales-B1557236-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/boissons-vegetales-B1557236-1.html",
+   "status": 200,
+   "products": 173,
+   "error": null,
+   "title": "Boissons végétales en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "boissons-vegetales",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/boisson-vegetale-a-l-amande-B1558272-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/boisson-vegetale-a-l-amande-B1558272-1.html",
+   "status": 200,
+   "products": 42,
+   "error": null,
+   "title": "Boisson végétale à l'amande en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "bieres",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/bieres-et-cidres-B1557266-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/bieres-et-cidres-B1557266-1.html",
+   "status": 200,
+   "products": 157,
+   "error": null,
+   "title": "Bières et cidres en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "bieres",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/bires-et-cidres/bires-blanches-et-aromatises-B1557267-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/bires-et-cidres/bires-blanches-et-aromatises-B1557267-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Bières blanches et aromatisées en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "bieres",
+   "url": "https://www.houra.fr/catalogue/boisson/cave-a-bieres/biere-francaise-B1489234-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/cave-a-bieres-B1557272-1.html",
+   "status": 200,
+   "products": 87,
+   "error": null,
+   "title": "Cave à bières en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "bieres",
+   "url": "https://www.houra.fr/catalogue/boisson/cave-a-bieres-B1480734-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/cave-a-bieres-B1557272-1.html",
+   "status": 200,
+   "products": 87,
+   "error": null,
+   "title": "Cave à bières en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cidres-sans-alcool",
+   "url": "https://www.houra.fr/catalogue/boisson/bieres/les-sans-alcools-B1338944-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/bieres-sans-alcool-et-panaches-B1557271-1.html",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Bières sans alcool et panachés en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cidres-sans-alcool",
+   "url": "https://www.houra.fr/catalogue/boisson/aperitifs/sans-alcool-B1380173-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/aperitifs-sans-alcool-B1557217-1.html",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Apéritifs sans alcool en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "cidres-sans-alcool",
+   "url": "https://www.houra.fr/catalogue/boisson-lait-B4000005-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « ^cidres? » sur https://www.houra.fr/catalogue/boisson-lait-B4000005-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Eaux | Sirop | Boissons énergisantes | Sodas | Jus de fruits | Jus de fruits frais | Lait | Boissons végétales | Bières , cidres | Apéritif, Digestifs | Jus et soupes Bio | Sirop artisanal naturel | Bières artisanales d'IDF | Lait, Équitable, Local | Bières artisanales parisiennes | Jus de fruits du terroir | Eau gazeuse Corse | Liqueurs et sirops du terroir | Eau minérale de Savoie | Boisson & Lait | nouveautés du rayon | offres spéciales | eaux en bouteille | eaux plates | eaux pétillantes | eaux aromatisées | variantes bullées subtilement parfumées | sirop de menthe | grenadine | orange-citron | Lait de vache | eaux en petits formats | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "vin-rouge",
+   "url": "https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « vins? rouges? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "vin-blanc",
+   "url": "https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « vins? blancs? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "vin-rose",
+   "url": "https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « vins? roses? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "champagne",
+   "url": "https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « champagne » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "aperitifs",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/alcools-aperitifs-et-digestifs-B1557205-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/alcools-aperitifs-et-digestifs-B1557205-1.html",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Alcools, apéritifs et digestifs en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "spiritueux",
+   "url": "https://www.houra.fr/catalogue/boisson-lait/rhum-B1557216-1.html",
+   "final": "https://www.houra.fr/catalogue/boisson-lait/rhum-B1557216-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Rhum en livraison à domicile - houra.fr"
+  }
+ ],
+ "decouvertes": [
+  {
+   "retailer": "houra",
+   "rayon": "riz",
+   "host": "houra.fr",
+   "match": "B1557058",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-riz-cereales-et-purees-B1557058-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "^riz|riz,|riz et|feculent|riz, pates"
+   ],
+   "text": "Pâtes, Riz, Céréales",
+   "at": "2026-10-31T15:27:26.688Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "conserves",
+   "host": "houra.fr",
+   "match": "B1557080",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-poissons-pates-foie-gras-B1557080-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "conserves? de poissons?|poissons? en conserve"
+   ],
+   "text": "Conserves de Poissons, Pâtés",
+   "at": "2026-10-31T15:28:58.325Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "plats-conserve",
+   "host": "houra.fr",
+   "match": "B1557038",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/plats-cuisines-repas-express-B1557038-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "^plats? cuisines?"
+   ],
+   "text": "Plats Cuisinés",
+   "at": "2026-10-31T15:29:23.376Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "soupes",
+   "host": "houra.fr",
+   "match": "B1557093",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons-B1557093-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "soupes?, potages?|^soupes?"
+   ],
+   "text": "Soupes, Potages",
+   "at": "2026-10-31T15:29:48.622Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "huile",
+   "host": "houra.fr",
+   "match": "B1558081",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/huile-herbes-aide-culinaire-B1558081-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "^huiles?( |,|$)|huile et|huiles,"
+   ],
+   "text": "huiles et herbes d'exception",
+   "at": "2026-10-31T15:30:16.090Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "vinaigre-vinaigrette",
+   "host": "houra.fr",
+   "match": "B1557016",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/assaisonnements-et-condiments-B1557016-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "vinaigre|vinaigrette|assaisonnement"
+   ],
+   "text": "Assaisonnements, Condiments",
+   "at": "2026-10-31T15:30:18.978Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "chips",
+   "host": "houra.fr",
+   "match": "B1557053",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/chips-B1557053-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "^chips"
+   ],
+   "text": "chips croustillantes",
+   "at": "2026-10-31T15:31:41.445Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "biscuits-aperitif",
+   "host": "houra.fr",
+   "match": "B1557050",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/aperitif-chips-antipasti-tartinable-B1557050-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+   "find": [
+    "aperitif, chips|^aperitif"
+   ],
+   "text": "Apéritif, Chips",
+   "at": "2026-10-31T15:32:20.283Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "compotes",
+   "host": "houra.fr",
+   "match": "B1557642",
+   "url": "https://www.houra.fr/catalogue/epicerie-sucree/compote-fruit-au-sirop-creme-dessert-B1557642-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+   "find": [
+    "compotes?"
+   ],
+   "text": "Compote, Fruit au Sirop",
+   "at": "2026-10-31T15:35:36.034Z"
+  }
+ ],
+ "bilan": {
+  "houra": {
+   "pages": 93,
+   "lues": 77,
+   "produits": 5603
+  }
+ }
+}
