@@ -67,7 +67,7 @@ WebFetch ne lit que les adresses données par l'utilisateur ou trouvées par une
 
 Diagnostic du robot : lancer le workflow avec l'option « diag ». Il relit les trois enseignes et dépose le compte rendu par page (`tools/work/scrape.json`) et des extraits de pages sur la branche `diag`, sans toucher à `main`.
 
-L'appli va chercher les prix à chaque ouverture (le service worker sert `data/` depuis le réseau d'abord) et revérifie toutes les 10 minutes quand elle reste ouverte. Elle affiche l'heure de vérification et nomme les enseignes dont les prix sont plus anciens.
+L'appli affiche tout de suite les prix du cache à l'ouverture, les revérifie derrière (le service worker prévient la page quand un relevé plus récent est arrivé) et toutes les 10 minutes quand elle reste ouverte. Elle affiche l'heure de vérification et nomme les enseignes dont les prix sont plus anciens.
 
 ## Faire évoluer le catalogue
 
