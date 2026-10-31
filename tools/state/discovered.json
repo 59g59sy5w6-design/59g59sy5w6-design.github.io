@@ -1,1 +1,184 @@
-[]
+[
+ {
+  "retailer": "houra",
+  "rayon": "lait-infantile",
+  "host": "houra.fr",
+  "match": "B1557800",
+  "url": "https://www.houra.fr/catalogue/bebe/laits-infantiles-biberons-tetines-B1557800-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/bebe-B4000044-1.html",
+  "find": [
+   "laits? infantiles?|1er age"
+  ],
+  "text": "Laits Infantiles, Biberons",
+  "at": "2026-10-31T15:27:02.090Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "repas-bebe",
+  "host": "houra.fr",
+  "match": "B1557852",
+  "url": "https://www.houra.fr/catalogue/bebe/repas-du-midi-pour-bebe-B1557852-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/bebe-B4000044-1.html",
+  "find": [
+   "repas et petits pots|^repas|petits? pots?"
+  ],
+  "text": "Repas du Midi",
+  "at": "2026-10-31T15:27:35.035Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "desserts-bebe",
+  "host": "houra.fr",
+  "match": "B1557834",
+  "url": "https://www.houra.fr/catalogue/bebe/desserts-lactes-et-aux-fruits-pour-bebe-B1557834-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/bebe-B4000044-1.html",
+  "find": [
+   "desserts? bebe|diversification|^desserts?"
+  ],
+  "text": "Desserts pour Bébé",
+  "at": "2026-10-31T15:27:49.797Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "couches",
+  "host": "houra.fr",
+  "match": "B1557806",
+  "url": "https://www.houra.fr/catalogue/bebe/couches-pour-bebe-B1557806-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/bebe-B4000044-1.html",
+  "find": [
+   "couches? et lingettes?|^couches?"
+  ],
+  "text": "Couches",
+  "at": "2026-10-31T15:28:02.367Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "hygiene-feminine",
+  "host": "houra.fr",
+  "match": "B1557287",
+  "url": "https://www.houra.fr/catalogue/hygiene-beaute/hygiene-feminine-B1557287-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html",
+  "find": [
+   "hygiene feminine"
+  ],
+  "text": "Hygiène féminine",
+  "at": "2026-10-31T15:29:48.496Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "soins-visage",
+  "host": "houra.fr",
+  "match": "B1557334",
+  "url": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-visage-B1557334-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html",
+  "find": [
+   "soin du visage|^visage"
+  ],
+  "text": "Soin du visage",
+  "at": "2026-10-31T15:30:26.912Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "mouchoirs-cotons",
+  "host": "houra.fr",
+  "match": "B1557283",
+  "url": "https://www.houra.fr/catalogue/hygiene-beaute/mouchoirs-et-cotons-B1557283-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html",
+  "find": [
+   "mouchoirs?|cotons?"
+  ],
+  "text": "Mouchoir, Coton",
+  "at": "2026-10-31T15:30:49.996Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "lessive-capsules-poudre",
+  "host": "houra.fr",
+  "match": "B1557346",
+  "url": "https://www.houra.fr/catalogue/entretien/lessive-pour-le-linge-B1557346-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+  "find": [
+   "^lessives?$|^lessives? "
+  ],
+  "text": "Lessive",
+  "at": "2026-10-31T15:31:26.927Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "adoucissant",
+  "host": "houra.fr",
+  "match": "B1557356",
+  "url": "https://www.houra.fr/catalogue/entretien/adoucissant-B1557356-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+  "find": [
+   "^adoucissants?"
+  ],
+  "text": "adoucissants parfumés",
+  "at": "2026-10-31T15:31:39.481Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "sacs-poubelle",
+  "host": "houra.fr",
+  "match": "B1557361",
+  "url": "https://www.houra.fr/catalogue/entretien/sacs-poubelle-B1557361-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+  "find": [
+   "sacs? poubelle|accessoires? de menage|eponges?"
+  ],
+  "text": "Sac Poubelle",
+  "at": "2026-10-31T15:33:16.068Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "desodorisants-insecticides",
+  "host": "houra.fr",
+  "match": "B1557345",
+  "url": "https://www.houra.fr/catalogue/entretien/insecticide-B1557345-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+  "find": [
+   "^desodorisants?|^insecticides?"
+  ],
+  "text": "Insecticide",
+  "at": "2026-10-31T15:33:32.532Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "patee-chien",
+  "host": "houra.fr",
+  "match": "B1557571",
+  "url": "https://www.houra.fr/catalogue/animaux/produits-pour-chiens-B1557571-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/animaux-B4000023-1.html",
+  "find": [
+   "^chiens?$|patees? pour chien|friandises? pour chien"
+  ],
+  "text": "Chiens",
+  "at": "2026-10-31T15:35:07.296Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "autres-animaux",
+  "host": "houra.fr",
+  "match": "B1557612",
+  "url": "https://www.houra.fr/catalogue/animaux/oiseaux-rongeurs-poissons-B1557612-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/animaux-B4000023-1.html",
+  "find": [
+   "^oiseaux?|^rongeurs?|^poissons?"
+  ],
+  "text": "Oiseaux, Rongeurs, Poissons",
+  "at": "2026-10-31T15:35:20.943Z"
+ }
+]
