@@ -512,6 +512,11 @@ button.wlcta { width: calc(100% - var(--g) * 2 - var(--sl) - var(--sr)); text-al
 .savings .sv-main > span { flex: 1; min-width: 0; }
 .savings .icbtn { flex: none; color: var(--brand-text); }
 .df .dsh { width: 36px; height: 36px; margin-left: auto; margin-right: 6px; color: var(--ink-2); }
+.plan { display: flex; align-items: flex-start; gap: 12px; margin: 4px calc(var(--g) + var(--sr)) 12px calc(var(--g) + var(--sl)); padding: 13px 14px; border-radius: 14px; background: var(--brand-tint); color: var(--brand-ink); }
+.plan .si { width: 26px; height: 26px; flex: none; margin-top: 1px; }
+.plan > span { flex: 1; min-width: 0; }
+.plan b { display: block; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; line-height: 22px; }
+.plan small { display: block; font-size: 13px; line-height: 18px; margin-top: 2px; letter-spacing: -0.005em; }
 .wlcta, .savings { display: flex; align-items: center; gap: 12px; margin: 6px calc(var(--g) + var(--sr)) 8px calc(var(--g) + var(--sl)); padding: 13px 14px; border-radius: 14px; background: var(--shelf); color: var(--ink); text-decoration: none; }
 .savings { background: var(--brand-tint); color: var(--brand-ink); }
 .savewrap { margin: 12px calc(var(--g) + var(--sr)) 0 calc(var(--g) + var(--sl)); }

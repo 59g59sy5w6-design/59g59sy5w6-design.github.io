@@ -575,7 +575,7 @@
 
   /* listes toutes faites, pour voir en un geste ce que fait Cabas (produits des rayons couverts) */
   const EXAMPLES = [
-    ["semaine", "La semaine", "lait, 2 paquets de pâtes, 6 œufs, beurre, yaourts nature, 6 bouteilles d'eau, papier toilette, café"],
+    ["semaine", "La semaine", "6 litres de lait, 3 paquets de pâtes, 12 œufs, beurre, yaourts nature x4, 12 bouteilles d'eau, papier toilette, café x2, jus d'orange x3, riz, huile de tournesol, thon x3, tomates pelées x2, sardines x2, emmental râpé, madeleines x2, coca x4, lessive, liquide vaisselle, sucre, farine"],
     ["petitdej", "Petit-déjeuner", "café moulu, lait demi-écrémé, jus d'orange, madeleines, sucre en poudre, beurre"],
     ["pates", "Dîner de pâtes", "spaghetti, thon au naturel, tomates pelées, huile d'olive, emmental râpé"],
     ["menage", "Ménage", "lessive liquide, liquide vaisselle, papier toilette x2"],
@@ -919,7 +919,18 @@
         const g = singles.map((x) => ({ s: x, gap: x.ch.P.min - x.sub })).sort((x, y) => x.gap - y.gap)[0];
         if (g.gap > 0) hint = ` Chez ${esc(S.retMap.get(g.s.ch.id).name)}, ${g.s.missing ? "les produits disponibles font" : "ton panier fait"} ${eurC(g.s.sub)}\u00a0: il manque ${eurC(g.gap)} pour atteindre le minimum de ${eurC(g.s.ch.P.min).replace(",00", "")}.`;
       }
-      side = `<div class="sum"><p class="sl">Pas encore de commande possible</p><div class="st">${px(subtotal())}</div><p class="sn">Chaque enseigne demande un minimum d'achat.${hint}</p>${seg}${noCompRow()}</div>`;
+      /* petit panier : en magasin, pas de minimum ; l'enseigne qui a des magasins et vend le plus de produits, au total le plus bas */
+      let store = "";
+      if (S.prefs.comp !== false) {
+        let b = null;
+        for (const r of S.rets.filter((r) => r.magasin && !r.simulated && retOn(r.id))) {
+          let tot = 0, have = 0;
+          for (const id of ids) { const o = (S.prods.get(id) || {}).offers[r.id]; if (o && o.price > 0) { tot += Math.round(o.price * 100) * S.basket[id]; have++; } }
+          if (have && (!b || have > b.have || (have === b.have && tot < b.tot))) b = { r, tot, have };
+        }
+        if (b) store = `<p class="sv">En magasin, sans minimum\u00a0: ${eurC(b.tot)} chez ${esc(b.r.name.split(" ")[0])}${b.have < ids.length ? ` pour ${b.have} produits sur ${ids.length}` : ""}.</p><p class="sn">Aux prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p>`;
+      }
+      side = `<div class="sum"><p class="sl">Panier trop petit pour une livraison</p><div class="st">${px(subtotal())}</div><p class="sn">Chaque enseigne demande un minimum d'achat.${hint}</p>${store}<div class="btns" style="margin-top:12px"><a class="btn tint" href="#/ecrire">${ic("pen")}Compléter ma liste</a></div>${seg}${noCompRow()}</div>`;
       main = `<div class="order">${plainItems(ids.filter((id) => !M.uncovered.includes(id)))}</div>` + uncovered;
     }
     return {
@@ -1271,7 +1282,9 @@
     S.list.forEach((p) => { const w = p._b.split(" ")[0]; if (w && w.length > 2 && w !== "sans") CATW.add(stem(w)); });
     return CATW;
   }
-  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "leger"];
+  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "leger"], JUICE_ONLY = new Set(["boisson", "nectar"]);
+  /* variétés d'un même rayon : huile d'olive ou de tournesol, sucre blanc ou roux, riz complet, pâtes complètes, yaourt au lait de chèvre */
+  const VARIETY = new Set("olive tournesol colza arachide noix sesame pepins avocat lin isio friture melange graine chevre brebi soja coco grec grecque complete integrale sarrasin mais pois roux cassonade canne morceau fluide".split(" ").map(stem));
   /* « beurre doux 60 % MG » : un beurre allégé qui ne dit pas son nom (le beurre est à 80 % ou plus) */
   const lowFat = (p) => p.r === "beurre" && /\b(1[0-9]|[2-6][0-9]|7[0-4]) ?mg\b/.test(norm(p.name));
   /* le mot est dans le produit lui-même (marque, nom, format, étiquettes), pas seulement dans le nom de son rayon */
@@ -1294,7 +1307,8 @@
     /* « jus d'orange » n'est pas une boisson au jus, « papier toilette » n'est pas des lingettes : un mot qui change la
        nature du produit l'écarte, sauf si on l'a écrit */
     const dn = NOTSAME.filter((w) => !toks.includes(w)), light = ["leger", "allege", "light"].some((w) => toks.includes(w));
-    const noDown = rel.filter((p) => !dn.some((w) => allW(p).has(w)) && (light || !lowFat(p)));
+    /* « boisson au jus » et « nectar » ne valent que pour les jus : un cola est, de son nom légal, une « boisson gazeuse » */
+    const noDown = rel.filter((p) => !dn.some((w) => allW(p).has(w) && (p.r === "jus" || !JUICE_ONLY.has(w))) && (light || !lowFat(p)));
     if (noDown.length) rel = noDown;
     const inRay = rel.filter((p) => { const rw = rayWords(p.r); return toks.some((t) => rw.has(t)); });
     if (inRay.length) rel = inRay;
@@ -1311,11 +1325,12 @@
     const qs = new Set(toks);
     /* « sardines à l'huile » : l'huile d'olive ou de tournesol de la boîte n'est pas une variante de trop */
     const OILS = new Set(["olive", "tournesol", "colza", "arachide"]);
-    const extra = (p) => sig(p).split(" ").filter((t) => { const w = t.replace(/^sans /, ""); return VARIANT.has(w) && !qs.has(w) && !(qs.has("huile") && p.r !== "huile" && OILS.has(w)); }).length;
-    /* le nom du rayon tout seul (« huile », « lait ») : toutes les variantes se valent, le moins cher l'emporte */
+    /* le nom du rayon tout seul (« huile », « sucre ») : les variétés (olive ou tournesol, blanc ou roux) se valent et le
+       moins cher l'emporte ; mais un parfum, un « zéro », un bio ou un décaféiné restent en trop si on ne les a pas écrits */
     const bare = avail.length && toks.every((t) => rayWords(avail[0].r).has(t));
-    const minX = bare ? -1 : Math.min(...avail.map(extra));
-    let plain = bare ? avail : avail.filter((p) => extra(p) === minX);
+    const extra = (p) => sig(p).split(" ").filter((t) => { const w = t.replace(/^sans /, ""); return VARIANT.has(w) && !qs.has(w) && !(qs.has("huile") && p.r !== "huile" && OILS.has(w)) && !(bare && VARIETY.has(w)); }).length;
+    const minX = Math.min(...avail.map(extra));
+    let plain = avail.filter((p) => extra(p) === minX);
     /* rayon « Jus d'orange » demandé par son nom : un pur jus de pamplemousse rangé là n'est pas un jus d'orange ;
        un mot de parfum ou de variété du nom du rayon doit être dans le produit lui-même, quand c'est le cas de certains */
     if (bare) {
@@ -1323,11 +1338,16 @@
       if (spec.length) { const own = plain.filter((p) => spec.every((t) => ownHas(p, t))); if (own.length) plain = own; }
     }
     let pick = null, n = L.n;
+    /* vivier : les produits acceptables pour cette ligne, avec la quantité à prendre de chacun (pour choisir, parmi eux,
+       celui qui rend la commande la moins chère, livraison comprise : listPlan) */
+    const pool = new Map();
     if (L.size) {
       const same = plain.filter((p) => p.qty && p.qty.u === L.size.u);
       const near = same.filter((p) => Math.abs(sz(p) - L.size.v) / L.size.v <= 0.15);
       const le = same.filter((p) => sz(p) <= L.size.v * 1.15);
-      pick = (near.length ? near : le.length ? le : same.length ? [same.slice().sort((a, b) => sz(a) - sz(b))[0]] : plain).slice().sort(byVal)[0];
+      const set = near.length ? near : le.length ? le : same.length ? [same.slice().sort((a, b) => sz(a) - sz(b))[0]] : plain;
+      set.forEach((p) => pool.set(p.id, p.qty && p.qty.u === L.size.u && sz(p) ? Math.max(1, Math.round(L.size.v / sz(p))) : 1));
+      pick = set.slice().sort(byVal)[0];
       if (pick.qty && pick.qty.u === L.size.u && sz(pick)) n = Math.max(1, Math.round(L.size.v / sz(pick)));
     } else {
       /* formats courants : ceux que partagent plusieurs produits pertinents (1 L et 6 x 1 L pour le lait, 500 g et 1 kg pour les pâtes) */
@@ -1344,10 +1364,68 @@
         const one = singles.filter((p) => keyS(p) === mode).sort(byVal)[0], pack = plain.filter((p) => packsOf(p) === L.n).sort(byVal)[0];
         if (pack && (!one || valOf(pack) <= valOf(one))) { pick = pack; n = 1; } else pick = one || common.slice().sort(byVal)[0];
       } else pick = common.slice().sort(byVal)[0];
+      /* vivier : les formats courants, chacun en quantité équivalente au produit choisi (deux paquets de 250 g pour 500 g),
+         et les packs de la quantité demandée */
+      /* même type d'emballage que le produit choisi (bouteille seule ou pack de N) : trois bouteilles ne deviennent pas
+         un pack de douze canettes ; les rouleaux, œufs ou lavages se comptent en quantité équivalente */
+      const multi = (p) => { const m = /^(\d+)\s*x/i.exec(p.format || ""); return m ? +m[1] : 1; };
+      const tot = sz(pick) * n, pk = multi(pick);
+      common.filter((p) => multi(p) === pk).forEach((p) => { const s = sz(p); pool.set(p.id, s && tot && p.qty.u === pick.qty.u ? Math.max(1, Math.round(tot / s)) : n); });
+      if (L.n > 1) plain.filter((p) => packsOf(p) === L.n).forEach((p) => pool.set(p.id, 1));
     }
     out.pick = pick.id;
     out.n = n;
+    pool.set(pick.id, n);
+    out.pool = [...pool.entries()];
     return out;
+  }
+  /* La liste entière, livraison comprise : pour chaque ensemble d'une à trois enseignes, chaque ligne prend le produit
+     du vivier le moins cher dans ces enseignes ; une enseigne dont la commande n'atteint pas son minimum disqualifie
+     l'ensemble ; frais de livraison et de service comptés. Renvoie le meilleur plan : lignes couvertes, puis total. */
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor });
+  function listPlan(lines) {
+    const chans = chansOf(retsFor(S.prefs.comp !== false)).filter((c) => !(S.allMap.get(c.id) || {}).simulated);
+    const L = lines.filter((x) => x.pick && x.pool && x.pool.length);
+    if (!L.length || !chans.length) return null;
+    const K = Math.min(3, Math.max(1, S.prefs.maxOrders || 3), chans.length);
+    const extra = Math.round((S.prefs.extraCost || 0) * 100);
+    const subsets = [];
+    const rec = (start, cur) => { if (cur.length) subsets.push(cur.slice()); if (cur.length === K) return; for (let i = start; i < chans.length; i++) { cur.push(i); rec(i + 1, cur); cur.pop(); } };
+    rec(0, []);
+    let best = null, short = null;
+    for (const sub of subsets) {
+      const subs = sub.map(() => 0), picks = [];
+      let covered = 0;
+      for (const x of L) {
+        /* pour chaque enseigne de l'ensemble, le produit du vivier le moins cher ; la ligne va à la moins chère */
+        const by = sub.map(() => null);
+        for (const [id, n] of x.pool) {
+          const p = S.prods.get(id);
+          if (!p) continue;
+          sub.forEach((ci, j) => { const o = p.offers[chans[ci].id]; if (o && o.price > 0 && !o.sim) { const c = Math.round(o.price * 100) * n; if (!by[j] || c < by[j].c) by[j] = { id, n, c }; } });
+        }
+        let j0 = -1;
+        by.forEach((b, j) => { if (b && (j0 < 0 || b.c < by[j0].c)) j0 = j; });
+        if (j0 >= 0) { subs[j0] += by[j0].c; covered++; picks.push({ line: x, by, j: j0 }); } else picks.push({ line: x, by, j: -1 });
+      }
+      /* une enseigne sous son minimum : on lui rapporte les lignes qui coûtent le moins cher à déplacer */
+      for (let pass = 0; pass < sub.length; pass++) {
+        const j = sub.findIndex((ci, jj) => subs[jj] > 0 && subs[jj] < chans[ci].P.min);
+        if (j < 0) break;
+        const movable = picks.filter((pk) => pk.j >= 0 && pk.j !== j && pk.by[j]).map((pk) => ({ pk, d: pk.by[j].c - pk.by[pk.j].c })).sort((a, b) => a.d - b.d);
+        for (const m of movable) { if (subs[j] >= chans[sub[j]].P.min) break; subs[m.pk.j] -= m.pk.by[m.pk.j].c; m.pk.j = j; subs[j] += m.pk.by[j].c; }
+      }
+      if (sub.some((ci, j) => subs[j] > 0 && subs[j] < chans[ci].P.min) || subs.every((s) => s === 0)) {
+        /* une seule enseigne sous son minimum : de combien ? (pour le dire quand aucune livraison n'est possible) */
+        if (sub.length === 1 && subs[0] > 0) { const gap = chans[sub[0]].P.min - subs[0]; if (!short || covered > short.covered || (covered === short.covered && gap < short.gap)) short = { ch: chans[sub[0]].id, gap, covered, sub: subs[0] }; }
+        continue;
+      }
+      picks.forEach((pk) => { if (pk.j >= 0) { pk.id = pk.by[pk.j].id; pk.n = pk.by[pk.j].n; pk.ch = chans[sub[pk.j]].id; } else pk.id = null; delete pk.by; });
+      const total = subs.reduce((a, s, j) => a + s + (s > 0 ? feeAt(chans[sub[j]].P, s) + extra : 0), 0);
+      const orders = sub.map((ci, j) => ({ ch: chans[ci].id, sub: subs[j], fee: subs[j] > 0 ? feeAt(chans[ci].P, subs[j]) : 0 })).filter((o) => o.sub > 0);
+      if (!best || covered > best.covered || (covered === best.covered && total < best.total)) best = { covered, total, orders, picks, n: L.length };
+    }
+    return best || (short ? { short, n: L.length } : null);
   }
   /* Une ligne sans résultat qui contient plusieurs produits (« lait pâtes coca zéro », dictée sans virgule) est découpée
      en morceaux disponibles qui désignent chacun un produit, s'il y en a au moins deux ; « eau gazeuse » ou « lait
@@ -1397,16 +1475,37 @@
           `<p class="gf" style="padding-top:14px">Rayons couverts pour l'instant\u00a0: ${esc(joinEt(S.rayons.map((r) => r.name.toLowerCase())))}.</p>`,
       };
     }
+    /* la liste entière, livraison comprise : l'ensemble d'enseignes le moins cher, minimums et frais compris ; quand il
+       prend toute la liste, ses produits sont choisis d'office (« Autre choix » reste là pour en changer) */
+    let plan = W.lines.some((x) => x.pick) ? listPlan(W.lines) : null;
+    if (plan && !plan.short && plan.covered === plan.n && !W.planApplied) {
+      for (const pk of plan.picks) if (pk.id) { pk.line.pick = pk.id; pk.line.n = pk.n; }
+      W.planApplied = true;
+      plan = listPlan(W.lines);
+    }
     const found = W.lines.filter((x) => x.pick);
     let t = 0;
     found.forEach((x) => { const b = best(S.prods.get(x.pick)); if (b) t += Math.round(b.price * 100) * x.n; });
     const nArt = found.reduce((a, x) => a + x.n, 0);
+    let planHtml = "";
+    if (plan && plan.short) {
+      const s = plan.short;
+      planHtml = `<div class="plan">${ic("coin", "si")}<span><b>Encore ${eurC(s.gap)} pour une livraison</b><small>Chez ${esc(retName(s.ch).split(" ")[0])}, ${s.covered < plan.n ? s.covered + " produits sur " + plan.n + " font" : "ces produits font"} ${eurC(s.sub)} au mieux\u00a0: le minimum de commande est de ${eurC(s.sub + s.gap).replace(",00", "")}. Ajoute des produits, ou achète ce petit panier en magasin.</small></span></div>`;
+    } else if (plan) {
+      const same = plan.picks.every((pk) => !pk.id || (pk.id === pk.line.pick && pk.n === pk.line.n));
+      const where = joinEt(plan.orders.map((o) => retName(o.ch).split(" ")[0]));
+      const fees = plan.orders.reduce((a, o) => a + o.fee, 0);
+      const head = plan.covered < plan.n ? `${plan.covered} produits sur ${plan.n}, ${eurC(plan.total)} livraison comprise` : `${eurC(plan.total)} livraison comprise`;
+      const sub = `${plan.orders.length === 1 ? "Une commande" : plan.orders.length + " commandes"} chez ${esc(where)}${fees ? ", " + eurC(fees) + " de frais" : ", livraison offerte"}${plan.covered < plan.n ? ". Les autres produits ne sont vendus que par une enseigne dont la commande n'atteindrait pas le minimum d'achat." : "."}`;
+      planHtml = `<div class="plan">${ic("coin", "si")}<span><b>${same ? "Le moins cher, livraison comprise\u00a0: " + head.replace(" livraison comprise", "") : "Encore moins cher\u00a0: " + head}</b><small>${sub}${same ? " Chaque produit est pris là où l'ensemble revient le moins cher\u00a0; «\u00a0Autre choix\u00a0» pour en changer un." : " Les produits ci-dessous changent pour y arriver."}</small>${same ? "" : `<button class="btn sm" type="button" data-act="wlplan" style="margin-top:10px">Prendre ces produits</button>`}</span></div>`;
+      W.plan = plan;
+    }
     return {
       title: "Ma liste", grouped: true,
       right: `<button class="txtbtn" type="button" data-act="wledit">Modifier</button>`,
       /* le bouton principal reste visible en bas, comme le mini panier : on n'a pas à descendre toute la liste */
       dockHtml: found.length ? `<button class="mini" type="button" data-act="wladd"><span class="mn">${nArt}</span><span class="ml">Ajouter au panier</span><span class="mp">${eurC(t)}</span></button>` : "",
-      html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">${plural(found.length, "produit trouvé", "produits trouvés")} sur ${W.lines.length}${found.length ? ", environ " + eurC(t) + " au meilleur prix" : ""}</p>` +
+      html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">${plural(found.length, "produit trouvé", "produits trouvés")} sur ${W.lines.length}${found.length && !(plan && !plan.short) ? ", environ " + eurC(t) + " au meilleur prix de chaque produit" : ""}</p>` + planHtml +
         `<div class="order" style="margin-top:4px">${W.lines.map(wlRow).join("")}</div>` +
         `<p class="gf">Pour chaque ligne, le produit le moins cher au kilo ou au litre parmi les plus proches de ce que tu as écrit, dans un format courant. Touche «\u00a0Autre choix\u00a0» pour en prendre un autre.</p>` +
         (found.length ? `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wladd">${ic("plus")}Ajouter ${plural(nArt, "article", "articles")} au panier</button><button class="btn tint" type="button" data-act="wlsave">Enregistrer en liste</button></div>` : ""),
@@ -2400,6 +2499,12 @@
       case "shop": shopSheet(); break;
       case "shopck": { const k = "mag|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); break; }
       /* liste écrite ou dictée */
+      case "wlplan": {
+        const W = S.wl, plan = W && W.plan;
+        if (!plan) break;
+        for (const pk of plan.picks) if (pk.id) { pk.line.pick = pk.id; pk.line.n = pk.n; }
+        rerender(); toast("Produits choisis pour la commande la moins chère"); break;
+      }
       case "wlex": {
         const ex = EXAMPLES.find((x) => x[0] === t.dataset.k);
         if (!ex) break;
