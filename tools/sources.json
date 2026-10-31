@@ -1513,8 +1513,8 @@
    "url": "",
    "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
    "find": [
-    "conserves? de legumes|^legumes en conserve|^conserves?( |$)",
-    "tomate"
+    "conserves? de legumes|legumes en conserve|legumes et feculents|^legumes",
+    "^tomates?( |,|$)|^tomates?$|tomates? (pelees|concassees|entieres|en conserve)"
    ],
    "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
   },
@@ -1526,8 +1526,8 @@
    "url": "",
    "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
    "find": [
-    "conserves? de poisson|poissons? en conserve|^conserves?( |$)",
-    "thon"
+    "conserves? de poissons?|poissons? en conserve",
+    "^thons?( |,|$)|^thons?$"
    ],
    "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
   },
@@ -1539,7 +1539,7 @@
    "url": "",
    "from": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
    "find": [
-    "^farines?|farine,|farines,|aide.*patisserie|patisserie"
+    "sucres?, farines|^farines?|farine"
    ],
    "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
   },

@@ -67,11 +67,11 @@ for it in prev:
 
 raw, ok_pages, read_pages, rejected = [], collections.Counter(), set(), []
 for f in F:
-    r = route(f["url"])
-    if not r:
+    rs = lib.routes(f["url"])
+    if not rs:
         continue
     read_pages.add(page_key(f["url"]))
-    ret, ray = r
+    ret, rays = rs[0][0], [x[1] for x in rs]
     data = parse_json(f["text"])
     if data is None:
         continue
@@ -81,7 +81,12 @@ for f in F:
         if not isinstance(it, dict):
             continue
         price = it.get("price")
-        if not isinstance(price, (int, float)) or price <= 0 or not (it.get("name") or it.get("title")):
+        label = it.get("name") or it.get("title")
+        if not isinstance(price, (int, float)) or price <= 0 or not label:
+            continue
+        # page partagée par plusieurs rayons : le premier rayon dont le filtre accepte le produit
+        ray = rays[0] if len(rays) == 1 else next((ry for ry in rays if not lib.hors_rayon(ry, label)), None)
+        if ray is None:
             continue
         good.append({"ret": ret, "ray": ray, "src": f["url"], "ts": f["ts"], "pos": pos, **it})
     # contrôle de qualité : une lecture nettement moins complète que la précédente est écartée,

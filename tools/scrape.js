@@ -191,15 +191,25 @@ const brandOf = (retailer) => (STORES[retailer] && STORES[retailer].enseigne) ||
 // étape par étape, le premier lien du catalogue dont le texte correspond ; l'adresse trouvée est notée pour build.py.
 const plain = (t) => String(t || "").toLowerCase().replace(/œ/g, "oe").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
 async function discover(page, src) {
-  let url = src.from;
-  for (const step of [].concat(src.find)) {
+  let url = src.from, depth = 0;
+  const steps = [].concat(src.find);
+  for (const step of steps) {
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(2500);
     const re = new RegExp(step, "i");
     const links = await page.evaluate(() => [...document.querySelectorAll("a[href*='/catalogue/']")].map((a) => ({ href: a.href, text: (a.textContent || "").replace(/\s+/g, " ").trim() })));
-    const hit = links.find((l) => l.text && re.test(l.text.toLowerCase().replace(/œ/g, "oe").normalize("NFD").replace(/[\u0300-\u036f]/g, "")));
-    if (!hit) throw new Error(`aucun lien « ${step} » sur ${url}`);
+    const norm = (t) => t.toLowerCase().replace(/œ/g, "oe").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const hit = links.find((l) => l.text && re.test(norm(l.text)));
+    if (!hit) {
+      // première étape manquée : rien à lire ; étape suivante manquée : la page atteinte est lue, le filtre du rayon
+      // (RAYON_FILTRE dans tools/lib.py) garde ce qui est le produit du rayon
+      const seen = [...new Set(links.map((l) => l.text).filter(Boolean))].slice(0, 80).join(" | ");
+      if (!depth) throw new Error(`aucun lien « ${step} » sur ${url} ; liens : ${seen}`);
+      console.log(`${src.retailer} ${src.rayon} : pas de lien « ${step} » sur ${url}, page lue telle quelle`);
+      break;
+    }
     url = hit.href;
+    depth++;
     console.log(`${src.retailer} ${src.rayon} : « ${hit.text} » ${url}`);
   }
   const m = /-(B\d+)-\d+\.html/.exec(url);

@@ -132,6 +132,20 @@ def route(url):
     return (best["retailer"], best["rayon"]) if best else None
 
 
+def routes(url):
+    """Tous les (enseigne, rayon) d'une page : une même page Houra peut servir deux rayons (sucres et farines),
+    chaque produit allant au premier rayon dont le filtre (RAYON_FILTRE) l'accepte."""
+    route(url)  # charge les sources
+    exact = []
+    for p in _SOURCES:
+        if p["url"] == url and (p["retailer"], p["rayon"]) not in exact:
+            exact.append((p["retailer"], p["rayon"]))
+    if exact:
+        return exact
+    r = route(url)
+    return [r] if r else []
+
+
 # ---------------------------------------------------------------- quantities
 NUM = r'(\d+(?:[.,]\d+)?)'
 UNIT = r'(kg|g|cl|ml|litres?|l)\b'
