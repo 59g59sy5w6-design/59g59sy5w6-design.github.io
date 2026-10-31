@@ -52,5 +52,28 @@
       "url": "./#/panier",
       "description": "La répartition la moins chère"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/ecran-1.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "L'accueil : écris ta liste, Cabas trouve chaque produit au meilleur prix"
+    },
+    {
+      "src": "icons/ecran-2.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Le panier réparti entre les enseignes, livraison comprise"
+    },
+    {
+      "src": "icons/ecran-3.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Des repas à petit prix, au coût de la portion"
+    }
   ]
 }

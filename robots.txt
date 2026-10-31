@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://59g59sy5w6-design.github.io/sitemap.xml

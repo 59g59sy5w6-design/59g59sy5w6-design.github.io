@@ -500,7 +500,7 @@ body.grouped .empty .art { background: var(--card); }
 .hero .trust a { color: var(--brand-ink); font-weight: 600; }
 button.wlcta { width: calc(100% - var(--g) * 2 - var(--sl) - var(--sr)); text-align: left; }
 /* comment ça marche : les quatre étapes */
-.steps { padding: 4px calc(var(--g) + var(--sr)) 6px calc(var(--g) + var(--sl)); }
+.how { padding: 4px calc(var(--g) + var(--sr)) 6px calc(var(--g) + var(--sl)); }
 .step { display: flex; gap: 14px; padding: 12px 0; }
 .step + .step { border-top: 0.5px solid var(--sep); }
 .step .sn { flex: none; width: 30px; height: 30px; border-radius: 15px; background: var(--brand); color: var(--on-brand); font-family: var(--round); font-weight: 700; font-size: 15px; display: grid; place-items: center; margin-top: 1px; }
