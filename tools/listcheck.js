@@ -1,0 +1,246 @@
+// Vérification de Ma liste : choix habituel mémorisé (repris d'office, ou signalé quand il est plus de 15 % plus cher,
+// « Garder le mien »), quantité habituelle d'après les paniers commandés (« × 2, comme d'habitude », « Toujours 1 »),
+// usualQty sur un historique fixe, orthographe (« spagetti x2 » trouve un spaghetti, « zzzz » reste sans suggestion,
+// « Tu voulais dire… ? Oui »), et lignes libres (« Garder quand même », panier, texte partagé, liste partagée).
+// Code de sortie 1 en cas de problème. Usage : node tools/listcheck.js
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+
+const ROOT = path.resolve(__dirname, "..");
+const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml" };
+
+let chromium;
+try { ({ chromium } = require("playwright")); } catch (e) {
+  console.log("Playwright n'est pas installé ici : test sauté (npm i playwright pour l'activer).");
+  process.exit(0);
+}
+
+const server = http.createServer((req, res) => {
+  const p = decodeURIComponent(req.url.split("?")[0]);
+  const f = path.join(ROOT, p === "/" ? "index.html" : p);
+  if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }
+  res.writeHead(200, { "Content-Type": TYPES[path.extname(f)] || "application/octet-stream" });
+  fs.createReadStream(f).pipe(res);
+});
+
+const b64e = (s) => Buffer.from(s, "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, maxOrders: 3, extraCost: 0, offv: 1 };
+
+(async () => {
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  const base = `http://127.0.0.1:${server.address().port}/index.html`;
+  const problems = [];
+  const fail = (m) => problems.push(m);
+  const browser = await chromium.launch();
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
+  const page = await ctx.newPage();
+  page.on("pageerror", (e) => fail("erreur JS : " + e.message));
+  page.on("console", (m) => { if (m.type() === "error") fail("console : " + m.text()); });
+  const ready = () => page.waitForFunction(() => !document.querySelector("#view .sk") && document.querySelector("#view .wrap > *"), null, { timeout: 20000 });
+  const stored = (k) => page.evaluate((k) => JSON.parse(localStorage.getItem("cabas." + k) || "null"), k);
+  const toastText = () => page.evaluate(() => { const t = document.getElementById("toast"); return t.hidden ? "" : t.textContent; });
+  /* pose l'état, recharge Ma liste et lance la recherche des produits pour un texte donné */
+  const runList = async (text, state) => {
+    await page.evaluate((st) => { localStorage.setItem("cabas.prefs", JSON.stringify(st.prefs)); localStorage.setItem("cabas.hist", JSON.stringify(st.hist || [])); localStorage.setItem("cabas.free", JSON.stringify(st.free || {})); localStorage.setItem("cabas.basket", "{}"); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); localStorage.setItem("cabas.draft", ""); }, state);
+    await page.goto(base + "#/ecrire"); await page.reload(); await ready();
+    await page.fill("#wlIn", text);
+    await page.click('[data-act="wlgo"]');
+    await page.waitForTimeout(500);
+    return page.evaluate(() => cabasDebug().S.wl.lines.map((x) => ({ raw: x.raw, q: x.q, n: x.n, pick: x.pick, usual: !!x.usual, usualAlt: x.usualAlt || null, why: x.why || null, sugg: x.sugg || null, free: x.free || null })));
+  };
+  const overflow = async (name) => { const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth); if (over > 0) fail(`${name} : déborde de ${over} px en largeur`); };
+  try {
+    await page.goto(base + "#/ecrire"); await ready();
+    /* le produit retenu pour « lait » et, parmi les candidats, un produit nettement plus cher à l'unité (prix relevés) */
+    const L0 = await page.evaluate(() => {
+      const D = cabasDebug(), M = D.matchLine(D.parseLine("lait")), P = D.S.prods, u = (id) => { const p = P.get(id), b = D.bestReal(p); return b ? D.perUnit(p, b.price) : null; };
+      const ref = u(M.pick);
+      const dear = M.cands.map((id) => [id, u(id)]).filter(([id, v]) => id !== M.pick && v != null && ref != null && v > ref * 1.25).sort((a, b) => a[1] - b[1])[0];
+      return { pick: M.pick, dear: dear ? dear[0] : null, rayon: P.get(M.pick).r };
+    });
+    if (!L0.pick) fail("« lait » ne trouve aucun produit");
+    if (!L0.dear) fail("« lait » : aucun candidat 25 % plus cher à l'unité pour le test du choix habituel");
+
+    /* 1. choix habituel au bon prix : repris d'office, dit dans la ligne */
+    let lines = await runList("lait", { prefs: Object.assign({}, PREFS, { usual: { lait: { id: L0.pick, at: "2026-10-01" } } }) });
+    if (!lines[0] || lines[0].pick !== L0.pick || !lines[0].usual) fail("choix habituel : la ligne « lait » ne reprend pas le produit mémorisé");
+    let small = await page.locator(".item.wli small").first().textContent();
+    if (!/ton choix habituel/.test(small)) fail(`choix habituel : la ligne ne dit pas « ton choix habituel » (« ${small.trim()} »)`);
+    await overflow("Ma liste, choix habituel");
+
+    /* 2. choix habituel trop cher : le moins cher d'office, « Garder le mien » pour le reprendre */
+    if (L0.dear) {
+      lines = await runList("lait", { prefs: Object.assign({}, PREFS, { usual: { lait: { id: L0.dear, at: "2026-10-01" } } }) });
+      if (!lines[0] || lines[0].pick === L0.dear) fail("choix habituel trop cher : il est repris malgré l'écart de prix");
+      if (!lines[0] || !lines[0].usualAlt || lines[0].usualAlt.id !== L0.dear) fail("choix habituel trop cher : usualAlt absent");
+      const note = (await page.locator(".item.wli .it").first().textContent()) || "";
+      if (!/Ton habituel est à/.test(note) || !/moins cher/.test(note)) fail(`choix habituel trop cher : la ligne ne le dit pas (« ${note.trim().slice(0, 120)} »)`);
+      if (!(await page.locator('[data-act="wlusual"]').count())) fail("choix habituel trop cher : pas de « Garder le mien »");
+      else {
+        await page.click('[data-act="wlusual"]');
+        await page.waitForTimeout(300);
+        const after = await page.evaluate(() => { const x = cabasDebug().S.wl.lines[0]; return { pick: x.pick, usual: !!x.usual }; });
+        if (after.pick !== L0.dear || !after.usual) fail("« Garder le mien » ne reprend pas le produit habituel");
+      }
+    }
+
+    /* 3. quantité habituelle : « lait » à 2 dans trois paniers commandés ; « Toujours 1 » ramène à 1 */
+    const hist = [1, 2, 3].map((i) => ({ d: `2026-09-0${i}`, t: 5000, s: 300, n: 5, o: ["Houra"], items: { [L0.pick]: 2 }, when: [] }));
+    lines = await runList("lait", { prefs: PREFS, hist });
+    if (!lines[0] || lines[0].n !== 2 || lines[0].why !== "habit") fail(`quantité habituelle : n=${lines[0] && lines[0].n}, why=${lines[0] && lines[0].why}`);
+    const it = (await page.locator(".item.wli .it").first().textContent()) || "";
+    if (!/2, comme d'habitude/.test(it)) fail(`quantité habituelle : la ligne ne dit pas « × 2, comme d'habitude » (« ${it.trim().slice(0, 120)} »)`);
+    if (!(await page.locator('[data-act="wlqty1"]').count())) fail("quantité habituelle : pas de « Toujours 1 »");
+    else {
+      await page.click('[data-act="wlqty1"]');
+      await page.waitForTimeout(300);
+      const n1 = await page.evaluate(() => cabasDebug().S.wl.lines[0].n), q1 = (await stored("prefs")).qty1 || {};
+      if (n1 !== 1) fail("« Toujours 1 » ne ramène pas la quantité à 1");
+      if (q1[L0.rayon] !== 1) fail("« Toujours 1 » n'est pas mémorisé dans prefs.qty1");
+    }
+    /* une quantité écrite n'est jamais remplacée */
+    lines = await runList("3 lait", { prefs: PREFS, hist });
+    if (!lines[0] || lines[0].n !== 3 || lines[0].why) fail("une quantité écrite (« 3 lait ») est remplacée par l'habitude");
+    /* usualQty sur un historique fixe : médiane, foyer, « toujours 1 » */
+    const uq = await page.evaluate((pick) => {
+      const D = cabasDebug(), S = D.S, p = S.prods.get(pick), r = p.r;
+      const was = { hist: S.hist, foyer: S.prefs.foyer, qty1: S.prefs.qty1 };
+      const out = {};
+      S.hist = [1, 2, 3, 4].map((i) => ({ items: { [pick]: [1, 3, 3, 9][i - 1] } })); S.prefs.qty1 = {};
+      out.median = D.usualQty(p);
+      S.hist = [{ items: { [pick]: 5 } }];
+      S.prefs.foyer = 4; out.foyer4 = D.usualQty(p);
+      S.prefs.foyer = 1; out.foyer1 = D.usualQty(p);
+      S.prefs.foyer = 0; out.none = D.usualQty(p);
+      S.prefs.foyer = 6; S.prefs.qty1 = { [r]: 1 }; out.qty1 = D.usualQty(p);
+      S.hist = was.hist; S.prefs.foyer = was.foyer; S.prefs.qty1 = was.qty1;
+      return out;
+    }, L0.pick);
+    if (uq.median.n !== 3 || uq.median.why !== "habit") fail(`usualQty : médiane attendue 3 (habit), obtenu ${JSON.stringify(uq.median)}`);
+    if (uq.foyer4.n !== 2 || uq.foyer4.why !== "foyer") fail(`usualQty : 4 personnes, lait, attendu 2 (foyer), obtenu ${JSON.stringify(uq.foyer4)}`);
+    if (uq.foyer1.n !== 1) fail(`usualQty : 1 personne, attendu 1, obtenu ${JSON.stringify(uq.foyer1)}`);
+    if (uq.none.n !== 1 || uq.none.why) fail(`usualQty : sans foyer ni historique, attendu 1, obtenu ${JSON.stringify(uq.none)}`);
+    if (uq.qty1.n !== 1 || uq.qty1.why) fail(`usualQty : « toujours 1 », obtenu ${JSON.stringify(uq.qty1)}`);
+
+    /* 4. orthographe : « spagetti x2 » trouve un spaghetti ; « zzzz » reste sans produit ni suggestion ; « spagheti » propose */
+    lines = await runList("spagetti x2\nzzzz\nspagheti", { prefs: PREFS });
+    const sp = lines[0];
+    const nm = sp && sp.pick ? await page.evaluate((id) => { const p = cabasDebug().S.prods.get(id); return (p.brand + " " + p.name).toLowerCase(); }, sp.pick) : "";
+    if (!sp || !sp.pick || !/spaghetti/.test(nm) || sp.n !== 2) fail(`« spagetti x2 » : produit « ${nm} », quantité ${sp && sp.n}`);
+    const zz = lines[1];
+    if (!zz || zz.pick || zz.sugg) fail("« zzzz » devrait rester sans produit ni suggestion");
+    const miss = page.locator(".item.wli.miss").first();
+    if (!(await miss.count()) || !/Pas encore dans Cabas/.test(await miss.textContent())) fail("« zzzz » : pas de ligne « Pas encore dans Cabas »");
+    if (await miss.locator('[data-act="wlfix"]').count()) fail("« zzzz » : une suggestion est proposée");
+    const sg = lines[2];
+    if (!sg || sg.pick || sg.sugg !== "spaghetti") fail(`« spagheti » : suggestion attendue « spaghetti », obtenu ${sg && JSON.stringify(sg.sugg)}`);
+    else {
+      const fixRow = page.locator(".item.wli.miss").nth(1);
+      if (!/Tu voulais dire/.test(await fixRow.textContent())) fail("« spagheti » : la ligne ne demande pas « Tu voulais dire… ? »");
+      await fixRow.locator('[data-act="wlfix"]').click();
+      await page.waitForTimeout(400);
+      const fixed = await page.evaluate(() => { const x = cabasDebug().S.wl.lines[2]; return { pick: x.pick, raw: x.raw, text: cabasDebug().S.wl.text }; });
+      if (!fixed.pick || fixed.raw !== "spaghetti") fail(`« Oui » : la ligne corrigée ne trouve pas de produit (${JSON.stringify(fixed)})`);
+      if (!/spaghetti/.test(fixed.text) || /spagheti\b/.test(fixed.text)) fail("« Oui » : le brouillon n'est pas corrigé");
+    }
+
+    /* 5. ligne libre : « levure chimique », « Garder quand même », prix et enseigne, panier, texte partagé */
+    lines = await runList("levure chimique\nlait", { prefs: PREFS });
+    if (!lines[0] || lines[0].pick) fail("« levure chimique » trouve un produit : choisir une autre ligne absente du catalogue pour ce test");
+    const keep = page.locator('[data-act="wlfree"]');
+    if (!(await keep.count())) fail("ligne absente : pas de « Garder quand même »");
+    await keep.first().click();
+    await page.waitForTimeout(450);
+    const title = await page.evaluate(() => (document.getElementById("sheetT") || {}).textContent || "");
+    if (title !== "Ligne libre") fail(`feuille « Ligne libre » attendue, obtenu « ${title} »`);
+    if (!(await page.locator("#sheet #freeT").count()) || !(await page.locator("#sheet #freeP").count())) fail("feuille « Ligne libre » : champs texte et prix absents");
+    await page.click('#sheet [data-act="freeinc"]');
+    await page.fill("#freeP", "1,20");
+    const chip = page.locator('#sheet [data-act="freeret"][data-v="carrefour"]');
+    if (!(await chip.count())) fail("feuille « Ligne libre » : pas de pastille « Chez Carrefour »");
+    else await chip.click();
+    await page.waitForTimeout(200);
+    const qv = await page.evaluate(() => document.querySelector("#freeP").value);
+    if (qv !== "1,20") fail(`le prix tapé ne survit pas au choix de l'enseigne (« ${qv} »)`);
+    await page.click('#sheet [data-act="freeok"]');
+    await page.waitForTimeout(400);
+    const free = (await stored("free")) || {}, fids = Object.keys(free);
+    if (fids.length !== 1) fail(`cabas.free devrait avoir une entrée, en a ${fids.length}`);
+    else {
+      const f = free[fids[0]];
+      if (f.t !== "levure chimique" || f.q !== 2 || f.price !== 1.2 || f.ret !== "carrefour") fail("cabas.free : entrée inattendue " + JSON.stringify(f));
+    }
+    const frow = page.locator(".item.wli.free");
+    if (!(await frow.count())) fail("Ma liste : la ligne n'est pas devenue une ligne libre");
+    else {
+      const ft = await frow.textContent();
+      if (!/prix saisi par toi/.test(ft) || !/chez Carrefour/.test(ft) || !/Ligne libre/.test(ft)) fail(`ligne libre : texte « ${ft.trim().slice(0, 120)} »`);
+    }
+    const sub = await page.locator(".lt-sub").first().textContent();
+    if (!/1\u00a0ligne libre/.test(sub)) fail(`Ma liste : le sous-titre ne compte pas la ligne libre (« ${sub} »)`);
+    await overflow("Ma liste, ligne libre");
+    /* le panier (vide de produits) montre la section, son total à part, et le texte partagé la liste « À chercher » */
+    await page.goto(base + "#/panier"); await ready();
+    await page.waitForTimeout(300);
+    const box = page.locator(".order.freebox");
+    if (!(await box.count())) fail("panier : section « Tes lignes libres » absente");
+    else {
+      const bt = await box.textContent();
+      if (!/levure chimique/.test(bt) || !/2,40/.test(bt) || !/prix saisi par toi/.test(bt) || !/non compris dans le total/.test(bt)) fail(`panier : section lignes libres « ${bt.trim().replace(/\s+/g, " ").slice(0, 160)} »`);
+    }
+    if (!/Rien à commander en ligne/.test(await page.locator("#view").textContent())) fail("panier vide avec lignes libres : titre inattendu");
+    const ct = await page.evaluate(() => cabasDebug().cartText());
+    if (!/À chercher :/.test(ct) || !/2 x levure chimique/.test(ct) || !/prix saisi par toi/.test(ct)) fail("cartText : pas de section « À chercher »\n" + ct);
+    await overflow("panier, lignes libres");
+    /* retirer puis « Annuler » */
+    await page.click('.freebox [data-act="freedec"]');
+    await page.waitForTimeout(300);
+    await page.click('.freebox [data-act="freedec"]');
+    await page.waitForTimeout(300);
+    if (Object.keys((await stored("free")) || {}).length) fail("ligne libre : le stepper à zéro ne la retire pas");
+    if (!/Annuler/.test(await toastText())) fail("ligne libre retirée : pas d'« Annuler »");
+    await page.click("#toast button");
+    await page.waitForTimeout(400);
+    if (Object.keys((await stored("free")) || {}).length !== 1) fail("ligne libre : « Annuler » ne la remet pas");
+    /* liste partagée avec une ligne libre : affichée, puis ajoutée au panier (la quantité s'ajoute à la ligne déjà là) */
+    const link = "#/partage/" + b64e(JSON.stringify({ n: "Liste test", i: [], f: [["levure chimique", 3], ["<b>x</b>", 1]] }));
+    await page.goto(base + link); await ready();
+    await page.waitForTimeout(300);
+    const pt = await page.locator("#view").textContent();
+    if (!/Lignes libres/.test(pt) || !/levure chimique/.test(pt) || !/2\u00a0lignes libres/.test(pt)) fail("liste partagée : lignes libres absentes");
+    if (await page.locator("#view b").filter({ hasText: /^x$/ }).count()) fail("liste partagée : le texte d'une ligne libre n'est pas échappé");
+    await page.click('[data-act="addshared"]');
+    await page.waitForTimeout(300);
+    const free2 = (await stored("free")) || {};
+    const lev = Object.values(free2).find((f) => f.t === "levure chimique");
+    if (!lev || lev.q !== 4 || Object.keys(free2).length !== 2) fail("liste partagée : les lignes libres ne rejoignent pas le panier comme attendu : " + JSON.stringify(free2));
+    /* une enseigne désactivée après coup : la ligne revient à « peu importe » */
+    await page.goto(base + "#/reglages"); await ready();
+    await page.waitForTimeout(300);
+    await page.evaluate(() => document.querySelector('input[data-act="ret"][data-id="carrefour"]').click());
+    await page.waitForTimeout(300);
+    const free3 = (await stored("free")) || {};
+    if (Object.values(free3).some((f) => f.ret === "carrefour")) fail("enseigne désactivée : la ligne libre garde cette enseigne");
+    if (!/peu importe/.test(await toastText())) fail("enseigne désactivée : pas de toast « peu importe »");
+    await overflow("réglages");
+    /* « Mes choix habituels » dans les réglages ouvre la feuille et « Tout oublier » vide usual et keep */
+    await page.evaluate((pick) => { const p = JSON.parse(localStorage.getItem("cabas.prefs")); p.usual = { lait: { id: pick, at: "2026-10-01" } }; p.keep = { [pick]: 1 }; localStorage.setItem("cabas.prefs", JSON.stringify(p)); }, L0.pick);
+    await page.reload(); await ready();
+    await page.click('[data-act="usual"]');
+    await page.waitForTimeout(450);
+    const ut = await page.evaluate(() => document.querySelector("#sheet .sheet").textContent);
+    if (!/Mes choix habituels/.test(ut) || !/Marques gardées/.test(ut) || !/lait/.test(ut)) fail("feuille « Mes choix et mes marques » incomplète");
+    await page.click('[data-act="usualreset"]');
+    await page.waitForTimeout(400);
+    const pr = await stored("prefs");
+    if (Object.keys(pr.usual || {}).length || Object.keys(pr.keep || {}).length) fail("« Tout oublier » ne vide pas usual et keep");
+    if (!/Annuler/.test(await toastText())) fail("« Tout oublier » : pas d'« Annuler »");
+  } catch (e) {
+    fail("parcours interrompu : " + e.message.split("\n")[0]);
+  }
+  await browser.close();
+  server.close();
+  if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
+  console.log("Ma liste (choix habituels, quantités, orthographe, lignes libres) : aucun problème.");
+})();

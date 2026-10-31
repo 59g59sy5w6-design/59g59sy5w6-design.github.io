@@ -254,6 +254,11 @@ body.grouped .nav.solid { background: var(--nav-bg-grouped); }
 .search .clr .ic { width: 22px; height: 22px; }
 .srow { display: flex; align-items: center; gap: 8px; padding: 2px var(--gr) 10px var(--gx); }
 .srow .icbtn { flex: none; margin-right: -8px; }
+/* complétion sous la recherche : une rangée de pastilles de 44 px, qui défile sans barre */
+.sugg { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 0 var(--gr) 8px var(--gx); margin-top: -2px; }
+.sugg::-webkit-scrollbar { display: none; }
+.sugg .chip { max-width: 72vw; }
+.sugg .chip > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .field { display: block; padding: 0 var(--g) 12px; }
 .field > span, .field > label { display: block; margin-bottom: 6px; font-size: 0.9375rem; font-weight: 600; }
 .field .in { display: flex; align-items: center; min-height: var(--tap-lg); padding: 0 14px; border-radius: var(--r-m); background: var(--group); box-shadow: inset 0 0 0 1px var(--ink-3); transition: box-shadow var(--t-1); }
@@ -458,7 +463,10 @@ a.row:active, button.row:active { background: var(--fill); }
 .ext { width: 20px; height: 20px; color: var(--ink-3); stroke-width: 2.2; flex: none; }
 .row .ext:last-child { margin-left: auto; }
 .order, .wlist { container-type: inline-size; }
-.item { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px 12px; align-items: center; padding: 10px 16px; }
+.item { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px 12px; align-items: center; padding: 10px 16px; touch-action: pan-y; transition: transform var(--t-2) var(--e-out); }
+/* glisser vers la gauche révèle « Retirer » (96 px, rouge de suppression), clipé par .order tant que la ligne n'a pas glissé */
+.item.swipe { transform: translateX(-96px); }
+.item .rm { position: absolute; top: 0; bottom: 0; right: -96px; width: 96px; display: grid; place-items: center; background: var(--promo-fill); color: var(--on-promo); font-size: 0.9375rem; font-weight: 600; }
 .item::before { content: ""; position: absolute; top: 0; left: 84px; right: 0; height: var(--hair); background: var(--sep); }
 .order > .item:first-child::before { display: none; }
 .item .thumb { position: relative; width: 56px; height: 56px; border-radius: var(--r-s); background: var(--shelf); }
@@ -470,10 +478,13 @@ a.row:active, button.row:active { background: var(--fill); }
 .item .ir { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 .item .ir .lp { font: 600 1.0625rem/1 var(--round); }
 .item .stepper { position: static; box-shadow: none; }
-.item .act { align-self: flex-start; margin: 2px 0 -6px -6px; }
+.item .acts { display: flex; flex-wrap: wrap; gap: 0 8px; margin: -2px 0 -8px -6px; }
+.item .acts .act { margin: 0; }
 .item.wli .wq { display: block; color: var(--ink-2); margin-bottom: 1px; }
-.item.miss .thumb.q { display: grid; place-items: center; color: var(--ink-3); }
-.item.miss .thumb.q .ic { width: 22px; height: 22px; }
+.item .thumb.q { display: grid; place-items: center; color: var(--ink-3); }
+.item .thumb.q .ic { width: 22px; height: 22px; }
+.freebox .of .ln { padding-top: 8px; }
+.frow { padding-left: var(--g); padding-right: var(--g); min-height: 56px; }
 .item.miss .it b { font-weight: 400; }
 @container (max-width: 360px) { .item { grid-template-columns: 56px minmax(0, 1fr); } .item .ir { grid-column: 2; flex-direction: row; justify-content: space-between; align-items: center; } }
 @media (min-width: 960px) { .item { grid-template-columns: 56px minmax(0, 28rem) auto; justify-content: start; } }
@@ -559,6 +570,7 @@ a.hcard:active, button.hcard:active { background: var(--fill); }
 button.mini { width: 100%; text-align: left; }
 .mini .mn { min-width: 36px; height: 36px; padding: 0 8px; border-radius: var(--r-s); background: var(--mini-count); display: grid; place-items: center; font: 700 1rem/1 var(--round); }
 .mini .ml { flex: 1; font-size: var(--chrome-fs); font-weight: 600; }
+.mini .ml small { display: block; font-size: 0.875rem; font-weight: 500; opacity: 0.9; }
 .mini .mp { font: 700 1.125rem/1 var(--round); }
 .buybar { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: var(--r-l); background: var(--nav-bg); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); box-shadow: var(--sh-2), 0 0 0 1px var(--edge); }
 .buybar .btn { flex: 1; min-height: var(--tap-lg); }
