@@ -316,6 +316,7 @@ body:not(.grouped) .group { background: var(--group); }
 .btn .ic { width: 19px; height: 19px; stroke-width: 2.2; }
 .btn.tint { background: var(--brand-tint); color: var(--brand-ink); }
 .btn.tint:active { background: var(--brand-tint-press); }
+.btn.tint[aria-pressed="true"] { background: var(--brand); color: #fff; }
 .btn.plain { background: var(--fill); color: var(--ink); }
 .btn.sm { width: auto; height: 34px; border-radius: 17px; font-size: 15px; padding: 0 14px; }
 .btn .sub { font-weight: 500; opacity: 0.85; font-family: var(--round); }

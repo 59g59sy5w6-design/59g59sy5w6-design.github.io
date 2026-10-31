@@ -1140,6 +1140,7 @@
     S.cur = h;
     const r = parse(h);
     if (S.route.name === "scan" && r.name !== "scan") stopScan();
+    if (rec) micStop();
     S.route = r;
     const V = (VIEWS[r.name] || VIEWS.home)(r) || notFound();
     lastV = V;
@@ -1470,8 +1471,9 @@
         title: "Ma liste", grouped: true,
         html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">Écris ou dicte tes courses, Cabas trouve chaque produit au meilleur prix.</p>` +
           `<div class="pad"><textarea id="wlIn" class="wl" rows="7" placeholder="lait&#10;2 paquets de pâtes&#10;coca zéro x3&#10;papier toilette" aria-label="Ta liste de courses" autocapitalize="off" spellcheck="true">${esc(W.text)}</textarea></div>` +
-          `<p class="gf">Une ligne par produit, ou sépare-les par des virgules. Pour dicter, touche le micro du clavier. Une quantité au début (2 paquets de pâtes) ou à la fin (coca zéro x3), un poids ou un volume (1 kg de café) sont compris.</p>` +
-          `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wlgo">Trouver les produits</button></div>` +
+          `<p class="gf">Une ligne par produit, ou sépare-les par des virgules. Une quantité au début (2 paquets de pâtes) ou à la fin (coca zéro x3), un poids ou un volume (1 kg de café) sont compris.</p>` +
+          `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wlgo">Trouver les produits</button>${speechOK() ? `<button class="btn tint" type="button" data-act="wlmic" id="wlMic" aria-pressed="false">${ic("mic")}Dicter ma liste</button>` : ""}</div>` +
+          (speechOK() ? `<p class="gf" id="wlMicNote">Dis tes produits en marquant une pause entre chacun\u00a0: la dictée passe par le service de reconnaissance vocale de ton téléphone.</p>` : "") +
           `<p class="gf" style="padding-top:14px">Rayons couverts pour l'instant\u00a0: ${esc(joinEt(S.rayons.map((r) => r.name.toLowerCase())))}.</p>`,
       };
     }
@@ -1511,6 +1513,37 @@
         (found.length ? `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wladd">${ic("plus")}Ajouter ${plural(nArt, "article", "articles")} au panier</button><button class="btn tint" type="button" data-act="wlsave">Enregistrer en liste</button></div>` : ""),
     };
   };
+  /* ---------- dictée (Web Speech API, quand le navigateur la propose) ---------- */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const speechOK = () => !!SR;
+  let rec = null;
+  function micStop() {
+    if (rec) { try { rec.stop(); } catch (e) { /* déjà arrêtée */ } rec = null; }
+    const b = $("#wlMic"); if (b) { b.setAttribute("aria-pressed", "false"); b.innerHTML = `${ic("mic")}Dicter ma liste`; }
+  }
+  function micStart() {
+    if (!SR) return;
+    if (rec) { micStop(); return; }
+    const ta = $("#wlIn"); if (!ta) return;
+    let base = ta.value.replace(/\s+$/, "");
+    const r = new SR();
+    r.lang = "fr-FR"; r.continuous = true; r.interimResults = true;
+    let finals = [];
+    r.onresult = (e) => {
+      let interim = "";
+      finals = [];
+      for (let i = 0; i < e.results.length; i++) { const t = (e.results[i][0].transcript || "").trim(); if (!t) continue; if (e.results[i].isFinal) finals.push(t); else interim += (interim ? " " : "") + t; }
+      const said = finals.concat(interim ? [interim] : []).join("\n");
+      ta.value = (base ? base + "\n" : "") + said;
+      if (S.wl) S.wl.text = ta.value;
+      ta.scrollTop = ta.scrollHeight;
+    };
+    r.onerror = (e) => { micStop(); toast(e && e.error === "not-allowed" ? "Cabas n'a pas accès au micro. Autorise-le dans les réglages du téléphone, ou écris ta liste." : "La dictée s'est interrompue, tu peux continuer au clavier."); };
+    r.onend = () => { if (rec === r) { rec = null; micStop(); store.set("draft", ta.value); } };
+    try { r.start(); } catch (e) { toast("La dictée n'est pas disponible ici."); return; }
+    rec = r;
+    const b = $("#wlMic"); if (b) { b.setAttribute("aria-pressed", "true"); b.innerHTML = `${ic("mic")}J'ai fini`; }
+  }
   function wlAltSheet(i) {
     const x = S.wl.lines[i];
     if (!x) return;
@@ -2513,7 +2546,9 @@
         push("#/ecrire");
         break;
       }
+      case "wlmic": micStart(); break;
       case "wlgo": {
+        micStop();
         const tx = ($("#wlIn") || {}).value || "";
         S.wl = { text: tx, lines: readList(tx) };
         store.set("draft", tx);
