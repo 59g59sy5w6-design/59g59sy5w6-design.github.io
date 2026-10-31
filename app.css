@@ -24,6 +24,8 @@
   --toast-bg: #1c1c1e;
   --toast-link: #7ee2a8;
   --edge: rgba(0, 0, 0, 0.06);
+  /* contour des commandes : invisible, sauf en contraste renforcé */
+  --ctl-line: transparent;
   /* encres : --ink-2 tient 7:1 sur blanc, --group, --shelf et --brand-tint ; --ink-3 jamais pour un texte */
   --ink: #111114;
   --ink-2: #4c4c52;
@@ -37,7 +39,7 @@
   --brand-tint-press: #d2eadc;
   --on-brand: #ffffff;
   --sw-on: var(--brand);
-  --sw-off: #c7c7cc;
+  --sw-off: #8a8a90;
   --mini-count: #085f3a;
   --focus: #0a7a4a;
   /* jaune : le prix le plus bas, rien d'autre */
@@ -84,9 +86,12 @@
   --badge: var(--promo-fill); --gray: var(--tab-off); --link: var(--brand-ink); --av: var(--mono-bg); --glass: var(--nav-bg);
   --note-bg: var(--warn-bg); --note-ink: var(--warn); --fill-2: var(--fill-press);
 }
-/* ---------- mode sombre ---------- */
+/* ---------- mode sombre ----------
+   Thème choisi dans les réglages (auto, clair, sombre) : boot.js pose html[data-theme] avant le premier rendu, d'après
+   le réglage ou celui du téléphone. Le bloc dans @media sert de secours tant que le script n'a pas tourné ; il est
+   identique au bloc html[data-theme="dark"] (tools/contrastcheck.py le vérifie). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --paper: #000000; --card: #1c1c1e; --group: #000000;
     --shelf: #2c2c2e; --fill: #2c2c2e; --fill-press: #3a3a3c; --sep: #3a3a3c;
     --nav-bg: rgba(28, 28, 30, 0.88); --nav-bg-grouped: rgba(0, 0, 0, 0.88);
@@ -96,10 +101,10 @@
     --ink: #f5f5f7; --ink-2: #b9b9c0; --ink-3: #8e8e95;
     --brand: #0d7d4b; --brand-press: #0a6a3f; --brand-ink: #62d99b;
     --brand-tint: #123a27; --brand-tint-press: #1a4d34;
-    --sw-on: var(--brand); --sw-off: #48484a;
+    --sw-on: var(--brand); --sw-off: #6c6c72;
     --mini-count: #0c683e; --focus: #62d99b;
     --sticker: #ffd60a; --sticker-ink: #111114;
-    --promo: #ff6b6b; --promo-fill: #c8102e;
+    --promo: #ff6b6b; --promo-fill: #d61a38;
     --warn: #ffb340; --warn-bg: #3a2d08;
     --tab-off: #a0a0a8;
     --mono-bg: #3a3a3c; --mono-ink: #f5f5f7;
@@ -108,8 +113,54 @@
     --sh-3: 0 -1px 0 var(--edge), 0 -8px 32px rgba(0, 0, 0, 0.7);
   }
 }
-@media (prefers-contrast: more) { :root { --ink-2: #3f3f46; --ink-3: #5c5c63; --sep: #9a9aa0; } }
-@media (prefers-color-scheme: dark) and (prefers-contrast: more) { :root { --ink-2: #d4d4da; --ink-3: #a8a8b0; --sep: #6a6a70; } }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #000000; --card: #1c1c1e; --group: #000000;
+  --shelf: #2c2c2e; --fill: #2c2c2e; --fill-press: #3a3a3c; --sep: #3a3a3c;
+  --nav-bg: rgba(28, 28, 30, 0.88); --nav-bg-grouped: rgba(0, 0, 0, 0.88);
+  --bar-bg: rgba(22, 22, 24, 0.94); --tab-line: rgba(255, 255, 255, 0.12);
+  --sheet-bg: #1c1c1e; --scrim: rgba(0, 0, 0, 0.58); --toast-bg: #3a3a3c; --toast-link: #7ee2a8;
+  --edge: rgba(255, 255, 255, 0.08);
+  --ink: #f5f5f7; --ink-2: #b9b9c0; --ink-3: #8e8e95;
+  --brand: #0d7d4b; --brand-press: #0a6a3f; --brand-ink: #62d99b;
+  --brand-tint: #123a27; --brand-tint-press: #1a4d34;
+  --sw-on: var(--brand); --sw-off: #6c6c72;
+  --mini-count: #0c683e; --focus: #62d99b;
+  --sticker: #ffd60a; --sticker-ink: #111114;
+  --promo: #ff6b6b; --promo-fill: #d61a38;
+  --warn: #ffb340; --warn-bg: #3a2d08;
+  --tab-off: #a0a0a8;
+  --mono-bg: #3a3a3c; --mono-ink: #f5f5f7;
+  --sh-1: 0 0 0 1px var(--edge), 0 2px 8px rgba(0, 0, 0, 0.5);
+  --sh-2: 0 0 0 1px var(--edge), 0 8px 24px rgba(0, 0, 0, 0.6);
+  --sh-3: 0 -1px 0 var(--edge), 0 -8px 32px rgba(0, 0, 0, 0.7);
+}
+/* ---------- contraste renforcé (réglage, ou « Augmenter le contraste » du téléphone) ----------
+   Texte à 7:1 au moins sur tous les fonds, séparateurs et contours des commandes à 3:1 ; en sombre, les boutons pleins
+   passent au vert clair avec un texte foncé, seul moyen de tenir 7:1 pour le texte et 3:1 contre le fond noir. */
+:root[data-contrast="more"] {
+  --ink: #000000; --ink-2: #2c2c31; --ink-3: #55555c;
+  --sep: #6e6e76; --ctl-line: #55555c;
+  --brand: #075c37; --brand-press: #054a2c; --brand-ink: #04462a; --brand-tint: #e3f2e9; --brand-tint-press: #d2eadc;
+  --on-brand: #ffffff; --mini-count: #043b23; --focus: #04462a;
+  --sw-on: var(--brand); --sw-off: #6e6e76;
+  --promo: #9e0c25; --promo-fill: #9e0c25; --on-promo: #ffffff;
+  --warn: #6b3c00; --warn-bg: #fff4e0;
+  --tab-off: #3a3a40; --mono-bg: #e9e9ee; --mono-ink: #000000;
+  --toast-bg: #1c1c1e; --toast-link: #8ff0be;
+}
+:root[data-theme="dark"][data-contrast="more"] {
+  --ink: #ffffff; --ink-2: #dcdce2; --ink-3: #a8a8b0;
+  --sep: #8e8e95; --ctl-line: #a8a8b0;
+  --brand: #7ee2a8; --brand-press: #5fd492; --brand-ink: #8ff0be; --brand-tint: #0f3322; --brand-tint-press: #16452e;
+  --on-brand: #00160b; --mini-count: #5fd492; --focus: #8ff0be;
+  --sw-on: var(--brand); --sw-off: #8e8e95;
+  --promo: #ff9e9e; --promo-fill: #ffb3b3; --on-promo: #2a0006;
+  --warn: #ffc56b; --warn-bg: #3a2d08;
+  --tab-off: #d0d0d6; --mono-bg: #3a3a3c; --mono-ink: #ffffff;
+  --toast-bg: #3a3a3c; --toast-link: #8ff0be;
+}
 @media (forced-colors: active) { :focus-visible { outline: 3px solid Highlight; } .btn, .chip, .stepper, .box, .seg button, .add, .icbtn { border: 1px solid ButtonText; } }
 @media (min-width: 600px) { :root { --g: 24px; } }
 @media (min-width: 960px) { :root { --g: 32px; --side: 248px; --tab: 0px; } }
@@ -680,7 +731,8 @@ body.grouped .empty .art { background: var(--card); }
 .sheet-f .btn { flex: 1; }
 .sheet-f .btn.sm, .sheet-f .btn.ghost { flex: 0 0 auto; }
 .sheet .group { background: var(--group); }
-@media (prefers-color-scheme: dark) { .sheet .group { background: var(--fill); } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sheet .group { background: var(--fill); } }
+:root[data-theme="dark"] .sheet .group { background: var(--fill); }
 .sheet .gh { padding-top: 18px; }
 .sheet .pad { padding-left: var(--g); padding-right: var(--g); }
 @keyframes up { from { transform: translateY(100%); } }
@@ -929,3 +981,78 @@ button.gt { width: 100%; text-align: left; padding: 0; }
   .fillp { grid-template-columns: 13rem minmax(0, 1fr); align-items: start; gap: 24px; padding: 24px; }
   .fillp .fimg { width: 100%; }
 }
+
+/* ---------- Demande à Cabas : ce qui est compris, la réponse, une liste composée, les frais ---------- */
+.banner.ask { margin-top: 4px; }
+.banner.ask b { margin-bottom: 0; }
+.gf.ask { padding-top: 0; padding-bottom: 10px; }
+.tagset.askex .chip { height: auto; min-height: var(--tap); padding-top: 8px; padding-bottom: 8px; white-space: normal; text-align: left; line-height: 1.25; }
+.hcard.ans { align-items: flex-start; }
+.hcard.ans > .thumb { position: relative; width: 56px; height: 56px; border-radius: var(--r-s); background: var(--shelf); flex: none; }
+.hcard.ans > .thumb img { position: absolute; inset: 4%; width: 92%; height: 92%; }
+.hcard .lab { color: var(--brand-ink); font-weight: 600; margin: 0 0 2px; }
+.hcard.ans .btn.sm { margin-top: 10px; }
+.hcard.compose, .hcard.fee { gap: 4px; }
+.hcard.fee small + small { margin-top: 6px; }
+.hcard.fee .fn { display: inline; font-size: inherit; line-height: inherit; }
+.hcard.fee .btn.sm, .hcard.compose .btns { margin-top: 12px; }
+.hcard.compose .hint, .hcard.fee .hint { margin-top: 8px; color: var(--ink-2); }
+.hcard.compose .bud { margin-top: 12px; }
+.crows { display: grid; width: 100%; margin-top: 10px; border-radius: var(--r-s); background: var(--group); }
+.crow { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 56px; padding: 8px 12px; color: var(--ink); text-decoration: none; }
+.crow + .crow { box-shadow: 0 -1px 0 var(--sep); }
+.crow .thumb { position: relative; width: 40px; height: 40px; border-radius: var(--r-s); background: var(--shelf); }
+.crow .thumb img { position: absolute; inset: 4%; width: 92%; height: 92%; }
+.crow .ct { min-width: 0; }
+.crow .ct b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.9375rem; font-weight: 500; line-height: 1.3; }
+.crow .ct small { display: block; margin-top: 1px; }
+.crow .cp { font: 600 0.9375rem/1 var(--round); font-variant-numeric: tabular-nums; }
+.gh.here { color: var(--brand-ink); }
+.gh[id^="frais-"] { scroll-margin-top: calc(var(--st) + var(--nav) + 8px); }
+.group.gap { margin-bottom: 12px; }
+#ftab .group { margin-top: 12px; }
+.sheet .tagset + .gf { padding-top: 10px; }
+
+/* ---------- contraste renforcé : contours des commandes sans bordure, liens d'action soulignés, focus épais ---------- */
+html[data-contrast="more"] :is(.chip, .btn.tint, .btn.plain, .btn.ghost, .search, .stepper.soft, .seg, .tsize button, .add, .field .in, .shelf input, .hcard, .deal, .banner, .sum .alt, .bud) { box-shadow: inset 0 0 0 1.5px var(--ctl-line); }
+html[data-contrast="more"] .group { box-shadow: 0 0 0 1.5px var(--ctl-line); }
+html[data-contrast="more"] .field.err .in { box-shadow: inset 0 0 0 2.5px var(--warn); }
+html[data-contrast="more"] :is(.act, .row.link, .txtbtn, .back span) { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+html[data-contrast="more"] :focus-visible { outline-width: 4px; }
+html[data-contrast="more"] .tab span, html[data-contrast="more"] .row .rt small, html[data-contrast="more"] .gf { font-weight: 500; }
+html[data-contrast="more"] .prog { box-shadow: inset 0 0 0 1px var(--ctl-line); }
+
+/* ---------- mode confort : cibles de 60 px, plus d'espace, une colonne, moins d'éléments par écran ----------
+   html[data-simple], posé par boot.js avant le premier rendu ; les cibles suivent --tap et --tap-lg */
+html[data-simple] { --tap: 60px; --tap-lg: 60px; --gap-card: 16px; --gap-section: 40px; --nav: 64px; --tab: 68px; --dock-h: 76px; }
+@media (min-width: 960px) { html[data-simple] { --tab: 0px; } }
+html[data-simple] :is(.row, .opt) { min-height: 64px; padding-top: 14px; padding-bottom: 14px; }
+html[data-simple] .row.th { min-height: 72px; }
+html[data-simple] .mini { min-height: 64px; }
+html[data-simple] .chip { min-height: 60px; padding: 0 20px; font-size: 1rem; }
+html[data-simple] .chips { flex-wrap: wrap; overflow: visible; position: static; -webkit-mask-image: none; mask-image: none; }
+html[data-simple] .act { min-height: 60px; margin: -12px 0; font-size: 1rem; }
+html[data-simple] .item .acts .act, html[data-simple] .row .acts .act, html[data-simple] .fnav .act, html[data-simple] .fend-acts .act, html[data-simple] .sh .act { margin: 0; }
+html[data-simple] :is(.gf, .foot, .sn, .hint, .trust, .prose) a { padding: 20px 2px; margin: -20px -2px; }
+html[data-simple] .grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+html[data-simple] .grid .tile, html[data-simple] .rail .tile { aspect-ratio: auto; height: 11rem; }
+html[data-simple] .tile img { left: 50%; width: auto; max-width: 86%; transform: translateX(-50%); object-fit: contain; }
+html[data-simple] .card:active .tile img { transform: translateX(-50%) scale(0.97); }
+html[data-simple] .rail { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); grid-auto-columns: auto; overflow: visible; scroll-snap-type: none; -webkit-mask-image: none; mask-image: none; gap: 20px; }
+html[data-simple] .rail > :nth-child(n + 5) { display: none; }
+html[data-simple] .cats, html[data-simple] .cats.big { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 14px; }
+html[data-simple] .item { grid-template-columns: 64px minmax(0, 1fr); gap: 10px 14px; padding: 14px 16px; }
+html[data-simple] .item .thumb { width: 64px; height: 64px; }
+html[data-simple] .item .ir { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
+html[data-simple] .item::before { left: 16px; }
+html[data-simple] .stepper { min-width: 180px; }
+html[data-simple] .sw { width: 64px; height: 38px; }
+html[data-simple] .sw input { inset: -11px 0; }
+html[data-simple] .sw span { border-radius: 19px; }
+html[data-simple] .sw span::after { width: 34px; height: 34px; }
+html[data-simple] .sw input:checked + span::after { transform: translateX(26px); }
+html[data-simple] .box { width: 30px; height: 30px; }
+html[data-simple] .btns { gap: 14px; }
+html[data-simple] .hcard { padding: 18px 16px; margin-top: 12px; }
+html[data-simple] .tab .ic { width: 28px; height: 28px; }
+html[data-simple] .tab span { font-size: 0.875rem; }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-QH8zL2d2tEAlR+JaygsXneLMycTR2Lg72ZHpEgLEnL0='; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' https://world.openfoodfacts.org; media-src 'self' blob: mediastream:; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-joh3fuKwNQC87yS+sgIUimcf8saYuNfmwGvEOkcrrUA='; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' https://world.openfoodfacts.org; media-src 'self' blob: mediastream:; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Cabas, tes courses au prix le plus bas</title>
 <meta name="description" content="Compare les prix de tes courses chez Monoprix, Carrefour, Houra et Auchan, et trouve où commander pour payer le moins cher, livraison comprise. Gratuit, sans compte.">
@@ -35,10 +35,9 @@
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="stylesheet" href="app.css">
+<script src="boot.js"></script>
 <script>/* premier passage, sans service worker : les prix se téléchargent pendant que l'appli se charge */
-if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) { const l = document.createElement("link"); l.rel = "preload"; l.as = "fetch"; l.href = "data/catalog.json"; l.crossOrigin = "anonymous"; document.head.appendChild(l); }
-/* taille du texte choisie : posée avant le premier rendu pour que le squelette ne saute pas */
-try { const z = String((JSON.parse(localStorage.getItem("cabas.prefs") || "{}") || {}).zoom || "1"), v = { "0.8": "0.82", "0.88": "0.9" }[z] || z; if (["0.82", "0.9", "1.12", "1.25"].includes(v)) document.documentElement.dataset.text = v; } catch (e) { /* sans réglage */ }</script>
+if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) { const l = document.createElement("link"); l.rel = "preload"; l.as = "fetch"; l.href = "data/catalog.json"; l.crossOrigin = "anonymous"; document.head.appendChild(l); }</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
