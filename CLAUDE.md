@@ -40,7 +40,8 @@ Lancer en local : `python3 -m http.server 8000` à la racine, puis ouvrir http:/
 - Uniquement des prix réellement relevés sur les sites des enseignes, jamais estimés. Chaque prix garde sa date. Seule exception, à la demande du propriétaire de l'appli : E.Leclerc, dont le catalogue ne se lit pas sans contourner sa protection anti-robot, a des prix simulés (réglage `simulation` de `data/retailers.json`, calcul dans `tools/make_catalog.py`). Chaque offre simulée porte `sim` et l'appli l'affiche partout comme telle (« Simulé », « Prix simulé, pas relevé », « Estimation avec des prix simulés ») ; elle n'entre pas dans les écarts de prix de l'accueil.
 - Aucune donnée personnelle dans le dépôt (il est public) : pas d'adresse, pas de code postal, pas de nom.
 - Pas de logos ni de visuels de marque. Les noms d'enseignes et de marques s'écrivent en texte.
-- À chaque changement de fichiers servis, lancer `python3 tools/bump.py` pour changer `VERSION` dans `sw.js`, sinon les téléphones gardent l'ancienne version en cache.
+- À chaque changement de fichiers servis, lancer `python3 tools/bump.py` pour changer `VERSION` dans `sw.js`, sinon les téléphones gardent l'ancienne version en cache. Il met aussi à jour l'empreinte du seul script en ligne de `index.html` (préchargement du catalogue) dans la règle de contenu.
+- Sécurité : `index.html` porte une règle de contenu (`Content-Security-Policy` en balise meta) qui n'autorise que les scripts du site (plus le script en ligne, par son empreinte), les connexions au site et à l'API d'Open Food Facts, les images du site et dessinées (`blob:`, `data:`), la caméra (`mediastream:`), et rien d'autre ; `referrer` strict. Tout texte venant des données ou de l'utilisateur passe par `esc()` avant `innerHTML` ; les liens partagés (`#/partage`) ne gardent que des identifiants connus et des quantités bornées ; les liens externes portent `rel="noopener"`. Aucun script tiers, aucun suivi.
 
 ## Mettre à jour les prix
 
