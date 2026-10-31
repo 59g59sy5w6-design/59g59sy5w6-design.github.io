@@ -1,6 +1,7 @@
 // Test rapide de l'appli après une mise à jour : sert le dépôt en local, ouvre les écrans principaux
 // au format iPhone (accueil, Rayons par univers, un rayon par univers, fiche produit avec ses détails, panier, Remplir
-// mes paniers, Recommander, recherche, guide des frais, À propos) et vérifie qu'ils s'affichent sans erreur ; puis
+// mes paniers, Recommander, recherche, guide des frais, À propos, mode magasin, Ce qui a bougé, listes par profil, lien
+// de transfert abîmé) et vérifie qu'ils s'affichent sans erreur ; puis
 // l'affichage (thème, contraste renforcé, mode confort et taille du texte posés avant le premier rendu, cibles de 60 px
 // en confort) et le bon Auchan d'après le code postal. Code de sortie 1 en cas de problème.
 // Usage : node tools/smoke.js
@@ -105,6 +106,17 @@ const server = http.createServer((req, res) => {
     await check("frais", "#ftab .row", 3);
     await check("frais", "#view .banner", 1);
     await check("frais", 'h2[id^="frais-"]', 3);
+    /* mode magasin (le panier rangé par rayon), ce qui a bougé, listes toutes faites par profil, lien de transfert abîmé */
+    await page.goto(base + "#/magasin"); await ready();
+    await check("magasin", "#view .gi.big", 1);
+    await page.goto(base + "#/mouvements"); await ready();
+    await check("mouvements", "#view h1", 1);
+    await page.goto(base + "#/listes"); await ready();
+    await page.waitForSelector("#profs [data-act=prof]", { timeout: 8000 }).catch(() => {});
+    await check("listes par profil", "#profs [data-act=prof]", 5);
+    await page.goto(base + "#/transfert/jabc"); await ready(); await page.waitForTimeout(300);
+    await check("transfert abîmé", "#view .empty", 1);
+    if (!/"data\/listes\.json"/.test(fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"))) problems.push("sw.js : data/listes.json absent de DATA");
 
     /* le bon Auchan d'après le code postal (données publiques de data/retailers.json, code postal sur le téléphone) */
     const ap = await page.evaluate(() => { const D = cabasDebug(); return ["94120", "75015", "75116", "92100", "93100", "78000", "91300", "13001", "123"].map((z) => { const a = D.autoPick(z, "auchan"); return a ? a.id + (a.exact ? "" : "~") : null; }); });

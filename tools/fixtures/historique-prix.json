@@ -1,0 +1,10 @@
+{
+  "note": "Historique de prix inventé pour tools/histcheck.js : pour chaque produit, des points [écart en jours avec le jour du test, écart en euros avec le prix relevé d'aujourd'hui] ; le test les convertit en data/history.json (dates et prix) pour l'enseigne où le produit est le moins cher aujourd'hui, ou pour l'enseigne nommée. Aucune donnée personnelle, aucun prix réel.",
+  "offres": [
+    { "k": "baisse", "id": "candia-lait-1-2-ecreme-6-x-1-l", "mine": true, "pts": [[-20, 0.6], [-3, 0]] },
+    { "k": "hausse", "id": "barilla-pates-capellini-n-1-500-g", "mine": true, "pts": [[-15, -0.4], [-2, 0]] },
+    { "k": "catalogue", "id": "x-tra-lessive-liquide-evasion-bora-bora-1-98-l", "mine": false, "pts": [[-10, 1.5], [-1, 0]] },
+    { "k": "infime", "id": "entremont-emmental-rape-francais-160-g", "mine": true, "pts": [[-6, 0.05], [-1, 0]] },
+    { "k": "simule", "id": "candia-lait-1-2-ecreme-6-x-1-l", "rid": "leclerc-livraison", "mine": true, "pts": [[-5, 5.0], [-1, 0]] }
+  ]
+}

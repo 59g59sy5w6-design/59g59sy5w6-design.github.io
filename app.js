@@ -79,8 +79,10 @@
   /* theme : « auto » (le téléphone), « light », « dark » ; contrast : null suit le téléphone, sinon le réglage ; simple :
      mode confort ; pickManual : groupes d'enseigne (Auchan) dont le point a été choisi à la main, pas d'après le code postal ;
      pin : produit épinglé à une enseigne ({ id: groupe }) ; ban : produit exclu d'enseignes ({ id: { groupe: true } }) ;
-     budgetMode : budget « panier » (chaque panier) ou « mois » (les paniers commandés du mois) */
-  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, maxOrders: 3, extraCost: 0, manualCk: false, badge: true, theme: "auto", contrast: null, simple: false, budgetMode: "panier" };
+     budgetMode : budget « panier » (chaque panier) ou « mois » (les paniers commandés du mois) ; shopDay : jour des
+     courses (0 dimanche à 6 samedi, null d'après les commandes) ; voice : lecture à voix haute « slow » ou « normal » ;
+     wake : écran gardé allumé en mode magasin */
+  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, maxOrders: 3, extraCost: 0, manualCk: false, badge: true, theme: "auto", contrast: null, simple: false, budgetMode: "panier", shopDay: null, voice: "normal", wake: true };
   const ROOTS = { accueil: "#/", rayons: "#/rayons", recherche: "#/recherche", listes: "#/listes", panier: "#/panier" };
   const S = {
     ready: false, failed: false,
@@ -1397,7 +1399,7 @@
     const ex = examples().map(([k, l]) => `<button class="chip" type="button" data-act="wlex" data-k="${k}">${esc(l)}</button>`).join("");
     return `<div class="hero"><h1>Tes courses au prix le plus bas, livraison comprise.</h1>` +
       `<p class="lede">Les mêmes produits chez Monoprix, Carrefour, Houra et Auchan, aux prix relevés sur leurs sites. Écris ta liste\u00a0: Cabas trouve chaque produit au meilleur prix et répartit tes commandes, frais compris.</p>` +
-      `<a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><p class="try">Ou essaie avec une liste toute faite</p><div class="exrow">${ex}</div>` +
+      `<a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><p class="try">Ou essaie avec une liste toute faite</p><div class="exrow">${ex}<a class="chip" href="#/listes">Par profil${ic("chev")}</a></div>` +
       `<p class="trust">Gratuit, sans compte, sans publicité. En Île-de-France pour l'instant. <a href="#/comment">Comment ça marche</a></p></div>`;
   }
   VIEWS.home = () => {
@@ -1407,6 +1409,16 @@
     const tiles = top.map((r) => catTile(r)).join("") + `<a class="cat" href="#/rayons"><span class="ct all">${ic("grid")}</span><span>Tous les rayons</span></a>`;
     const sg = suggestion();
     const first = newcomer();
+    /* le jour des courses, la carte du panier de la semaine remplace « Tes prochaines courses », « À racheter bientôt »
+       et « Tes habitudes » ;
+       trois rangées au plus : les plus personnelles d'abord (baisses de tes produits, à racheter, habitudes), puis les
+       écarts de prix, les repas et les offres */
+    const prep = first ? null : prepNow();
+    const upper = [], lower = [];
+    for (const f of [dropsRail, prep ? () => "" : dueRail, prep ? () => "" : habitsRail, () => (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals" role="region" aria-label="Même produit, pas le même prix">${ds.map(dealCard).join("")}</div>` : "")]) { if (upper.length < 3) { const h = f(); if (h) upper.push(h); } }
+    for (const f of simpleOn() ? [] : [recRail, promosRail]) if (upper.length + lower.length < 3) { const h = f(); if (h) lower.push(h); }
+    /* le panier type de la personne remplace le panier tout prêt des débuts */
+    const tpl = !simpleOn() && Object.keys(sg.items).length && !weekTpl();
     return {
       title: "",
       /* le wordmark compact tient lieu de titre dans la barre ; le titre de contenu est la promesse, ou « Accueil » pour les lecteurs d'écran */
@@ -1418,19 +1430,17 @@
         (first ? "" : `<a class="hcard" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>`) +
         (!first && !S.seen.welcome ? `<button class="hcard" type="button" data-act="welcome">${ic("gear", "si")}<span><b>Dis-nous où tu fais tes courses</b><small>Enseignes, déplacement ou tout livré, nombre de personnes</small></span>${ic("chev", "chev")}</button>` : "") +
         fillHomeCard() +
+        prepCard(prep) +
         arrivalCard() +
         todoCard() +
-        nextCard() +
+        (prep ? "" : nextCard()) +
         ordersCard() +
         savingsCard() +
         installCard() +
-        dropsRail() +
-        dueRail() +
-        habitsRail() +
-        (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals" role="region" aria-label="Même produit, pas le même prix">${ds.map(dealCard).join("")}</div>` : "") +
+        upper.join("") +
         `<div class="sh"><h2>${mine.length ? "Tes rayons" : "Rayons"}</h2><a class="act" href="#/rayons">Tout voir${ic("chev")}</a></div><div class="cats">${tiles}</div>` +
         /* mode confort : moins d'éléments, les repas restent dans Listes et les offres sur les fiches */
-        (simpleOn() ? "" : recRail() + promosRail() + (Object.keys(sg.items).length ? `<div class="sh"><h2>Panier tout prêt</h2></div>${suggestCard(sg)}` : "")) +
+        lower.join("") + (tpl ? `<div class="sh"><h2>Panier tout prêt</h2></div>${suggestCard(sg)}` : "") +
         footNote(),
     };
   };
@@ -1581,14 +1591,36 @@
     const e = estimate(L.items);
     return `<a class="row th" href="#/liste/${esc(L.id)}"><span class="thumb">${ids[0] ? img(S.prods.get(ids[0]), 48) : ""}</span><span class="rt">${esc(L.name)}<small>${plural(e.n, "produit", "produits")}, environ ${eur(e.t)}</small></span>${ic("chev", "chev")}</a>`;
   }
+  /* ---------- listes toutes faites par profil (data/listes.json) ---------- */
+  /* Étudiant, famille, senior, petit budget, végétarien, bébé : chaque liste s'ouvre dans Ma liste, où chaque ligne est
+     cherchée aux prix relevés ; les listes « semaine » sont faites pour atteindre le minimum de commande d'une enseigne. */
+  let PROF = null, profP = null;
+  function loadProfiles() {
+    if (!profP) profP = fetch("data/listes.json").then((r) => (r.ok ? r.json() : null)).then((j) => { PROF = j && Array.isArray(j.listes) ? j : { profils: [], listes: [] }; return PROF; }).catch(() => { profP = null; return null; });
+    return profP;
+  }
+  /* le profil proposé d'abord : végétarien d'après le régime, famille d'après le foyer, sinon le premier */
+  const profDefault = () => (dietSet().veg ? "vegetarien" : (+S.prefs.foyer || 0) >= 3 ? "famille" : ((PROF && PROF.profils[0]) || {}).k);
+  const linesOf = (text) => String(text || "").split(/,(?!\d)/).filter((x) => x.trim()).length;
+  function profHtml() {
+    if (!PROF) return `<h2 class="gh" id="profT">Listes toutes faites</h2><div class="group" aria-busy="true"><div class="row"><span class="rt"><span class="skl"></span><small class="skl s"></small></span></div></div>`;
+    if (!PROF.profils.length) return "";
+    const cur = PROF.profils.some((p) => p.k === S.prof) ? S.prof : profDefault(), P = PROF.profils.find((p) => p.k === cur) || PROF.profils[0];
+    const L = PROF.listes.filter((x) => x.base === P.k);
+    return `<h2 class="gh" id="profT">Listes toutes faites</h2><div class="tagset" role="radiogroup" aria-labelledby="profT">${PROF.profils.map((p) => `<button class="chip" type="button" role="radio" data-act="prof" data-k="${esc(p.k)}" aria-checked="${p.k === P.k}">${esc(p.label)}</button>`).join("")}</div>` +
+      `<p class="gf">${esc(P.hint || "")}.</p><div class="group" style="margin-top:10px">${L.map((x) => `<button class="row" type="button" data-act="wlprof" data-k="${esc(x.k)}"><span class="rt">${esc(x.label)}<small>${plural(linesOf(x.text), "ligne", "lignes")}${x.kind === "semaine" ? `, de quoi atteindre le minimum de commande${x.budget ? ", environ " + eurR(x.budget) + " livraison comprise" : ""}` : ", un petit appoint"}</small></span>${ic("chev", "chev")}</button>`).join("")}</div>` +
+      `<p class="gf">Chaque liste s'ouvre dans Ma liste : Cabas cherche chaque produit au meilleur prix, et tu peux tout changer avant d'ajouter au panier.</p>`;
+  }
   VIEWS.listes = () => {
     const n = count(), sg = suggestion();
     return {
       title: "Listes", grouped: true,
+      mount: () => { if (!PROF) loadProfiles().then(() => { const el = $("#profs"); if (el && S.route.name === "listes") el.innerHTML = profHtml(); }); },
       html: `<h1 class="lt">Listes</h1>` +
         `<div class="pad btns" style="padding-top:4px"><a class="btn" href="#/ecrire">${ic("pen")}Écrire ou dicter une liste</a><a class="btn tint" href="#/repas">Repas à petit prix</a>${n ? `<button class="btn tint" type="button" data-act="savelist">${ic("plus")}Enregistrer le panier en liste</button>` : ""}</div>` +
         (S.lists.length ? `<h2 class="gh">Mes listes</h2><div class="group">${S.lists.map(listRow).join("")}</div><p class="gf">Une liste se remet dans le panier en un geste.</p>` :
           `<div class="empty" style="padding-top:28px">${emptyArt("list")}<h2>Aucune liste</h2><p>Enregistre ton panier en liste pour le refaire la semaine prochaine en un geste.</p></div>`) +
+        `<div id="profs">${profHtml()}</div>` +
         (Object.keys(sg.items).length ? `<h2 class="gh">Suggestion</h2>${suggestCard(sg)}` : ""),
     };
   };
@@ -1598,16 +1630,25 @@
       return `<a class="row th" href="${hp(id)}"><span class="thumb">${img(p, 48)}</span><span class="rt"><b style="font-weight:600">${esc(p.brand)}</b> ${esc(p.name)}<small>${esc(p.format)}${b ? ", " + eur(b.price) + " chez " + esc(retName(b.ret)) + (b.sim ? " (simulé)" : "") : ", pas dans tes enseignes"}</small></span><span class="val num">× ${q}</span></a>`;
     }).join("");
   }
+  /* les produits du panier type, chacun avec son rythme (à chaque fois, toutes les 2 semaines…) */
+  function tplItems(L) {
+    return Object.keys(L.items).filter((id) => S.prods.has(id)).map((id) => {
+      const p = S.prods.get(id), b = best(p), c = (L.cad || {})[id] || 0;
+      return `<div class="row th tpl"><span class="thumb">${img(p, 48)}</span><span class="rt"><a href="${hp(id)}"><b style="font-weight:600">${esc(p.brand)}</b> ${esc(p.name)}<small>${L.items[id] > 1 ? L.items[id] + "\u00a0× " : ""}${esc(p.format)}${b ? ", " + eur(b.price) + " chez " + esc(retName(b.ret)) + (b.sim ? " (simulé)" : "") : ", pas dans tes enseignes"}</small></a><button class="act" type="button" data-act="cad" data-l="${esc(L.id)}" data-id="${esc(id)}" aria-label="Rythme de ${esc(pname(p))}\u00a0: ${esc(cadLabel(c))}">${esc(cadLabel(c))}${ic("chev")}</button></span></div>`;
+    }).join("");
+  }
   VIEWS.liste = (r) => {
     const L = S.lists.find((x) => x.id === r.id);
     if (!L) return notFound("liste");
-    const e = estimate(L.items);
+    const e = estimate(L.items), sd = shopDay();
+    const tplBox = `<h2 class="gh">Panier de la semaine</h2><div class="group"><div class="row"><span class="rt" id="tplL">C'est mon panier de la semaine<small>Le jour des courses, l'accueil te le propose, prêt à remplir, avec seulement ce qui est à reprendre ce jour-là.</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="tpl" data-id="${esc(L.id)}" aria-labelledby="tplL"${L.template ? " checked" : ""}><span></span></label></div>` +
+      (L.template ? `<button class="row" type="button" data-act="shopdays"><span class="rt">Jour des courses<small>${daySet() ? "Choisi par toi" : sd != null ? "D'après tes commandes" : "Pas encore de jour habituel : choisis-en un"}</small></span><span class="val">${sd != null ? DAYS[sd].replace(/^./, (c) => c.toUpperCase()) : "Aucun"}</span>${ic("chev", "chev")}</button>` : "") + `</div>`;
     return {
       title: L.name, grouped: true,
       html: `<h1 class="lt">${esc(L.name)}</h1><p class="lt-sub">${plural(e.n, "produit", "produits")}, environ ${eur(e.t)} au meilleur prix</p>` +
         `<div class="pad btns" style="padding-top:6px"><button class="btn" type="button" data-act="addlist" data-id="${esc(L.id)}">${ic("plus")}Tout ajouter au panier</button><button class="btn tint" type="button" data-act="replacelist" data-id="${esc(L.id)}">Remplacer le panier par cette liste</button></div>` +
-        `<h2 class="gh">Produits</h2><div class="group">${itemsList(L.items)}</div>` + listFreeHtml(L) +
-        `<div class="group" style="margin-top:28px"><button class="row link" type="button" data-act="sharelist" data-id="${esc(L.id)}">Partager la liste</button><button class="row link" type="button" data-act="renamelist" data-id="${esc(L.id)}">Renommer la liste</button><button class="row danger" type="button" data-act="dellist" data-id="${esc(L.id)}">Supprimer la liste</button></div>` +
+        `<h2 class="gh">Produits</h2><div class="group">${L.template ? tplItems(L) : itemsList(L.items)}</div>` + (L.template ? `<p class="gf">Touche le rythme d'un produit pour le changer : la lessive tous les mois, le lait à chaque fois.</p>` : "") + listFreeHtml(L) + tplBox +
+        `<div class="group" style="margin-top:28px">${speakBtn("list", "Écouter la liste", "row link", L.id)}<button class="row link" type="button" data-act="sharelist" data-id="${esc(L.id)}">Partager la liste</button><button class="row link" type="button" data-act="renamelist" data-id="${esc(L.id)}">Renommer la liste</button><button class="row danger" type="button" data-act="dellist" data-id="${esc(L.id)}">Supprimer la liste</button></div>` +
         `<p class="gf">Le lien de partage contient la liste elle-même\u00a0: la personne qui l'ouvre peut l'ajouter à son panier ou à ses listes.</p>`,
     };
   };
@@ -1844,7 +1885,7 @@
     return {
       title: "Panier", grouped: true,
       right: `<button class="icbtn" type="button" data-act="sharecart" aria-label="Partager la répartition">${ic("share")}</button><button class="txtbtn" type="button" data-act="clear">Vider</button>`,
-      html: `<h1 class="lt">Panier</h1>` + netBanner() + `<div class="cartcols"><div class="cside">${side}${zipNote}</div><div class="cmain">${main}${freeBox}</div></div>` +
+      html: `<h1 class="lt">Panier</h1>` + netBanner() + `<div class="cartcols"><div class="cside">${side}${zipNote}<div class="pad btns noprint" style="padding-top:12px">${speakBtn("panier", "Écouter la répartition", "btn ghost")}<button class="btn ghost" type="button" data-act="shopall">${ic("store")}Mode magasin et impression</button></div></div><div class="cmain">${main}${freeBox}</div></div>` +
         `<p class="foot">${esc(freshText())}. Le total exact s'affiche sur le site de chaque enseigne au moment de commander.<br><a class="act" href="#/frais">Frais des enseignes${ic("chev")}</a> <a class="act" href="#/reglages">Réglages de livraison${ic("chev")}</a></p>`,
     };
   };
@@ -1874,6 +1915,7 @@
       sw("manualck", "manckL", "Cocher à la main", "Sinon, Cabas coche un produit quand tu reviens dans l'appli après l'avoir ouvert sur le site.", !!S.prefs.manualCk) +
       sw("badge", "badgeL", "Rappel dans le mini panier", "Tant que tu remplis tes paniers\u00a0: «\u00a0Il te reste 3 produits à mettre chez Carrefour\u00a0».", S.prefs.badge !== false) +
       `<button class="row" type="button" data-act="leads"><span class="rt">Délais de livraison<small>Pour te dire quand commander.</small></span>${ic("chev", "chev")}</button>` +
+      `<button class="row" type="button" data-act="shopdays"><span class="rt">Jour des courses<small>Ce jour-là, l'accueil te propose ton panier de la semaine.</small></span><span class="val">${daySet() ? DAYS[S.prefs.shopDay].replace(/^./, (c) => c.toUpperCase()) : "Auto"}</span>${ic("chev", "chev")}</button>` +
       `<a class="row" href="#/recommander"><span class="rt">Recommander un panier</span>${ic("chev", "chev")}</a>` +
       (nb ? `<button class="row" type="button" data-act="brokenclear"><span class="rt">Liens à revoir<small>${plural(nb, "lien ne menait", "liens ne menaient")} pas au bon produit\u00a0: Cabas ouvre la recherche du site à la place.</small></span><span class="val">Tout reproposer</span></button>` : "") +
       (nf ? `<button class="row link" type="button" data-act="firstreset">Revoir les étapes «\u00a0Avant de commencer\u00a0»</button>` : "") + `</div>`;
@@ -1884,7 +1926,7 @@
     return {
       title: "Réglages", grouped: true,
       html: `<h1 class="lt">Réglages</h1>` +
-        `<h2 class="gh">Affichage</h2><div class="group">${lookHtml()}<button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
+        `<h2 class="gh">Affichage</h2><div class="group">${lookHtml()}${TTS() ? `<div class="row stack"><span class="rt" id="voiceL">Lecture à voix haute<small>Pour écouter ta liste, ta répartition et ta liste du magasin.</small></span><div class="seg" role="radiogroup" aria-labelledby="voiceL">${[["slow", "Lente"], ["normal", "Normale"]].map(([v, l]) => `<button type="button" role="radio" data-act="voice" data-v="${v}" aria-checked="${(S.prefs.voice === "slow" ? "slow" : "normal") === v}">${l}</button>`).join("")}</div></div>` : ""}<button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
         `<h2 class="gh">Livraison</h2><div class="group"><button class="row" type="button" data-act="zip"><span class="rt">Code postal</span><span class="val">${S.prefs.zip ? esc(S.prefs.zip) : "À indiquer"}</span>${ic("chev", "chev")}</button></div>` +
         `<p class="gf">${S.prefs.zip && !inZone() ? "Les enseignes de Cabas livrent en Île-de-France : ton code postal n'est pas encore couvert." : "Les enseignes de Cabas livrent en Île-de-France. Chacune confirme ses créneaux au moment de commander."}</p>` +
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw hit"><input type="checkbox" role="switch" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
@@ -1904,6 +1946,7 @@
         `<h2 class="gh">Alimentation</h2><div class="group"><button class="row" type="button" data-act="diet"><span class="rt">Mon régime<small>Filtre la recherche, les rayons, Ma liste, les repas et les remplacements, d'après ce que les enseignes indiquent.</small></span><span class="val">${esc(dietLabel())}</span>${ic("chev", "chev")}</button></div>` +
         `<h2 class="gh">Mes choix et mes marques</h2><div class="group"><button class="row" type="button" data-act="usual"><span class="rt">Mes choix habituels<small>${usualCount() ? "Ce que tu as choisi dans Ma liste revient d'office, tant que le prix suit." : "Choisis un produit dans Ma liste : Cabas s'en souvient."}</small></span>${usualCount() ? `<span class="val num">${usualCount()}</span>` : ""}${ic("chev", "chev")}</button></div>` +
         `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/comment"><span class="rt">Comment ça marche</span>${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="${installEvt ? "installnow" : "install"}"><span class="rt">${isIOS ? "Installer Cabas sur l'iPhone" : "Installer Cabas sur le téléphone"}</span>${ic("chev", "chev")}</button>`}<button class="row" type="button" data-act="shareapp"><span class="rt">Faire connaître Cabas<small>Une image et un lien à envoyer à qui fait ses courses</small></span>${ic("share", "chev")}</button><div class="row"><span class="rt">Version</span><span class="val">1.2</span></div></div>` +
+        dataHtml() +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
     };
   };
@@ -2057,6 +2100,9 @@
       case "remplir": return { name: "remplir", id };
       case "recommander": return { name: "recommander" };
       case "frais": return { name: "frais", id };
+      case "mouvements": return { name: "mouvements" };
+      case "magasin": return { name: "magasin" };
+      case "transfert": return { name: "transfert", id: seg[1] || "" };
       default: return { name: "home" };
     }
   }
@@ -2090,6 +2136,9 @@
       case "remplir": return r.id ? retName(r.id) : "Remplir";
       case "recommander": return "Recommander";
       case "frais": return "Frais";
+      case "mouvements": return "Prix";
+      case "magasin": return "Magasin";
+      case "transfert": return "Transfert";
     }
     return "Retour";
   }
@@ -2140,6 +2189,8 @@
     S.cur = h;
     const r = parse(h);
     if (S.route.name === "scan" && r.name !== "scan") stopScan();
+    if (S.route.name === "magasin" && r.name !== "magasin") wakeOff();
+    if (speaking && r.name !== S.route.name) speakStop();
     if (rec) micStop();
     S.route = r;
     const V = (VIEWS[r.name] || VIEWS.home)(r) || notFound();
@@ -2203,7 +2254,7 @@
     let dh = "";
     if (V.dock === "bar" && V.dockId) dh = `<div class="wrap">${buyCtl(V.dockId, "bar")}</div>`;
     else if (V.dockHtml) dh = `<div class="wrap">${V.dockHtml}</div>`;
-    else if (n && S.route.name !== "panier" && S.route.name !== "remplir") dh = `<div class="wrap">${miniHtml()}</div>`;
+    else if (n && !["panier", "remplir", "magasin", "transfert"].includes(S.route.name)) dh = `<div class="wrap">${miniHtml()}</div>`;
     const was = !dock.hidden;
     dock.innerHTML = dh;
     dock.hidden = !dh;
@@ -2319,7 +2370,7 @@
   }
   /* un mot qui change la nature du produit (lingettes pour « papier toilette », culotte pour « couches », pâtée pour
      « croquettes », nectar pour « jus ») l'écarte, sauf s'il est écrit */
-  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "leger", "culotte", "patee", "sauce", "aromatise", "sirop", "concentre", "mousse"], JUICE_ONLY = new Set(["boisson", "nectar"]);
+  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "leger", "culotte", "patee", "sauce", "aromatise", "sirop", "concentre", "mousse", "margarine", "boire"], JUICE_ONLY = new Set(["boisson", "nectar"]);
   /* variétés d'un même rayon : huile d'olive ou de tournesol, sucre blanc ou roux, riz complet, pâtes complètes, yaourt au lait de chèvre,
      bière blonde ou ambrée, vin de telle région, croquettes au poulet ou au saumon */
   const VARIETY = new Set("olive tournesol colza arachide noix sesame pepins avocat lin isio friture melange graine chevre brebi soja coco grec grecque complete integrale sarrasin mais pois roux cassonade canne morceau fluide blonde blond ambree brune bordeaux bourgogne rhone languedoc loire provence beaujolais merlot cabernet syrah grenache chardonnay sauvignon pinot basmati thai long rond nature campagne cereales tradition".split(" ").map(stem));
@@ -2446,7 +2497,7 @@
   /* La liste entière, livraison comprise : pour chaque ensemble d'une à trois enseignes, chaque ligne prend le produit
      du vivier le moins cher dans ces enseignes ; une enseigne dont la commande n'atteint pas son minimum disqualifie
      l'ensemble ; frais de livraison et de service comptés. Renvoie le meilleur plan : lignes couvertes, puis total. */
-  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, AUX: () => AUX });
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems });
   /* jeu d'essai (tests) : un petit catalogue v2 ajouté au catalogue chargé, rayons et produits compris */
   function mergeCatalog(extra) {
     const c = unpack(extra), seen = new Set(S.list.map((p) => p.id));
@@ -2585,7 +2636,7 @@
         title: "Ma liste", grouped: true,
         html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">Écris ou dicte tes courses, Cabas trouve chaque produit au meilleur prix.</p>` +
           `<div class="pad"><textarea id="wlIn" class="wl" rows="7" placeholder="lait&#10;2 paquets de pâtes&#10;coca zéro x3&#10;papier toilette" aria-label="Ta liste de courses" autocapitalize="off" spellcheck="true">${esc(W.text)}</textarea></div>` +
-          `<p class="gf">Une ligne par produit, ou sépare-les par des virgules. Une quantité au début (2 paquets de pâtes) ou à la fin (coca zéro x3), un poids ou un volume (1 kg de café) sont compris.</p>` +
+          `<p class="gf">Une ligne par produit, ou sépare-les par des virgules. Une quantité au début (2 paquets de pâtes) ou à la fin (coca zéro x3), un poids ou un volume (1 kg de café) sont compris. Tu peux aussi coller un panier ou une commande copiés sur le site d'une enseigne, un courriel ou un ticket : Cabas garde les produits et les quantités.</p>` +
           `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wlgo">Trouver les produits</button>${speechOK() ? `<button class="btn tint" type="button" data-act="wlmic" id="wlMic" aria-pressed="false">${ic("mic")}Dicter ma liste</button>` : ""}${pasteOK() ? `<button class="btn tint" type="button" data-act="wlpaste">${ic("paste")}Coller ma liste</button>` : ""}</div>` +
           (speechOK() ? `<p class="gf" id="wlMicNote">Dis tes produits en marquant une pause entre chacun\u00a0: la dictée passe par le service de reconnaissance vocale de ton téléphone.</p>` : "") +
           `<p class="gf" style="padding-top:14px">${esc(coverText())}. <a href="#/rayons">Voir les rayons</a></p>`,
@@ -2619,6 +2670,9 @@
       planHtml = `<div class="banner good" role="status">${ic("coin")}<span><b>${same ? "Le moins cher, livraison comprise\u00a0: " + head.replace(" livraison comprise", "") : "Encore moins cher\u00a0: " + head}</b>${sub}${same ? " Chaque produit est pris là où l'ensemble revient le moins cher\u00a0; «\u00a0Autre choix\u00a0» pour en changer un." : " Les produits ci-dessous changent pour y arriver."}</span>${same ? "" : `<button class="btn sm ghost" type="button" data-act="wlplan">Prendre ces produits</button>`}</div>`;
       W.plan = plan;
     }
+    /* panier collé : ce qui a été lu ; le montant collé est dit tel quel, jamais compté comme un prix relevé */
+    const P = W.paste, pfrom = P && P.from && S.allMap.has(P.from) ? S.allMap.get(P.from).name.split(" ")[0] : "";
+    const pasteHtml = P ? `<div class="banner" role="status">${ic("paste")}<span><b>Panier collé${pfrom ? " de " + esc(pfrom) : ""} : ${plural(P.n, "produit lu", "produits lus")}</b>Prix, boutons et mentions du site retirés. ${P.total ? `Il faisait ${eurC(P.total)} d'après ce que tu as collé : ce montant reste à part, Cabas compte seulement les prix relevés.` : "Les prix collés restent à part : Cabas compte seulement les prix relevés."} Vérifie chaque ligne avant d'ajouter au panier.</span></div>` : "";
     return {
       title: "Ma liste", grouped: true,
       right: `<button class="txtbtn" type="button" data-act="wledit">Modifier</button>`,
@@ -2626,10 +2680,10 @@
       /* le montant du bouton est celui que le panier affichera : le plan livraison comprise quand il prend toute la liste */
       dockHtml: found.length ? `<button class="mini" type="button" data-act="wladd"><span class="mn">${nArt}</span><span class="ml">Ajouter au panier</span><span class="mp">${eurC(plan && !plan.short && plan.covered === plan.n && plan.picks.every((pk) => pk.id === pk.line.pick && pk.n === pk.line.n) ? plan.total : t)}</span></button>` : "",
       /* un seul appel à l'action plein : le dock ; en bas de page, seulement « Enregistrer en liste » */
-      html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">${plural(found.length, "produit trouvé", "produits trouvés")} sur ${W.lines.length}${nFree ? ", " + plural(nFree, "ligne libre", "lignes libres") : ""}${found.length && !(plan && !plan.short) ? ", environ " + eurC(t) + " au meilleur prix de chaque produit" : ""}</p>` + planHtml +
+      html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">${plural(found.length, "produit trouvé", "produits trouvés")} sur ${W.lines.length}${nFree ? ", " + plural(nFree, "ligne libre", "lignes libres") : ""}${found.length && !(plan && !plan.short) ? ", environ " + eurC(t) + " au meilleur prix de chaque produit" : ""}</p>` + pasteHtml + planHtml +
         `<div class="order wlist" style="margin-top:12px">${W.lines.map(wlRow).join("")}</div>` +
         `<p class="gf">Pour chaque ligne, le produit le moins cher au kilo ou au litre parmi les plus proches de ce que tu as écrit, dans un format courant. «\u00a0Autre choix\u00a0» pour en prendre un autre.</p>` +
-        (found.length ? `<div class="pad btns" style="padding-top:16px"><button class="btn tint" type="button" data-act="wlsave">Enregistrer en liste</button></div>` : ""),
+        (found.length ? `<div class="pad btns" style="padding-top:16px"><button class="btn tint" type="button" data-act="wlsave">Enregistrer en liste</button>${speakBtn("liste", "Écouter ma liste", "btn ghost")}</div>` : ""),
     };
   };
   /* ---------- dictée (Web Speech API, quand le navigateur la propose) ---------- */
@@ -2665,12 +2719,92 @@
     rec = r;
     const b = $("#wlMic"); if (b) { b.setAttribute("aria-pressed", "true"); b.innerHTML = `${ic("mic")}J'ai fini`; }
   }
-  /* une liste reçue (collée, partagée depuis une autre appli) : lue tout de suite, comme « Trouver les produits » */
+  /* ---------- colle ton panier ---------- */
+  /* Le texte d'un panier ou d'une commande copié sur le site d'une enseigne, dans un courriel, un ticket ou un message :
+     chaque produit est gardé avec sa quantité ; prix, prix au kilo, boutons, totaux, livraison et mentions du site sont
+     retirés. Les montants lus ne servent qu'à dire « d'après ce que tu as collé » : jamais un prix relevé, jamais dans
+     le catalogue ni dans un total de Cabas. Une liste écrite à la main ressort telle quelle (paste: false). */
+  /* lignes de bruit, lues sur le texte sans accents ni ponctuation (norm) : boutons, mentions, totaux, en-têtes */
+  const PASTE_NOISE = [
+    /^(ajouter|retirer|supprimer|modifier|diminuer|augmenter|vider|valider|commander|payer|paiement|merci|bonjour|favoris|imprimer|partager)\b/,
+    /^voir (le|la|les|plus|tout|details?|produit|panier)\b/, /^(quantite|qte|qty)\b/, /^prix (au|a l|unitaire|total|barre|par|de)\b|^prix$/,
+    /^(sous )?total\b|^montant\b/, /^(frais|livraison|retrait|creneau|date|heure)\b/,
+    /^(remise|reduction|promo|promotion|offre|economi|cagnotte|avantage|fidelite|bon de|code promo)/,
+    /^(mon |votre |ton )?panier( \d+)?( articles?| produits?)?$/, /^(ma |votre |ta )?commande\b|^recapitulatif\b|^n \d/,
+    /^(carte bancaire|carte de fidelite|carte fidelite|cb|especes|rendu|ticket|caisse|client|siret|tel|telephone|tva|ttc|ht|www|http|https)\b/,
+    /^(articles?|produits?|designation|libelle)( \d+| qte| quantite| prix| total)*$/, /^\d+ (articles?|produits?)$/, /^(nb|nombre d) ?articles?\b/,
+    /^(disponible|en stock|rupture|indisponible|epuise)\b/, /^(vendu|expedie|livre) par\b/,
+    /^(note|avis|nutri ?score|marque|origine|ingredients?|conservation|a partir de|soit)\b/,
+    /^\d{1,4} (rue|avenue|av|bd|boulevard|place|chemin|allee|route|quai)\b/, /^\d{5} \D/,
+    /^(e )?(monoprix|carrefour|houra|auchan|leclerc|franprix|intermarche|lidl|casino|super u|hyper u)( (market|city|express|drive|contact|bio|direct|fr|com))*( \d+)?$/,
+  ];
+  const PASTE_HEAD = new Set(["fruits et legumes", "fruits legumes", "cremerie", "epicerie", "epicerie salee", "epicerie sucree", "boissons", "surgeles", "hygiene", "beaute", "hygiene beaute", "entretien", "maison", "boucherie", "charcuterie", "traiteur", "frais", "bebe", "animaux", "boulangerie", "petit dejeuner", "cave", "produits laitiers", "liste de courses", "mes courses"]);
+  const isNoise = (t) => { const nt = norm(t); return PASTE_HEAD.has(nt) || PASTE_NOISE.some((r) => r.test(nt)); };
+  const UNIT_PRICE = /\(?\s*(?:soit\s+)?\d{1,4}(?:[.,]\d{1,3})?\s*€\s*(?:\/|par|le|la|l')\s*(?:kg|kilo|l\b|litre|unit[eé]|pi[eè]ce|100\s*g|100\s*ml|lavage|dose|m\b|rouleau)[^)\s]*\s*\)?/gi;
+  const PRICE_ONE = /(\d{1,4})\s*€\s*(\d{2})(?!\d)|(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:€|eur\b|euros?\b)|€\s*(\d{1,4}(?:[.,]\d{1,2})?)/i;
+  const centsOf = (m) => (m[1] ? +m[1] * 100 + +m[2] : Math.round(parseFloat(String(m[3] || m[4]).replace(",", ".")) * 100));
+  const FORMAT_ONLY = /^(?:\d+\s*[x×]\s*)?\d+(?:[.,]\d+)?\s*(?:kg|g|gr|l|cl|ml|litres?)\.?$|^(?:lot de|pack de|x)\s*\d+$|^\d+\s*(?:rouleaux|couches|capsules|lavages|doses|pi[eè]ces|sachets|tranches|œufs|oeufs)$/i;
+  function cleanPaste(text) {
+    const src = String(text || "").replace(/\r/g, "").replace(/[\u00a0\u202f]/g, " ").replace(/\p{Extended_Pictographic}|[\u2610-\u2612\u2713-\u2718\uFE0F]/gu, " ");
+    const out = [], R = { lines: out, total: null, from: null, dropped: 0, prices: 0, marks: 0 };
+    const low = norm(src);
+    R.from = ["monoprix", "carrefour", "houra", "auchan", "leclerc"].find((k) => low.includes(k)) || null;
+    let last = null;
+    const qtyTo = (n) => { if (last && n >= 1 && n <= 99) { last.n = n; last.q = true; } };
+    for (let raw of src.split("\n")) {
+      raw = raw.trim();
+      if (!raw) continue;
+      let m = /^[-–]\s*(\d{1,2})\s*\+$/.exec(raw);
+      if (m) { qtyTo(+m[1]); R.dropped++; continue; }
+      const mark = /^(?:\[[ x]?\]|[-*•·▪►]\s)/i.test(raw);
+      if (mark) R.marks++;
+      raw = raw.replace(/^(?:\[[ x]?\]\s*|[-*•·▪►]+\s*)/i, "").trim();
+      /* une ligne de total : le montant est gardé à part, pour le dire tel quel */
+      if (/^(?:total|montant)/i.test(norm(raw)) && !/sous/i.test(raw)) { const m = PRICE_ONE.exec(raw) || /(\d{1,4},\d{2})\s*$/.exec(raw); if (m) R.total = m.length > 2 ? centsOf(m) : Math.round(parseFloat(m[1].replace(",", ".")) * 100); R.dropped++; continue; }
+      /* « - 2 + », « Quantité : 2 », « Qté 3 », « 2 X 1,29 » : la quantité du produit d'avant */
+      if ((m = /^(?:quantit[eé]|qt[eé])\s*:?\s*(\d{1,2})$/i.exec(raw)) || (m = /^(\d{1,2})\s*[x×]\s*\d{1,4}[.,]\d{2}(?:\s*€)?(?:\s+\d{1,4}[.,]\d{2}\s*€?)?$/i.exec(raw))) { qtyTo(+m[1]); R.dropped++; continue; }
+      if (/^\d{1,2}$/.test(raw)) { if (last && !last.q) qtyTo(+raw); R.dropped++; continue; }
+      /* colonnes (tabulations, espaces, barres) : le nom, la quantité seule, les prix */
+      const cells = raw.split(/\t|\s{2,}|\s\|\s|\|/).map((c) => c.trim()).filter(Boolean);
+      let name = [], n = 0, price = null;
+      for (let c of cells) {
+        c = c.replace(UNIT_PRICE, " ").trim();
+        if (!c) continue;
+        if (/^\d{1,2}$/.test(c) && name.length) { n = +c; continue; }
+        if ((m = /^(?:quantit[eé]|qt[eé])\s*:?\s*(\d{1,2})$/i.exec(c))) { n = +m[1]; continue; }
+        let pm = PRICE_ONE.exec(c);
+        while (pm) { if (price == null) price = centsOf(pm); R.prices++; c = (c.slice(0, pm.index) + " " + c.slice(pm.index + pm[0].length)).trim(); pm = PRICE_ONE.exec(c); }
+        /* ticket de caisse : le montant en fin de ligne, sans le signe € */
+        if ((pm = /(?:^|\s)(\d{1,4},\d{2})$/.exec(c)) && /\p{L}{2}/u.test(c.slice(0, pm.index))) { if (price == null) price = Math.round(parseFloat(pm[1].replace(",", ".")) * 100); R.prices++; c = c.slice(0, pm.index).trim(); }
+        if (/^\d{1,4}[.,]\d{2}$/.test(c)) { if (price == null) price = Math.round(parseFloat(c.replace(",", ".")) * 100); R.prices++; continue; }
+        if (c) name.push(c);
+      }
+      let t = name.join(" ").replace(/\s*€\s*/g, " ").replace(/\s+/g, " ").replace(/^[-–:,;.]+|[-–:,;]+$/g, "").trim();
+      if (((m = /^(.*?)\s*\(\s*[x×]\s*(\d{1,2})\s*\)$/i.exec(t)) || (m = /^(.*?)\s+[x×]\s*([1-9])$/i.exec(t))) && /\p{L}/u.test(m[1])) { n = +m[2]; t = m[1].trim(); }
+      else if ((m = /^(\d{1,2})\s*[x×]\s+(\D.*)$/i.exec(t))) { n = +m[1]; t = m[2].trim(); }
+      if (!t || !/\p{L}{2}/u.test(t)) { if (price != null && last && last.price == null) last.price = price; if (n) qtyTo(n); if (price != null || n) R.dropped++; continue; }
+      /* la contenance ou la marque seule sur sa ligne (paniers des sites, un produit sur plusieurs lignes) : avec le
+         produit d'avant, s'il est écrit en minuscules (sur un ticket de caisse, tout est en capitales) */
+      if (last && last.price == null && !n && !mark && !R.marks && (FORMAT_ONLY.test(t) || (/^[\p{Lu}][\p{Lu}'&. -]{1,24}$/u.test(t) && t.split(" ").length <= 2 && /\p{Ll}/u.test(last.t)))) { last.t += " " + t; if (price != null) last.price = price; continue; }
+      if (isNoise(t)) { R.dropped++; continue; }
+      last = { t, n: n || 1, price, q: !!n };
+      out.push(last);
+    }
+    R.paste = R.prices > 0 || R.dropped >= 2 || R.marks >= 2 || out.some((x) => x.q && x.n > 1 && /\d/.test(x.t));
+    if (R.total == null && R.prices && out.length && out.every((x) => x.price != null)) R.total = out.reduce((a, x) => a + x.price, 0);
+    R.text = out.map((x) => (x.n > 1 || /[x×]\s*\d{1,2}$/i.test(x.t) ? x.t + " x" + x.n : x.t)).join("\n");
+    return R;
+  }
+  /* une liste reçue (collée, partagée depuis une autre appli) : lue tout de suite, comme « Trouver les produits » ; un
+     panier copié sur un site est nettoyé d'abord (cleanPaste) */
   function listFrom(text) {
-    S.wl = { text, lines: readList(text) }; store.set("draft", text);
+    const C = cleanPaste(text), clean = C.paste && C.lines.length ? C.text : text;
+    /* le brouillon en attente (frappe dans le champ) ne doit pas remettre le texte collé brut */
+    clearTimeout(draftT);
+    S.wl = { text: clean, lines: readList(clean), paste: C.paste && C.lines.length ? { n: C.lines.length, total: C.total, from: C.from, dropped: C.dropped } : null }; store.set("draft", clean);
     if (!S.wl.lines.length) { S.wl.lines = null; if (S.route.name === "ecrire") rerender(); toast("Rien à lire dans cette liste"); return; }
     if (S.route.name === "ecrire") { window.scrollTo(0, 0); rerender(); } else push("#/ecrire");
-    toast(plural(S.wl.lines.length, "ligne lue", "lignes lues"), null, "check");
+    toast(S.wl.paste ? `Panier collé : ${plural(S.wl.lines.length, "produit lu", "produits lus")}` : plural(S.wl.lines.length, "ligne lue", "lignes lues"), null, "check");
   }
   function wlAltSheet(i) {
     const x = S.wl.lines[i];
@@ -3619,6 +3753,7 @@
         (H.length ? `<div class="group">${H.map((x, i) => { const hi = S.hist.length - 1 - i, names = (x.o || []).map((v) => (typeof v === "string" ? v : v && v.name)).filter(Boolean), pd = paidSum(x); return `<div class="row stack"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${names.length ? ", " + esc(joinEt(names)) : ""}, ${eurC(x.t)} aux prix relevés${x.s ? ", " + eurC(x.s) + " économisés" : ""}</small>${pd ? `<small>Payé ${eurC(pd)}, saisi par toi</small>` : ""}</span><div class="acts">${x.items ? `<button class="btn sm plain" type="button" data-act="refill" data-id="${hi}">Recommander et remplir</button>` : ""}<button class="act" type="button" data-act="paid" data-id="${hi}">${pd ? "Modifier le total payé" : "Indiquer le total payé"}</button></div></div>`; }).join("")}</div>` +
           `<p class="gf">Un panier compte quand toutes ses commandes sont notées comme passées. L'économie d'un panier additionne, pour chaque produit, l'écart entre le prix payé et son prix moyen dans les enseignes qui le vendent, et ce que les remplacements par un équivalent moins cher ont fait gagner. Selon les prix relevés. Le total payé, quand tu l'indiques, est saisi par toi\u00a0: il reste à part et n'entre dans aucun calcul.</p>` +
           `<div class="pad btns" style="padding-top:18px"><button class="btn tint" type="button" data-act="sharesave">${ic("share")}Partager mes économies</button></div>` +
+          `<div class="group" style="margin-top:28px"><a class="row" href="#/mouvements"><span class="rt">Tes dépenses et ce qui a bougé<small>Tes dépenses de chaque mois, les hausses et les baisses de tes produits</small></span>${ic("chev", "chev")}</a></div>` +
           `<div class="group" style="margin-top:28px"><button class="row danger" type="button" data-act="histclear">Effacer l'historique</button></div>` :
           `<div class="empty">${emptyArt("coin")}<h2>Rien pour l'instant</h2><p>Dans le panier, touche «\u00a0Remplir mes paniers\u00a0»\u00a0: quand chaque commande est passée, l'économie s'ajoute ici.</p></div>`),
     };
@@ -3735,6 +3870,124 @@
     const ps = habits(10);
     if (!ps.length) return "";
     return `<div class="sh"><h2>Tes habitudes</h2>${S.hist.some((h) => h.items) ? `<button class="act" type="button" data-act="refill" data-id="last" aria-label="Recommander le dernier panier et remplir mes paniers">Recommander et remplir${ic("chev")}</button>` : ""}</div><div class="rail" role="region" aria-label="Tes habitudes">${ps.map((p) => card(p)).join("")}</div>`;
+  }
+
+  /* ---------- le panier de la semaine ---------- */
+  /* D'après les paniers commandés (cabas.hist) : le rythme des courses (écart médian, jour le plus fréquent) et, pour
+     chaque produit qui revient, sa cadence (à chaque fois, toutes les 2 ou 3 semaines, tous les mois) et sa quantité
+     habituelle. Le panier type est une liste (cabas.lists[].template, .cad) que l'on garde et modifie ; le jour des
+     courses (prefs.shopDay, sinon le jour le plus fréquent), l'accueil dit « C'est l'heure des courses » et remet au
+     panier, en un geste, ce qui est à reprendre ce jour-là. */
+  const DAYS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  const CADS = [[0, "À chaque fois"], [14, "Toutes les 2 semaines"], [21, "Toutes les 3 semaines"], [28, "Tous les mois"]];
+  const dayMs = (iso) => Date.parse(iso + "T12:00:00");
+  const daysSince = (iso) => Math.round((dayMs(isoDay(new Date())) - dayMs(iso)) / 864e5);
+  const histItems = () => (S.hist || []).filter((h) => h && h.items && h.d);
+  const liveId = (id) => (S.prods.has(id) ? id : (S.alias || {})[id] && S.prods.has(S.alias[id]) ? S.alias[id] : null);
+  /* écart médian, en jours, entre des dates (deux dates différentes au moins) */
+  function medGap(ds) {
+    const t = [...new Set(ds)].sort().map(dayMs);
+    if (t.length < 2) return null;
+    const g = t.slice(1).map((x, i) => x - t[i]).sort((a, b) => a - b);
+    return Math.round(g[Math.floor(g.length / 2)] / 864e5);
+  }
+  /* le rythme : tous les combien de jours ; le jour de la semaine quand deux paniers au moins des six derniers tombent le même jour et que le rythme est d'environ une semaine */
+  function rhythm() {
+    const H = histItems();
+    const every = H.length >= 2 ? medGap(H.map((h) => h.d)) : null;
+    if (!every) return null;
+    const cnt = [0, 0, 0, 0, 0, 0, 0];
+    H.slice(-6).forEach((h) => cnt[new Date(h.d + "T12:00:00").getDay()]++);
+    const top = cnt.indexOf(Math.max(...cnt));
+    return { every, day: cnt[top] >= 2 && every >= 5 && every <= 10 ? top : null, last: H.map((h) => h.d).sort().pop(), n: H.length };
+  }
+  const daySet = () => typeof S.prefs.shopDay === "number" && S.prefs.shopDay >= 0 && S.prefs.shopDay <= 6;
+  const shopDay = () => { if (daySet()) return S.prefs.shopDay; const r = rhythm(); return r ? r.day : null; };
+  /* dates des paniers commandés qui contiennent un produit */
+  const boughtOn = (id) => histItems().filter((h) => Object.keys(h.items).some((k) => k === id || (S.alias || {})[k] === id)).map((h) => h.d).sort();
+  /* cadence d'un produit : 0 s'il revient à presque chaque panier, sinon 14, 21 ou 28 jours */
+  function cadOf(id) {
+    const d = medGap(boughtOn(id)), ev = (rhythm() || {}).every || 7;
+    return d == null || d <= ev * 1.4 ? 0 : d < 18 ? 14 : d < 25 ? 21 : 28;
+  }
+  const cadLabel = (c) => (CADS.find((x) => x[0] === c) || CADS[0])[1];
+  /* le panier type proposé : les produits d'au moins deux des six derniers paniers commandés (et d'au moins un tiers d'entre eux), à leur quantité habituelle */
+  function autoTemplate() {
+    const H = histItems().slice(-6);
+    if (H.length < 2) return null;
+    const cnt = new Map();
+    H.forEach((h) => new Set(Object.keys(h.items).map(liveId).filter(Boolean)).forEach((id) => cnt.set(id, (cnt.get(id) || 0) + 1)));
+    const items = {}, cad = {};
+    for (const [id, n] of cnt) if (n >= 2 && n >= H.length / 3) { items[id] = usualQty(S.prods.get(id)).n; const c = cadOf(id); if (c) cad[id] = c; }
+    return Object.keys(items).length >= 3 ? { id: "auto", name: "Mon panier de la semaine", items, cad, template: true, auto: true } : null;
+  }
+  const savedTpl = () => S.lists.find((L) => L.template) || null;
+  const weekTpl = () => savedTpl() || autoTemplate();
+  /* ce qui est à reprendre aujourd'hui : chaque produit « à chaque fois », les autres quand leur cadence est passée (à un demi-rythme près) */
+  function tplDue(T) {
+    const items = {}, later = [], slack = Math.floor(((rhythm() || {}).every || 7) / 2);
+    for (const id of Object.keys((T && T.items) || {})) {
+      if (!S.prods.has(id)) continue;
+      const c = (T.cad || {})[id] || 0, last = boughtOn(id).pop(), left = last ? c - daysSince(last) : 0;
+      if (!c || !last || left <= slack) items[id] = T.items[id]; else later.push({ id, left });
+    }
+    return { items, later: later.sort((a, b) => a.left - b.left) };
+  }
+  /* l'enseigne de la dernière commande au délai le plus long : « Commande avant… » */
+  const leadRid = () => { const H = histItems(), last = H[H.length - 1]; return ((last && last.o) || []).filter((x) => x && x.rid && S.allMap.has(x.rid)).map((x) => x.rid).sort((a, b) => leadDays(b) - leadDays(a))[0] || null; };
+  /* « C'est l'heure des courses » : le jour des courses (réglé, ou le plus fréquent), ou, sans jour, quand le rythme est
+     passé (sept jours au plus) ; jamais pendant un remplissage, avec un panier déjà commencé, juste après une commande,
+     ni après « Pas cette fois » le même jour */
+  function prepNow() {
+    if (!S.ready || fillActive() || count() > 2) return null;
+    const T = weekTpl(), r = rhythm(), today = isoDay(new Date());
+    if (!T || store.get("prepSnooze", "") >= today) return null;
+    if (r && daysSince(r.last) < Math.max(2, Math.floor(r.every / 2))) return null;
+    const sd = shopDay();
+    const when = sd != null ? new Date().getDay() === sd : !!r && daysSince(r.last) >= r.every && daysSince(r.last) <= r.every + 7;
+    if (!when) return null;
+    const D = tplDue(T);
+    return Object.keys(D.items).length ? { T, D, sd } : null;
+  }
+  function prepCard(P) {
+    if (!P) return "";
+    const e = estimate(P.D.items), n = Object.keys(P.D.items).length, rid = leadRid();
+    /* ce qui attendra : le nom court du rayon (« fromage râpé et lessive »), pas le nom complet du produit */
+    const later = [...new Set(P.D.later.map((x) => { const r = rayon(S.prods.get(x.id).r); return r ? shortName(r).toLowerCase() : ""; }).filter(Boolean))].slice(0, 2);
+    const why = P.sd != null ? `${DAYS[P.sd].replace(/^./, (c) => c.toUpperCase())}, ${daySet() ? "ton jour de courses" : "ton jour de courses habituel"}.` : `Tu fais tes courses tous les ${(rhythm() || {}).every} jours environ.`;
+    return `<section class="hcard col arr prep" aria-labelledby="prepT"><div class="arrh">${ic("cal", "si")}<span><b id="prepT">C'est l'heure des courses</b><small>${esc(why)} Ton panier de la semaine${P.T.auto ? ", d'après tes commandes" : ""} : ${plural(n, "produit", "produits")}, environ ${eur(e.t)}.${later.length ? ` Pas cette fois : ${esc(joinEt(later))}${P.D.later.length > later.length ? ", et d'autres" : ""}.` : ""}</small>${rid ? `<small>${esc(leadText(rid, isoDay(new Date(Date.now() + leadDays(rid) * 864e5))))}</small>` : ""}</span><button class="x" type="button" data-act="prepskip" aria-label="Pas cette fois">${ic("x")}</button></div>` +
+      `<div class="btns two"><button class="btn sm tint" type="button" data-act="prepgo">Remplir mon panier</button><button class="btn sm ghost" type="button" data-act="prepsee">Voir le panier type</button></div></section>`;
+  }
+  /* le panier type proposé devient une liste gardée (modifiable, cadences comprises) */
+  function keepTpl() {
+    let L = savedTpl();
+    if (L) return L;
+    const A = autoTemplate();
+    if (!A) return null;
+    L = { id: Date.now().toString(36), name: A.name, items: A.items, cad: A.cad, template: true, at: isoDay(new Date()) };
+    S.lists.unshift(L); saveLists();
+    return L;
+  }
+  function shopDaySheet() {
+    const build = () => {
+      const r = rhythm(), cur = daySet() ? S.prefs.shopDay : -1;
+      return {
+        body: `<p>Ce jour-là, l'accueil te propose ton panier de la semaine, prêt à remplir.</p><div class="group" role="radiogroup" aria-label="Jour des courses">` +
+          opt("shopday", `D'après mes commandes${r && r.day != null ? ` (le ${DAYS[r.day]})` : ""}`, cur < 0, `data-v="-1"`, null, true) +
+          [1, 2, 3, 4, 5, 6, 0].map((d) => opt("shopday", DAYS[d].replace(/^./, (c) => c.toUpperCase()), cur === d, `data-v="${d}"`, null, true)).join("") + `</div>`,
+      };
+    };
+    const b = build();
+    openSheet({ title: "Jour des courses", body: b.body, build, onClose: () => { if (["reglages", "liste", "home"].includes(S.route.name)) rerender(); } });
+  }
+  function cadSheet(lid, id) {
+    const L = S.lists.find((x) => x.id === lid), p = S.prods.get(id);
+    if (!L || !p) return;
+    const build = () => ({
+      body: `<p>${esc(pname(p))} : à quel rythme le reprendre dans ton panier de la semaine ?</p><div class="group" role="radiogroup" aria-label="Rythme">${CADS.map(([c, l]) => opt("cadset", l, ((L.cad || {})[id] || 0) === c, `data-id="${esc(id)}" data-l="${esc(lid)}" data-v="${c}"`, null, true)).join("")}</div>`,
+    });
+    const b = build();
+    openSheet({ title: "Rythme", body: b.body, build, onClose: () => { if (S.route.name === "liste") rerender(); } });
   }
 
   /* ---------- partager ---------- */
@@ -4006,29 +4259,302 @@
   }
 
   /* ---------- courses en magasin ---------- */
-  function shopSheet() {
-    const build = () => {
-      /* pendant un remplissage, les achats en magasin de l'instantané (avec ceux que « Pas trouvé » y a envoyés) */
-      const fs = snapOf(), st = RES.steps[RES.K], bst = st && (st.full || st.partial);
-      const c = (fs && fillUsable() ? magOf(fs).map((x, n) => ({ l: { id: x.id, q: x.q, n }, cost: x.cost, ret: x.ret })) : ((bst && bst.completed) || []).map((x) => (x.alt ? Object.assign({}, x, { l: Object.assign({}, x.l, { id: x.alt }) }) : x))).filter((x) => S.prods.has(x.l.id));
-      if (!c.length) return { body: `<p>Plus rien à acheter en magasin.</p>`, foot: "" };
-      const by = new Map();
-      c.forEach((x) => { if (!by.has(x.ret)) by.set(x.ret, []); by.get(x.ret).push(x); });
-      const order = (x) => { const p = S.prods.get(x.l.id); return (S.rayons.findIndex((r) => r.id === p.r) + 1) * 1000 + (x.l.n || 0); };
-      const k = c.filter((x) => S.guide.ck["mag|" + x.l.id]).length;
-      return {
-        body: `<p>Coche chaque produit une fois dans ton panier. Les produits sont rangés par rayon.</p><div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${c.length}" aria-valuenow="${k}" aria-valuetext="${k} sur ${plural(c.length, "produit", "produits")}"><span style="width:${Math.round((100 * k) / c.length)}%"></span></div><p class="progl${k === c.length ? " done" : ""}" aria-live="polite">${k === c.length ? ic("check") : ""}${k} sur ${plural(c.length, "produit", "produits")}</p>` +
-          [...by.entries()].map(([ret, xs]) => `<h3 class="gh">Chez ${esc(retName(ret))}</h3><div class="group">${xs.sort((a, b) => order(a) - order(b)).map((x) => {
-            const p = S.prods.get(x.l.id), on = !!S.guide.ck["mag|" + p.id], ray = rayon(p.r);
-            return `<div class="gi${on ? " on" : ""}"><button class="box hit" type="button" data-act="shopck" data-p="${esc(p.id)}" role="checkbox" aria-checked="${on}" aria-label="Dans mon panier, ${esc(p.brand + " " + p.name)}">${ic("check")}</button><span class="gt"><b>${x.l.q > 1 ? `<span class="gq">${x.l.q} ×</span> ` : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}, environ ${eurC(x.cost)}${ray ? ", rayon " + esc(ray.name.toLowerCase()) : ""}</small></span><span></span></div>`;
-          }).join("")}</div>`).join("") +
-          `<p class="gf">Prix relevés en ligne\u00a0: en magasin, ils peuvent être un peu différents.</p>`,
-        foot: "",
-      };
-    };
-    const o = build();
-    openSheet({ title: "En magasin", body: o.body, build, onClose: () => { if (S.route.name === "panier" || S.route.name === "remplir") rerender(); } });
+  /* ---------- mode magasin et impression ---------- */
+  /* #/magasin : la liste à cocher en marchant, rangée par univers puis dans l'ordre des rayons, en gros caractères ;
+     « À acheter en magasin » (les produits que tes commandes ne prennent pas) ou « Tout le panier » (lignes libres
+     comprises). L'écran reste allumé quand le navigateur le permet (prefs.wake, Screen Wake Lock), le scanner coche ce
+     qu'il reconnaît, et la page s'imprime proprement (feuille d'impression de app.css). Coches : cabas.guide.ck « mag|… ». */
+  function storeMag() {
+    const fs = snapOf(), st = RES.steps[RES.K], bst = st && (st.full || st.partial);
+    const c = fs && fillUsable() ? magOf(fs).map((x) => ({ id: x.id, q: x.q, cost: x.cost, ret: x.ret })) : ((bst && bst.completed) || []).map((x) => ({ id: x.alt || x.l.id, q: x.l.q, cost: x.cost, ret: x.ret }));
+    return c.filter((x) => S.prods.has(x.id));
   }
+  function storeItems(mode) {
+    if (mode === "mag") return storeMag();
+    const out = Object.keys(S.basket).filter((id) => S.basket[id] > 0 && S.prods.has(id)).map((id) => { const b = best(S.prods.get(id)); return { id, q: S.basket[id], cost: b ? Math.round(b.price * 100) * S.basket[id] : 0, ret: b ? b.ret : "", sim: !!(b && b.sim) }; });
+    return out.concat(freeList().map((f) => ({ fid: f.fid, t: f.t, q: f.q, free: true })));
+  }
+  /* « À acheter en magasin » d'office quand la répartition en a, sinon tout le panier */
+  const storeMode = () => (S.storeMode !== "all" && storeMag().length ? "mag" : "all");
+  const storeKey = (x) => "mag|" + (x.free ? "f:" + x.fid : x.id);
+  const storeOrder = (x) => { if (x.free) return 1e9; const p = S.prods.get(x.id), ri = S.rayons.findIndex((r) => r.id === p.r), u = S.univers.findIndex((v) => v.id === (rayon(p.r) || {}).u); return (u < 0 ? 99 : u) * 1e6 + (ri < 0 ? 9999 : ri) * 10; };
+  /* l'écran allumé : demandé à l'ouverture du mode magasin, rendu en le quittant, redemandé au retour dans l'appli */
+  let wakeL = null;
+  const wakeOK = () => "wakeLock" in navigator;
+  async function wakeOn() {
+    if (!wakeOK() || S.prefs.wake === false || S.route.name !== "magasin" || document.visibilityState !== "visible" || wakeL) return;
+    try { const l = await navigator.wakeLock.request("screen"); if (S.route.name !== "magasin") { l.release(); return; } wakeL = l; l.addEventListener("release", () => { if (wakeL === l) wakeL = null; }); } catch (e) { wakeL = null; }
+  }
+  function wakeOff() { const l = wakeL; wakeL = null; if (l) l.release().catch(() => { /* déjà rendu */ }); }
+  function storeRow(x) {
+    const on = !!S.guide.ck[storeKey(x)];
+    if (x.free) return `<button class="gi big${on ? " on" : ""}" type="button" role="checkbox" aria-checked="${on}" data-act="shopck" data-f="${esc(x.fid)}"><span class="box">${ic("check")}</span><span class="gt"><b>${x.q > 1 ? `<span class="gq">${x.q} ×</span> ` : ""}${esc(x.t)}</b><small>Ligne libre${S.free[x.fid] && S.free[x.fid].price > 0 ? ", " + esc(eur(S.free[x.fid].price)) + " l'unité, prix saisi par toi" : ""}</small></span></button>`;
+    const p = S.prods.get(x.id), ray = rayon(p.r);
+    return `<button class="gi big${on ? " on" : ""}" type="button" role="checkbox" aria-checked="${on}" data-act="shopck" data-p="${esc(p.id)}"><span class="box">${ic("check")}</span><span class="gt"><b>${x.q > 1 ? `<span class="gq">${x.q} ×</span> ` : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}${x.cost ? ", environ " + eurC(x.cost) + (x.ret ? " chez " + esc(retName(x.ret)) : "") + (x.sim ? " (prix simulé)" : "") : ""}${ray ? ", rayon " + esc(ray.name.toLowerCase()) : ""}</small></span></button>`;
+  }
+  VIEWS.magasin = () => {
+    const mag = storeMag(), mode = storeMode(), L = storeItems(mode).sort((a, b) => storeOrder(a) - storeOrder(b));
+    const k = L.filter((x) => S.guide.ck[storeKey(x)]).length, today = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+    const groups = [];
+    for (const x of L) { const u = x.free ? "Lignes libres" : univName((rayon(S.prods.get(x.id).r) || {}).u) || "Autres"; const g = groups[groups.length - 1]; if (g && g.u === u) g.xs.push(x); else groups.push({ u, xs: [x] }); }
+    const seg = mag.length && count() ? `<div class="pad noprint"><div class="seg" role="radiogroup" aria-label="Liste affichée"><button type="button" role="radio" data-act="storemode" data-v="mag" aria-checked="${mode === "mag"}">À acheter en magasin</button><button type="button" role="radio" data-act="storemode" data-v="all" aria-checked="${mode === "all"}">Tout le panier</button></div></div>` : "";
+    const done = L.length && k === L.length;
+    return {
+      title: "En magasin", grouped: true,
+      mount: () => { wakeOn(); },
+      html: `<div class="store"><h1 class="lt">En magasin</h1><p class="lt-sub noprint">Coche en marchant : les produits sont rangés par rayon.</p><p class="print-only">Mes courses du ${esc(today)}, avec Cabas</p>` + seg +
+        (L.length ? `<div class="prog noprint" role="progressbar" aria-valuemin="0" aria-valuemax="${L.length}" aria-valuenow="${k}" aria-valuetext="${k} sur ${plural(L.length, "produit", "produits")}"><span style="width:${Math.round((100 * k) / L.length)}%"></span></div><p class="progl noprint${done ? " done" : ""}" aria-live="polite">${done ? ic("check") : ""}${done ? "Tout est dans ton panier" : `${k} sur ${plural(L.length, "produit", "produits")}`}</p>` +
+          groups.map((g) => `<h2 class="gh">${esc(g.u)}</h2><div class="group">${g.xs.map(storeRow).join("")}</div>`).join("") +
+          `<p class="gf">${mode === "mag" ? "Ce sont les produits que tes commandes ne prennent pas. " : ""}Prix relevés en ligne : en magasin, ils peuvent être un peu différents.</p>` +
+          `<div class="pad btns noprint" style="padding-top:18px"><button class="btn tint" type="button" data-act="storescan">${ic("scan")}Scanner un produit</button><button class="btn ghost" type="button" data-act="print">Imprimer la liste</button>${speakBtn("magasin", "Écouter ce qu'il reste", "btn ghost")}</div>` +
+          `<h2 class="gh noprint">Réglages du mode magasin</h2><div class="group noprint">${wakeOK() ? `<div class="row"><span class="rt" id="wakeL">Garder l'écran allumé<small>Tant que cette page est ouverte, l'écran ne se met pas en veille.</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="wake" aria-labelledby="wakeL"${S.prefs.wake !== false ? " checked" : ""}><span></span></label></div>` : `<div class="row"><span class="rt">Écran allumé<small>Ton navigateur ne peut pas garder l'écran allumé : touche-le de temps en temps.</small></span></div>`}${k ? `<button class="row link" type="button" data-act="storereset">Tout décocher</button>` : ""}</div>` +
+          `<p class="print-only">${esc(freshText())}.</p>`
+          : `<div class="empty">${emptyArt("bag")}<h2>Rien à acheter en magasin</h2><p>Ajoute des produits à ton panier, ou écris ta liste : ils s'afficheront ici, rangés par rayon.</p><a class="btn tint" href="#/ecrire">${ic("pen")}Écrire ma liste</a></div>`) + `</div>`,
+    };
+  };
+
+  /* ---------- tes données : sauvegarde, restauration, transfert ---------- */
+  /* Tout ce que Cabas garde est dans ce navigateur (clés cabas.*). Une copie s'enregistre en fichier JSON (packState),
+     se restaure depuis ce fichier, ou passe d'un téléphone à l'autre par un lien #/transfert/<x> : les données sont
+     dans le lien lui-même, après le #, que le navigateur n'envoie à aucun serveur. Tout ce qui arrive est vérifié
+     (importCheck : clés connues, types, tailles) et ne remplace rien sans confirmation, avec « Annuler ». */
+  const DKEYS = ["basket", "lists", "prefs", "free", "flex", "hist", "menu", "todo", "seen", "recent", "guide", "draft", "seenp", "drops", "ups", "seenAt", "univ", "prepSnooze"];
+  /* le lien ne porte que l'essentiel : pas de remplissage en cours, de brouillon ni de mémoire des prix vus */
+  const XKEYS = ["basket", "lists", "prefs", "free", "flex", "hist", "menu", "todo", "seen", "recent"];
+  function packState(keys) {
+    const data = {};
+    for (const k of keys || DKEYS) { const v = store.get(k, undefined); if (v !== undefined && v !== null) data[k] = v; }
+    if (!keys && data.hist) data.hist = data.hist.slice(-200);
+    if (keys && data.hist) data.hist = data.hist.slice(-60);
+    return { app: "cabas", v: 1, at: new Date().toISOString(), data };
+  }
+  const b64u = (u8) => { let b = ""; for (let i = 0; i < u8.length; i += 0x8000) b += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(b).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
+  const u8b = (s) => { const b = atob(String(s).replace(/-/g, "+").replace(/_/g, "/")), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+  const zipOK = () => typeof CompressionStream === "function" && typeof DecompressionStream === "function";
+  async function pipeBytes(u8, stream) { return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(stream)).arrayBuffer()); }
+  /* « z » + JSON compressé (deflate-raw) quand le navigateur sait le faire, sinon « j » + JSON */
+  async function packLink(state) {
+    const raw = new TextEncoder().encode(JSON.stringify(state || packState(XKEYS)));
+    if (zipOK()) { try { return "z" + b64u(await pipeBytes(raw, new CompressionStream("deflate-raw"))); } catch (e) { /* compression refusée : lien non compressé */ } }
+    return "j" + b64u(raw);
+  }
+  async function unpackState(x) {
+    try {
+      x = String(x || "");
+      if (x.length > 600000) return null;
+      let bytes = u8b(x.slice(1));
+      if (x[0] === "z") { if (!zipOK()) return null; bytes = await pipeBytes(bytes, new DecompressionStream("deflate-raw")); }
+      else if (x[0] !== "j") return null;
+      if (bytes.length > 4000000) return null;
+      return JSON.parse(new TextDecoder().decode(bytes));
+    } catch (e) { return null; }
+  }
+  /* vérification de ce qui arrive : forme de chaque clé, bornes, aucune clé inconnue gardée ; renvoie les données
+     nettoyées, ce qui a été écarté, et un résumé pour la confirmation */
+  function importCheck(obj) {
+    const errs = [], data = {}, skip = [];
+    const isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+    const safeK = (k) => typeof k === "string" && k.length > 0 && k.length <= 200 && !/^(__proto__|constructor|prototype)$/.test(k);
+    const str = (v, n) => typeof v === "string" && v.length <= n;
+    const qty = (v) => Number.isInteger(v) && v >= 1 && v <= 99;
+    const cents = (v) => Number.isInteger(v) && v >= 0 && v <= 10000000;
+    const iso = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v) && v.length <= 40;
+    const items = (v) => { if (!isObj(v)) return null; const o = {}; for (const k of Object.keys(v).slice(0, 600)) if (safeK(k) && qty(v[k])) o[k] = v[k]; return o; };
+    const map = (v, ok, n) => { if (!isObj(v)) return null; const o = {}; for (const k of Object.keys(v).slice(0, n || 2000)) if (safeK(k) && ok(v[k])) o[k] = v[k]; return o; };
+    const json = (v, n) => { try { return JSON.stringify(v).length <= n; } catch (e) { return false; } };
+    if (!isObj(obj) || obj.app !== "cabas" || !isObj(obj.data)) return { ok: false, errs: ["Ce n'est pas une copie de Cabas."], data, skip, sum: {} };
+    if (obj.v !== 1) return { ok: false, errs: ["Cette copie vient d'une autre version de Cabas."], data, skip, sum: {} };
+    const D = obj.data;
+    const V = {
+      basket: (v) => items(v),
+      lists: (v) => (Array.isArray(v) ? v.slice(0, 100).filter((L) => isObj(L) && str(L.id, 40) && str(L.name, 80) && isObj(L.items)).map((L) => { const o = { id: L.id, name: L.name, items: items(L.items) || {}, at: iso(L.at) ? L.at.slice(0, 10) : isoDay(new Date()) }; if (Array.isArray(L.free)) o.free = L.free.slice(0, 20).filter((f) => Array.isArray(f) && str(f[0], 60) && qty(f[1])).map((f) => [f[0], f[1]]); if (L.template === true) o.template = true; if (isObj(L.cad)) o.cad = map(L.cad, (c) => [0, 14, 21, 28].includes(c), 600); return o; }) : null),
+      prefs: (v) => {
+        if (!isObj(v)) return null;
+        const o = {};
+        for (const k of Object.keys(v)) {
+          const x = v[k], d = PREFS0[k];
+          if (!safeK(k)) continue;
+          if (k === "zip") { if (typeof x === "string" && /^\d{0,5}$/.test(x)) o.zip = x; }
+          else if (k === "foyer" || k === "maxOrders") { if (Number.isInteger(x) && x >= 0 && x <= 10) o[k] = x; }
+          else if (k === "budget" || k === "extraCost") { if (typeof x === "number" && x >= 0 && x <= 100000) o[k] = x; }
+          else if (k === "shopDay") { if (x === null || (Number.isInteger(x) && x >= 0 && x <= 6)) o.shopDay = x; }
+          else if (k === "voice") { if (x === "slow" || x === "normal") o.voice = x; }
+          else if (k === "theme") { if (["auto", "light", "dark"].includes(x)) o.theme = x; }
+          else if (k === "budgetMode") { if (x === "panier" || x === "mois") o.budgetMode = x; }
+          else if (k === "zoom") { if (typeof x === "string" && /^[01](\.\d{1,2})?$/.test(x)) o.zoom = x; }
+          else if (k === "contrast") { if (x === null || typeof x === "boolean") o.contrast = x; }
+          else if (["comp", "wake", "simple", "manualCk", "badge"].includes(k)) { if (typeof x === "boolean") o[k] = x; }
+          else if (k === "offv") { if (Number.isInteger(x) && x >= 0 && x <= 9) o.offv = x; }
+          else if (isObj(d) || ["off", "fee", "pick", "pickManual", "liv", "keep", "usual", "qty1", "diet", "lead", "pin", "ban"].includes(k)) { if (isObj(x) && json(x, 200000)) { const m = map(x, (y) => ["string", "number", "boolean"].includes(typeof y) || (isObj(y) && json(y, 2000)), 3000); if (m) o[k] = m; } }
+          else skip.push("prefs." + k);
+        }
+        return o;
+      },
+      free: (v) => map(v, (f) => isObj(f) && str(f.t, 60) && qty(f.q) && (f.price == null || (typeof f.price === "number" && f.price >= 0 && f.price <= 1000)) && (f.ret == null || str(f.ret, 40)), 200),
+      flex: (v) => map(v, (a) => Array.isArray(a) && a.length <= 20 && a.every((x) => str(x, 200)), 600),
+      hist: (v) => (Array.isArray(v) ? v.slice(-200).filter((h) => isObj(h) && iso(h.d) && cents(h.t) && (h.items == null || isObj(h.items)) && json(h, 60000)).map((h) => { const o = { d: h.d.slice(0, 10), t: h.t, s: cents(h.s) ? h.s : 0, n: Number.isInteger(h.n) && h.n >= 0 && h.n <= 10000 ? h.n : 0 }; if (h.items) o.items = items(h.items) || {}; if (Array.isArray(h.o)) o.o = h.o.slice(0, 12).filter((x) => typeof x === "string" ? x.length <= 60 : isObj(x) && str(x.rid, 60) && json(x, 30000)); if (Array.isArray(h.when)) o.when = h.when.slice(0, 12).filter((w) => isObj(w) && json(w, 1000)); if (isObj(h.paid)) o.paid = map(h.paid, cents, 20); if (isObj(h.arr)) o.arr = map(h.arr, (x) => str(x, 20), 20); if (isObj(h.miss)) o.miss = map(h.miss, (x) => Array.isArray(x) && x.length <= 200 && x.every((y) => str(y, 200)), 20); if (str(h.sid, 40)) o.sid = h.sid; return o; }) : null),
+      menu: (v) => (Array.isArray(v) ? v.slice(0, 40).filter((m) => isObj(m) && str(m.id, 80) && Number.isInteger(m.portions) && m.portions >= 1 && m.portions <= 40).map((m) => ({ id: m.id, portions: m.portions })) : null),
+      todo: (v) => (Array.isArray(v) ? v.slice(0, 200).filter((x) => isObj(x) && str(x.id, 200) && qty(x.q)).map((x) => ({ id: x.id, q: x.q, from: str(x.from, 60) ? x.from : "", at: iso(x.at) ? x.at.slice(0, 10) : isoDay(new Date()) })) : null),
+      seen: (v) => (isObj(v) && json(v, 20000) ? map(v, (x) => ["number", "boolean"].includes(typeof x) || (isObj(x) && json(x, 5000)), 100) : null),
+      recent: (v) => (Array.isArray(v) ? v.filter((x) => str(x, 80)).slice(0, 20) : null),
+      guide: (v) => (isObj(v) && json(v, 400000) ? Object.assign({ ck: {}, done: {} }, map(v, (x) => isObj(x) || typeof x === "string" || typeof x === "number" || x === null, 40)) : null),
+      draft: (v) => (str(v, 4000) ? v : null),
+      seenp: (v) => map(v, (x) => typeof x === "number" && x >= 0 && x < 100000, 5000),
+      drops: (v) => (Array.isArray(v) ? v.slice(0, 20).filter((d) => isObj(d) && str(d.id, 200) && typeof d.old === "number" && typeof d.now === "number" && iso(d.until)) : null),
+      ups: (v) => (Array.isArray(v) ? v.slice(0, 20).filter((d) => isObj(d) && str(d.id, 200) && typeof d.old === "number" && typeof d.now === "number" && iso(d.until)) : null),
+      seenAt: (v) => (str(v, 40) ? v : null),
+      univ: (v) => map(v, (x) => typeof x === "boolean", 40),
+      prepSnooze: (v) => (str(v, 12) ? v : null),
+    };
+    for (const k of Object.keys(D)) {
+      if (!V[k]) { skip.push(k); continue; }
+      const c = V[k](D[k]);
+      if (c == null) errs.push(k); else data[k] = c;
+    }
+    const sum = { basket: Object.keys(data.basket || {}).length, lists: (data.lists || []).length, hist: (data.hist || []).length, free: Object.keys(data.free || {}).length, prefs: !!data.prefs, menu: (data.menu || []).length };
+    const ok = Object.keys(data).length > 0;
+    return { ok, errs: ok ? errs : errs.concat(["Cette copie ne contient rien à restaurer."]), data, skip, sum, at: iso(obj.at) ? obj.at : "" };
+  }
+  /* ce que la copie contient, en clair */
+  function importSum(R) {
+    const s = R.sum, parts = [];
+    if (s.basket) parts.push(plural(s.basket, "produit au panier", "produits au panier"));
+    if (s.lists) parts.push(plural(s.lists, "liste", "listes"));
+    if (s.hist) parts.push(plural(s.hist, "panier commandé", "paniers commandés"));
+    if (s.free) parts.push(plural(s.free, "ligne libre", "lignes libres"));
+    if (s.menu) parts.push(plural(s.menu, "repas", "repas"));
+    if (s.prefs) parts.push("tes réglages");
+    return parts.length ? joinEt(parts) : "rien à restaurer";
+  }
+  /* l'état de l'appli relu depuis le stockage (après une restauration ou son « Annuler ») */
+  function reloadState() {
+    const pr = store.get("prefs", {});
+    S.basket = store.get("basket", {}); S.lists = store.get("lists", []); S.recent = store.get("recent", []); S.seen = store.get("seen", {});
+    S.hist = store.get("hist", []); S.menu = store.get("menu", []); S.todo = store.get("todo", []); S.free = store.get("free", {}); S.flex = store.get("flex", {});
+    S.guide = Object.assign({ ck: {}, done: {} }, store.get("guide", {}));
+    S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {} }, pr);
+    S.wl = null; S.undo = null; S._sug = null; S._ask = null; S._compose = null; S.filt = {}; DIETV.v++; RECM = null;
+    applyLook(); applyGroups(); renderChrome();
+  }
+  /* remplace les données de l'appareil ; « Annuler » remet exactement ce qu'il y avait */
+  function applyImport(data, how) {
+    const before = {};
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("cabas.")) before[k] = localStorage.getItem(k); } } catch (e) { /* stockage indisponible */ }
+    try {
+      Object.keys(before).forEach((k) => localStorage.removeItem(k));
+      for (const k of Object.keys(data)) localStorage.setItem("cabas." + k, JSON.stringify(data[k]));
+    } catch (e) { toast("Le stockage de ce navigateur est plein ou bloqué\u00a0: rien n'a changé"); Object.keys(before).forEach((k) => { try { localStorage.setItem(k, before[k]); } catch (er) { /* rien */ } }); return false; }
+    reloadState();
+    const restore = () => { try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith("cabas.")) localStorage.removeItem(k); } Object.keys(before).forEach((k) => localStorage.setItem(k, before[k])); } catch (e) { /* stockage indisponible */ } reloadState(); };
+    S.tab = "accueil"; S.stacks = { accueil: ["#/"], rayons: ["#/rayons"], recherche: ["#/recherche"], listes: ["#/listes"], panier: ["#/panier"] };
+    history.replaceState(null, "", location.pathname + "#/");
+    navigate("#/", "tab");
+    undoable(how, restore, 10000);
+    return true;
+  }
+  function exportFile() {
+    const st = packState(), name = `cabas-${isoDay(new Date())}.json`;
+    const blob = new Blob([JSON.stringify(st, null, 1)], { type: "application/json" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    toast("Copie enregistrée\u00a0: " + name, null, "check");
+  }
+  function importSheet(R, how) {
+    S.imp = R;
+    openSheet({
+      title: R.ok ? "Remplacer tes données\u00a0?" : "Copie illisible",
+      body: R.ok ? `<p>${R.at ? `Copie faite ${esc(whenFr(R.at))}` : "Cette copie"}\u00a0: ${esc(importSum(R))}.</p><p>Elle remplacera le panier, les listes, l'historique et les réglages de cet appareil. Tu pourras annuler juste après.</p>${R.errs.length || R.skip.length ? `<p class="hint">Certaines parties, abîmées ou inconnues, sont laissées de côté.</p>` : ""}`
+        : `<p>${esc(R.errs[0] || "Ce fichier n'est pas une copie de Cabas.")}</p><p>Choisis le fichier enregistré par «\u00a0Enregistrer une copie\u00a0» (cabas-date.json).</p>`,
+      foot: R.ok ? `<button class="btn plain" type="button" data-act="close">Garder mes données</button><button class="btn" type="button" data-act="impok" data-k="${esc(how)}">Remplacer</button>` : `<button class="btn" type="button" data-act="close">OK</button>`,
+    });
+  }
+  function dataHtml() {
+    return `<h2 class="gh">Tes données</h2><div class="group">` +
+      `<button class="row" type="button" data-act="export"><span class="rt">Enregistrer une copie<small>Un fichier avec ton panier, tes listes, tes paniers commandés et tes réglages</small></span>${ic("chev", "chev")}</button>` +
+      `<button class="row" type="button" data-act="import"><span class="rt">Restaurer une copie<small>Depuis un fichier enregistré par Cabas</small></span>${ic("chev", "chev")}</button>` +
+      `<button class="row" type="button" data-act="xfer"><span class="rt">Envoyer vers un autre téléphone<small>Un lien à ouvrir sur l'autre téléphone, sans compte ni serveur</small></span>${ic("share", "chev")}</button>` +
+      `</div><input type="file" id="impIn" accept=".json,application/json" hidden><p class="gf">Tout reste sur cet appareil. Le lien contient tes données elles-mêmes\u00a0: envoie-le seulement à toi.</p>`;
+  }
+  /* #/transfert/<x> : ce qui arrive d'un autre téléphone, vérifié, puis remplacé seulement si tu le confirmes */
+  VIEWS.transfert = (r) => {
+    const X = S.xfer && S.xfer.id === r.id ? S.xfer : (S.xfer = { id: r.id, st: "wait", R: null });
+    if (X.st === "wait" && !X.p) X.p = unpackState(r.id).then((o) => { X.R = o ? importCheck(o) : null; X.st = X.R && X.R.ok ? "ok" : "bad"; if (S.route.name === "transfert") rerender(); });
+    const R = X.R;
+    return {
+      title: "Transfert", grouped: true,
+      html: `<h1 class="lt">Données d'un autre téléphone</h1>` + (X.st === "wait" ? `<p class="lt-sub" role="status">Lecture du lien…</p>` :
+        X.st === "bad" ? `<div class="empty" role="alert">${emptyArt("info")}<h2>Ce lien est illisible</h2><p>Il est incomplet ou abîmé (un message trop long peut couper un lien). Enregistre plutôt une copie en fichier sur l'autre téléphone, puis restaure-la ici.</p><a class="btn tint" href="#/">Retour à l'accueil</a></div>` :
+        `<p class="lt-sub">${R.at ? "Envoyées " + esc(whenFr(R.at)) : "Envoyées depuis Cabas"}\u00a0: ${esc(importSum(R))}.</p><div class="banner warn" role="status">${ic("info")}<span><b>Elles remplaceront celles de ce téléphone</b>Le panier, les listes, l'historique et les réglages de ce téléphone seront remplacés. Tu pourras annuler juste après.</span></div>` +
+          `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="xferok">Remplacer les données de ce téléphone</button><button class="btn ghost" type="button" data-act="xferno">Ne rien changer</button></div><p class="gf">Rien n'est passé par un serveur\u00a0: les données étaient dans le lien lui-même.</p>`),
+    };
+  };
+
+  /* ---------- écouter ---------- */
+  /* La liste, la répartition du panier ou ce qu'il reste à prendre en magasin, lus à voix haute par la synthèse vocale
+     du téléphone (speechSynthesis, voix française, débit lent ou normal : prefs.voice). Rien ne quitte le téléphone. */
+  const TTS = () => (window.speechSynthesis && typeof window.SpeechSynthesisUtterance === "function" ? window.speechSynthesis : null);
+  const sayEur = (c) => { c = Math.round(c); const e = Math.floor(c / 100), ct = c % 100; return `${e} euro${e > 1 ? "s" : ""}${ct ? " " + ct : ""}`; };
+  /* « 6 x 1 L » se dit « 6 fois 1 litre », « 500 g » « 500 grammes » */
+  const sayFmt = (f) => String(f || "").replace(/(\d),(\d)/g, "$1 virgule $2").replace(/(\d)\s*[x×]\s*(\d)/gi, "$1 fois $2")
+    .replace(/(\d)\s*(kg|g|cl|ml|l)\b\.?/gi, (m, d, u) => d + " " + ({ kg: "kilo", g: "grammes", cl: "centilitres", ml: "millilitres", l: "litre" })[u.toLowerCase()]);
+  const sayItem = (p, q) => `${q > 1 ? q + " fois " : ""}${p.brand && p.brand !== "Sans marque" ? p.brand + ", " : ""}${p.name}${p.format ? ", " + sayFmt(p.format) : ""}`;
+  /* le texte lu : « panier » (la répartition), « liste » (Ma liste), « list » (une liste enregistrée, id), « magasin » */
+  function speakText(kind, id) {
+    const out = [];
+    if (kind === "panier") {
+      const res = cartResult(), st = res.steps[res.K], bst = st && (st.full || st.partial), n = count();
+      if (!n) return "Ton panier est vide.";
+      if (!bst) return `Ton panier\u00a0: ${plural(n, "article", "articles")}, environ ${sayEur(Math.round(subtotal() * 100))} au meilleur prix de chaque produit. ${res.done ? "Il est trop petit pour une livraison." : ""}`.trim();
+      out.push(`Ton panier\u00a0: ${plural(n, "article", "articles")}, ${bst.orders.length > 1 ? plural(bst.orders.length, "commande", "commandes") : "une commande"}, ${sayEur(fullTotal(bst))} livraison comprise.`);
+      for (const o of bst.orders) {
+        const r = S.retMap.get(o.ch.id) || { name: o.ch.id };
+        out.push(`Chez ${r.name}, ${sayEur(o.sub + o.fee)}${o.fee ? ", dont " + sayEur(o.fee) + " de frais" : ", livraison offerte"}${r.simulated ? ", prix simulés" : ""}\u00a0: ${o.items.map((x) => sayItem(S.prods.get(x.alt || x.l.id), x.l.q)).join("\u00a0; ")}.`);
+      }
+      if ((bst.completed || []).length) out.push(`En magasin, ${sayEur(bst.compTotal)}\u00a0: ${bst.completed.map((x) => sayItem(S.prods.get(x.alt || x.l.id), x.l.q) + ", chez " + retName(x.ret)).join("\u00a0; ")}.`);
+      if ((bst.skipped || []).length) out.push(`Hors commande\u00a0: ${bst.skipped.map((x) => sayItem(S.prods.get(x.l.id), x.l.q)).join("\u00a0; ")}.`);
+    } else if (kind === "liste") {
+      const L = (S.wl && S.wl.lines) || [], f = L.filter((x) => x.pick);
+      out.push(`Ta liste\u00a0: ${plural(f.length, "produit trouvé", "produits trouvés")} sur ${L.length}.`);
+      f.forEach((x) => { const p = S.prods.get(x.pick), b = best(p); out.push(`${x.raw}\u00a0: ${sayItem(p, x.n)}${b ? ", " + sayEur(Math.round(b.price * 100) * x.n) + " chez " + retName(b.ret) + (b.sim ? ", prix simulé" : "") : ""}.`); });
+      const miss = L.filter((x) => !x.pick);
+      if (miss.length) out.push(`Pas trouvé\u00a0: ${miss.map((x) => x.raw).join(", ")}.`);
+    } else if (kind === "list") {
+      const L = S.lists.find((x) => x.id === id);
+      if (!L) return "";
+      const ids = Object.keys(L.items).filter((x) => S.prods.has(x));
+      out.push(`Liste ${L.name}\u00a0: ${plural(ids.length, "produit", "produits")}.`);
+      ids.forEach((x) => out.push(sayItem(S.prods.get(x), L.items[x]) + "."));
+      (L.free || []).forEach(([t, q]) => out.push(`${q > 1 ? q + " fois " : ""}${t}.`));
+    } else if (kind === "magasin") {
+      const L = storeItems(storeMode()).sort((a, b) => storeOrder(a) - storeOrder(b)), left = L.filter((x) => !S.guide.ck[storeKey(x)]);
+      if (!left.length) return L.length ? "Tout est dans ton panier." : "Rien à acheter en magasin.";
+      out.push(`Il te reste ${plural(left.length, "produit", "produits")}.`);
+      let u = "";
+      for (const x of left) {
+        const g = x.free ? "Lignes libres" : univName((rayon(S.prods.get(x.id).r) || {}).u);
+        out.push((g !== u ? g + "\u00a0: " : "") + (x.free ? `${x.q > 1 ? x.q + " fois " : ""}${x.t}` : sayItem(S.prods.get(x.id), x.q)) + ".");
+        u = g;
+      }
+    }
+    return out.join(" ").replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  }
+  let speaking = null;
+  function markSpeak(on) { $$('[data-act="speak"]').forEach((b) => { b.setAttribute("aria-pressed", String(on)); const l = b.querySelector(".sl2"); if (l) l.textContent = on ? "Arrêter la lecture" : l.dataset.l; }); }
+  function speakStop() { const t = TTS(); speaking = null; if (t) t.cancel(); markSpeak(false); }
+  function speak(text) {
+    const tts = TTS();
+    if (!tts || !text) return;
+    if (speaking) { speakStop(); return; }
+    tts.cancel();
+    const u = new window.SpeechSynthesisUtterance(text), vs = tts.getVoices();
+    u.lang = "fr-FR"; u.rate = S.prefs.voice === "slow" ? 0.8 : 1;
+    const v = vs.find((x) => /^fr[-_]FR/i.test(x.lang) && x.localService) || vs.find((x) => /^fr[-_]FR/i.test(x.lang)) || vs.find((x) => /^fr/i.test(x.lang));
+    if (v) u.voice = v;
+    u.onend = u.onerror = () => { if (speaking === u) { speaking = null; markSpeak(false); } };
+    speaking = u; markSpeak(true);
+    tts.speak(u);
+  }
+  const speakBtn = (k, label, cls, id) => (TTS() ? `<button class="${cls || "btn tint"}" type="button" data-act="speak" data-k="${k}"${id ? ` data-id="${esc(id)}"` : ""} aria-pressed="false">${ic("speaker")}<span class="sl2" data-l="${esc(label)}">${esc(label)}</span></button>` : "");
 
   /* ---------- baisses de prix ---------- */
   /* À chaque nouveau relevé, les produits du panier et des listes sont comparés au prix vu la fois d'avant
@@ -4036,23 +4562,27 @@
   function trackDrops() {
     const at = S.meta.updatedAt || "";
     if (!at || store.get("seenAt", "") === at) return;
-    const seen = store.get("seenp", {}), drops = store.get("drops", []).filter((d) => d.until >= new Date().toISOString().slice(0, 10));
+    const seen = store.get("seenp", {}), drops = store.get("drops", []).filter((d) => d.until >= new Date().toISOString().slice(0, 10)), ups = store.get("ups", []).filter((d) => d.until >= new Date().toISOString().slice(0, 10));
     const ids = new Set(Object.keys(S.basket).concat(...S.lists.map((L) => Object.keys(L.items || {}))));
     const until = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
     for (const id of ids) {
       const p = S.prods.get(id), b = p && bestReal(p);
       if (!b) continue;
       const old = seen[id];
-      if (old && b.price <= old * 0.97 && old - b.price >= 0.1) { const i = drops.findIndex((d) => d.id === id); if (i >= 0) drops.splice(i, 1); drops.unshift({ id, old, now: b.price, until }); }
+      const drop = old && b.price <= old * 0.97 && old - b.price >= 0.1, up = old && b.price >= old * 1.03 && b.price - old >= 0.1;
+      if (drop || up) { [drops, ups].forEach((L) => { const i = L.findIndex((d) => d.id === id); if (i >= 0) L.splice(i, 1); }); (drop ? drops : ups).unshift({ id, old, now: b.price, until }); }
       seen[id] = b.price;
     }
-    store.set("seenp", seen); store.set("drops", drops.slice(0, 20)); store.set("seenAt", at);
+    /* hausses vues (cabas.ups) : dites sept jours, comme les baisses */
+    store.set("seenp", seen); store.set("drops", drops.slice(0, 20)); store.set("ups", ups.slice(0, 20)); store.set("seenAt", at);
   }
   function dropsRail() {
     const today = new Date().toISOString().slice(0, 10);
     const ds = store.get("drops", []).filter((d) => d.until >= today && S.prods.has(d.id)).map((d) => { const p = S.prods.get(d.id), b = bestReal(p); return b && b.price < d.old ? { p, old: d.old, b } : null; }).filter(Boolean);
-    if (!ds.length) return "";
-    return `<div class="sh"><h2>Moins cher sur tes produits</h2></div><div class="rail" role="region" aria-label="Moins cher sur tes produits">${ds.map((d) => card(d.p, { was: d.old })).join("")}</div>`;
+    const us = store.get("ups", []).filter((d) => d.until >= today && S.prods.has(d.id)).map((d) => { const p = S.prods.get(d.id), b = bestReal(p); return b && b.price > d.old ? { p, old: d.old, b } : null; }).filter(Boolean);
+    /* seulement des hausses : une carte à la place de la rangée, vers « Ce qui a bougé » */
+    if (!ds.length) return us.length ? `<a class="hcard" href="#/mouvements">${ic("info", "si")}<span><b>${us.length > 1 ? plural(us.length, "de tes produits a augmenté", "de tes produits ont augmenté") : "Un de tes produits a augmenté"}</b><small>${esc(joinEt(us.slice(0, 2).map((x) => pname(x.p))))}${us.length > 2 ? ", et d'autres" : ""}, d'après le dernier relevé.</small></span>${ic("chev", "chev")}</a>` : "";
+    return `<div class="sh"><h2>Moins cher sur tes produits</h2><a class="act" href="#/mouvements">Ce qui a bougé${ic("chev")}</a></div><div class="rail" role="region" aria-label="Moins cher sur tes produits">${ds.map((d) => card(d.p, { was: d.old })).join("")}</div>`;
   }
 
   /* ---------- repas à petit prix ---------- */
@@ -4216,8 +4746,99 @@
     return `<h2 class="gh">Évolution du prix</h2><div class="group hist"><svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Évolution du prix depuis le ${day(all.map((x) => x[0]).sort()[0])}">${paths}</svg>` +
       `<div class="hax"><span>${day(all.map((x) => x[0]).sort()[0])}</span><span>${day(last)}</span></div>` +
       `<div class="hleg">${series.map((x, k) => `<span><i style="background:${cols[k]}"></i>${esc(retName(x.r))}, ${eur(x.pts[x.pts.length - 1][1])}</span>`).join("")}</div>` +
-      `<p class="hnote">Le plus bas relevé\u00a0: ${eur(low.v)} chez ${esc(retName(low.r))}, le ${day(low.d)}.</p></div>`;
+      `<p class="hnote">Le plus bas relevé\u00a0: ${eur(low.v)} chez ${esc(retName(low.r))}, le ${day(low.d)}.</p>${(() => { const m = momentOf(p); return m && m.k !== "flat" ? `<p class="hnote moment ${m.k}">${esc(m.text)}</p>` : ""; })()}</div>`;
   }
+
+  /* ---------- ce qui a bougé, le bon moment, tes dépenses ---------- */
+  /* data/history.json garde les prix relevés qui ont changé, par produit et par enseigne (jamais les prix simulés). Pour
+     tes produits (panier, listes, paniers commandés) : la dernière hausse ou baisse de chaque enseigne que tu utilises,
+     d'au moins 3 % et 10 centimes ; le bon moment, c'est le prix d'aujourd'hui comparé à tout ce qui a été relevé, sans
+     rien prédire ; tes dépenses, ce sont tes paniers commandés, aux prix relevés, et à part ce que tu as indiqué payé. */
+  function seriesOf(p, rid) {
+    const H = HIST && HIST.p && HIST.p[p.id] && HIST.p[p.id][rid], o = p.offers[rid];
+    if (!o || o.sim || !(o.price > 0)) return null;
+    const pts = (H || []).map(([i, v]) => [HIST.d[i], v]).filter((x) => x[0] && x[1] > 0);
+    if (!pts.length || Math.abs(pts[pts.length - 1][1] - o.price) >= 0.005) pts.push([o.at || (pts.length ? pts[pts.length - 1][0] : S.meta.updatedAt || ""), o.price]);
+    return pts;
+  }
+  function lastMove(p, rid) {
+    const pts = seriesOf(p, rid);
+    if (!pts || pts.length < 2) return null;
+    const [d, to] = pts[pts.length - 1], from = pts[pts.length - 2][1], dv = to - from;
+    if (Math.abs(dv) < 0.095 || Math.abs(dv) < from * 0.03) return null;
+    return { p, rid, from, to, d, pct: Math.round((dv / from) * 100) };
+  }
+  /* tes produits : le panier, les listes et les six derniers paniers commandés */
+  function myIds() {
+    const ids = new Set(Object.keys(S.basket).filter((id) => S.basket[id] > 0));
+    S.lists.forEach((L) => Object.keys(L.items || {}).forEach((id) => ids.add(id)));
+    histItems().slice(-6).forEach((h) => Object.keys(h.items).forEach((id) => ids.add(id)));
+    return [...ids].map(liveId).filter(Boolean);
+  }
+  /* ce qui a bougé ces derniers jours (28 par défaut) : une ligne par produit, l'enseigne où il est le moins cher d'abord */
+  function moves(all, days) {
+    const floor = isoDay(new Date(Date.now() - (days || 28) * 864e5)), out = [];
+    const ids = all ? (HIST && HIST.p ? Object.keys(HIST.p).map(liveId).filter(Boolean) : []) : myIds();
+    for (const id of new Set(ids)) {
+      const p = S.prods.get(id);
+      if (!p) continue;
+      const ms = Object.keys(p.offers).filter((r) => retOn(r)).map((r) => lastMove(p, r)).filter((m) => m && m.d >= floor);
+      if (!ms.length) continue;
+      const b = bestReal(p);
+      out.push(ms.find((m) => b && m.rid === b.ret) || ms.sort((x, y) => Math.abs(y.pct) - Math.abs(x.pct))[0]);
+    }
+    return { down: out.filter((m) => m.to < m.from).sort((a, b) => a.pct - b.pct), up: out.filter((m) => m.to > m.from).sort((a, b) => b.pct - a.pct) };
+  }
+  /* le bon moment : le moins cher d'aujourd'hui dans tes enseignes, comparé à tous les prix relevés depuis le début de l'historique */
+  function momentOf(p) {
+    const b = p && bestReal(p);
+    if (!b || !HIST || !HIST.p || !HIST.p[p.id]) return null;
+    const pts = Object.keys(p.offers).filter((r) => retOn(r)).flatMap((r) => (seriesOf(p, r) || []).map(([d, v]) => ({ d, v, r })));
+    if (pts.length < 2 || new Set(pts.map((x) => Math.round(x.v * 100))).size < 2) return null;
+    const lo = pts.reduce((a, x) => (x.v < a.v - 0.004 || (Math.abs(x.v - a.v) < 0.005 && x.d > a.d) ? x : a)), since = pts.map((x) => x.d).sort()[0];
+    if (b.price <= lo.v + 0.005) return { k: "low", text: `Bon moment\u00a0: ${eur(b.price)} chez ${retName(b.ret)}, le prix le plus bas relevé depuis le ${dayFr(since)}.` };
+    const gap = b.price - lo.v;
+    if (gap >= 0.095 && gap >= lo.v * 0.05) return { k: "high", text: `Il a déjà été moins cher\u00a0: ${eur(lo.v)} chez ${retName(lo.r)} le ${dayFr(lo.d)}, contre ${eur(b.price)} aujourd'hui au mieux.` };
+    return { k: "flat", text: `Proche du plus bas relevé depuis le ${dayFr(since)}.` };
+  }
+  /* dépenses par mois, d'après les paniers commandés : aux prix relevés (total de chaque panier), et à part ce que tu as indiqué payé */
+  function spendByMonth(n) {
+    const by = new Map();
+    for (const h of S.hist || []) {
+      if (!h || !h.d) continue;
+      const k = h.d.slice(0, 7), x = by.get(k) || { month: k, t: 0, n: 0, paid: 0, np: 0 };
+      x.t += h.t || 0; x.n++;
+      const pd = paidSum(h);
+      if (pd > 0) { x.paid += pd; x.np++; }
+      by.set(k, x);
+    }
+    const now = new Date(), out = [];
+    for (let i = (n || 6) - 1; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 15), k = isoDay(d).slice(0, 7); out.push(by.get(k) || { month: k, t: 0, n: 0, paid: 0, np: 0 }); }
+    return out;
+  }
+  const monthShort = (key) => { try { return new Date(key + "-15T12:00:00").toLocaleDateString("fr-FR", { month: "short" }).replace(/\.$/, ""); } catch (e) { return key.slice(5); } };
+  const moveRow = (m) => `<a class="row th" href="${hp(m.p.id)}"><span class="thumb">${img(m.p, 48)}</span><span class="rt">${esc(pname(m.p))}<small>${esc(retName(m.rid))}, ${eur(m.from)} puis ${eur(m.to)} le ${esc(dayFr(m.d))}</small></span><span class="val num mv ${m.to < m.from ? "dn" : "up"}">${m.pct > 0 ? "+" : "−"}${Math.abs(m.pct)}${NB}%</span></a>`;
+  VIEWS.mouvements = () => {
+    if (!HIST) loadHist().then(() => { if (S.route.name === "mouvements" && $("#sheet").hidden) rerender(); });
+    const M = HIST ? moves(false) : { down: [], up: [] }, A = HIST ? moves(true, 14) : { down: [], up: [] };
+    const mine = new Set(M.down.concat(M.up).map((m) => m.p.id)), aD = A.down.filter((m) => !mine.has(m.p.id)).slice(0, 6), aU = A.up.filter((m) => !mine.has(m.p.id)).slice(0, 6);
+    const months = spendByMonth(6), max = Math.max(1, ...months.map((x) => x.t)), anySpend = months.some((x) => x.n);
+    const bars = `<div class="spend" role="img" aria-label="${esc(months.map((x) => `${monthName(x.month)} ${x.n ? eurC(x.t) : "rien"}`).join(", "))}">${months.map((x) => `<div class="sb"><span class="sv">${x.n ? esc(eurR(Math.round(x.t / 100))) : ""}</span><span class="bar"><i style="height:${x.n ? Math.max(4, Math.round((100 * x.t) / max)) : 0}%"></i></span><span class="sm">${esc(monthShort(x.month))}</span></div>`).join("")}</div>`;
+    const cur = months[months.length - 1], prev = months[months.length - 2];
+    const loading = !HIST ? `<div class="group" aria-busy="true"><div class="row"><span class="rt"><span class="skl"></span><small class="skl s"></small></span></div></div>` : "";
+    return {
+      title: "Ce qui a bougé", grouped: true,
+      html: `<h1 class="lt">Ce qui a bougé</h1><p class="lt-sub">Les prix relevés de tes produits qui ont changé ces quatre dernières semaines, et tes dépenses.</p>` +
+        `<h2 class="gh">Moins cher sur tes produits</h2>` + (loading || (M.down.length ? `<div class="group">${M.down.map(moveRow).join("")}</div>` : `<p class="gf">Aucune baisse sur tes produits pour l'instant.</p>`)) +
+        `<h2 class="gh">Plus cher sur tes produits</h2>` + (loading || (M.up.length ? `<div class="group">${M.up.map(moveRow).join("")}</div>` : `<p class="gf">Aucune hausse sur tes produits pour l'instant.</p>`)) +
+        (!myIds().length && HIST ? `<p class="gf">Tes produits sont ceux de ton panier, de tes listes et de tes paniers commandés.</p>` : "") +
+        (aD.length || aU.length ? `<h2 class="gh">Dans tout le catalogue, ces deux dernières semaines</h2><div class="group">${aD.concat(aU).map(moveRow).join("")}</div>` : "") +
+        `<p class="gf">Seuls les prix relevés sur les sites comptent, à 3${NB}% et 10 centimes près, jamais les prix simulés ni ceux que tu as saisis. Chaque baisse ou hausse est celle de l'enseigne où le produit est le moins cher aujourd'hui, dans tes enseignes.</p>` +
+        `<h2 class="gh">Tes dépenses</h2>` + (anySpend ? `<div class="group">${bars}</div><p class="gf">${cur.n ? `En ${monthName(cur.month)}, ${eurC(cur.t)} sur ${plural(cur.n, "panier commandé", "paniers commandés")}` : `Rien de commandé en ${monthName(cur.month)}`}${prev && prev.n ? `, contre ${eurC(prev.t)} en ${monthName(prev.month)}` : ""}, aux prix relevés.${months.some((x) => x.np) ? ` Payé, d'après ce que tu as indiqué\u00a0: ${eurC(months.reduce((a, x) => a + x.paid, 0))} sur ${plural(months.reduce((a, x) => a + x.np, 0), "panier", "paniers")}, saisi par toi, à part.` : ""}</p>` :
+          `<p class="gf">Quand tu remplis tes paniers avec Cabas et que tu passes tes commandes, tes dépenses de chaque mois s'affichent ici.</p>`) +
+        `<div class="group" style="margin-top:24px"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${ic("chev", "chev")}</a></div>`,
+    };
+  };
 
   /* ---------- scanner un code-barres ---------- */
   /* En magasin : la caméra lit le code-barres (BarcodeDetector du navigateur s'il existe, sinon scan.js), Cabas retrouve
@@ -4248,7 +4869,7 @@
     SC.last = code; SC.lastAt = now;
     buzz("add");
     const id = eanIndex().get(code.replace(/^0+/, ""));
-    const it = { code, at: now, pid: id || null, off: null, near: null, loading: !id };
+    const it = { code, at: now, pid: id || null, off: null, near: null, loading: !id, store: storeTick(id) };
     SC.items = [it].concat(SC.items.filter((x) => x.code !== code)).slice(0, 12);
     scanRender();
     if (id) return;
@@ -4261,12 +4882,21 @@
     }
     scanRender();
   }
+  /* venu du mode magasin (il y a moins de trois heures) : un produit scanné qui est dans la liste y est coché */
+  function storeTick(id) {
+    if (!id || !S.storeScan || Date.now() - S.storeScan > 3 * 3600e3) return false;
+    const x = storeItems(storeMode()).find((y) => !y.free && y.id === id);
+    if (!x || S.guide.ck[storeKey(x)]) return false;
+    S.guide.ck[storeKey(x)] = 1; saveGuide();
+    toast("Coché dans ta liste\u00a0: " + pname(S.prods.get(id)), null, "check");
+    return true;
+  }
   const scanOne = (x) => {
     const shelf = (v, b, code) => `<p class="sn" data-shelfnote="${esc(code)}">${shelfNote(v, b)}</p>`;
     if (x.pid) {
       const p = S.prods.get(x.pid), os = offers(p, true), b = os[0] || null;
       const rows = os.slice(0, 4).map((o, i) => `<li class="${i === 0 ? "low" : ""}"><span>${esc(retName(o.ret))}${o.sim ? " (simulé)" : ""}</span>${i === 0 ? `<span class="sticker">${eur(o.price)}</span>` : `<span class="num">${eur(o.price)}</span>`}</li>`).join("");
-      return `<article class="deal scanr"><div class="dh"><a class="di" href="${hp(p.id)}">${img(p)}</a><div class="dtx"><a class="dt" href="${hp(p.id)}"><b>${esc(p.brand)}</b> ${esc(p.name)}</a><div class="pfmt">${esc(p.format)}, code ${esc(x.code)}</div></div></div>` +
+      return `<article class="deal scanr"><div class="dh"><a class="di" href="${hp(p.id)}">${img(p)}</a><div class="dtx"><a class="dt" href="${hp(p.id)}"><b>${esc(p.brand)}</b> ${esc(p.name)}</a><div class="pfmt">${esc(p.format)}, code ${esc(x.code)}</div></div></div>` + (x.store ? `<p class="sn ok">${ic("check")}Coché dans ta liste du magasin</p>` : "") +
         (rows ? `<ul class="ladder">${rows}</ul>` : `<p class="sn">Pas vendu par tes enseignes.</p>`) +
         `<label class="shelf"><span>Prix vu en rayon</span><input type="number" inputmode="decimal" step="0.01" min="0" data-shelf="${esc(x.code)}" value="${esc(x.shelf || "")}" placeholder="0,00"><span>€</span></label>${shelf(x.shelf, b, x.code)}` +
         `<div class="df"><span></span>${buyCtl(p.id, "flat")}</div></article>`;
@@ -4676,7 +5306,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": { const undo = snap("lists"); S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); undoable("Liste supprimée", undo, 5000); break; }
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); store.del("univ"); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"), f = el._act; el.hidden = true; el._act = null; S.undo = null; if (f) f(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -4789,8 +5419,34 @@
         setQty(id, before + 1, "inc"); renderChrome(); bumpBadge(); refreshSheet();
         undoable(pname(p) + " ajouté", () => { if (before) S.basket[id] = before; else delete S.basket[id]; saveBasket(); if (sheetCtx && sheetCtx.aux) auxPaint(); }, 6000); break;
       }
-      case "shop": shopSheet(); break;
-      case "shopck": { const k = "mag|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); break; }
+      case "shop": S.storeMode = "mag"; push("#/magasin"); break;
+      case "shopck": {
+        const key = "mag|" + (t.dataset.f ? "f:" + t.dataset.f : t.dataset.p), on = !S.guide.ck[key];
+        if (on) S.guide.ck[key] = 1; else delete S.guide.ck[key];
+        saveGuide(); buzz(on ? "add" : "remove");
+        if (S.route.name === "magasin") { rerenderKeep(t); const L = storeItems(storeMode()); if (on && L.length && L.every((x) => S.guide.ck[storeKey(x)])) { buzz("done"); toast("Tout est dans ton panier", null, "check"); } }
+        break;
+      }
+      case "shopall": S.storeMode = null; push("#/magasin"); break;
+      case "storemode": S.storeMode = t.dataset.v === "all" ? "all" : "mag"; rerenderKeep(t); break;
+      case "storereset": { const undo = snap("guide"); Object.keys(S.guide.ck).filter((x) => x.startsWith("mag|")).forEach((x) => delete S.guide.ck[x]); saveGuide(); rerender(); undoable("Tout est décoché", undo, 5000); break; }
+      case "storescan": S.storeScan = Date.now(); push("#/scan"); break;
+      case "print": window.print(); break;
+      case "export": exportFile(); break;
+      case "import": { const i = $("#impIn"); if (i) { i.value = ""; i.click(); } break; }
+      case "impok": { const R = S.imp; closeSheet(); S.imp = null; if (R && R.ok) applyImport(R.data, "Copie restaurée"); break; }
+      case "xfer": {
+        packLink().then((x) => {
+          const url = location.origin + location.pathname + "#/transfert/" + x;
+          if (url.length > 60000) { toast("Trop de données pour un lien\u00a0: enregistre plutôt une copie en fichier"); return; }
+          shareText("Mes données Cabas", "Ouvre ce lien sur ton autre téléphone pour y retrouver ton panier, tes listes et tes réglages. Il contient tes données\u00a0: ne l'envoie qu'à toi.", url);
+        });
+        break;
+      }
+      case "xferok": { const X = S.xfer; if (X && X.R && X.R.ok) { S.xfer = null; applyImport(X.R.data, "Données de l'autre téléphone reprises"); } break; }
+      case "xferno": S.xfer = null; history.replaceState(null, "", location.pathname + "#/"); S.stacks.accueil = ["#/"]; S.tab = "accueil"; navigate("#/", "tab"); toast("Rien n'a changé"); break;
+      case "speak": speak(speakText(k, id)); break;
+      case "voice": S.prefs.voice = t.dataset.v === "slow" ? "slow" : "normal"; savePrefs(); rerenderKeep(t); if (TTS()) { speakStop(); speak("Voici la lecture " + (S.prefs.voice === "slow" ? "lente." : "normale.")); } break;
       /* liste écrite ou dictée */
       case "wlplan": {
         const W = S.wl, plan = W && W.plan;
@@ -4803,6 +5459,16 @@
         if (!ex) break;
         S.wl = { text: ex[2], lines: readList(ex[2]) };
         store.set("draft", ex[2]);
+        push("#/ecrire");
+        break;
+      }
+      case "prof": { S.prof = k; const el = $("#profs"); if (el) { el.innerHTML = profHtml(); const b = $(`[data-act="prof"][data-k="${CSS.escape(k)}"]`, el); if (b) b.focus(); } break; }
+      case "wlprof": {
+        const x = PROF && PROF.listes.find((y) => y.k === k);
+        if (!x) break;
+        S.wl = { text: x.text.split(/,(?!\d)/).map((l) => l.trim()).filter(Boolean).join("\n"), lines: null };
+        S.wl.lines = readList(S.wl.text);
+        store.set("draft", S.wl.text);
         push("#/ecrire");
         break;
       }
@@ -4819,7 +5485,10 @@
       case "wlgo": {
         micStop();
         const tx = ($("#wlIn") || {}).value || "";
-        S.wl = { text: tx, lines: readList(tx) };
+        /* un panier collé à la main dans le champ (appui long, « Coller ») est nettoyé comme par « Coller ma liste » */
+        const C = cleanPaste(tx), prev = S.wl && S.wl.paste && S.wl.text === tx ? S.wl.paste : null;
+        if (C.paste && C.lines.length) { listFrom(tx); break; }
+        S.wl = { text: tx, lines: readList(tx), paste: prev };
         store.set("draft", tx);
         if (!S.wl.lines.length) { S.wl.lines = null; toast("Écris au moins un produit"); break; }
         window.scrollTo(0, 0); rerender(); break;
@@ -5018,6 +5687,21 @@
       case "whens": S.guide.when = Object.assign({}, S.guide.when, { [id]: Object.assign({}, (S.guide.when || {})[id], { s: t.dataset.s }) }); saveWhen(); refreshSheet(); break;
       case "whenno": { const W = Object.assign({}, S.guide.when); delete W[id]; S.guide.when = W; saveWhen(); closeSheet(); break; }
       case "ics": downloadIcs(id, t.dataset.d, t.dataset.s); break;
+      /* le panier de la semaine */
+      case "prepgo": {
+        const P = prepNow(); if (!P) break;
+        const undo = snap("basket", "todo"), items = Object.assign({}, P.D.items);
+        for (const x of S.todo) if (S.prods.has(x.id)) items[x.id] = Math.min(99, (items[x.id] || 0) + x.q);
+        const n = addItems(items, false); S.todo = []; saveTodo();
+        renderChrome(); bumpBadge(); switchTab("panier");
+        undoable("Panier de la semaine ajouté, " + plural(n, "produit", "produits"), undo, 8000); break;
+      }
+      case "prepskip": { const was = store.get("prepSnooze", ""); store.set("prepSnooze", isoDay(new Date())); rerender(); undoable("Pas cette fois : Cabas te le reproposera", () => store.set("prepSnooze", was), 5000); break; }
+      case "prepsee": { const L = keepTpl(); if (L) push("#/liste/" + L.id); break; }
+      case "shopdays": shopDaySheet(); break;
+      case "shopday": { const v = +t.dataset.v; S.prefs.shopDay = v >= 0 && v <= 6 ? v : null; savePrefs(); refreshSheet(); break; }
+      case "cad": cadSheet(t.dataset.l, id); break;
+      case "cadset": { const L = S.lists.find((x) => x.id === t.dataset.l), v = +t.dataset.v; if (!L) break; const C = Object.assign({}, L.cad); if (v > 0) C[id] = v; else delete C[id]; L.cad = C; saveLists(); refreshSheet(); break; }
       case "refill": case "reorder": { const H = S.hist || []; refill(id === "last" ? H.filter((x) => x.items).slice(-1)[0] : H[+id]); break; }
       /* après la commande : tout est arrivé, il manquait quelque chose, total payé, à racheter */
       case "arrok": { const h = S.hist[+id]; if (!h) break; h.arr = Object.assign({}, h.arr, { [t.dataset.r]: "ok" }); store.set("hist", S.hist); rerender(); toast("C'est noté", { label: "Total payé", run: () => paidSheet(+id) }, "check"); break; }
@@ -5110,6 +5794,13 @@
     if (t.dataset && t.dataset.act === "ret") { const k = offKey(S.allMap.get(t.dataset.id)) || t.dataset.id; if (t.checked) delete S.prefs.off[k]; else S.prefs.off[k] = true; savePrefs(); freeCheck(true); renderChrome(); return; }
     if (t.dataset && t.dataset.act === "itemflex") { flexSet(t.dataset.id, t.checked); refreshSheet(); return; }
     if (t.dataset && t.dataset.act === "manualck") { S.prefs.manualCk = t.checked; savePrefs(); return; }
+    /* une seule liste est le panier de la semaine ; ses rythmes viennent des commandes quand elle le devient */
+    if (t.dataset && t.dataset.act === "tpl") {
+      const L = S.lists.find((x) => x.id === t.dataset.id); if (!L) return;
+      S.lists.forEach((x) => { if (x !== L) delete x.template; });
+      if (t.checked) { L.template = true; if (!L.cad) { const C = {}; Object.keys(L.items).forEach((id) => { const c = cadOf(id); if (c) C[id] = c; }); L.cad = C; } } else delete L.template;
+      saveLists(); rerenderKeep(t); toast(t.checked ? "C'est ton panier de la semaine" : "Ce n'est plus ton panier de la semaine"); return;
+    }
     if (t.dataset && t.dataset.act === "pickauto") {
       const g = t.dataset.g, M = Object.assign({}, S.prefs.pickManual);
       if (t.checked) delete M[g]; else M[g] = 1;
@@ -5122,6 +5813,14 @@
     if (t.dataset && t.dataset.act === "contrast") { S.prefs.contrast = t.checked; savePrefs(); applyLook(); return; }
     if (t.dataset && t.dataset.act === "simple") { S.prefs.simple = t.checked; savePrefs(); applyLook(); S.shown = {}; rerenderKeep(t); return; }
     if (t.dataset && t.dataset.act === "badge") { S.prefs.badge = t.checked; savePrefs(); renderChrome(); return; }
+    if (t.id === "impIn") {
+      const f = t.files && t.files[0];
+      if (!f) return;
+      if (f.size > 5000000) { importSheet({ ok: false, errs: ["Ce fichier est trop gros pour une copie de Cabas."] }, ""); return; }
+      f.text().then((tx) => { let o = null; try { o = JSON.parse(tx); } catch (e) { o = null; } importSheet(importCheck(o), "file"); }, () => toast("Ce fichier n'a pas pu être lu"));
+      return;
+    }
+    if (t.dataset && t.dataset.act === "wake") { S.prefs.wake = t.checked; savePrefs(); if (t.checked) wakeOn(); else wakeOff(); return; }
     if (t.id === "extra") { const v = numOf(t.value); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; t.value = frNum(S.prefs.extraCost); savePrefs(); return; }
     if (t.dataset && t.dataset.fee) { const v = numOf(t.value); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; t.value = frNum(o.base); savePrefs(); return; }
     if (t.id === "fmax") { const v = numOf(t.value); F(t.dataset.k).max = v > 0 ? String(v) : ""; refreshSheet(); }
@@ -5360,6 +6059,8 @@
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && Date.now() - (S.lastCheckFetch || S.loadedAt || 0) > 5 * 60 * 1000) refreshData();
     if (S.route.name === "scan") { if (document.visibilityState === "hidden") stopScan(); else startScan(); }
+    /* le navigateur rend le verrou d'écran quand la page est cachée : il est redemandé au retour */
+    if (S.route.name === "magasin" && document.visibilityState === "visible") wakeOn();
   });
   setInterval(() => { if (document.visibilityState === "visible") refreshData(); }, 10 * 60 * 1000);
 

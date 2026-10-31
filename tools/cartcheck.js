@@ -6,7 +6,9 @@
 // tableau du panier (une colonne par enseigne, le prix pris coché, défilement au clavier), épingler et exclure depuis
 // la ligne, Et si (le total d'un scénario est celui du panier une fois appliqué, « Annuler » le défait), panier souple
 // (jamais plus cher, l'équivalent est celui de « Remplir mes paniers »), Compléter malin (le total annoncé est celui
-// du panier après l'ajout), budget du mois (total payé saisi compté à part) et « Tenir le budget ».
+// du panier après l'ajout), budget du mois (total payé saisi compté à part) et « Tenir le budget ». Enfin « Écouter »
+// (synthèse vocale remplacée par un témoin) : la répartition lue en français (montants en euros, frais, chaque
+// commande), le bouton qui devient « Arrêter la lecture », la lecture lente des réglages (prefs.voice), Ma liste.
 // Code de sortie 1 en cas de problème.
 // Usage : node tools/cartcheck.js
 const http = require("http");
@@ -377,9 +379,48 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     fail(`panier intelligent interrompu (${step}) : ` + e.message.split("\n")[0]);
   }
   await sctx.close();
+
+  /* ---------- écouter : speechSynthesis remplacé par un témoin qui garde ce qui est dit ---------- */
+  const vctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
+  await vctx.addInitScript(() => {
+    window.__said = [];
+    const synth = { _u: null, getVoices: () => [{ lang: "en-US", name: "en", localService: true }, { lang: "fr-FR", name: "fr", localService: true }], speak(u) { window.__said.push({ text: u.text, rate: u.rate, lang: u.lang, voice: u.voice && u.voice.lang }); this._u = u; }, cancel() { const u = this._u; this._u = null; if (u && u.onend) u.onend(); } };
+    Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true });
+    window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+  });
+  const vp = await vctx.newPage();
+  vp.on("pageerror", (e) => fail("erreur JS (écouter) : " + e.message));
+  vp.on("console", (m) => { if (m.type() === "error") fail("console (écouter) : " + m.text()); });
+  try {
+    await vp.goto(base + "#/"); await ready(vp);
+    await vp.evaluate((b) => { localStorage.clear(); localStorage.setItem("cabas.basket", JSON.stringify(b)); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); localStorage.setItem("cabas.prefs", JSON.stringify({ zip: "94120", off: { leclerc: true }, offv: 1 })); }, PRODS);
+    await vp.goto(base + "#/panier"); await vp.reload(); await ready(vp);
+    await vp.waitForSelector(".order", { timeout: 20000 });
+    await vp.click("[data-act=speak][data-k=panier]"); await vp.waitForTimeout(300);
+    const said = await vp.evaluate(() => window.__said);
+    const t = (said[0] || {}).text || "";
+    if (!/^Ton panier : \d+ articles, /.test(t) || !/livraison comprise/.test(t) || !/Chez [A-Z]/.test(t) || !/\d+ euros/.test(t)) fail("écouter le panier : « " + t.slice(0, 160) + " »");
+    if (/€/.test(t)) fail("écouter le panier : les montants doivent se dire en euros, pas avec le signe €");
+    if ((said[0] || {}).lang !== "fr-FR" || (said[0] || {}).voice !== "fr-FR" || (said[0] || {}).rate !== 1) fail("écouter : voix française au débit normal attendue " + JSON.stringify(said[0] && { lang: said[0].lang, voice: said[0].voice, rate: said[0].rate }));
+    if ((await vp.getAttribute("[data-act=speak][data-k=panier]", "aria-pressed")) !== "true" || !/Arrêter la lecture/.test(await vp.textContent("[data-act=speak][data-k=panier]"))) fail("écouter : le bouton devrait dire « Arrêter la lecture »");
+    await vp.click("[data-act=speak][data-k=panier]"); await vp.waitForTimeout(200);
+    if ((await vp.getAttribute("[data-act=speak][data-k=panier]", "aria-pressed")) !== "false") fail("écouter : un second appui doit arrêter la lecture");
+    await vp.evaluate(() => { location.hash = "#/reglages"; }); await vp.waitForTimeout(500);
+    await vp.click('[data-act=voice][data-v="slow"]'); await vp.waitForTimeout(300);
+    const s2 = await vp.evaluate(() => window.__said);
+    if (((await stored(vp, "prefs")) || {}).voice !== "slow" || (s2[s2.length - 1] || {}).rate !== 0.8) fail("lecture lente : prefs.voice ou débit " + JSON.stringify(s2[s2.length - 1]));
+    await vp.evaluate(() => { location.hash = "#/ecrire"; }); await vp.waitForTimeout(400);
+    await vp.fill("#wlIn", "lait\n2 paquets de pâtes\nzzzzzz"); await vp.click("[data-act=wlgo]"); await vp.waitForTimeout(700);
+    await vp.click("[data-act=speak][data-k=liste]"); await vp.waitForTimeout(300);
+    const s3 = await vp.evaluate(() => window.__said), t3 = (s3[s3.length - 1] || {}).text || "";
+    if (!/^Ta liste : 2 produits trouvés sur 3\./.test(t3) || !/Pas trouvé : zzzzzz/.test(t3)) fail("écouter Ma liste : « " + t3.slice(0, 160) + " »");
+  } catch (e) {
+    fail("écouter interrompu : " + e.message.split("\n")[0]);
+  }
+  await vctx.close();
   await browser.close();
   server.close();
   if (info.length) console.log(info.join("\n"));
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, panier souple, Compléter malin, budget du mois, tenir le budget) : aucun problème.");
+  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, panier souple, Compléter malin, budget du mois, tenir le budget), écouter : aucun problème.");
 })();

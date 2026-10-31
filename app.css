@@ -1067,6 +1067,61 @@ button.gt { width: 100%; text-align: left; padding: 0; }
 #ftab .group { margin-top: 12px; }
 .sheet .tagset + .gf { padding-top: 10px; }
 
+/* ---------- panier de la semaine, mode magasin, ce qui a bougé, tes dépenses ---------- */
+.hcard.prep .btns { margin-top: 4px; }
+/* panier type : le rythme de chaque produit sous son nom */
+.row.tpl .rt a { display: block; color: inherit; text-decoration: none; padding: 2px 0; }
+.row.tpl .rt .act { margin: 2px 0 -8px -6px; }
+/* mode magasin : gros caractères, toute la ligne se coche en marchant */
+.store .gi.big { width: 100%; grid-template-columns: 32px minmax(0, 1fr); gap: 14px; min-height: 64px; padding: 12px 16px; text-align: left; color: var(--ink); transition: background-color var(--t-1); }
+.store .gi.big .box { width: 32px; height: 32px; }
+.store .gi.big .box .ic { width: 18px; height: 18px; }
+.store .gi.big .gt b { font-size: 1.1875rem; line-height: 1.35; font-weight: 500; }
+.store .gi.big .gt small { font-size: 0.9375rem; line-height: 1.3; }
+.store .gi.big + .gi.big::before { left: 62px; }
+.store .gi.big:active { background: var(--fill); }
+.store .gh { font-size: 1.0625rem; color: var(--ink); }
+.store .progl { font-size: 1rem; }
+.print-only { display: none; }
+.scanr .sn.ok { display: flex; align-items: center; gap: 6px; color: var(--brand-ink); font-weight: 600; }
+.scanr .sn.ok .ic { width: 18px; height: 18px; flex: none; }
+/* ce qui a bougé : le signe est toujours écrit, la couleur ne fait que le redire */
+.mv { font: 600 0.9375rem/1 var(--round); }
+.mv.dn { color: var(--brand-ink); }
+.mv.up { color: var(--warn); }
+.hnote.moment { font-weight: 600; color: var(--ink); }
+.hnote.moment.low { color: var(--brand-ink); }
+/* dépenses par mois : des barres sobres, le montant au-dessus, le mois dessous */
+.spend { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; align-items: end; height: 11rem; padding: 14px 12px 10px; }
+.spend .sb { display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; min-width: 0; }
+.spend .sv { font: 600 0.875rem/1.1 var(--round); color: var(--ink-2); white-space: nowrap; min-height: 1rem; }
+.spend .bar { flex: 1; width: 100%; max-width: 44px; display: flex; align-items: flex-end; box-shadow: 0 2px 0 var(--sep); }
+.spend .bar i { display: block; width: 100%; background: var(--brand); border-radius: var(--r-s) var(--r-s) 0 0; }
+.spend .sm { font-size: 0.875rem; color: var(--ink-2); }
+
+/* ---------- impression : la page seule, en noir sur blanc, sans barres ni boutons ; la liste du magasin à cocher au stylo ---------- */
+@media print {
+  @page { margin: 14mm; }
+  html, body, body.grouped, html:has(body.grouped) { background: #fff !important; color: #000 !important; }
+  .skip, .side, .nav, .tabbar, .dock, .toast, .sheetw, .noprint, .btn, .act, .icbtn, .txtbtn, .mini, .seg, .prog, .progl, .banner { display: none !important; }
+  .view { padding: 0 !important; margin: 0 !important; min-height: 0; }
+  .wrap { max-width: none; }
+  .lt { font-size: 20pt; line-height: 1.2; padding: 0 0 4pt; color: #000; }
+  .lt-sub { color: #333; padding: 0 0 6pt; }
+  .print-only { display: block; font-size: 11pt; margin: 0 0 8pt; color: #000; }
+  .group, .hcard, .order { margin-left: 0; margin-right: 0; box-shadow: none !important; background: #fff !important; border: 0.8pt solid #888; border-radius: 4pt; }
+  .gh { color: #000 !important; padding: 10pt 0 4pt; font-size: 12pt; break-after: avoid; }
+  .gf { color: #333 !important; font-size: 9.5pt; padding: 4pt 0 0; }
+  .store .gi.big { min-height: 0; padding: 5pt 8pt; break-inside: avoid; grid-template-columns: 14pt minmax(0, 1fr); gap: 8pt; }
+  .store .gi.big + .gi.big::before { left: 0; background: #ccc; }
+  .store .gi.big .box { width: 13pt; height: 13pt; border-radius: 2pt; border: 1.2pt solid #000; background: #fff !important; }
+  .store .gi.big .box .ic { color: #000; }
+  .store .gi.big .gt b { font-size: 12pt; color: #000; }
+  .store .gi.big .gt small { font-size: 9.5pt; color: #333; }
+  .store .gi.on .gt { opacity: 1; text-decoration: line-through; }
+  a { color: #000; text-decoration: none; }
+}
+
 /* ---------- contraste renforcé : contours des commandes sans bordure, liens d'action soulignés, focus épais ---------- */
 html[data-contrast="more"] :is(.chip, .btn.tint, .btn.plain, .btn.ghost, .search, .stepper.soft, .seg, .tsize button, .add, .field .in, .shelf input, .hcard, .deal, .banner, .sum .alt, .bud) { box-shadow: inset 0 0 0 1.5px var(--ctl-line); }
 html[data-contrast="more"] .group { box-shadow: 0 0 0 1.5px var(--ctl-line); }

@@ -4,7 +4,12 @@
 // au panier (avec « Annuler ») ; « Oui, tout est là » ; « Plus tard » repousse d'un jour ; « Tes prochaines courses »
 // et « Commande avant … » d'après le rythme des paniers et le délai de chaque enseigne (leadText, réglage prefs.lead) ;
 // le total payé, saisi par la personne, gardé à part (cabas.hist[].paid) et dit « saisi par toi » ; la carte et la
-// pastille du mini panier tant qu'un remplissage est en cours, sans la pastille quand le réglage l'éteint.
+// pastille du mini panier tant qu'un remplissage est en cours, sans la pastille quand le réglage l'éteint ; puis le panier
+// de la semaine (F17) avec tools/fixtures/semaine.json : rythme et jour habituel, panier type (produits qui reviennent,
+// quantités habituelles, cadences), carte « C'est l'heure des courses » le bon jour et pas un autre, qui remplace
+// « Tes prochaines courses », « À racheter bientôt » et « Tes habitudes » ; « Remplir mon panier » en un geste avec
+// « Annuler », « Pas cette fois » (cabas.prepSnooze), « Voir le panier type » (liste gardée, rythme modifiable), le jour
+// des courses dans les réglages (prefs.shopDay) ; trois rangées au plus sur l'accueil d'un habitué.
 // Code de sortie 1 en cas de problème. Usage : node tools/homecheck.js [--shots=dossier]
 const http = require("http");
 const fs = require("fs");
@@ -158,11 +163,84 @@ function histOf() {
     if (/Il te reste/.test(await text(".dock .mini"))) fail("réglage éteint : la pastille reste");
     if (!/Voir le panier/.test(await text(".dock .mini"))) fail("réglage éteint : le mini panier normal attendu");
     if ((await stored("prefs") || {}).badge !== false) fail("réglage : prefs.badge non enregistré");
+
+    /* 8. trois rangées au plus sur l'accueil d'un habitué (historique, baisses, listes) */
+    await load({ hist: histOf(), seen: { welcome: 1 }, prefs: PREFS, lists: [{ id: "l1", name: "Courses", items: { "candia-lait-1-2-ecreme-6-x-1-l": 1, "barilla-pates-capellini-n-1-500-g": 2 }, at: plus(-3) }], drops: [{ id: "candia-lait-1-2-ecreme-6-x-1-l", old: 99, now: 1, until: plus(3) }] });
+    let rails = await page.locator("#view .rail").count();
+    if (rails > 3) fail(`accueil d'un habitué : ${rails} rangées, 3 au plus`);
+
+    /* 9. le panier de la semaine : cinq paniers hebdomadaires, le même jour de la semaine qu'aujourd'hui */
+    const W = fixture("semaine.json"), A = W.attendu;
+    const wk = W.hist.map((h) => { const x = Object.assign({}, h, { d: plus(h.dd) }); delete x.dd; return x; });
+    const today = new Date().getDay();
+    await load({ hist: wk, seen: { welcome: 1 }, prefs: PREFS });
+    const R = await page.evaluate(() => { const D = window.cabasDebug(); const T = D.weekTpl(); return { r: D.rhythm(), T, due: D.tplDue(T), prep: !!D.prepNow() }; });
+    if (!R.r || R.r.every !== 7 || R.r.day !== today) fail("rythme : " + JSON.stringify(R.r));
+    const tIds = Object.keys((R.T || {}).items || {});
+    if (!R.T || !R.T.auto) fail("panier type : pas de panier proposé d'après les commandes");
+    for (const id of A.chaque.concat(A.plus_tard)) if (!tIds.includes(id)) fail("panier type : " + id + " manque");
+    for (const id of A.absent) if (tIds.includes(id)) fail("panier type : " + id + " acheté une seule fois ne doit pas y être");
+    for (const [id, q] of Object.entries(A.quantites)) if ((R.T.items || {})[id] !== q) fail(`panier type : quantité de ${id} ${(R.T.items || {})[id]}, ${q} attendue`);
+    if ((R.T.cad || {})["entremont-emmental-rape-francais-160-g"] !== 14 || (R.T.cad || {})["x-tra-lessive-liquide-evasion-bora-bora-1-98-l"] !== 28) fail("cadences : " + JSON.stringify(R.T.cad));
+    const dueIds = Object.keys(R.due.items).sort();
+    if (JSON.stringify(dueIds) !== JSON.stringify(A.chaque.slice().sort())) fail("à reprendre aujourd'hui : " + JSON.stringify(dueIds));
+    if (R.due.later.map((x) => x.id).sort().join() !== A.plus_tard.slice().sort().join()) fail("pas cette fois : " + JSON.stringify(R.due.later));
+    const pc = await text(".hcard.prep");
+    if (!/C'est l'heure des courses/.test(pc)) fail("carte du jour des courses absente : « " + pc + " »");
+    if (!/4\s+produits/.test(pc) || !/Pas cette fois\s:\s/.test(pc) || !/lessive/.test(pc)) fail("carte du jour des courses : « " + pc + " »");
+    if (await page.locator("#nextT").count()) fail("le jour des courses : « Tes prochaines courses » devrait laisser la place");
+    const heads = await page.$$eval("#view .sh h2", (els) => els.map((e) => e.textContent));
+    if (heads.some((h) => /Tes habitudes|À racheter bientôt/.test(h))) fail("le jour des courses : rangées remplacées encore là " + JSON.stringify(heads));
+    rails = await page.locator("#view .rail").count();
+    if (rails > 3) fail(`jour des courses : ${rails} rangées, 3 au plus`);
+    await over("accueil, jour des courses"); await shot("5-jour-des-courses");
+    /* « Remplir mon panier » : les produits du jour, à leur quantité ; « Annuler » remet le panier vide */
+    await page.click(".hcard.prep [data-act=prepgo]"); await page.waitForTimeout(600);
+    const bk = (await stored("basket")) || {};
+    if (JSON.stringify(Object.keys(bk).sort()) !== JSON.stringify(A.chaque.slice().sort())) fail("remplir mon panier : " + JSON.stringify(bk));
+    for (const [id, q] of Object.entries(A.quantites)) if (bk[id] !== q) fail(`remplir mon panier : ${id} × ${bk[id]}, ${q} attendu`);
+    if (!/#\/panier$/.test(page.url())) fail("remplir mon panier : le panier devrait s'ouvrir (" + page.url() + ")");
+    if (!/Panier de la semaine ajouté/.test(await toastText())) fail("remplir mon panier : toast « " + (await toastText()) + " »");
+    await page.click("#toast button"); await page.waitForTimeout(400);
+    if (Object.keys((await stored("basket")) || {}).length) fail("remplir mon panier : « Annuler » ne vide pas le panier");
+    /* « Pas cette fois » : la carte part pour la journée, « Annuler » la remet */
+    await go("#/");
+    await page.click(".hcard.prep [data-act=prepskip]"); await page.waitForTimeout(400);
+    if (await page.locator(".hcard.prep").count()) fail("pas cette fois : la carte reste");
+    if ((await stored("prepSnooze")) !== plus(0)) fail("pas cette fois : cabas.prepSnooze " + (await stored("prepSnooze")));
+    await page.click("#toast button"); await page.waitForTimeout(400);
+    if (!(await page.locator(".hcard.prep").count())) fail("pas cette fois : « Annuler » ne remet pas la carte");
+    /* un autre jour des courses : pas de carte aujourd'hui */
+    await load({ hist: wk, seen: { welcome: 1 }, prefs: Object.assign({}, PREFS, { shopDay: (today + 1) % 7 }) });
+    if (await page.locator(".hcard.prep").count()) fail("jour des courses demain : la carte ne doit pas s'afficher aujourd'hui");
+    /* « Voir le panier type » : une liste gardée, ses rythmes ; « À chaque fois » pour la lessive */
+    await load({ hist: wk, seen: { welcome: 1 }, prefs: PREFS });
+    await page.click(".hcard.prep [data-act=prepsee]"); await page.waitForTimeout(500);
+    const ls = (await stored("lists")) || [], tl = ls.find((l) => l.template);
+    if (!tl || !/#\/liste\//.test(page.url())) fail("voir le panier type : liste gardée " + JSON.stringify(ls));
+    else {
+      if (await page.locator(`[data-act=cad]`).count() !== Object.keys(tl.items).length) fail("panier type : un rythme par produit attendu");
+      await page.click('[data-act=cad][data-id="x-tra-lessive-liquide-evasion-bora-bora-1-98-l"]'); await page.waitForTimeout(400);
+      await page.click('#sheet [data-act=cadset][data-v="0"]'); await page.waitForTimeout(250);
+      const tl2 = ((await stored("lists")) || []).find((l) => l.template) || {};
+      if ((tl2.cad || {})["x-tra-lessive-liquide-evasion-bora-bora-1-98-l"]) fail("rythme : « À chaque fois » non enregistré " + JSON.stringify(tl2.cad));
+      await page.click("#sheet .sheet-h [data-act=close]"); await page.waitForTimeout(400);
+      await shot("6-panier-type");
+      const due2 = await page.evaluate(() => { const D = window.cabasDebug(); return Object.keys(D.tplDue(D.weekTpl()).items); });
+      if (!due2.includes("x-tra-lessive-liquide-evasion-bora-bora-1-98-l")) fail("rythme « À chaque fois » : la lessive devrait revenir aujourd'hui");
+    }
+    /* réglages : le jour des courses */
+    await go("#/reglages");
+    await page.click("[data-act=shopdays]"); await page.waitForTimeout(400);
+    await page.click('#sheet [data-act=shopday][data-v="1"]'); await page.waitForTimeout(250);
+    if (((await stored("prefs")) || {}).shopDay !== 1) fail("réglages : prefs.shopDay " + JSON.stringify(((await stored("prefs")) || {}).shopDay));
+    await page.click('#sheet [data-act=shopday][data-v="-1"]'); await page.waitForTimeout(250);
+    if (((await stored("prefs")) || {}).shopDay !== null) fail("réglages : « D'après mes commandes » devrait remettre prefs.shopDay à null");
   } catch (e) {
     fail("parcours interrompu : " + e.message.split("\n")[0]);
   }
   await browser.close();
   server.close();
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Accueil vérifié : arrivée, il manquait, à racheter, prochaines courses, commande avant, total payé, remplissage en cours.");
+  console.log("Accueil vérifié : arrivée, il manquait, à racheter, prochaines courses, commande avant, total payé, remplissage en cours, trois rangées au plus, panier de la semaine.");
 })();

@@ -1,0 +1,187 @@
+{
+ "note": "Cinq paniers commandés inventés, un par semaine, le même jour de la semaine que le jour du test (dd : écart en jours), pour tools/homecheck.js (panier de la semaine). Le lait, les pâtes et les œufs reviennent à chaque fois ; l'emmental toutes les deux semaines ; la lessive toutes les quatre ; le jus d'orange deux fois ; l'eau une seule. Aucune donnée personnelle.",
+ "hist": [
+  {
+   "dd": -35,
+   "t": 6120,
+   "s": 300,
+   "n": 10,
+   "sid": "sem1",
+   "items": {
+    "candia-lait-1-2-ecreme-6-x-1-l": 1,
+    "barilla-pates-capellini-n-1-500-g": 3,
+    "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+    "entremont-emmental-rape-francais-160-g": 1,
+    "x-tra-lessive-liquide-evasion-bora-bora-1-98-l": 1,
+    "contrex-eau-minerale-naturelle-6-x-1-l": 2
+   },
+   "o": [
+    {
+     "rid": "houra",
+     "name": "Houra",
+     "pick": false,
+     "t": 6120,
+     "items": {
+      "candia-lait-1-2-ecreme-6-x-1-l": 1,
+      "barilla-pates-capellini-n-1-500-g": 3,
+      "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+      "entremont-emmental-rape-francais-160-g": 1,
+      "x-tra-lessive-liquide-evasion-bora-bora-1-98-l": 1,
+      "contrex-eau-minerale-naturelle-6-x-1-l": 2
+     }
+    }
+   ],
+   "when": [],
+   "arr": {
+    "houra": "ok"
+   }
+  },
+  {
+   "dd": -28,
+   "t": 6040,
+   "s": 300,
+   "n": 6,
+   "sid": "sem2",
+   "items": {
+    "candia-lait-1-2-ecreme-6-x-1-l": 1,
+    "barilla-pates-capellini-n-1-500-g": 3,
+    "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2
+   },
+   "o": [
+    {
+     "rid": "houra",
+     "name": "Houra",
+     "pick": false,
+     "t": 6040,
+     "items": {
+      "candia-lait-1-2-ecreme-6-x-1-l": 1,
+      "barilla-pates-capellini-n-1-500-g": 3,
+      "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2
+     }
+    }
+   ],
+   "when": [],
+   "arr": {
+    "houra": "ok"
+   }
+  },
+  {
+   "dd": -21,
+   "t": 6310,
+   "s": 300,
+   "n": 6,
+   "sid": "sem3",
+   "items": {
+    "candia-lait-1-2-ecreme-6-x-1-l": 1,
+    "barilla-pates-capellini-n-1-500-g": 2,
+    "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+    "entremont-emmental-rape-francais-160-g": 1
+   },
+   "o": [
+    {
+     "rid": "houra",
+     "name": "Houra",
+     "pick": false,
+     "t": 6310,
+     "items": {
+      "candia-lait-1-2-ecreme-6-x-1-l": 1,
+      "barilla-pates-capellini-n-1-500-g": 2,
+      "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+      "entremont-emmental-rape-francais-160-g": 1
+     }
+    }
+   ],
+   "when": [],
+   "arr": {
+    "houra": "ok"
+   }
+  },
+  {
+   "dd": -14,
+   "t": 6080,
+   "s": 300,
+   "n": 8,
+   "sid": "sem4",
+   "items": {
+    "candia-lait-1-2-ecreme-6-x-1-l": 1,
+    "barilla-pates-capellini-n-1-500-g": 3,
+    "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+    "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2
+   },
+   "o": [
+    {
+     "rid": "houra",
+     "name": "Houra",
+     "pick": false,
+     "t": 6080,
+     "items": {
+      "candia-lait-1-2-ecreme-6-x-1-l": 1,
+      "barilla-pates-capellini-n-1-500-g": 3,
+      "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+      "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2
+     }
+    }
+   ],
+   "when": [],
+   "arr": {
+    "houra": "ok"
+   }
+  },
+  {
+   "dd": -7,
+   "t": 6450,
+   "s": 300,
+   "n": 11,
+   "sid": "sem5",
+   "items": {
+    "candia-lait-1-2-ecreme-6-x-1-l": 1,
+    "barilla-pates-capellini-n-1-500-g": 4,
+    "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+    "entremont-emmental-rape-francais-160-g": 1,
+    "x-tra-lessive-liquide-evasion-bora-bora-1-98-l": 1,
+    "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2
+   },
+   "o": [
+    {
+     "rid": "houra",
+     "name": "Houra",
+     "pick": false,
+     "t": 6450,
+     "items": {
+      "candia-lait-1-2-ecreme-6-x-1-l": 1,
+      "barilla-pates-capellini-n-1-500-g": 4,
+      "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+      "entremont-emmental-rape-francais-160-g": 1,
+      "x-tra-lessive-liquide-evasion-bora-bora-1-98-l": 1,
+      "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2
+     }
+    }
+   ],
+   "when": [],
+   "arr": {
+    "houra": "ok"
+   }
+  }
+ ],
+ "attendu": {
+  "chaque": [
+   "candia-lait-1-2-ecreme-6-x-1-l",
+   "barilla-pates-capellini-n-1-500-g",
+   "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs",
+   "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l"
+  ],
+  "plus_tard": [
+   "entremont-emmental-rape-francais-160-g",
+   "x-tra-lessive-liquide-evasion-bora-bora-1-98-l"
+  ],
+  "absent": [
+   "contrex-eau-minerale-naturelle-6-x-1-l"
+  ],
+  "quantites": {
+   "barilla-pates-capellini-n-1-500-g": 3,
+   "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2,
+   "candia-lait-1-2-ecreme-6-x-1-l": 1,
+   "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2
+  }
+ }
+}

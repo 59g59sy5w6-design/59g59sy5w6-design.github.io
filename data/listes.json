@@ -1,0 +1,120 @@
+{
+  "note": "Listes toutes faites par profil, proposées dans Listes et sur l'accueil d'une première visite. Chaque ligne est cherchée comme une ligne de « Ma liste », aux prix relevés. Les listes « semaine » sont faites pour atteindre le minimum de commande d'une enseigne (60 € chez Monoprix, Carrefour et Houra) ; tools/listcheck.js le vérifie sur le catalogue. budget : ordre de grandeur visé, en euros, livraison comprise.",
+  "profils": [
+    {
+      "k": "etudiant",
+      "label": "Étudiant",
+      "hint": "Petit budget, cuisine simple"
+    },
+    {
+      "k": "famille",
+      "label": "Famille",
+      "hint": "Quatre personnes, goûters compris"
+    },
+    {
+      "k": "senior",
+      "label": "Senior",
+      "hint": "Produits simples, petits formats, tout livré"
+    },
+    {
+      "k": "petitbudget",
+      "label": "Petit budget",
+      "hint": "Le moins cher au kilo, minimum de commande atteint"
+    },
+    {
+      "k": "vegetarien",
+      "label": "Végétarien",
+      "hint": "Sans viande ni poisson"
+    },
+    {
+      "k": "bebe",
+      "label": "Bébé",
+      "hint": "Couches, lait infantile, petits pots"
+    }
+  ],
+  "listes": [
+    {
+      "k": "etudiant-semaine",
+      "label": "La semaine étudiante",
+      "base": "etudiant",
+      "kind": "semaine",
+      "budget": 85,
+      "text": "3 paquets de pâtes, riz, 12 œufs, 6 litres de lait, beurre, fromage râpé, thon x4, tomates pelées x3, jambon x2, corn flakes, café, yaourts nature x2, 6 bouteilles d'eau, papier toilette, liquide vaisselle, gel douche, pizza surgelée x2, chips, biscuits, soupe x2"
+    },
+    {
+      "k": "etudiant-depannage",
+      "label": "Le dépannage",
+      "base": "etudiant",
+      "kind": "appoint",
+      "text": "pâtes, tomates pelées, 6 œufs, fromage râpé, lait demi-écrémé"
+    },
+    {
+      "k": "famille-semaine",
+      "label": "La semaine en famille",
+      "base": "famille",
+      "kind": "semaine",
+      "budget": 180,
+      "text": "12 litres de lait, 12 bouteilles d'eau x2, 4 paquets de pâtes, riz x2, 12 œufs x2, beurre x2, yaourts nature x4, fromage frais x2, fromage râpé x2, jambon x3, poulet, nuggets de poulet, haricots verts, concombre, corn flakes x2, biscuits x3, madeleines x2, jus d'orange x4, jus de pomme x2, lessive, liquide vaisselle, papier toilette x2, essuie-tout, gel douche, pizza surgelée x2"
+    },
+    {
+      "k": "famille-gouter",
+      "label": "Les goûters",
+      "base": "famille",
+      "kind": "appoint",
+      "text": "biscuits x2, madeleines x2, jus de pomme x2, fromage frais, corn flakes"
+    },
+    {
+      "k": "senior-semaine",
+      "label": "L'essentiel livré",
+      "base": "senior",
+      "kind": "semaine",
+      "budget": 95,
+      "text": "6 litres de lait, 6 bouteilles d'eau x2, 12 œufs, beurre, yaourts nature x2, fromage blanc, jambon, camembert, soupe x3, biscottes, café, thé noir, madeleines, crème fraîche, concombre, riz, pâtes, thon x2, sardines à l'huile x2, haricots verts, papier toilette, liquide vaisselle, essuie-tout"
+    },
+    {
+      "k": "senior-petitdej",
+      "label": "Le petit-déjeuner",
+      "base": "senior",
+      "kind": "appoint",
+      "text": "café, thé noir, biscottes, beurre, lait demi-écrémé, jus d'orange, madeleines"
+    },
+    {
+      "k": "budget-semaine",
+      "label": "La semaine à petit prix",
+      "base": "petitbudget",
+      "kind": "semaine",
+      "budget": 65,
+      "text": "3 paquets de pâtes, riz x2, 6 litres de lait, beurre, farine, sucre, huile, tomates pelées x4, thon x4, sardines à l'huile x3, haricots verts x2, pommes de terre, fromage blanc, café, biscuits, soupe x2, papier toilette, lessive, liquide vaisselle"
+    },
+    {
+      "k": "budget-placard",
+      "label": "Le placard de base",
+      "base": "petitbudget",
+      "kind": "appoint",
+      "text": "pâtes, riz, farine, sucre, huile, café, tomates pelées"
+    },
+    {
+      "k": "veg-semaine",
+      "label": "La semaine végétarienne",
+      "base": "vegetarien",
+      "kind": "semaine",
+      "budget": 90,
+      "text": "3 paquets de pâtes, riz, pois chiches x2, 12 œufs, 6 litres de lait, beurre, yaourts nature x4, fromage râpé x2, fromage frais x2, pizza margherita x2, tomates pelées x3, haricots verts, concombre, corn flakes, café, jus d'orange x2, biscuits, soupe x2, camembert, papier toilette, liquide vaisselle"
+    },
+    {
+      "k": "veg-diner",
+      "label": "Le dîner végétarien",
+      "base": "vegetarien",
+      "kind": "appoint",
+      "text": "pâtes, tomates pelées, fromage frais, fromage râpé, huile d'olive"
+    },
+    {
+      "k": "bebe-semaine",
+      "label": "Les essentiels de bébé",
+      "base": "bebe",
+      "kind": "semaine",
+      "budget": 90,
+      "text": "couches taille 3 x2, lait 2e âge x2, petits pots légumes x4, gourdes bébé x2, lingettes bébé x3, gel lavant, lessive, papier toilette"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "note": "Paniers et commandes collés, inventés pour tools/listcheck.js (cleanPaste) : la forme des textes copiés sur un site d'enseigne, dans un courriel de confirmation, un ticket de caisse ou un message. Aucune donnée personnelle, aucun prix relevé. want : [morceau attendu dans la ligne gardée (sans accents, minuscules), quantité].",
+  "cas": [
+    {
+      "k": "site-plusieurs-lignes",
+      "text": "Mon panier (4 articles)\nLait demi-écrémé UHT\nCARREFOUR\n6x1L\n1,05 €/L\n6,30 €\nQuantité\n1\nPâtes spaghetti n°5\nBARILLA\n500g\n3,78 €/kg\n1,89 €\n- 2 +\nSupprimer\nCafé moulu pur arabica\n250 g\n4,15 €\nQuantité\n1\nPapier toilette blanc\n12 rouleaux\n5,49 €\nAjouter aux favoris\nSous-total 17,52 €\nFrais de livraison 8,00 €\nTotal 25,52 €\nValider mon panier",
+      "want": [["lait demi ecreme", 1], ["spaghetti", 2], ["cafe moulu", 1], ["papier toilette", 1]],
+      "total": 2552, "from": "carrefour"
+    },
+    {
+      "k": "courriel-colonnes",
+      "text": "Bonjour,\nMerci pour votre commande n° 4821-77 !\nRécapitulatif\nArticle\tQté\tPrix\nLait demi-écrémé 1 L\t6\t6,54 €\nCoca-Cola 1,5 L\t2\t3,58 €\nBeurre doux 250 g\t1\t2,15 €\nThon au naturel 3 x 80 g\t3\t8,97 €\nSous-total : 21,24 €\nLivraison : offerte\nTotal TTC : 21,24 €",
+      "want": [["lait demi ecreme", 6], ["coca cola", 2], ["beurre doux", 1], ["thon au naturel", 3]],
+      "total": 2124, "from": null
+    },
+    {
+      "k": "ticket-de-caisse",
+      "text": "MONOPRIX\n12 RUE DES EXEMPLES\n75000 PARIS\nLAIT DEMI ECR 1L        1,05\nPATES SPAGHETTI 500G    0,89\nCOCA COLA 1.5L\n  2 X 1,29              2,58\nBEURRE DOUX 250G        2,15\nTOTAL                   6,67\nCB                      6,67\nNB ARTICLES 5",
+      "want": [["lait demi ecr", 1], ["pates spaghetti", 1], ["coca cola", 2], ["beurre doux", 1]],
+      "total": 667, "from": "monoprix"
+    },
+    {
+      "k": "message-cases",
+      "text": "Liste de courses\n[ ] 2 x lait\n[x] pâtes (x3)\n[ ] coca zéro 1,5 L\n[ ] papier toilette\n[ ] 6 œufs",
+      "want": [["lait", 2], ["pates", 3], ["coca zero", 1], ["papier toilette", 1], ["6 oeufs", 1]],
+      "total": null, "from": null
+    },
+    {
+      "k": "site-une-ligne",
+      "text": "Quantité : 2 | Lait demi-écrémé Candia 6 x 1 L | 7,90 €\nQuantité : 1 | Yaourts nature 8 x 125 g | 2,35 €\nQuantité : 3 | Eau de source 6 x 1,5 L | 6,57 €\nDisponible\nTotal panier : 16,82 €",
+      "want": [["lait demi ecreme candia", 2], ["yaourts nature", 1], ["eau de source", 3]],
+      "total": 1682, "from": null
+    },
+    {
+      "k": "site-quantite-seule",
+      "text": "Panier\nŒufs de poules élevées en plein air AUCHAN 12 œufs\n3,29 €\n0,27 € / pièce\nDiminuer la quantité\n2\nAugmenter la quantité\nHuile de tournesol 1 L\n2,09 €\n2,09 € / L\nDiminuer la quantité\n1\nAugmenter la quantité\nPrix Bas Escalopes de dinde 240 g\n3,34 €\nDiminuer la quantité\n1\nAugmenter la quantité\nTotal 8,72 €",
+      "want": [["oeufs", 2], ["huile de tournesol", 1], ["prix bas escalopes", 1]],
+      "total": 872, "from": "auchan"
+    }
+  ],
+  "ecrite": "lait\n2 paquets de pâtes\ncoca zéro x3\npapier toilette\n1 kg de café"
+}

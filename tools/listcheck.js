@@ -4,7 +4,11 @@
 // « Tu voulais dire… ? Oui »), lignes libres (« Garder quand même », panier, texte partagé, liste partagée), puis, avec le
 // jeu d'essai tools/fixtures/catalog-extra.json ajouté au catalogue, les mots des nouvelles catégories (jambon, camembert,
 // lessive capsules, couches, croquettes chat, vin rouge…) et « Mon régime » (rayon filtré, chip, Ma liste, réglages,
-// dietOk sur 30 libellés, repas).
+// dietOk sur 30 libellés, repas) ; « Colle ton panier » (cleanPaste sur les paniers collés de tools/fixtures/paniers-
+// colles.json : site sur plusieurs lignes, courriel en colonnes, ticket de caisse, message à cases, quantités seules ;
+// une liste écrite ressort telle quelle ; dans Ma liste, le montant collé est dit « d'après ce que tu as collé » et
+// n'entre ni dans le catalogue ni dans un total) ; les listes toutes faites par profil (data/listes.json : forme, chaque
+// ligne trouvée, chaque liste « semaine » prise en entier par une commande qui atteint son minimum ; écran Listes).
 // Code de sortie 1 en cas de problème. Usage : node tools/listcheck.js
 const http = require("http");
 const fs = require("fs");
@@ -305,11 +309,66 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     await page.evaluate(() => { location.hash = "#/repas/pates-thon-tomate"; }); await page.waitForTimeout(500);
     if (!/Pas pour ton régime/.test(await page.locator("#view").textContent())) fail("régime végétarien : la recette n'avertit pas sur le thon");
     await overflow("recette, régime");
+
+    /* Colle ton panier : chaque format de tools/fixtures/paniers-colles.json */
+    const PC = JSON.parse(require("fs").readFileSync(path.join(__dirname, "fixtures", "paniers-colles.json"), "utf8"));
+    await page.evaluate((st) => { localStorage.clear(); localStorage.setItem("cabas.prefs", JSON.stringify(st)); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); }, PREFS);
+    await page.goto(base + "#/ecrire"); await page.reload(); await ready();
+    const norm = (t) => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/œ/g, "oe").replace(/[^a-z0-9]+/g, " ").trim();
+    for (const c of PC.cas) {
+      const C = await page.evaluate((t) => { const D = cabasDebug(), C = D.cleanPaste(t); return { paste: C.paste, total: C.total, from: C.from, lines: C.lines.map((x) => ({ t: x.t, n: x.n })), found: D.readList(C.text).filter((x) => x.pick).length }; }, c.text);
+      if (!C.paste) fail(`panier collé ${c.k} : pas reconnu comme un panier collé`);
+      if (C.lines.length !== c.want.length) fail(`panier collé ${c.k} : ${C.lines.length} lignes gardées, ${c.want.length} attendues (${C.lines.map((x) => x.t).join(" | ")})`);
+      c.want.forEach(([w, n], i) => { const L = C.lines[i]; if (!L || !norm(L.t).includes(w) || L.n !== n) fail(`panier collé ${c.k}, ligne ${i + 1} : ${JSON.stringify(L)}, « ${w} » × ${n} attendu`); });
+      if (C.total !== c.total) fail(`panier collé ${c.k} : total ${C.total}, ${c.total} attendu`);
+      if (C.from !== c.from) fail(`panier collé ${c.k} : enseigne ${C.from}, ${c.from} attendue`);
+      if (C.found < Math.ceil(c.want.length * 0.75)) fail(`panier collé ${c.k} : ${C.found} lignes trouvées dans le catalogue sur ${c.want.length}`);
+    }
+    const typed = await page.evaluate((t) => { const C = cabasDebug().cleanPaste(t); return { paste: C.paste }; }, PC.ecrite);
+    if (typed.paste) fail("liste écrite à la main : prise pour un panier collé, elle doit ressortir telle quelle");
+    /* dans Ma liste : le panier collé est nettoyé, son montant dit à part, jamais compté ni mis au catalogue */
+    const site = PC.cas[0], before = await page.evaluate(() => { const D = cabasDebug(); return D.S.list.slice(0, 400).map((p) => (D.best(p) || {}).price || 0).join(); });
+    await page.fill("#wlIn", site.text);
+    await page.click('[data-act="wlgo"]'); await page.waitForTimeout(700);
+    const pb = await page.locator("#view .banner").first().textContent();
+    if (!/Panier collé de Carrefour/.test(pb) || !/4\s+produits lus/.test(pb) || !/25,52\s€ d'après ce que tu as collé/.test(pb)) fail("Ma liste, panier collé : « " + pb + " »");
+    const draft = await stored("draft");
+    if (/€|Valider|Supprimer|Quantité/.test(draft || "")) fail("Ma liste, panier collé : le brouillon garde le bruit du site « " + draft + " »");
+    const dockT = await page.locator(".dock .mini").textContent().catch(() => "");
+    if (/25,52/.test(dockT)) fail("Ma liste, panier collé : le montant collé ne doit pas devenir le total « " + dockT + " »");
+    const after = await page.evaluate(() => { const D = cabasDebug(); return D.S.list.slice(0, 400).map((p) => (D.best(p) || {}).price || 0).join(); });
+    if (before !== after) fail("Ma liste, panier collé : des prix du catalogue ont changé");
+    await overflow("Ma liste, panier collé");
+
+    /* listes toutes faites par profil */
+    const LJ = await page.evaluate(() => fetch("data/listes.json").then((r) => r.json()));
+    const pk = new Set((LJ.profils || []).map((p) => p.k));
+    if (pk.size < 5 || pk.size !== (LJ.profils || []).length) fail("listes.json : profils manquants ou en double");
+    for (const want of ["etudiant", "famille", "senior", "petitbudget", "vegetarien"]) if (!pk.has(want)) fail("listes.json : profil " + want + " absent");
+    const lk = new Set();
+    for (const L of LJ.listes || []) {
+      if (!L.k || lk.has(L.k) || !pk.has(L.base) || !["semaine", "appoint"].includes(L.kind) || !L.label || !L.text) fail("listes.json : liste mal formée " + JSON.stringify(L).slice(0, 120));
+      lk.add(L.k);
+      if (/\u2014/.test(L.label + L.text)) fail("listes.json : tiret cadratin dans " + L.k);
+      const r = await page.evaluate((text) => { const D = cabasDebug(), lines = D.readList(text), plan = D.listPlan(lines); return { n: lines.length, miss: lines.filter((x) => !x.pick).map((x) => x.raw), plan: plan && { short: !!plan.short, covered: plan.covered, n: plan.n, total: plan.total, orders: (plan.orders || []).length } }; }, L.text);
+      if (r.miss.length) fail(`liste ${L.k} : lignes sans produit ${JSON.stringify(r.miss)}`);
+      if (L.kind === "semaine" && (!r.plan || r.plan.short || r.plan.covered !== r.plan.n)) fail(`liste ${L.k} : la liste devrait se commander en entier, minimum atteint (${JSON.stringify(r.plan)})`);
+    }
+    await page.evaluate(() => { location.hash = "#/listes"; }); await page.waitForTimeout(800);
+    if ((await page.locator("#profs [data-act=prof]").count()) !== pk.size) fail("écran Listes : une pastille par profil attendue");
+    await page.click('#profs [data-act=prof][data-k="famille"]'); await page.waitForTimeout(300);
+    if ((await page.getAttribute('#profs [data-act=prof][data-k="famille"]', "aria-checked")) !== "true") fail("écran Listes : le profil Famille n'est pas choisi");
+    const famRows = await page.locator("#profs [data-act=wlprof]").count();
+    if (famRows !== LJ.listes.filter((x) => x.base === "famille").length) fail(`écran Listes, Famille : ${famRows} listes`);
+    await page.click('#profs [data-act=wlprof] >> nth=0'); await page.waitForTimeout(800);
+    const nl = await page.evaluate(() => (cabasDebug().S.wl.lines || []).length);
+    if (!/#\/ecrire$/.test(page.url()) || nl < 10) fail(`liste toute faite : Ma liste attendue avec ses lignes (${page.url()}, ${nl})`);
+    await overflow("liste toute faite");
   } catch (e) {
     fail("parcours interrompu : " + e.message.split("\n")[0]);
   }
   await browser.close();
   server.close();
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Ma liste (choix habituels, quantités, orthographe, lignes libres, nouvelles catégories, régime) : aucun problème.");
+  console.log("Ma liste (choix habituels, quantités, orthographe, lignes libres, nouvelles catégories, régime, panier collé, listes par profil) : aucun problème.");
 })();

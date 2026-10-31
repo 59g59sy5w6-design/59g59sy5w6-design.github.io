@@ -58,6 +58,8 @@ const STATES = {
   },
 };
 const PARTAGE = "#/partage/" + b64e(JSON.stringify({ n: "Liste de Camille", i: Object.entries(LIST_ITEMS) }));
+/* lien de transfert entre deux téléphones (non compressé) : un panier et une liste */
+const TRANSFERT = "#/transfert/j" + b64e(JSON.stringify({ app: "cabas", v: 1, at: new Date().toISOString(), data: { basket: LIST_ITEMS, lists: [{ id: "t1", name: "Courses", items: LIST_ITEMS }], seen: { welcome: 1 } } }));
 const ROUTES = [
   ["accueil", "#/"], ["rayons", "#/rayons"], ["rayon-pates", "#/rayon/pates"], ["produit", "#/produit/barilla-pates-capellini-n-1-500-g"],
   ["recherche", "#/recherche"], ["listes", "#/listes"], ["liste", "#/liste/l1"], ["suggestion", "#/suggestion"], ["panier", "#/panier"],
@@ -65,13 +67,14 @@ const ROUTES = [
   ["apropos", "#/apropos"], ["comment", "#/comment"], ["ecrire", "#/ecrire"], ["economies", "#/economies"], ["repas", "#/repas"],
   ["recette", "#/repas/pates-thon-tomate"], ["scan", "#/scan"], ["partage", PARTAGE], ["inconnu", "#/nimportequoi"],
   ["remplir", "#/remplir"], ["remplir-guide", "#/remplir/monoprix"], ["remplir-fin", "#/remplir/houra"], ["remplir-avant", "#/remplir/carrefour"], ["recommander", "#/recommander"],
+  ["magasin", "#/magasin"], ["mouvements", "#/mouvements"], ["transfert", TRANSFERT],
 ];
 /* écrans mesurés aussi à l'état vide (première visite) */
-const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander"];
+const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander", "magasin", "mouvements"];
 /* feuilles ouvertes depuis chaque écran : nom, bouton qui l'ouvre ; celles du panier demandent un gros panier
    (14 produits vendus par plusieurs enseignes, en deux exemplaires), qui atteint les minimums de commande */
 const SHEETS = {
-  reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"]],
+  reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"], ["jour-courses", "[data-act=shopdays]"]],
   /* « Remplir mes paniers » est un écran (#/remplir), plus une feuille : ses feuilles sont mesurées depuis le mode guidé */
   "panier-gros": [["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"], ["ou-le-prendre", "[data-act=itemopt]"], ["panier-souple", "[data-act=flex]"]],
   "remplir-guide": [["pas-trouve", "#view [data-act=fillmiss]"]],
