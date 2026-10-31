@@ -214,7 +214,7 @@ const server = http.createServer((req, res) => {
     const clip = await page.evaluate(() => navigator.clipboard.readText()).catch(() => "");
     if (!new RegExp(`^${fname} \\(`).test(clip) || !/\n- /.test(clip)) fail("copier la liste : texte inattendu : " + clip.slice(0, 120));
     const all = await page.evaluate(() => window.cabasDebug().fillText());
-    if (!/^Mes courses du/.test(all) || !all.includes(fname) || !all.includes(sname) || !/Total : /.test(all)) fail("fillText() : toutes les listes attendues");
+    if (!/^Mes courses du/.test(all) || !all.includes(fname) || !all.includes(sname) || !/Total\s:\s/.test(all)) fail("fillText() : toutes les listes attendues");
 
     /* 8. tout cocher, fin de commande, créneau, commande suivante */
     for (let i = 0; i < 40 && (await page.locator("#view .fbtns [data-act=fillck]").count()); i++) { await page.click("#view .fbtns [data-act=fillck]"); await page.waitForTimeout(120); }

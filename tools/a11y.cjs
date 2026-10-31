@@ -1,8 +1,11 @@
 // Mesures d'accessibilité et de mise en page de l'appli, sans captures : débordements, cibles sous 44 px, contrastes,
 // textes sous 14 px ou en --ink-3, feuilles (focus entrant, inert, piège de Tab, retour du focus), rôles, titres,
-// console, un seul bouton plein par écran, scrollWidth. Chaque écran est mesuré avec les états localStorage de l'audit
-// (vide, plein), à 390 et 1 280 px, en clair et en sombre, aux cinq crans de texte. Code de sortie 1 au premier écart.
-// Usage : node tools/a11y.cjs [--full] [--routes=accueil,panier] [--modes=m-light-1,d-dark-1.25] [--all] [--json=fichier]
+// console, un seul bouton plein et un seul chiffre héros par écran, scrollWidth. Chaque écran est mesuré avec les
+// états localStorage de l'audit (vide, plein), à 390 et 1 280 px, en clair et en sombre, aux cinq crans de texte, en
+// contraste renforcé (suffixe -c du mode) et en mode confort (suffixe -s : cibles de 60 px de haut). Code de sortie 1
+// au premier écart.
+// Usage : node tools/a11y.cjs [--full] [--routes=accueil,panier] [--modes=m-light-1,d-dark-1.25,m-dark-1-c] [--all] [--json=fichier]
+// tools/textcheck.cjs reprend ses écrans, ses états et son serveur (require).
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -55,6 +58,7 @@ const STATES = {
     ],
     guide: { ck: { "monoprix|entremont-emmental-rape-francais-160-g": 1 }, done: { houra: true }, when: { houra: { d: plus(1), s: "soir" } }, snap: SNAP },
     menu: [{ id: "pates-thon-tomate", portions: 4 }, { id: "omelette-fromage", portions: 2 }],
+    reports: [{ id: "r1", at: new Date().toISOString(), k: "manque", pid: "", ret: "", text: "Le riz basmati de Monoprix n'est pas dans Cabas." }],
     recent: ["lait", "pâtes", "café"], seenAt: "", seenp: { "barilla-pates-capellini-n-1-500-g": 9.9, "candia-lait-1-2-ecreme-6-x-1-l": 9.9 }, drops: [],
   },
 };
@@ -70,13 +74,17 @@ const ROUTES = [
   ["remplir", "#/remplir"], ["remplir-guide", "#/remplir/monoprix"], ["remplir-fin", "#/remplir/houra"], ["remplir-avant", "#/remplir/carrefour"], ["recommander", "#/recommander"],
   ["magasin", "#/magasin"], ["mouvements", "#/mouvements"], ["transfert", TRANSFERT],
   ["comparer", "#/comparer/barilla-pates-capellini-n-1-500-g/barilla-pates-spaghetti-n-5-500-g"],
+  ["frais", "#/frais"], ["frais-houra", "#/frais/houra"], ["rayon-bio", "#/rayon/bio"], ["recette-semaine", "#/repas/omelette-fromage"],
+  ["demande", "#/recherche"],
 ];
+/* phrase de « Demande à Cabas » tapée sur l'écran « demande » */
+const ASK = "pâtes complètes à moins de 2 € chez Houra";
 /* écrans mesurés aussi à l'état vide (première visite) */
-const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander", "magasin", "mouvements"];
+const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander", "magasin", "mouvements", "frais"];
 /* feuilles ouvertes depuis chaque écran : nom, bouton qui l'ouvre ; celles du panier demandent un gros panier
    (14 produits vendus par plusieurs enseignes, en deux exemplaires), qui atteint les minimums de commande */
 const SHEETS = {
-  reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"], ["jour-courses", "[data-act=shopdays]"], ["alertes", "[data-act=watchlist]"], ["signaler-demander", "#view [data-act=report]"], ["regime", "[data-act=diet]"]],
+  reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"], ["jour-courses", "[data-act=shopdays]"], ["alertes", "[data-act=watchlist]"], ["signaler-demander", "#view [data-act=report]"], ["regime", "[data-act=diet]"], ["mes-choix", "[data-act=usual]"], ["mes-signalements", "[data-act=reports]"]],
   produit: [["comparer", "#view [data-act=cmppick]"], ["previens-moi", "#view [data-act=watch]"], ["signaler", "#view [data-act=report]"]],
   /* « Remplir mes paniers » est un écran (#/remplir), plus une feuille : ses feuilles sont mesurées depuis le mode guidé */
   "panier-gros": [["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"], ["ou-le-prendre", "[data-act=itemopt]"], ["panier-souple", "[data-act=flex]"]],
@@ -91,13 +99,16 @@ const GROS_JS = `fetch("data/catalog.json").then((r) => r.json()).then((c) => { 
 const CRANS = ["0.82", "0.9", "1", "1.12", "1.25"];
 const WIDTHS = { m: { width: 390, height: 844 }, d: { width: 1280, height: 800 } };
 function modeOf(id) {
-  const [w, scheme, cran] = id.split("-");
-  return { id, vp: WIDTHS[w], scheme, cran: cran || "1", mobile: w === "m" };
+  const [w, scheme, cran, ...x] = id.split("-");
+  return { id, vp: WIDTHS[w], scheme, cran: cran || "1", mobile: w === "m", contrast: x.includes("c"), simple: x.includes("s") };
 }
+/* les réglages d'affichage d'un mode : cran de texte, contraste renforcé, mode confort */
+const lookOf = (mode) => Object.assign(mode.cran !== "1" ? { zoom: mode.cran } : {}, mode.contrast ? { contrast: true } : {}, mode.simple ? { simple: true } : {});
 /* par défaut : mobile clair et sombre, desktop clair, les cinq crans en mobile clair et le plus grand en desktop sombre ;
    --full : tout le produit largeurs x thèmes x crans */
-const DEFAULT_MODES = ["m-light-1", "m-dark-1", "d-light-1", "m-light-0.82", "m-light-0.9", "m-light-1.12", "m-light-1.25", "d-dark-1.25"];
-const FULL_MODES = ["m", "d"].flatMap((w) => ["light", "dark"].flatMap((s) => CRANS.map((c) => `${w}-${s}-${c}`)));
+const DEFAULT_MODES = ["m-light-1", "m-dark-1", "d-light-1", "m-light-0.82", "m-light-0.9", "m-light-1.12", "m-light-1.25", "d-dark-1.25",
+  "m-light-1-c", "m-dark-1-c", "d-dark-1-c", "m-light-1-s", "m-dark-1.25-s", "d-light-1-s"];
+const FULL_MODES = ["m", "d"].flatMap((w) => ["light", "dark"].flatMap((s) => CRANS.flatMap((c) => ["", "-c", "-s", "-c-s"].map((x) => `${w}-${s}-${c}${x}`))));
 const MODES = (ARGS.modes ? String(ARGS.modes).split(",") : ARGS.full ? FULL_MODES : DEFAULT_MODES).map(modeOf);
 const ROUTE_FILTER = ARGS.routes ? new Set(String(ARGS.routes).split(",")) : null;
 
@@ -137,16 +148,20 @@ const MEASURE_JS = `(() => {
     const r = el.getBoundingClientRect();
     if (r.right > vw + 1 && !el.closest(".skip") && !inScroller(el)) { if (nOver++ < 6) out.push({ cat: "débordement", msg: sig(el) + " dépasse à " + Math.round(r.right) + " px (« " + txt(el) + " »)" }); }
   }
-  /* 2 : cibles sous 44 x 44 (la zone de touche étendue par .hit compte) */
+  /* 2 : cibles sous 44 x 44, 44 x 60 en mode confort (la zone de touche étendue par .hit compte) */
+  const simple = document.documentElement.hasAttribute("data-simple"), minH = simple ? 59.5 : 43.5;
   const TSEL = "button, a[href], [data-act], input:not([type=hidden]), textarea, select, label.sw, [role=checkbox], [role=radio], [role=switch]";
   const targetRoot = sheetOpen ? document.querySelector("#sheet .sheet") : document;
   for (const el of targetRoot.querySelectorAll(TSEL)) {
     if (!vis(el) || el.closest(".sr") || el.classList.contains("sr")) continue;
     if (el.tagName === "INPUT" && el.closest("label.sw")) continue;
     if (!sheetOpen && el.closest("#sheet")) continue;
-    const r = el.getBoundingClientRect(), hit = el.classList.contains("hit");
-    const w = hit ? Math.max(r.width, 44) : r.width, h = hit ? Math.max(r.height, 44) : r.height;
-    if (w < 43.5 || h < 43.5) out.push({ cat: "cible", msg: sig(el) + " " + Math.round(r.width) + " x " + Math.round(r.height) + " (« " + txt(el) + " »)" });
+    const r = el.getBoundingClientRect(), hit = el.classList.contains("hit") || (el.parentElement && el.parentElement.classList.contains("hit"));
+    const tap = simple ? 60 : 44;
+    let w = hit ? Math.max(r.width, tap) : r.width, h = hit ? Math.max(r.height, tap) : r.height;
+    /* l'interrupteur : sa case invisible déborde du dessin de 11 px en haut et en bas */
+    if (el.matches("label.sw")) h = Math.max(h, r.height + 22);
+    if (w < 43.5 || h < minH) out.push({ cat: "cible", msg: sig(el) + " " + Math.round(r.width) + " x " + Math.round(r.height) + " (« " + txt(el) + " »)" });
   }
   /* 3 et 4 : contrastes, tailles, texte en --ink-3 */
   const seen = new Set(), nodes = [];
@@ -191,11 +206,13 @@ const MEASURE_JS = `(() => {
     if (h1.length !== 1) out.push({ cat: "titre", msg: h1.length + " h1 (" + h1.map((h) => h.t).join(" | ") + ")" });
     let prev = 0; for (const h of hs) { if (prev && h.l > prev + 1) out.push({ cat: "titre", msg: "saut h" + prev + " vers h" + h.l + " (" + h.t + ")" }); prev = h.l; }
   }
+  /* 7 bis : un seul chiffre héros (le total en grand) par écran */
+  if (!sheetOpen) { const heroes = [...document.querySelectorAll("#view .sum .st .px")].filter(vis); if (heroes.length > 1) out.push({ cat: "chiffre héros", msg: heroes.length + " chiffres héros : " + heroes.map((h) => "« " + txt(h) + " »").join(", ") }); }
   /* 8 : gestionnaires en ligne */
   for (const el of document.querySelectorAll("[onclick], [onchange], [oninput]")) out.push({ cat: "inline", msg: "gestionnaire en ligne sur " + sig(el) });
   /* 9 : un seul bouton plein visible à l'ouverture, dock compris */
   if (!sheetOpen) {
-    const full = [...document.querySelectorAll(".btn:not(.tint):not(.ghost):not(.plain):not(.danger), .dock .mini")].filter((b) => { if (!vis(b)) return false; const r = b.getBoundingClientRect(); return r.top < vh && r.bottom > 0; });
+    const full = [...document.querySelectorAll(".btn:not(.tint):not(.ghost):not(.plain):not(.danger), .dock .mini:not(.soft)")].filter((b) => { if (!vis(b)) return false; const r = b.getBoundingClientRect(); return r.top < vh && r.bottom > 0; });
     if (full.length > 1) out.push({ cat: "bouton plein", msg: full.length + " boutons pleins visibles : " + full.map((b) => "« " + txt(b) + " »").join(", ") });
   }
   return out;
@@ -211,8 +228,19 @@ async function ready(page, route) {
   if (route === "accueil") await page.waitForFunction(() => !document.querySelector("#recrail"), null, { timeout: 15000 }).catch(() => {});
   await sleep(320);
 }
+/* écrans qui demandent un geste avant la mesure : Ma liste cherchée, une recherche, une demande en phrase */
+async function prepare(page, rname, st) {
+  if (rname === "ecrire" && st === "plein") { await page.click("[data-act=wlgo]").catch(() => {}); await page.waitForSelector("[data-act=wlalt], .banner", { timeout: 20000 }).catch(() => {}); await sleep(300); }
+  if ((rname === "recherche" && st === "plein") || rname === "demande") { const i = await page.$("#q"); if (i) { await i.fill(rname === "demande" ? ASK : "lait"); await sleep(rname === "demande" ? 1200 : 600); } }
+  await page.evaluate(() => window.scrollTo(0, 0));
+}
+/* états du gros panier (14 produits en deux exemplaires) : le tableau des prix et « Et si… » ouvert */
+const GROS_STEPS = [
+  ["panier-tableau", async (page) => { await page.click("[data-act=cview][data-v=tab]"); await sleep(400); }, async (page) => { await page.click("[data-act=cview][data-v=cmd]").catch(() => {}); await sleep(300); }],
+  ["panier-et-si", async (page) => { await page.evaluate(() => { const d = document.querySelector("details.wif"); if (d) { d.scrollIntoView({ block: "start" }); d.querySelector("summary").click(); } }); await page.waitForFunction(() => !document.querySelector("details.wif .sk, details.wif .loading"), null, { timeout: 15000 }).catch(() => {}); await sleep(500); }, async (page) => { await page.evaluate(() => { const d = document.querySelector("details.wif[open]"); if (d) d.querySelector("summary").click(); window.scrollTo(0, 0); }); await sleep(200); }],
+];
 
-(async () => {
+async function main() {
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
   const base = `http://127.0.0.1:${server.address().port}/index.html`;
   const findings = [];
@@ -220,10 +248,11 @@ async function ready(page, route) {
   const browser = await chromium.launch();
   let loads = 0;
   for (const mode of MODES) {
-    const states = mode.id === "m-light-1" ? ["plein", "vide"] : ["plein"];
+    const states = mode.id === "m-light-1" || mode.id === "m-light-1-s" ? ["plein", "vide"] : ["plein"];
     for (const st of states) {
       const state = JSON.parse(JSON.stringify(STATES[st]));
-      if (mode.cran !== "1") state.prefs = Object.assign({ off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {} }, state.prefs || {}, { zoom: mode.cran });
+      const look = lookOf(mode);
+      if (Object.keys(look).length) state.prefs = Object.assign({ off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {} }, state.prefs || {}, look);
       const ctx = await browser.newContext({ viewport: mode.vp, deviceScaleFactor: 1, colorScheme: mode.scheme, isMobile: mode.mobile, hasTouch: mode.mobile, locale: "fr-FR", timezoneId: "Europe/Paris", serviceWorkers: "block" });
       /* Open Food Facts simulé (tools/fixtures/openfoodfacts.json) : la fiche montre Nutri-Score, allergènes et labels */
       await ctx.route(/^https:\/\/world\.openfoodfacts\.org\//, (r) => r.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(OFF.connu) }));
@@ -242,14 +271,17 @@ async function ready(page, route) {
           else await page.evaluate((h) => { location.hash = h; window.scrollTo(0, 0); }, hash);
           loads++;
           await ready(page, rname);
-          if (rname === "ecrire" && st === "plein") { await page.click("[data-act=wlgo]").catch(() => {}); await page.waitForSelector("[data-act=wlalt], .banner", { timeout: 20000 }).catch(() => {}); await sleep(300); }
-          if (rname === "recherche" && st === "plein") { const i = await page.$("#q"); if (i) { await i.fill("lait"); await sleep(600); } }
-          await page.evaluate(() => window.scrollTo(0, 0));
+          await prepare(page, rname, st);
           add(where, await page.evaluate(MEASURE_JS));
           if (/enseigne/.test(rname)) { const h1 = await page.evaluate(() => (document.querySelector("#view h1") || {}).textContent || ""); if (/introuvable|n'existe pas/i.test(h1) || !h1) add(where, [{ cat: "titre", msg: "page d'enseigne non rendue (h1 « " + h1.trim() + " »)" }]); }
           /* feuilles : mobile clair et sombre, état plein ; sur le panier, avec un gros panier qui a des commandes */
           const gros = rname === "panier" && st === "plein" && mode.cran === "1" && mode.mobile;
-          if (gros) { await page.evaluate(GROS_JS); await page.reload({ waitUntil: "domcontentloaded" }); await ready(page, rname); loads++; add(`${mode.id} gros ${rname}`, await page.evaluate(MEASURE_JS)); }
+          if (gros) {
+            await page.evaluate(GROS_JS); await page.reload({ waitUntil: "domcontentloaded" }); await ready(page, rname); loads++; add(`${mode.id} gros ${rname}`, await page.evaluate(MEASURE_JS));
+            for (const [sname, go, back] of GROS_STEPS) {
+              try { await go(page); add(`${mode.id} gros ${sname}`, await page.evaluate(MEASURE_JS)); await back(page); } catch (e) { add(`${mode.id} gros ${sname}`, [{ cat: "erreur", msg: String(e).split("\n")[0].slice(0, 160) }]); }
+            }
+          }
           if (st === "plein" && mode.cran === "1" && mode.mobile) {
             for (const [sname, sel] of SHEETS[gros ? "panier-gros" : rname] || []) {
               const sw = `${where} feuille ${sname}`;
@@ -302,4 +334,7 @@ async function ready(page, route) {
   }
   if (findings.length) process.exit(1);
   console.log("Aucun écart.");
-})().catch((e) => { console.error(e); process.exit(1); });
+}
+
+if (require.main === module) main().catch((e) => { console.error(e); process.exit(1); });
+else module.exports = { server, ROUTES, STATES, EMPTY_TOO, SHEETS, GROS_JS, OFF, ready, prepare, sleep };

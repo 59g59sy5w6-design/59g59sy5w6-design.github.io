@@ -1,14 +1,14 @@
 {
   "name": "Cabas",
   "short_name": "Cabas",
-  "description": "Compare les prix de tes courses chez Monoprix, Carrefour, Houra et Auchan, et trouve où commander pour payer le moins cher, livraison comprise.",
+  "description": "Tes courses au prix le plus bas, livraison comprise. Cabas compare Monoprix, Carrefour, Houra et Auchan aux prix relevés sur leurs sites, répartit ton panier entre les enseignes, frais compris, et t'aide à remplir chaque panier. Gratuit, sans compte.",
   "lang": "fr",
   "dir": "ltr",
   "id": "./",
   "start_url": "./#/",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "categories": [
@@ -38,7 +38,13 @@
       "name": "Écrire ma liste",
       "short_name": "Ma liste",
       "url": "./#/ecrire",
-      "description": "Écris, dicte ou colle tes courses, Cabas trouve chaque produit au meilleur prix"
+      "description": "Écris, dicte ou colle tes courses : Cabas trouve chaque produit au meilleur prix"
+    },
+    {
+      "name": "Mon panier",
+      "short_name": "Panier",
+      "url": "./#/panier",
+      "description": "La répartition la moins chère, livraison comprise"
     },
     {
       "name": "Remplir mes paniers",
@@ -47,22 +53,22 @@
       "description": "Ajoute chaque produit au panier de chaque enseigne, sans refaire tout le parcours"
     },
     {
+      "name": "Scanner un code-barres",
+      "short_name": "Scanner",
+      "url": "./#/scan",
+      "description": "En magasin, compare le prix d'un produit à celui des sites"
+    },
+    {
       "name": "Recommander un panier",
       "short_name": "Recommander",
       "url": "./#/recommander",
       "description": "Un panier déjà commandé, remis et réparti aux prix d'aujourd'hui"
     },
     {
-      "name": "Mon panier",
-      "short_name": "Panier",
-      "url": "./#/panier",
-      "description": "La répartition la moins chère"
-    },
-    {
-      "name": "Scanner un code-barres",
-      "short_name": "Scanner",
-      "url": "./#/scan",
-      "description": "En magasin, compare le prix d'un produit"
+      "name": "Mode magasin",
+      "short_name": "Magasin",
+      "url": "./#/magasin",
+      "description": "Ta liste rangée par rayon, en gros caractères, à cocher en marchant"
     }
   ],
   "share_target": {
@@ -80,7 +86,7 @@
       "sizes": "780x1688",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "L'accueil : écris ta liste, Cabas trouve chaque produit au meilleur prix"
+      "label": "L'accueil : écris ta liste, Cabas trouve chaque produit au meilleur prix"
     },
     {
       "src": "icons/ecran-2.png",
@@ -94,7 +100,7 @@
       "sizes": "780x1688",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Des repas à petit prix, au coût de la portion"
+      "label": "Remplir mes paniers : chaque produit s'ouvre sur le site de son enseigne"
     }
   ],
   "launch_handler": {

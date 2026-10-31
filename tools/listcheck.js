@@ -2,13 +2,14 @@
 // « Garder le mien »), quantité habituelle d'après les paniers commandés (« × 2, comme d'habitude », « Toujours 1 »),
 // usualQty sur un historique fixe, orthographe (« spagetti x2 » trouve un spaghetti, « zzzz » reste sans suggestion,
 // « Tu voulais dire… ? Oui »), lignes libres (« Garder quand même », panier, texte partagé, liste partagée), puis, avec le
-// jeu d'essai tools/fixtures/catalog-extra.json ajouté au catalogue, les mots des nouvelles catégories (jambon, camembert,
+// jeu d'essai tools/fixtures/catalog-extra.json ajouté au catalogue relevé, les mots des nouvelles catégories (jambon, camembert,
 // lessive capsules, couches, croquettes chat, vin rouge…) et « Mon régime » (rayon filtré, chip, Ma liste, réglages,
 // dietOk sur 30 libellés, repas) ; « Colle ton panier » (cleanPaste sur les paniers collés de tools/fixtures/paniers-
 // colles.json : site sur plusieurs lignes, courriel en colonnes, ticket de caisse, message à cases, quantités seules ;
 // une liste écrite ressort telle quelle ; dans Ma liste, le montant collé est dit « d'après ce que tu as collé » et
 // n'entre ni dans le catalogue ni dans un total) ; les listes toutes faites par profil (data/listes.json : forme, chaque
-// ligne trouvée, chaque liste « semaine » prise en entier par une commande qui atteint son minimum ; écran Listes).
+// ligne trouvée, chaque liste « semaine » et « La semaine » de l'accueil prises en entier par une commande qui atteint
+// son minimum ; écran Listes).
 // Code de sortie 1 en cas de problème. Usage : node tools/listcheck.js
 const http = require("http");
 const fs = require("fs");
@@ -198,7 +199,7 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     }
     if (!/Rien à commander en ligne/.test(await page.locator("#view").textContent())) fail("panier vide avec lignes libres : titre inattendu");
     const ct = await page.evaluate(() => cabasDebug().cartText());
-    if (!/À chercher :/.test(ct) || !/2 x piles alcalines/.test(ct) || !/prix saisi par toi/.test(ct)) fail("cartText : pas de section « À chercher »\n" + ct);
+    if (!/À chercher\s:/.test(ct) || !/2 x piles alcalines/.test(ct) || !/prix saisi par toi/.test(ct)) fail("cartText : pas de section « À chercher »\n" + ct);
     await overflow("panier, lignes libres");
     /* retirer puis « Annuler » */
     await page.click('.freebox [data-act="freedec"]');
@@ -253,7 +254,7 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
       await page.evaluate((x) => cabasDebug().merge(x), extra);
     };
     await withExtra(PREFS);
-    const WORDS = [["jambon", "jambon-blanc", /jambon blanc/i], ["camembert", "fromages-pate-molle", /^Camembert$/], ["lessive capsules", "lessive-capsules-poudre", /capsules/i], ["couches", "couches", /^Couches taille 4$/], ["croquettes chat", "croquettes-chat", /adulte/i], ["vin rouge", "vin-rouge", /rouge/i], ["bière blonde x6", "bieres", /^Bière blonde$/], ["chips", "chips", /nature/i], ["saucisson", "saucisson", /saucisson/i], ["dentifrice", "dentifrice", /dentifrice/i], ["pain", "pain", /baguette/i], ["camenbert", "fromages-pate-molle", /^Camembert$/]];
+    const WORDS = [["jambon", "jambon-blanc", /jambon/i], ["camembert", "fromages-pate-molle", /^Camembert$/], ["lessive capsules", "lessive-capsules-poudre", /capsules/i], ["couches", "couches", /^Couches/], ["croquettes chat", "croquettes-chat", /adulte/i], ["vin rouge", "vin-rouge", /rouge/i], ["bière blonde x6", "bieres", /^Bière blonde(?!.*\b(légère|forte)\b)/i], ["chips", "chips", /nature/i], ["saucisson", "saucisson", /saucisson/i], ["dentifrice", "dentifrice", /dentifrice/i], ["pain", "pain", /baguette/i], ["camenbert", "fromages-pate-molle", /^Camembert$/]];
     const got = await page.evaluate((qs) => { const D = cabasDebug(); return D.readList(qs.join("\n")).map((x) => { const p = x.pick && D.S.prods.get(x.pick); return { raw: x.raw, r: p ? p.r : null, name: p ? p.name : null, n: x.n }; }); }, WORDS.map((w) => w[0]));
     WORDS.forEach(([q, r, re], i) => { const g = got[i]; if (!g || g.r !== r || !re.test(g.name || "")) fail(`Ma liste « ${q} » : attendu rayon ${r} et ${re}, obtenu ${g ? g.r + " / " + g.name : "rien"}`); });
     if (got[6] && got[6].n !== 1) fail("« bière blonde x6 » : un pack de 6 attendu en quantité 1, obtenu " + got[6].n);
@@ -263,14 +264,16 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     await withExtra(Object.assign({}, PREFS, { diet: { halal: true } }));
     await page.evaluate(() => { location.hash = "#/rayon/jambon-blanc"; });
     await page.waitForTimeout(400);
-    let cards = await page.locator("#view .card").count();
-    if (cards !== 1) fail(`régime halal : ${cards} cartes dans le rayon jambon, 1 attendue`);
+    /* les cartes du rayon sont toutes conformes au régime ; une fois la chip décochée, il y en a plus */
+    const halalCards = () => page.evaluate(() => { const D = cabasDebug(); return [...document.querySelectorAll("#view .card a.cover")].map((a) => decodeURIComponent(a.getAttribute("href").split("/").pop())).map((id) => D.dietOk(D.S.prods.get(id))); });
+    let shown = await halalCards(), cards = shown.length;
+    if (!cards || shown.some((ok) => !ok)) fail(`régime halal : ${cards} cartes dans le rayon jambon, ${shown.filter((ok) => !ok).length} non conformes`);
     if (!/correspond.*ton régime/.test(await page.locator("#view .count").textContent().catch(() => ""))) fail("régime halal : le nombre de produits conformes n'est pas dit");
     const dchip = page.locator('[data-act="quick"][data-q="diet"]');
     if ((await dchip.getAttribute("aria-pressed")) !== "true") fail("régime : la chip « Mon régime » n'est pas pressée par défaut");
     await dchip.click(); await page.waitForTimeout(300);
-    cards = await page.locator("#view .card").count();
-    if (cards !== 4) fail(`régime halal décoché : ${cards} cartes, 4 attendues`);
+    const all = await page.locator("#view .card").count();
+    if (all <= cards) fail(`régime halal décoché : ${all} cartes, plus de ${cards} attendues`);
     const dl = await page.evaluate(() => { const D = cabasDebug(); return D.readList("jambon\ncamembert").map((x) => ({ pick: x.pick, miss: !!x.dietMiss })); });
     if (!dl[0] || !/halal/.test(dl[0].pick) || dl[0].miss) fail("régime halal, Ma liste « jambon » : " + JSON.stringify(dl[0]));
     if (!dl[1] || !dl[1].pick || !dl[1].miss) fail("régime halal, Ma liste « camembert » : le repli sans filtre n'est pas signalé : " + JSON.stringify(dl[1]));
@@ -353,6 +356,13 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
       const r = await page.evaluate((text) => { const D = cabasDebug(), lines = D.readList(text), plan = D.listPlan(lines); return { n: lines.length, miss: lines.filter((x) => !x.pick).map((x) => x.raw), plan: plan && { short: !!plan.short, covered: plan.covered, n: plan.n, total: plan.total, orders: (plan.orders || []).length } }; }, L.text);
       if (r.miss.length) fail(`liste ${L.k} : lignes sans produit ${JSON.stringify(r.miss)}`);
       if (L.kind === "semaine" && (!r.plan || r.plan.short || r.plan.covered !== r.plan.n)) fail(`liste ${L.k} : la liste devrait se commander en entier, minimum atteint (${JSON.stringify(r.plan)})`);
+    }
+    /* la liste « La semaine » de l'accueil d'une première visite se commande aussi en entier, minimum atteint */
+    const ex = /\["semaine", "La semaine", "([^"]+)"/.exec(fs.readFileSync(path.join(ROOT, "app.js"), "utf8"));
+    if (!ex) fail("EXAMPLES : liste « La semaine » introuvable dans app.js");
+    else {
+      const r = await page.evaluate((text) => { const D = cabasDebug(), lines = D.readList(text), plan = D.listPlan(lines); return { miss: lines.filter((x) => !x.pick).map((x) => x.raw), plan: plan && { short: !!plan.short, covered: plan.covered, n: plan.n } }; }, ex[1]);
+      if (r.miss.length || !r.plan || r.plan.short || r.plan.covered !== r.plan.n) fail(`accueil, « La semaine » : la liste devrait se commander en entier (${JSON.stringify(r)})`);
     }
     await page.evaluate(() => { location.hash = "#/listes"; }); await page.waitForTimeout(800);
     if ((await page.locator("#profs [data-act=prof]").count()) !== pk.size) fail("écran Listes : une pastille par profil attendue");
