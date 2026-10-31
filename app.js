@@ -1482,12 +1482,15 @@
     }
     /* la liste entière, livraison comprise : l'ensemble d'enseignes le moins cher, minimums et frais compris ; quand il
        prend toute la liste, ses produits sont choisis d'office (« Autre choix » reste là pour en changer) */
-    let plan = W.lines.some((x) => x.pick) ? listPlan(W.lines) : null;
-    if (plan && !plan.short && plan.covered === plan.n && !W.planApplied) {
-      for (const pk of plan.picks) if (pk.id) { pk.line.pick = pk.id; pk.line.n = pk.n; }
-      W.planApplied = true;
-      plan = listPlan(W.lines);
-    }
+    let plan = null;
+    try {
+      plan = W.lines.some((x) => x.pick) ? listPlan(W.lines) : null;
+      if (plan && !plan.short && plan.covered === plan.n && !W.planApplied) {
+        for (const pk of plan.picks) if (pk.id) { pk.line.pick = pk.id; pk.line.n = pk.n; }
+        W.planApplied = true;
+        plan = listPlan(W.lines);
+      }
+    } catch (e) { plan = null; /* la liste s'affiche quand même, produit par produit */ }
     const found = W.lines.filter((x) => x.pick);
     let t = 0;
     found.forEach((x) => { const b = best(S.prods.get(x.pick)); if (b) t += Math.round(b.price * 100) * x.n; });
