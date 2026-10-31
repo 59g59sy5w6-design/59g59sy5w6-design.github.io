@@ -1,0 +1,3360 @@
+{
+ "cible": "auchan-livraison-perreux",
+ "debut": "2026-10-31T15:26:38.249Z",
+ "fin": "2026-10-31T16:19:28.933Z",
+ "only": [
+  "auchan-livraison-perreux"
+ ],
+ "lot": [],
+ "max": 0,
+ "pages": [
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fruits",
+   "url": "https://www.auchan.fr/recherche?text=fruits%20frais#livraison-perreux",
+   "final": "https://www.auchan.fr/fruits-legumes/fruits/ca-n0301?redirect_keywords=fruits%20frais&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 59,
+   "error": null,
+   "title": "Fruits frais pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "legumes",
+   "url": "https://www.auchan.fr/recherche?text=l%C3%A9gumes%20frais#livraison-perreux",
+   "final": "https://www.auchan.fr/fruits-legumes/legumes/ca-n0302?redirect_keywords=l%C3%A9gumes%20frais&lark-cioSessionId=1+1793460436072&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 137,
+   "error": null,
+   "title": "Légumes frais, légumes de saison pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pommes-de-terre",
+   "url": "https://www.auchan.fr/recherche?text=pommes%20de%20terre#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pommes%20de%20terre#livraison-perreux",
+   "status": 200,
+   "products": 41,
+   "error": null,
+   "title": "Votre recherche pommes de terre sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pommes-de-terre",
+   "url": "https://www.auchan.fr/recherche?text=oignons#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=oignons#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Votre recherche oignons sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "salades-herbes",
+   "url": "https://www.auchan.fr/recherche?text=salade%20en%20sachet#livraison-perreux",
+   "final": "https://www.auchan.fr/fruits-legumes/fruits-legumes-pret-a-consommer/salades-en-sachet/ca-n03021901?redirect_keywords=salade%20en%20sachet&lark-cioSessionId=1+1793460461466&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Salades en sachet pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "salades-herbes",
+   "url": "https://www.auchan.fr/recherche?text=herbes%20aromatiques#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=herbes%20aromatiques#livraison-perreux",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Votre recherche herbes aromatiques sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fruits-secs",
+   "url": "https://www.auchan.fr/recherche?text=fruits%20secs#livraison-perreux",
+   "final": "https://www.auchan.fr/fruits-legumes/fruits-secs-graines/ca-n030115?redirect_keywords=fruits%20secs&lark-cioSessionId=1+1793460479535&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 59,
+   "error": null,
+   "title": "Fruits secs, graines pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fruits-secs",
+   "url": "https://www.auchan.fr/recherche?text=cacahu%C3%A8tes#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cacahu%C3%A8tes#livraison-perreux",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Votre recherche cacahuètes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "boeuf",
+   "url": "https://www.auchan.fr/recherche?text=boeuf#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=boeuf&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche boeuf sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "porc",
+   "url": "https://www.auchan.fr/recherche?text=porc#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=porc&page=2",
+   "status": 200,
+   "products": 56,
+   "error": null,
+   "title": "Votre recherche porc sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "veau-agneau",
+   "url": "https://www.auchan.fr/recherche?text=agneau#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=agneau#livraison-perreux",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Votre recherche agneau sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "veau-agneau",
+   "url": "https://www.auchan.fr/recherche?text=veau#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=veau#livraison-perreux",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Votre recherche veau sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "volaille",
+   "url": "https://www.auchan.fr/recherche?text=poulet#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=poulet&page=4",
+   "status": 200,
+   "products": 101,
+   "error": null,
+   "title": "Votre recherche poulet sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "volaille",
+   "url": "https://www.auchan.fr/recherche?text=dinde#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=dinde#livraison-perreux",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Votre recherche dinde sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "viande-hachee",
+   "url": "https://www.auchan.fr/recherche?text=steak%20hach%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=steak%20hach%C3%A9#livraison-perreux",
+   "status": 200,
+   "products": 24,
+   "error": null,
+   "title": "Votre recherche steak haché sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "saucisses-merguez",
+   "url": "https://www.auchan.fr/recherche?text=merguez#livraison-perreux",
+   "final": "https://www.auchan.fr/boucherie-volaille-poissonnerie/boucherie/saucisses-merguez/merguez/ca-n02010802?redirect_keywords=merguez&lark-cioSessionId=1+1793460564810&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Merguez pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "saucisses-merguez",
+   "url": "https://www.auchan.fr/recherche?text=brochettes#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=brochettes#livraison-perreux",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Votre recherche brochettes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "poissons",
+   "url": "https://www.auchan.fr/recherche?text=poisson%20frais#livraison-perreux",
+   "final": "https://www.auchan.fr/boucherie-volaille-poissonnerie/poissons-crustaces/ca-n0203?redirect_keywords=poisson%20frais&lark-cioSessionId=1+1793460584052&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 96,
+   "error": null,
+   "title": "Poissonnerie Auchan. Poisson et crustacés de qualité pas cher"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "crustaces",
+   "url": "https://www.auchan.fr/recherche?text=crevettes#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=crevettes#livraison-perreux",
+   "status": 200,
+   "products": 24,
+   "error": null,
+   "title": "Votre recherche crevettes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "crustaces",
+   "url": "https://www.auchan.fr/recherche?text=moules#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=moules&page=2",
+   "status": 200,
+   "products": 12,
+   "error": null,
+   "title": "Votre recherche moules sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "traiteur-mer",
+   "url": "https://www.auchan.fr/recherche?text=saumon%20fum%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/boucherie-volaille-poissonnerie/traiteur-de-la-mer/saumons-truites-fumes/saumon-fume/ca-n02040201?redirect_keywords=saumon%20fum%C3%A9&lark-cioSessionId=1+1793460616863&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Saumon fumé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "traiteur-mer",
+   "url": "https://www.auchan.fr/recherche?text=surimi#livraison-perreux",
+   "final": "https://www.auchan.fr/boucherie-volaille-poissonnerie/traiteur-de-la-mer/batonnets-surimi/ca-n020404?redirect_keywords=surimi&lark-cioSessionId=1+1793460623044&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Surimi, bâtonnets pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "traiteur-mer",
+   "url": "https://www.auchan.fr/recherche?text=tarama#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tarama#livraison-perreux",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Votre recherche tarama sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lait",
+   "url": "https://www.auchan.fr/recherche?text=lait%20demi-%C3%A9cr%C3%A9m%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/lait-demi-ecreme/ca-n01010101?redirect_keywords=lait%20demi-%C3%A9cr%C3%A9m%C3%A9&lark-cioSessionId=1+1793460641507&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Lait demi-écrémé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "laits-autres",
+   "url": "https://www.auchan.fr/recherche?text=lait%20entier#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/lait-entier/ca-n01010103?redirect_keywords=lait%20entier&lark-cioSessionId=1+1793460651256&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Lait entier pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "laits-autres",
+   "url": "https://www.auchan.fr/recherche?text=lait%20%C3%A9cr%C3%A9m%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/lait-ecreme/ca-n01010102?redirect_keywords=lait%20%C3%A9cr%C3%A9m%C3%A9&lark-cioSessionId=1+1793460660292&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Lait écrémé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "laits-autres",
+   "url": "https://www.auchan.fr/recherche?text=lait%20sans%20lactose#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=lait%20sans%20lactose#livraison-perreux",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche lait sans lactose sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "yaourts",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20nature#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/yaourts-fromages-blancs/yaourts-nature/ca-n01020103?redirect_keywords=yaourt%20nature&lark-cioSessionId=1+1793460676101&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 59,
+   "error": null,
+   "title": "Yaourts nature pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "yaourts-fruits",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20aux%20fruits#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=yaourt%20aux%20fruits&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche yaourt aux fruits sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "yaourts-fruits",
+   "url": "https://www.auchan.fr/recherche?text=yaourt%20%C3%A0%20boire#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/yaourts-fromages-blancs/yaourts-a-boire/ca-n010207?redirect_keywords=yaourt%20%C3%A0%20boire&lark-cioSessionId=1+1793460699196&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Yaourts à boire pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromage-blanc",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20blanc#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/yaourts-fromages-blancs/fromages-blancs/ca-n01020102?redirect_keywords=fromage%20blanc&lark-cioSessionId=1+1793460708671&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Fromage blanc, fromage frais, faisselle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromage-blanc",
+   "url": "https://www.auchan.fr/recherche?text=skyr#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/yaourts-fromages-blancs/yaourts-alleges-bien-etre-skyr/skyr/ca-n01020604?redirect_keywords=skyr&lark-cioSessionId=1+1793460718896&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Skyr pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desserts-frais",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20dessert#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20dessert&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche crème dessert sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desserts-frais",
+   "url": "https://www.auchan.fr/recherche?text=compote%20fra%C3%AEche#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=compote%20fra%C3%AEche&page=2",
+   "status": 200,
+   "products": 43,
+   "error": null,
+   "title": "Votre recherche compote fraîche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "beurre",
+   "url": "https://www.auchan.fr/recherche?text=beurre#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=beurre&page=2",
+   "status": 200,
+   "products": 55,
+   "error": null,
+   "title": "Votre recherche beurre sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "creme",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20fra%C3%AEche#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-beurres-margarines/cremes-fraiches/ca-n010104?redirect_keywords=cr%C3%A8me%20fra%C3%AEche&lark-cioSessionId=1+1793460759125&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Crèmes fraîches et UHT pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "creme",
+   "url": "https://www.auchan.fr/recherche?text=chantilly#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-beurres-margarines/chantilly-cremes-fouettees/ca-n01010405?redirect_keywords=chantilly&lark-cioSessionId=1+1793460767925&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Chantilly, crèmes fouettées pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "oeufs",
+   "url": "https://www.auchan.fr/recherche?text=oeufs#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/oeufs/ca-n010103?redirect_keywords=oeufs&lark-cioSessionId=1+1793460774998&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Oeufs pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20r%C3%A2p%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/fromages-a-deguster-a-la-coupe/fromages-rapes/ca-n010604?redirect_keywords=fromage%20r%C3%A2p%C3%A9&lark-cioSessionId=1+1793460784187&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 46,
+   "error": null,
+   "title": "Fromages râpés, parmesan pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-pate-molle",
+   "url": "https://www.auchan.fr/recherche?text=camembert#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=camembert#livraison-perreux",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche camembert sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-pate-molle",
+   "url": "https://www.auchan.fr/recherche?text=roquefort#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/fromages-a-deguster-a-la-coupe/bleu-roquefort-gorgonzola/roquefort/ca-n01080302?redirect_keywords=roquefort&lark-cioSessionId=1+1793460804106&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Roquefort pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-pate-pressee",
+   "url": "https://www.auchan.fr/recherche?text=comt%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=comt%C3%A9&page=2",
+   "status": 200,
+   "products": 64,
+   "error": null,
+   "title": "Votre recherche comté sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-pate-pressee",
+   "url": "https://www.auchan.fr/recherche?text=emmental#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=emmental&page=2",
+   "status": 200,
+   "products": 66,
+   "error": null,
+   "title": "Votre recherche emmental sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chevre-brebis",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20de%20ch%C3%A8vre#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=fromage%20de%20ch%C3%A8vre#livraison-perreux",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Votre recherche fromage de chèvre sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-tartiner",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20%C3%A0%20tartiner#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/fromages-a-deguster-a-la-coupe/fromages-a-tartiner/ca-n010605?redirect_keywords=fromage%20%C3%A0%20tartiner&lark-cioSessionId=1+1793460843779&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 46,
+   "error": null,
+   "title": "Fromages à tartiner pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-tartiner",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20portions#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=fromage%20portions#livraison-perreux",
+   "status": 200,
+   "products": 23,
+   "error": null,
+   "title": "Votre recherche fromage portions sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-cuisiner",
+   "url": "https://www.auchan.fr/recherche?text=mozzarella#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=mozzarella#livraison-perreux",
+   "status": 200,
+   "products": 24,
+   "error": null,
+   "title": "Votre recherche mozzarella sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-cuisiner",
+   "url": "https://www.auchan.fr/recherche?text=raclette#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/fromages-a-deguster-a-la-coupe/fromages-a-fondre-raclette-tartiflette/raclette/ca-n01060301?redirect_keywords=raclette&lark-cioSessionId=1+1793460869179&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Fromages à raclette pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "fromages-coupe",
+   "url": "https://www.auchan.fr/recherche?text=fromage%20%C3%A0%20la%20coupe#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=fromage%20%C3%A0%20la%20coupe#livraison-perreux",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Votre recherche fromage à la coupe sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jambon-blanc",
+   "url": "https://www.auchan.fr/recherche?text=jambon%20blanc#livraison-perreux",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/charcuterie/jambon-blanc-roti-haches/jambon-blanc/ca-n12010101?redirect_keywords=jambon%20blanc&lark-cioSessionId=1+1793460888340&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 47,
+   "error": null,
+   "title": "Jambon blanc pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jambon-blanc",
+   "url": "https://www.auchan.fr/recherche?text=blanc%20de%20poulet#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=blanc%20de%20poulet&page=2",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Votre recherche blanc de poulet sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jambon-cru",
+   "url": "https://www.auchan.fr/recherche?text=jambon%20cru#livraison-perreux",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/charcuterie/jambon-cru-charcuteries-en-tranche/jambon-cru-sec-fume/ca-n12010201?redirect_keywords=jambon%20cru&lark-cioSessionId=1+1793460912874&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Jambon cru, sec, fumé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jambon-cru",
+   "url": "https://www.auchan.fr/recherche?text=charcuterie%20tranch%C3%A9e#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=charcuterie%20tranch%C3%A9e#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche charcuterie tranchée sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "saucisson",
+   "url": "https://www.auchan.fr/recherche?text=saucisson#livraison-perreux",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/charcuterie/saucissons-chorizos-entiers/ca-n120103?redirect_keywords=saucisson&lark-cioSessionId=1+1793460918606&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Saucissons, chorizos, rosette pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "saucisson",
+   "url": "https://www.auchan.fr/recherche?text=chorizo#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=chorizo#livraison-perreux",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Votre recherche chorizo sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lardons",
+   "url": "https://www.auchan.fr/recherche?text=lardons#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=lardons#livraison-perreux",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche lardons sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "saucisses-boudins",
+   "url": "https://www.auchan.fr/recherche?text=knacki#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=knacki#livraison-perreux",
+   "status": 200,
+   "products": 23,
+   "error": null,
+   "title": "Votre recherche knacki sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "saucisses-boudins",
+   "url": "https://www.auchan.fr/recherche?text=boudin#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=boudin#livraison-perreux",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Votre recherche boudin sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pates-rillettes",
+   "url": "https://www.auchan.fr/recherche?text=rillettes#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=rillettes#livraison-perreux",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Votre recherche rillettes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pates-rillettes",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2t%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=p%C3%A2t%C3%A9&page=2",
+   "status": 200,
+   "products": 58,
+   "error": null,
+   "title": "Votre recherche pâté sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aperitif-frais",
+   "url": "https://www.auchan.fr/recherche?text=tartinable#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tartinable&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche tartinable sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aperitif-frais",
+   "url": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20frais#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20frais#livraison-perreux",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Votre recherche apéritif frais sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "plats-cuisines-frais",
+   "url": "https://www.auchan.fr/recherche?text=plat%20cuisin%C3%A9%20frais#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=plat%20cuisin%C3%A9%20frais#livraison-perreux",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Votre recherche plat cuisiné frais sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "plats-cuisines-frais",
+   "url": "https://www.auchan.fr/recherche?text=soupe%20fra%C3%AEche#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=soupe%20fra%C3%AEche#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche soupe fraîche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pizzas-quiches-fraiches",
+   "url": "https://www.auchan.fr/recherche?text=pizza%20fra%C3%AEche#livraison-perreux",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/traiteur/pizza/ca-n12020201?redirect_keywords=pizza%20fra%C3%AEche&lark-cioSessionId=1+1793461025909&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Pizza pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pizzas-quiches-fraiches",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2te%20%C3%A0%20tarte#livraison-perreux",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/traiteur/pates-a-tartes-a-pizzas-galettes/ca-n120203?redirect_keywords=p%C3%A2te%20%C3%A0%20tarte&lark-cioSessionId=1+1793461035114&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Pâtes à tartes, à pizzas, galettes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pates-fraiches",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes%20fra%C3%AEches#livraison-perreux",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/traiteur/pates-fraiches-gnocchis-quenelles/ca-n120205?redirect_keywords=p%C3%A2tes%20fra%C3%AEches&lark-cioSessionId=1+1793461048639&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 68,
+   "error": null,
+   "title": "Pâtes fraiches, gnocchi, quenelles pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pates-fraiches",
+   "url": "https://www.auchan.fr/recherche?text=gnocchi#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=gnocchi#livraison-perreux",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Votre recherche gnocchi sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "salades-sandwichs",
+   "url": "https://www.auchan.fr/recherche?text=sandwich#livraison-perreux",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/snacking-salade-plats-cuisines/sandwich-wraps/ca-n120401?redirect_keywords=sandwich&lark-cioSessionId=1+1793461067319&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Sandwich, wraps pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "salades-sandwichs",
+   "url": "https://www.auchan.fr/recherche?text=sushi#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sushi#livraison-perreux",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Votre recherche sushi sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "salades-sandwichs",
+   "url": "https://www.auchan.fr/recherche?text=salade%20compos%C3%A9e#livraison-perreux",
+   "final": "https://www.auchan.fr/charcuterie-traiteur-pain/snacking-salade-plats-cuisines/salades-composees/ca-n120404?redirect_keywords=salade%20compos%C3%A9e&lark-cioSessionId=1+1793461084689&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Salades repas pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "traiteur-vegetal",
+   "url": "https://www.auchan.fr/recherche?text=v%C3%A9g%C3%A9tarien#livraison-perreux",
+   "final": "https://www.auchan.fr/bio-et-nutrition/vegetarien-vegetal/ca-b0201?redirect_keywords=v%C3%A9g%C3%A9tarien&lark-cioSessionId=1+1793461093230&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 120,
+   "error": null,
+   "title": "Produits végétariens et vegan pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "traiteur-vegetal",
+   "url": "https://www.auchan.fr/recherche?text=tofu#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tofu#livraison-perreux",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Votre recherche tofu sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pain",
+   "url": "https://www.auchan.fr/recherche?text=pain#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pain&page=2",
+   "status": 200,
+   "products": 66,
+   "error": null,
+   "title": "Votre recherche pain sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pain",
+   "url": "https://www.auchan.fr/recherche?text=baguette#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=baguette#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Votre recherche baguette sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pain-de-mie",
+   "url": "https://www.auchan.fr/recherche?text=pain%20de%20mie#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pain%20de%20mie#livraison-perreux",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Votre recherche pain de mie sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pain-de-mie",
+   "url": "https://www.auchan.fr/recherche?text=pain%20burger#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pain%20burger#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Votre recherche pain burger sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "viennoiseries",
+   "url": "https://www.auchan.fr/recherche?text=brioche#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=brioche&page=2",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Votre recherche brioche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "viennoiseries",
+   "url": "https://www.auchan.fr/recherche?text=croissants#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=croissants#livraison-perreux",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Votre recherche croissants sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "patisseries",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tisserie%20fra%C3%AEche#livraison-perreux",
+   "final": "https://www.auchan.fr/les-halles-d-auchan/mon-boulanger/patisseries-gateaux/ca-b202512181611?redirect_keywords=p%C3%A2tisserie%20fra%C3%AEche&lark-cioSessionId=1+1793461165523&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Pâtisseries, gâteaux pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "patisseries",
+   "url": "https://www.auchan.fr/recherche?text=tarte%20aux%20pommes#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tarte%20aux%20pommes#livraison-perreux",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Votre recherche tarte aux pommes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "glaces",
+   "url": "https://www.auchan.fr/recherche?text=glace#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/glaces-viennoiseries/ca-n0408?redirect_keywords=glace&lark-cioSessionId=1+1793461183823&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 112,
+   "error": null,
+   "title": "Glaces et sorbets pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "glaces",
+   "url": "https://www.auchan.fr/recherche?text=sorbet#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/glaces-viennoiseries/bacs-sorbets-cremes-glacees/sorbets/ca-n04081001?redirect_keywords=sorbet&lark-cioSessionId=1+1793461198300&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Bacs sorbets pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "legumes-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=l%C3%A9gumes%20surgel%C3%A9s#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/legumes/ca-n0404?redirect_keywords=l%C3%A9gumes%20surgel%C3%A9s&lark-cioSessionId=1+1793461204615&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 64,
+   "error": null,
+   "title": "Légumes et fruits surgelés pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "legumes-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=po%C3%AAl%C3%A9e%20de%20l%C3%A9gumes%20surgel%C3%A9s#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=po%C3%AAl%C3%A9e%20de%20l%C3%A9gumes%20surgel%C3%A9s#livraison-perreux",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Votre recherche poêlée de légumes surgelés sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "frites",
+   "url": "https://www.auchan.fr/recherche?text=frites#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=frites#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Votre recherche frites sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "frites",
+   "url": "https://www.auchan.fr/recherche?text=pommes%20noisettes#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pommes%20noisettes#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche pommes noisettes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pizzas-surgelees",
+   "url": "https://www.auchan.fr/recherche?text=pizza%20surgel%C3%A9e#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/pizzas/ca-n04010201?redirect_keywords=pizza%20surgel%C3%A9e&lark-cioSessionId=1+1793461241935&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 40,
+   "error": null,
+   "title": "Pizzas surgelées pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pizzas-surgelees",
+   "url": "https://www.auchan.fr/recherche?text=quiche%20surgel%C3%A9e#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=quiche%20surgel%C3%A9e#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche quiche surgelée sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "plats-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=plat%20cuisin%C3%A9%20surgel%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=plat%20cuisin%C3%A9%20surgel%C3%A9#livraison-perreux",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Votre recherche plat cuisiné surgelé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "plats-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=lasagnes%20surgel%C3%A9es#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=lasagnes%20surgel%C3%A9es#livraison-perreux",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Votre recherche lasagnes surgelées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "poissons-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=poisson%20surgel%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/poissons-fruits-de-mer/ca-n0407?redirect_keywords=poisson%20surgel%C3%A9&lark-cioSessionId=1+1793461276700&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 49,
+   "error": null,
+   "title": "Poissons et fruits de mer surgelés"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "poissons-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=poisson%20pan%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=poisson%20pan%C3%A9#livraison-perreux",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Votre recherche poisson pané sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "poissons-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=crevettes%20surgel%C3%A9es#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/poissons-fruits-de-mer/crustaces-mollusques/ca-n040608?redirect_keywords=crevettes%20surgel%C3%A9es&lark-cioSessionId=1+1793461298385&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Coquillages et crustacés surgelés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "viandes-surgelees",
+   "url": "https://www.auchan.fr/recherche?text=viande%20surgel%C3%A9e#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/viandes/ca-n0406?redirect_keywords=viande%20surgel%C3%A9e&lark-cioSessionId=1+1793461305101&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Viande surgelée pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "viandes-surgelees",
+   "url": "https://www.auchan.fr/recherche?text=steak%20hach%C3%A9%20surgel%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/viandes/steaks-haches/ca-n04060101?redirect_keywords=steak%20hach%C3%A9%20surgel%C3%A9&lark-cioSessionId=1+1793461313691&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Steaks hachés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aperitifs-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20surgel%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20surgel%C3%A9#livraison-perreux",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche apéritif surgelé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aperitifs-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=nems%20surgel%C3%A9s#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=nems%20surgel%C3%A9s#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche nems surgelés sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desserts-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=dessert%20surgel%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=dessert%20surgel%C3%A9&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Votre recherche dessert surgelé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desserts-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=viennoiseries%20surgel%C3%A9es#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=viennoiseries%20surgel%C3%A9es#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Votre recherche viennoiseries surgelées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desserts-surgeles",
+   "url": "https://www.auchan.fr/recherche?text=fruits%20surgel%C3%A9s#livraison-perreux",
+   "final": "https://www.auchan.fr/surgeles/legumes/fruits-coulis/ca-n040806?redirect_keywords=fruits%20surgel%C3%A9s&lark-cioSessionId=1+1793461358119&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 4,
+   "error": null,
+   "title": "Fruits et coulis de fruits surgelés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pates",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2tes#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/pates/ca-n060501?redirect_keywords=p%C3%A2tes&lark-cioSessionId=1+1793461366613&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=7",
+   "status": 200,
+   "products": 181,
+   "error": null,
+   "title": "Pâtes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "riz",
+   "url": "https://www.auchan.fr/recherche?text=riz#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/pates-riz-legumes-secs/riz/ca-n060502?redirect_keywords=riz&lark-cioSessionId=1+1793461384956&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Riz pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "semoule-cereales",
+   "url": "https://www.auchan.fr/recherche?text=semoule#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/pates-riz-legumes-secs/couscous-semoule/ca-n060505?redirect_keywords=semoule&lark-cioSessionId=1+1793461393033&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Couscous, semoule pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "semoule-cereales",
+   "url": "https://www.auchan.fr/recherche?text=quinoa#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=quinoa#livraison-perreux",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Votre recherche quinoa sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "semoule-cereales",
+   "url": "https://www.auchan.fr/recherche?text=pur%C3%A9e%20mousseline#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pur%C3%A9e%20mousseline#livraison-perreux",
+   "status": 200,
+   "products": 4,
+   "error": null,
+   "title": "Votre recherche purée mousseline sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "legumes-secs",
+   "url": "https://www.auchan.fr/recherche?text=lentilles#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=lentilles#livraison-perreux",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Votre recherche lentilles sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "legumes-secs",
+   "url": "https://www.auchan.fr/recherche?text=pois%20chiches#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pois%20chiches#livraison-perreux",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Votre recherche pois chiches sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "legumes-secs",
+   "url": "https://www.auchan.fr/recherche?text=haricots%20rouges#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=haricots%20rouges#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Votre recherche haricots rouges sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "tomates",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tomates%20pel%C3%A9es#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche tomates pelées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "tomates",
+   "url": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tomates%20concass%C3%A9es#livraison-perreux",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Votre recherche tomates concassées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "tomates",
+   "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#livraison-perreux",
+   "status": 200,
+   "products": 47,
+   "error": null,
+   "title": "Votre recherche coulis de tomates sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conserves-legumes",
+   "url": "https://www.auchan.fr/recherche?text=haricots%20verts%20conserve#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/conserves-soupes/haricots-flageolets/haricots-verts/ca-n0607010101?redirect_keywords=haricots%20verts%20conserve&lark-cioSessionId=1+1793461473344&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Haricots verts pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conserves-legumes",
+   "url": "https://www.auchan.fr/recherche?text=petits%20pois%20conserve#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=petits%20pois%20conserve#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche petits pois conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conserves-legumes",
+   "url": "https://www.auchan.fr/recherche?text=ma%C3%AFs%20conserve#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=ma%C3%AFs%20conserve#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Votre recherche maïs conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conserves-legumes",
+   "url": "https://www.auchan.fr/recherche?text=champignons%20conserve#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=champignons%20conserve#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche champignons conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "thon",
+   "url": "https://www.auchan.fr/recherche?text=thon#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=thon&page=2",
+   "status": 200,
+   "products": 53,
+   "error": null,
+   "title": "Votre recherche thon sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conserves",
+   "url": "https://www.auchan.fr/recherche?text=sardines#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sardines#livraison-perreux",
+   "status": 200,
+   "products": 12,
+   "error": null,
+   "title": "Votre recherche sardines sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conserves",
+   "url": "https://www.auchan.fr/recherche?text=maquereaux#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=maquereaux#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Votre recherche maquereaux sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conserves",
+   "url": "https://www.auchan.fr/recherche?text=saumon%20conserve#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=saumon%20conserve#livraison-perreux",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Votre recherche saumon conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "plats-conserve",
+   "url": "https://www.auchan.fr/recherche?text=cassoulet#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cassoulet#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Votre recherche cassoulet sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "plats-conserve",
+   "url": "https://www.auchan.fr/recherche?text=raviolis#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=raviolis#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Votre recherche raviolis sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "plats-conserve",
+   "url": "https://www.auchan.fr/recherche?text=couscous%20conserve#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=couscous%20conserve&page=2",
+   "status": 200,
+   "products": 59,
+   "error": null,
+   "title": "Votre recherche couscous conserve sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soupes",
+   "url": "https://www.auchan.fr/recherche?text=soupe%20brique#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/soupes-croutons/soupes-liquides-croutons/ca-n060704?redirect_keywords=soupe%20brique&lark-cioSessionId=1+1793461569225&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Soupes liquides pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soupes",
+   "url": "https://www.auchan.fr/recherche?text=soupe%20d%C3%A9shydrat%C3%A9e#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/soupes-croutons/soupes-deshydratees-instantanees/ca-n060705?redirect_keywords=soupe%20d%C3%A9shydrat%C3%A9e&lark-cioSessionId=1+1793461578024&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 34,
+   "error": null,
+   "title": "Soupes deshydratées, instantanées pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soupes",
+   "url": "https://www.auchan.fr/recherche?text=cro%C3%BBtons#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cro%C3%BBtons#livraison-perreux",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Votre recherche croûtons sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "huile",
+   "url": "https://www.auchan.fr/recherche?text=huile%20d%27olive#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/huiles/huiles-d-olive/ca-n06080101?redirect_keywords=huile%20d%27olive&lark-cioSessionId=1+1793461595442&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Huile d'olive pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "huile",
+   "url": "https://www.auchan.fr/recherche?text=huile%20de%20tournesol#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/huiles/huiles-de-tournesol/ca-n06080102?redirect_keywords=huile%20de%20tournesol&lark-cioSessionId=1+1793461604577&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Huiles de tournesol pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "huile",
+   "url": "https://www.auchan.fr/recherche?text=huile%20de%20coco#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=huile%20de%20coco#livraison-perreux",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Votre recherche huile de coco sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vinaigre-vinaigrette",
+   "url": "https://www.auchan.fr/recherche?text=vinaigre#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=vinaigre#livraison-perreux",
+   "status": 200,
+   "products": 48,
+   "error": null,
+   "title": "Votre recherche vinaigre sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vinaigre-vinaigrette",
+   "url": "https://www.auchan.fr/recherche?text=vinaigrette#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=vinaigrette#livraison-perreux",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Votre recherche vinaigrette sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vinaigre-vinaigrette",
+   "url": "https://www.auchan.fr/recherche?text=jus%20de%20citron#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=jus%20de%20citron#livraison-perreux",
+   "status": 200,
+   "products": 24,
+   "error": null,
+   "title": "Votre recherche jus de citron sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "epices",
+   "url": "https://www.auchan.fr/recherche?text=%C3%A9pices#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/epices/ca-n06080406?redirect_keywords=%C3%A9pices&lark-cioSessionId=1+1793461648690&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 34,
+   "error": null,
+   "title": "Epices pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "epices",
+   "url": "https://www.auchan.fr/recherche?text=sel#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sel#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Votre recherche sel sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "epices",
+   "url": "https://www.auchan.fr/recherche?text=poivre#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/poivre-et-melanges-de-baies/ca-n06080404?redirect_keywords=poivre&lark-cioSessionId=1+1793461667196&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Poivre, mélange de baies pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "epices",
+   "url": "https://www.auchan.fr/recherche?text=herbes%20de%20provence#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=herbes%20de%20provence#livraison-perreux",
+   "status": 200,
+   "products": 4,
+   "error": null,
+   "title": "Votre recherche herbes de provence sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "bouillons",
+   "url": "https://www.auchan.fr/recherche?text=bouillon#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/huiles-sauces-aides-culinaires/bouillons-fonds-de-sauce/bouillons-cube-poudre/ca-n06080801?redirect_keywords=bouillon&lark-cioSessionId=1+1793461684225&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Bouillons cube, poudre pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "bouillons",
+   "url": "https://www.auchan.fr/recherche?text=fond%20de%20veau#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=fond%20de%20veau#livraison-perreux",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Votre recherche fond de veau sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mayonnaise-ketchup",
+   "url": "https://www.auchan.fr/recherche?text=mayonnaise#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=mayonnaise#livraison-perreux",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Votre recherche mayonnaise sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mayonnaise-ketchup",
+   "url": "https://www.auchan.fr/recherche?text=ketchup#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/sauces/ketchup/ca-n06080702?redirect_keywords=ketchup&lark-cioSessionId=1+1793461710615&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Ketchup pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mayonnaise-ketchup",
+   "url": "https://www.auchan.fr/recherche?text=moutarde#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/sauces/moutarde-piccalilli/ca-n06080703?redirect_keywords=moutarde&lark-cioSessionId=1+1793461720672&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Moutarde pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sauces-chaudes",
+   "url": "https://www.auchan.fr/recherche?text=sauce%20tomate#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sauce%20tomate&page=3",
+   "status": 200,
+   "products": 101,
+   "error": null,
+   "title": "Votre recherche sauce tomate sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sauces-chaudes",
+   "url": "https://www.auchan.fr/recherche?text=pesto#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pesto#livraison-perreux",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Votre recherche pesto sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sauces-chaudes",
+   "url": "https://www.auchan.fr/recherche?text=sauce%20bolognaise#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-salee/sauces/sauces-bolognaise/ca-n06080901?redirect_keywords=sauce%20bolognaise&lark-cioSessionId=1+1793461751322&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Sauces bolognaise pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sauces-monde",
+   "url": "https://www.auchan.fr/recherche?text=sauce%20soja#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sauce%20soja#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Votre recherche sauce soja sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sauces-monde",
+   "url": "https://www.auchan.fr/recherche?text=sauce%20barbecue#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sauce%20barbecue#livraison-perreux",
+   "status": 200,
+   "products": 40,
+   "error": null,
+   "title": "Votre recherche sauce barbecue sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sauces-monde",
+   "url": "https://www.auchan.fr/recherche?text=lait%20de%20coco#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=lait%20de%20coco&page=2",
+   "status": 200,
+   "products": 53,
+   "error": null,
+   "title": "Votre recherche lait de coco sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cornichons-olives",
+   "url": "https://www.auchan.fr/recherche?text=cornichons#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cornichons#livraison-perreux",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Votre recherche cornichons sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cornichons-olives",
+   "url": "https://www.auchan.fr/recherche?text=olives#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=olives#livraison-perreux",
+   "status": 200,
+   "products": 48,
+   "error": null,
+   "title": "Votre recherche olives sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chips",
+   "url": "https://www.auchan.fr/recherche?text=chips#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=chips&page=5",
+   "status": 200,
+   "products": 143,
+   "error": null,
+   "title": "Votre recherche chips sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscuits-aperitif",
+   "url": "https://www.auchan.fr/recherche?text=biscuits%20ap%C3%A9ritifs#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=biscuits%20ap%C3%A9ritifs&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Votre recherche biscuits apéritifs sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscuits-aperitif",
+   "url": "https://www.auchan.fr/recherche?text=crackers#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=crackers#livraison-perreux",
+   "status": 200,
+   "products": 35,
+   "error": null,
+   "title": "Votre recherche crackers sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cafe",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20moulu#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/cafe-moulu/ca-n05020502?redirect_keywords=caf%C3%A9%20moulu&lark-cioSessionId=1+1793461839195&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 35,
+   "error": null,
+   "title": "Café moulu pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cafe",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20en%20grains#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/cafe-en-grains/ca-n05020503?redirect_keywords=caf%C3%A9%20en%20grains&lark-cioSessionId=1+1793461849113&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Café en grains pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cafe",
+   "url": "https://www.auchan.fr/recherche?text=caf%C3%A9%20soluble#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/cafe-soluble/ca-n05020701?redirect_keywords=caf%C3%A9%20soluble&lark-cioSessionId=1+1793461856595&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Café soluble pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "capsules",
+   "url": "https://www.auchan.fr/recherche?text=capsules%20caf%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/ca-n0502?redirect_keywords=capsules%20caf%C3%A9&lark-cioSessionId=1+1793461865233&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 60,
+   "error": null,
+   "title": "Café pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "capsules",
+   "url": "https://www.auchan.fr/recherche?text=dosettes%20senseo#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/cafes/dosettes-compatibles-senseo/ca-n050204?redirect_keywords=dosettes%20senseo&lark-cioSessionId=1+1793461877210&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Dosettes café compatibles Senseo pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "capsules",
+   "url": "https://www.auchan.fr/recherche?text=dolce%20gusto#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=dolce%20gusto&page=2",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Votre recherche dolce gusto sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "the",
+   "url": "https://www.auchan.fr/recherche?text=th%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=th%C3%A9&page=3",
+   "status": 200,
+   "products": 80,
+   "error": null,
+   "title": "Votre recherche thé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "infusions",
+   "url": "https://www.auchan.fr/recherche?text=infusion#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/boissons-chaudes/tisanes-infusions/ca-n050304?redirect_keywords=infusion&lark-cioSessionId=1+1793461906694&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Tisanes, infusions pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "infusions",
+   "url": "https://www.auchan.fr/recherche?text=tisane#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/boissons-chaudes/tisanes-infusions/ca-n050304?redirect_keywords=tisane&lark-cioSessionId=1+1793461915746&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Tisanes, infusions pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chocolat-poudre",
+   "url": "https://www.auchan.fr/recherche?text=chocolat%20en%20poudre#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/boissons-chaudes/chocolat-en-poudre/ca-n050305?redirect_keywords=chocolat%20en%20poudre&lark-cioSessionId=1+1793461924189&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Chocolat en poudre pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chocolat-poudre",
+   "url": "https://www.auchan.fr/recherche?text=nesquik#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=nesquik#livraison-perreux",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche nesquik sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cereales",
+   "url": "https://www.auchan.fr/recherche?text=c%C3%A9r%C3%A9ales%20petit%20d%C3%A9jeuner#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=c%C3%A9r%C3%A9ales%20petit%20d%C3%A9jeuner&page=3",
+   "status": 200,
+   "products": 87,
+   "error": null,
+   "title": "Votre recherche céréales petit déjeuner sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cereales",
+   "url": "https://www.auchan.fr/recherche?text=muesli#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/cereales-barres/muesli/ca-n05041001?redirect_keywords=muesli&lark-cioSessionId=1+1793461952265&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 35,
+   "error": null,
+   "title": "Muesli pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "barres-cereales",
+   "url": "https://www.auchan.fr/recherche?text=barres%20de%20c%C3%A9r%C3%A9ales#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/barres-de-cereales/ca-n050402?redirect_keywords=barres%20de%20c%C3%A9r%C3%A9ales&lark-cioSessionId=1+1793461963271&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 30,
+   "error": null,
+   "title": "Barres de céréales pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "barres-cereales",
+   "url": "https://www.auchan.fr/recherche?text=barres%20prot%C3%A9in%C3%A9es#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=barres%20prot%C3%A9in%C3%A9es#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche barres protéinées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "confitures",
+   "url": "https://www.auchan.fr/recherche?text=confiture#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/confitures/ca-n050303?redirect_keywords=confiture&lark-cioSessionId=1+1793461978969&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Confitures pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "confitures",
+   "url": "https://www.auchan.fr/recherche?text=miel#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/miel-sirop-d-erable/ca-n05040702?redirect_keywords=miel&lark-cioSessionId=1+1793461990966&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Miel pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "pate-a-tartiner",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2te%20%C3%A0%20tartiner#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/pates-a-tartiner/ca-n05040701?redirect_keywords=p%C3%A2te%20%C3%A0%20tartiner&lark-cioSessionId=1+1793461998237&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Pâtes à tartiner pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscottes",
+   "url": "https://www.auchan.fr/recherche?text=biscottes#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/biscottes-biscuits-petit-dejeuner/ca-n050411?redirect_keywords=biscottes&lark-cioSessionId=1+1793462010237&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Biscottes, pains grillés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscottes",
+   "url": "https://www.auchan.fr/recherche?text=galettes%20de%20riz#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=galettes%20de%20riz#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Votre recherche galettes de riz sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "gateaux",
+   "url": "https://www.auchan.fr/recherche?text=madeleines#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=madeleines#livraison-perreux",
+   "status": 200,
+   "products": 33,
+   "error": null,
+   "title": "Votre recherche madeleines sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscuits-secs",
+   "url": "https://www.auchan.fr/recherche?text=petit%20beurre#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/biscuits-gateaux/petits-beurres/ca-n05050405?redirect_keywords=petit%20beurre&lark-cioSessionId=1+1793462038764&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Petits beurres pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscuits-secs",
+   "url": "https://www.auchan.fr/recherche?text=biscuits%20petit%20d%C3%A9jeuner#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/petit-dejeuner-thes-chocolats-en-poudre/biscuits-petit-dejeuner/ca-n050403?redirect_keywords=biscuits%20petit%20d%C3%A9jeuner&lark-cioSessionId=1+1793462045836&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Biscuits petit déjeuner pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscuits-secs",
+   "url": "https://www.auchan.fr/recherche?text=sabl%C3%A9s#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sabl%C3%A9s&page=2",
+   "status": 200,
+   "products": 71,
+   "error": null,
+   "title": "Votre recherche sablés sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscuits-chocolat",
+   "url": "https://www.auchan.fr/recherche?text=biscuits%20chocolat#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=biscuits%20chocolat&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Votre recherche biscuits chocolat sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "biscuits-chocolat",
+   "url": "https://www.auchan.fr/recherche?text=go%C3%BBters%20fourr%C3%A9s#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=go%C3%BBters%20fourr%C3%A9s&page=2",
+   "status": 200,
+   "products": 47,
+   "error": null,
+   "title": "Votre recherche goûters fourrés sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "crepes-gaufres",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%AApes#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%AApes#livraison-perreux",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Votre recherche crêpes sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "crepes-gaufres",
+   "url": "https://www.auchan.fr/recherche?text=gaufres#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=gaufres#livraison-perreux",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Votre recherche gaufres sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "crepes-gaufres",
+   "url": "https://www.auchan.fr/recherche?text=cake#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cake#livraison-perreux",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Votre recherche cake sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chocolat-tablettes",
+   "url": "https://www.auchan.fr/recherche?text=chocolat%20tablette#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/chocolats-confiseries/tablettes-de-chocolat/ca-n050701?redirect_keywords=chocolat%20tablette&lark-cioSessionId=1+1793462112460&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Tablettes de chocolat pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chocolat-tablettes",
+   "url": "https://www.auchan.fr/recherche?text=chocolat%20noir#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=chocolat%20noir&page=3",
+   "status": 200,
+   "products": 76,
+   "error": null,
+   "title": "Votre recherche chocolat noir sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chocolat-bouchees",
+   "url": "https://www.auchan.fr/recherche?text=rochers%20chocolat#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=rochers%20chocolat#livraison-perreux",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Votre recherche rochers chocolat sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chocolat-bouchees",
+   "url": "https://www.auchan.fr/recherche?text=barres%20chocolat%C3%A9es#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=barres%20chocolat%C3%A9es&page=2",
+   "status": 200,
+   "products": 52,
+   "error": null,
+   "title": "Votre recherche barres chocolatées sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "chocolat-bouchees",
+   "url": "https://www.auchan.fr/recherche?text=bo%C3%AEte%20de%20chocolats#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=bo%C3%AEte%20de%20chocolats&page=3",
+   "status": 200,
+   "products": 72,
+   "error": null,
+   "title": "Votre recherche boîte de chocolats sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "bonbons",
+   "url": "https://www.auchan.fr/recherche?text=bonbons#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/bonbons/ca-n050706?redirect_keywords=bonbons&lark-cioSessionId=1+1793462163282&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 137,
+   "error": null,
+   "title": "Bonbons, confiseries pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "bonbons",
+   "url": "https://www.auchan.fr/recherche?text=chewing-gum#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/bonbons/chewing-gums/ca-n050707?redirect_keywords=chewing-gum&lark-cioSessionId=1+1793462176712&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Chewing-gums pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "compotes",
+   "url": "https://www.auchan.fr/recherche?text=compote#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=compote&page=7",
+   "status": 200,
+   "products": 186,
+   "error": null,
+   "title": "Votre recherche compote sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "compotes",
+   "url": "https://www.auchan.fr/recherche?text=fruits%20au%20sirop#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/fruits-au-sirop/ca-n050804?redirect_keywords=fruits%20au%20sirop&lark-cioSessionId=1+1793462200603&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Fruits au sirop pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "farine",
+   "url": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=farine%20de%20bl%C3%A9#livraison-perreux",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche farine de blé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sucre",
+   "url": "https://www.auchan.fr/recherche?text=sucre#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/sucres-edulcorants/ca-n050904?redirect_keywords=sucre&lark-cioSessionId=1+1793462214104&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 40,
+   "error": null,
+   "title": "Sucres, édulcorants pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sucre",
+   "url": "https://www.auchan.fr/recherche?text=%C3%A9dulcorant#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/sucres-edulcorants/edulcorants/ca-n050905?redirect_keywords=%C3%A9dulcorant&lark-cioSessionId=1+1793462225117&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 4,
+   "error": null,
+   "title": "Edulcorants pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aide-patisserie",
+   "url": "https://www.auchan.fr/recherche?text=levure#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/levures/ca-n0509020302?redirect_keywords=levure&lark-cioSessionId=1+1793462231081&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Levures pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aide-patisserie",
+   "url": "https://www.auchan.fr/recherche?text=chocolat%20p%C3%A2tissier#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/chocolats-confiseries/tablettes-de-chocolat/chocolat-patissier/ca-n050703?redirect_keywords=chocolat%20p%C3%A2tissier&lark-cioSessionId=1+1793462238764&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Chocolat pâtissier pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aide-patisserie",
+   "url": "https://www.auchan.fr/recherche?text=pr%C3%A9paration%20g%C3%A2teau#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/preparations-pour-desserts/ca-n050901?redirect_keywords=pr%C3%A9paration%20g%C3%A2teau&lark-cioSessionId=1+1793462246812&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Préparations pour desserts pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aide-patisserie",
+   "url": "https://www.auchan.fr/recherche?text=lait%20concentr%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/epicerie-sucree/desserts-sucres-farines-dietetique/lait-en-poudre-lait-concentre/ca-n050208?redirect_keywords=lait%20concentr%C3%A9&lark-cioSessionId=1+1793462254853&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Lait en poudre, lait concentré pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "eaux",
+   "url": "https://www.auchan.fr/recherche?text=eau%20plate#livraison-perreux",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/eaux-laits/eaux-plates-natures/ca-n070101?redirect_keywords=eau%20plate&lark-cioSessionId=1+1793462262526&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 42,
+   "error": null,
+   "title": "Eaux plates natures pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "eaux-gazeuses",
+   "url": "https://www.auchan.fr/recherche?text=eau%20gazeuse#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=eau%20gazeuse#livraison-perreux",
+   "status": 200,
+   "products": 46,
+   "error": null,
+   "title": "Votre recherche eau gazeuse sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "eaux-gazeuses",
+   "url": "https://www.auchan.fr/recherche?text=eau%20aromatis%C3%A9e#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=eau%20aromatis%C3%A9e#livraison-perreux",
+   "status": 200,
+   "products": 43,
+   "error": null,
+   "title": "Votre recherche eau aromatisée sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jus",
+   "url": "https://www.auchan.fr/recherche?text=jus%20d%27orange#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=jus%20d%27orange#livraison-perreux",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Votre recherche jus d'orange sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jus-autres",
+   "url": "https://www.auchan.fr/recherche?text=jus%20de%20pomme#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=jus%20de%20pomme#livraison-perreux",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Votre recherche jus de pomme sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jus-autres",
+   "url": "https://www.auchan.fr/recherche?text=jus%20multifruits#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=jus%20multifruits#livraison-perreux",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Votre recherche jus multifruits sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jus-autres",
+   "url": "https://www.auchan.fr/recherche?text=nectar#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=nectar#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Votre recherche nectar sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "jus-autres",
+   "url": "https://www.auchan.fr/recherche?text=jus%20frais#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=jus%20frais#livraison-perreux",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Votre recherche jus frais sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sirops",
+   "url": "https://www.auchan.fr/recherche?text=sirop#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sirop&page=2",
+   "status": 200,
+   "products": 59,
+   "error": null,
+   "title": "Votre recherche sirop sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sirops",
+   "url": "https://www.auchan.fr/recherche?text=teisseire#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=teisseire#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Votre recherche teisseire sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sodas",
+   "url": "https://www.auchan.fr/recherche?text=cola#livraison-perreux",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/colas-boissons-gazeuses-energisantes/colas/ca-n070601?sort=default&brand=brandcocacola&redirect_keywords=cola&lark-cioSessionId=1+1793462354541&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Colas, Coca-Cola, Pepsi pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "limonades",
+   "url": "https://www.auchan.fr/recherche?text=limonade#livraison-perreux",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/colas-boissons-gazeuses-energisantes/limonades-limes-tonic/limonades/ca-n07060301?redirect_keywords=limonade&lark-cioSessionId=1+1793462363640&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Limonades pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "limonades",
+   "url": "https://www.auchan.fr/recherche?text=tonic#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tonic#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche tonic sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "limonades",
+   "url": "https://www.auchan.fr/recherche?text=orangina#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=orangina#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Votre recherche orangina sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "boissons-plates",
+   "url": "https://www.auchan.fr/recherche?text=th%C3%A9%20glac%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/thes-boissons-plates-aux-fruits-sirops/thes-infusions-glacees/ca-n070501?redirect_keywords=th%C3%A9%20glac%C3%A9&lark-cioSessionId=1+1793462389880&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Thés, infusions glacées pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "boissons-plates",
+   "url": "https://www.auchan.fr/recherche?text=boisson%20%C3%A9nergisante#livraison-perreux",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/colas-boissons-gazeuses-energisantes/boissons-energisantes/ca-n070604?redirect_keywords=boisson%20%C3%A9nergisante&lark-cioSessionId=1+1793462403128&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Boissons énergisantes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "boissons-plates",
+   "url": "https://www.auchan.fr/recherche?text=oasis#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=oasis#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Votre recherche oasis sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "boissons-vegetales",
+   "url": "https://www.auchan.fr/recherche?text=boisson%20v%C3%A9g%C3%A9tale#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/boissons-vegetales/ca-n010102?redirect_keywords=boisson%20v%C3%A9g%C3%A9tale&lark-cioSessionId=1+1793462419060&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 38,
+   "error": null,
+   "title": "Boissons végétales, laits végétaux d'amande et de coco pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "boissons-vegetales",
+   "url": "https://www.auchan.fr/recherche?text=lait%20d%27amande#livraison-perreux",
+   "final": "https://www.auchan.fr/oeufs-produits-laitiers/cremerie-oeufs-laits/boissons-vegetales/boissons-amande/ca-n01010201?redirect_keywords=lait%20d%27amande&lark-cioSessionId=1+1793462431968&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Boissons, laits amande pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "bieres",
+   "url": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20blonde#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/bieres-futs-cidres/bieres-blondes/ca-n070701?redirect_keywords=bi%C3%A8re%20blonde&lark-cioSessionId=1+1793462437696&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 76,
+   "error": null,
+   "title": "Bières blondes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "bieres",
+   "url": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20ipa#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/bieres-futs-cidres/cave-a-bieres/ipa/ca-n07070406?redirect_keywords=bi%C3%A8re%20ipa&lark-cioSessionId=1+1793462450491&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Bières IPA de qualité à petit prix | Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "bieres",
+   "url": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20belge#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20belge#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Votre recherche bière belge sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cidres-sans-alcool",
+   "url": "https://www.auchan.fr/recherche?text=cidre#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/bieres-futs-cidres/cidres/ca-n070705?redirect_keywords=cidre&lark-cioSessionId=1+1793462464893&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 6,
+   "error": null,
+   "title": "Cidre de qualité à petit prix - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "cidres-sans-alcool",
+   "url": "https://www.auchan.fr/recherche?text=bi%C3%A8re%20sans%20alcool#livraison-perreux",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/bieres-vins-et-aperitifs-sans-alcool/bieres-sans-alcool/ca-n070707?redirect_keywords=bi%C3%A8re%20sans%20alcool&lark-cioSessionId=1+1793462472772&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Bières sans alcool pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vin-rouge",
+   "url": "https://www.auchan.fr/recherche?text=vin%20rouge#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/vins/vins-rouges/ca-n070923?redirect_keywords=vin%20rouge&lark-cioSessionId=1+1793462482247&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 63,
+   "error": null,
+   "title": "Vins rouges de qualité à petit prix - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vin-blanc",
+   "url": "https://www.auchan.fr/recherche?text=vin%20blanc#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/vins/vins-blancs/ca-n070921?redirect_keywords=vin%20blanc&lark-cioSessionId=1+1793462495036&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 35,
+   "error": null,
+   "title": "Vins blancs de qualité à petit prix"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vin-rose",
+   "url": "https://www.auchan.fr/recherche?text=vin%20ros%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/vins/vins-roses/ca-n070922?redirect_keywords=vin%20ros%C3%A9&lark-cioSessionId=1+1793462505374&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Vins rosés pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "champagne",
+   "url": "https://www.auchan.fr/recherche?text=champagne#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=champagne#livraison-perreux",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Votre recherche champagne sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "champagne",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A9mant#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A9mant#livraison-perreux",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche crémant sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "champagne",
+   "url": "https://www.auchan.fr/recherche?text=prosecco#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=prosecco#livraison-perreux",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche prosecco sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aperitifs",
+   "url": "https://www.auchan.fr/recherche?text=pastis#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pastis#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche pastis sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aperitifs",
+   "url": "https://www.auchan.fr/recherche?text=porto#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=porto#livraison-perreux",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Votre recherche porto sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "aperitifs",
+   "url": "https://www.auchan.fr/recherche?text=ap%C3%A9ritif%20sans%20alcool#livraison-perreux",
+   "final": "https://www.auchan.fr/boissons-sans-alcool/bieres-vins-et-aperitifs-sans-alcool/aperitifs-cocktails-sans-alcool/ca-n070814?redirect_keywords=ap%C3%A9ritif%20sans%20alcool&lark-cioSessionId=1+1793462557696&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Apéritifs, cocktails sans alcool pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "spiritueux",
+   "url": "https://www.auchan.fr/recherche?text=whisky#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/aperitifs-spiritueux/whisky/ca-n070801?redirect_keywords=whisky&lark-cioSessionId=1+1793462566309&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Whisky, whiskey, bourbon pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "spiritueux",
+   "url": "https://www.auchan.fr/recherche?text=rhum#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/aperitifs-spiritueux/rhums-punchs/ca-n070802?redirect_keywords=rhum&lark-cioSessionId=1+1793462574983&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 19,
+   "error": null,
+   "title": "Rhum de qualité pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "spiritueux",
+   "url": "https://www.auchan.fr/recherche?text=vodka#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/aperitifs-spiritueux/vodka-tequila-gin/vodka/ca-n070803?redirect_keywords=vodka&lark-cioSessionId=1+1793462584557&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Vodka de qualité à petit prix - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "spiritueux",
+   "url": "https://www.auchan.fr/recherche?text=gin#livraison-perreux",
+   "final": "https://www.auchan.fr/vins-bieres-alcool/aperitifs-spiritueux/vodka-tequila-gin/gin/ca-n070805?redirect_keywords=gin&lark-cioSessionId=1+1793462594388&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Gin pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lait-infantile",
+   "url": "https://www.auchan.fr/recherche?text=lait%20infantile#livraison-perreux",
+   "final": "https://www.auchan.fr/bebe/laits-petits-dejeuners-de-bebe/ca-n0801?redirect_keywords=lait%20infantile&lark-cioSessionId=1+1793462603062&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 101,
+   "error": null,
+   "title": "Laits infantiles, céréales bébé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lait-infantile",
+   "url": "https://www.auchan.fr/recherche?text=lait%20de%20croissance#livraison-perreux",
+   "final": "https://www.auchan.fr/bebe/laits-petits-dejeuners-de-bebe/laits-de-croissance-junior-des-10-mois/ca-n080103?redirect_keywords=lait%20de%20croissance&lark-cioSessionId=1+1793462616976&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Laits de croissance, junior (dès 10 mois) pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "repas-bebe",
+   "url": "https://www.auchan.fr/recherche?text=petits%20pots%20b%C3%A9b%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=petits%20pots%20b%C3%A9b%C3%A9#livraison-perreux",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Votre recherche petits pots bébé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "repas-bebe",
+   "url": "https://www.auchan.fr/recherche?text=repas%20b%C3%A9b%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/bebe/repas-desserts-gouters-de-bebe/ca-n0802?redirect_keywords=repas%20b%C3%A9b%C3%A9&lark-cioSessionId=1+1793462631783&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 120,
+   "error": null,
+   "title": "Alimentation bébé, repas et petits pots pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desserts-bebe",
+   "url": "https://www.auchan.fr/recherche?text=compote%20b%C3%A9b%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/bebe/desserts-gouters-jus/compotes/ca-n080302?redirect_keywords=compote%20b%C3%A9b%C3%A9&lark-cioSessionId=1+1793462646059&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 61,
+   "error": null,
+   "title": "Compotes bébé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desserts-bebe",
+   "url": "https://www.auchan.fr/recherche?text=c%C3%A9r%C3%A9ales%20infantiles#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=c%C3%A9r%C3%A9ales%20infantiles&page=7",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Votre recherche céréales infantiles sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desserts-bebe",
+   "url": "https://www.auchan.fr/recherche?text=biscuits%20b%C3%A9b%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/bebe/desserts-gouters-jus/biscuits-bebe/ca-n080304?redirect_keywords=biscuits%20b%C3%A9b%C3%A9&lark-cioSessionId=1+1793462672408&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Biscuits bébé pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "couches",
+   "url": "https://www.auchan.fr/recherche?text=couches%20b%C3%A9b%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=couches%20b%C3%A9b%C3%A9&page=3",
+   "status": 200,
+   "products": 87,
+   "error": null,
+   "title": "Votre recherche couches bébé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "couches",
+   "url": "https://www.auchan.fr/recherche?text=lingettes%20b%C3%A9b%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=lingettes%20b%C3%A9b%C3%A9#livraison-perreux",
+   "status": 200,
+   "products": 23,
+   "error": null,
+   "title": "Votre recherche lingettes bébé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "toilette-bebe",
+   "url": "https://www.auchan.fr/recherche?text=soin%20b%C3%A9b%C3%A9#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=soin%20b%C3%A9b%C3%A9#livraison-perreux",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Votre recherche soin bébé sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "toilette-bebe",
+   "url": "https://www.auchan.fr/recherche?text=biberon#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=biberon&page=5",
+   "status": 200,
+   "products": 94,
+   "error": null,
+   "title": "Votre recherche biberon sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "gel-douche",
+   "url": "https://www.auchan.fr/recherche?text=gel%20douche#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=gel%20douche&page=3",
+   "status": 200,
+   "products": 93,
+   "error": null,
+   "title": "Votre recherche gel douche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "gel-douche",
+   "url": "https://www.auchan.fr/recherche?text=savon#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=savon&page=3",
+   "status": 200,
+   "products": 90,
+   "error": null,
+   "title": "Votre recherche savon sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "deodorants",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9odorant#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=d%C3%A9odorant&page=3",
+   "status": 200,
+   "products": 82,
+   "error": null,
+   "title": "Votre recherche déodorant sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "shampoing",
+   "url": "https://www.auchan.fr/recherche?text=shampooing#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=shampooing&page=4",
+   "status": 200,
+   "products": 121,
+   "error": null,
+   "title": "Votre recherche shampooing sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-cheveux",
+   "url": "https://www.auchan.fr/recherche?text=apr%C3%A8s-shampooing#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=apr%C3%A8s-shampooing#livraison-perreux",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Votre recherche après-shampooing sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-cheveux",
+   "url": "https://www.auchan.fr/recherche?text=coloration%20cheveux#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/soins-des-cheveux/coloration/ca-n090306?redirect_keywords=coloration%20cheveux&lark-cioSessionId=1+1793462767897&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Coloration des cheveux pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-cheveux",
+   "url": "https://www.auchan.fr/recherche?text=laque#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/soins-des-cheveux/laques-mousses-coiffantes/laques/ca-n09030701?redirect_keywords=laque&lark-cioSessionId=1+1793462776485&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Laques pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "dentifrice",
+   "url": "https://www.auchan.fr/recherche?text=dentifrice#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=dentifrice&page=3",
+   "status": 200,
+   "products": 78,
+   "error": null,
+   "title": "Votre recherche dentifrice sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "dentifrice",
+   "url": "https://www.auchan.fr/recherche?text=brosse%20%C3%A0%20dents#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=brosse%20%C3%A0%20dents&page=3",
+   "status": 200,
+   "products": 67,
+   "error": null,
+   "title": "Votre recherche brosse à dents sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "dentifrice",
+   "url": "https://www.auchan.fr/recherche?text=bain%20de%20bouche#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=bain%20de%20bouche#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Votre recherche bain de bouche sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "rasage",
+   "url": "https://www.auchan.fr/recherche?text=rasoir#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=rasoir&page=4",
+   "status": 200,
+   "products": 81,
+   "error": null,
+   "title": "Votre recherche rasoir sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "rasage",
+   "url": "https://www.auchan.fr/recherche?text=mousse%20%C3%A0%20raser#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/hygiene-soins-homme/barbe-rasage/mousses-gels-a-raser-homme/ca-n09080204?redirect_keywords=mousse%20%C3%A0%20raser&lark-cioSessionId=1+1793462833518&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Mousses, gels à raser homme pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "rasage",
+   "url": "https://www.auchan.fr/recherche?text=cire%20%C3%A9pilation#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/hygiene-soins-du-corps/epilation-rasage/cires-bandes/ca-n09020702?redirect_keywords=cire%20%C3%A9pilation&lark-cioSessionId=1+1793462836089&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Cires, bandes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "hygiene-feminine",
+   "url": "https://www.auchan.fr/recherche?text=serviettes%20hygi%C3%A9niques#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/protections-hygiene-feminine/serviettes-hygieniques/ca-n09090302?redirect_keywords=serviettes%20hygi%C3%A9niques&lark-cioSessionId=1+1793462844736&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Serviettes hygiéniques pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "hygiene-feminine",
+   "url": "https://www.auchan.fr/recherche?text=tampons#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/protections-hygiene-feminine/tampons-avec-applicateur/ca-n09090305?redirect_keywords=tampons&lark-cioSessionId=1+1793462856037&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Tampons hygiéniques avec ou sans applicateur pas cher- Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "hygiene-feminine",
+   "url": "https://www.auchan.fr/recherche?text=incontinence#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/protections-hygiene-feminine/incontinence/ca-n090904?redirect_keywords=incontinence&lark-cioSessionId=1+1793462862466&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Protections urinaires, incontinence - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-corps",
+   "url": "https://www.auchan.fr/recherche?text=lait%20corps#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=lait%20corps&page=5",
+   "status": 200,
+   "products": 150,
+   "error": null,
+   "title": "Votre recherche lait corps sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-corps",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20mains#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20mains#livraison-perreux",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche crème mains sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-corps",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20solaire#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20solaire#livraison-perreux",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Votre recherche crème solaire sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-visage",
+   "url": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20visage#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cr%C3%A8me%20visage&page=2",
+   "status": 200,
+   "products": 56,
+   "error": null,
+   "title": "Votre recherche crème visage sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-visage",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9maquillant#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=d%C3%A9maquillant#livraison-perreux",
+   "status": 200,
+   "products": 36,
+   "error": null,
+   "title": "Votre recherche démaquillant sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "soins-visage",
+   "url": "https://www.auchan.fr/recherche?text=maquillage#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/soins-du-visage-hygiene-dentaire-maquillage/maquillage/ca-n090416?redirect_keywords=maquillage&lark-cioSessionId=1+1793462924110&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Maquillage, manucure pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "papier",
+   "url": "https://www.auchan.fr/recherche?text=papier%20toilette#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/papier-toilette-essuie-tout-mouchoir/papier-toilette/ca-n100203?redirect_keywords=papier%20toilette&lark-cioSessionId=1+1793462931590&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 42,
+   "error": null,
+   "title": "Papier toilette pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mouchoirs-cotons",
+   "url": "https://www.auchan.fr/recherche?text=mouchoirs#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/papier-toilette-essuie-tout-mouchoir/mouchoirs/ca-n100204?redirect_keywords=mouchoirs&lark-cioSessionId=1+1793462943141&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 26,
+   "error": null,
+   "title": "Mouchoirs papier pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mouchoirs-cotons",
+   "url": "https://www.auchan.fr/recherche?text=coton#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=coton#livraison-perreux",
+   "status": 200,
+   "products": 22,
+   "error": null,
+   "title": "Votre recherche coton sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mouchoirs-cotons",
+   "url": "https://www.auchan.fr/recherche?text=cotons-tiges#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/soins-du-visage-hygiene-dentaire-maquillage/cotons-cotons-tiges-lingettes/cotons-tiges/ca-n09040303?redirect_keywords=cotons-tiges&lark-cioSessionId=1+1793462959023&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Cotons tiges pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "premiers-soins",
+   "url": "https://www.auchan.fr/recherche?text=pansements#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=pansements#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Votre recherche pansements sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "premiers-soins",
+   "url": "https://www.auchan.fr/recherche?text=gel%20hydroalcoolique#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=gel%20hydroalcoolique#livraison-perreux",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Votre recherche gel hydroalcoolique sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "premiers-soins",
+   "url": "https://www.auchan.fr/recherche?text=pr%C3%A9servatifs#livraison-perreux",
+   "final": "https://www.auchan.fr/hygiene-beaute-parapharmacie/petite-parapharmacie/preservatifs-gels-de-massage/ca-n090905?redirect_keywords=pr%C3%A9servatifs&lark-cioSessionId=1+1793462984726&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Préservatifs, lubrifiants, gels intimes pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "complements",
+   "url": "https://www.auchan.fr/recherche?text=compl%C3%A9ments%20alimentaires#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=compl%C3%A9ments%20alimentaires#livraison-perreux",
+   "status": 200,
+   "products": 4,
+   "error": null,
+   "title": "Votre recherche compléments alimentaires sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "complements",
+   "url": "https://www.auchan.fr/recherche?text=vitamines#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=vitamines&page=3",
+   "status": 200,
+   "products": 37,
+   "error": null,
+   "title": "Votre recherche vitamines sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "complements",
+   "url": "https://www.auchan.fr/recherche?text=magn%C3%A9sium#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=magn%C3%A9sium#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche magnésium sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lessive",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20liquide#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/lessives/liquide/ca-n10030101?redirect_keywords=lessive%20liquide&lark-cioSessionId=1+1793463019766&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 65,
+   "error": null,
+   "title": "Lessives liquides pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lessive-capsules-poudre",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20capsules#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/lessives/capsules/ca-n10030102?redirect_keywords=lessive%20capsules&lark-cioSessionId=1+1793463032741&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Capsules lessive pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lessive-capsules-poudre",
+   "url": "https://www.auchan.fr/recherche?text=lessive%20poudre#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/lessives/poudre-et-tablettes/ca-n10030103?redirect_keywords=lessive%20poudre&lark-cioSessionId=1+1793463041907&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Lessives en poudre et tablette pas cher à prix Auchan"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "adoucissant",
+   "url": "https://www.auchan.fr/recherche?text=adoucissant#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/assouplissants-adoucissants/ca-n100302?redirect_keywords=adoucissant&lark-cioSessionId=1+1793463048819&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 41,
+   "error": null,
+   "title": "Adoucissants, parfums de linge pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "adoucissant",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9tachant#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/soin-du-linge/detachants-anti-decoloration/ca-n100303?redirect_keywords=d%C3%A9tachant&lark-cioSessionId=1+1793463061031&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 13,
+   "error": null,
+   "title": "Détachants, anti-décoloration pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "adoucissant",
+   "url": "https://www.auchan.fr/recherche?text=anticalcaire%20lave-linge#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=anticalcaire%20lave-linge#livraison-perreux",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Votre recherche anticalcaire lave-linge sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vaisselle",
+   "url": "https://www.auchan.fr/recherche?text=liquide%20vaisselle#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/vaisselle-entretien-lave-vaisselle/liquide-vaisselle/ca-n100601?redirect_keywords=liquide%20vaisselle&lark-cioSessionId=1+1793463074980&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 25,
+   "error": null,
+   "title": "Liquide vaisselle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lave-vaisselle",
+   "url": "https://www.auchan.fr/recherche?text=tablettes%20lave-vaisselle#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/vaisselle-entretien-lave-vaisselle/gels-pastilles-lave-vaisselle/pastilles-lave-vaisselle/ca-n10060202?redirect_keywords=tablettes%20lave-vaisselle&lark-cioSessionId=1+1793463084039&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 20,
+   "error": null,
+   "title": "Tablettes et pastilles lave-vaisselle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "lave-vaisselle",
+   "url": "https://www.auchan.fr/recherche?text=sel%20lave-vaisselle#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/vaisselle-entretien-lave-vaisselle/entretien-lave-vaisselle/sels-regenerant-lave-vaisselle/ca-n10060206?redirect_keywords=sel%20lave-vaisselle&lark-cioSessionId=1+1793463094237&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 2,
+   "error": null,
+   "title": "Sels régénérant lave vaisselle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=nettoyant%20multi-usages#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=nettoyant%20multi-usages#livraison-perreux",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Votre recherche nettoyant multi-usages sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=nettoyant%20vitres#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=nettoyant%20vitres#livraison-perreux",
+   "status": 200,
+   "products": 17,
+   "error": null,
+   "title": "Votre recherche nettoyant vitres sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=nettoyant%20sol#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/nettoyants-multi-usage-vitres-sols/nettoyants-sols/ca-n10040502?redirect_keywords=nettoyant%20sol&lark-cioSessionId=1+1793463121247&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 16,
+   "error": null,
+   "title": "Nettoyants sols pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=javel#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/desinfectants-lingettes-javel/javel/ca-n10041003?redirect_keywords=javel&lark-cioSessionId=1+1793463129892&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Javel pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9graissant#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=d%C3%A9graissant#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Votre recherche dégraissant sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "wc-deboucheurs",
+   "url": "https://www.auchan.fr/recherche?text=nettoyant%20wc#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/wc-canalisations/gels-nettoyants/ca-n1004060208?redirect_keywords=nettoyant%20wc&lark-cioSessionId=1+1793463146555&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 12,
+   "error": null,
+   "title": "Gels nettoyants, détartrants pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "wc-deboucheurs",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9boucheur#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=d%C3%A9boucheur#livraison-perreux",
+   "status": 200,
+   "products": 10,
+   "error": null,
+   "title": "Votre recherche déboucheur sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "wc-deboucheurs",
+   "url": "https://www.auchan.fr/recherche?text=bloc%20wc#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/wc-canalisations/blocs-cuvettes/ca-n1004060201?redirect_keywords=bloc%20wc&lark-cioSessionId=1+1793463162027&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 9,
+   "error": null,
+   "title": "Blocs cuvettes pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "essuie-tout",
+   "url": "https://www.auchan.fr/recherche?text=essuie-tout#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/papier-toilette-essuie-tout-mouchoir/essuie-tout/ca-n100202?redirect_keywords=essuie-tout&lark-cioSessionId=1+1793463169638&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 21,
+   "error": null,
+   "title": "Papier essuie-tout, Sopalin pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sacs-poubelle",
+   "url": "https://www.auchan.fr/recherche?text=sacs%20poubelle#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/accessoires-menagers-maison/sacs-poubelle/ca-n101101?redirect_keywords=sacs%20poubelle&lark-cioSessionId=1+1793463178964&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Sacs poubelle pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sacs-poubelle",
+   "url": "https://www.auchan.fr/recherche?text=%C3%A9ponges#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/accessoires-menagers-maison/eponges-gants-serpillieres/eponges/ca-n10110201?redirect_keywords=%C3%A9ponges&lark-cioSessionId=1+1793463186792&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 11,
+   "error": null,
+   "title": "Éponges pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sacs-poubelle",
+   "url": "https://www.auchan.fr/recherche?text=gants%20m%C3%A9nage#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=gants%20m%C3%A9nage#livraison-perreux",
+   "status": 200,
+   "products": 8,
+   "error": null,
+   "title": "Votre recherche gants ménage sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conservation",
+   "url": "https://www.auchan.fr/recherche?text=sac%20cong%C3%A9lation#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sac%20cong%C3%A9lation#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche sac congélation sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conservation",
+   "url": "https://www.auchan.fr/recherche?text=papier%20aluminium#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/papiers-alu-emballages-ustensiles-vaisselle/papiers-aluminium/ca-n10110002?redirect_keywords=papier%20aluminium&lark-cioSessionId=1+1793463213374&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 4,
+   "error": null,
+   "title": "Papiers aluminium pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "conservation",
+   "url": "https://www.auchan.fr/recherche?text=film%20alimentaire#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/papiers-alu-emballages-ustensiles-vaisselle/films-alimentaires-etirables/ca-n10110001?redirect_keywords=film%20alimentaire&lark-cioSessionId=1+1793463222387&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Films alimentaires, sacs de conservation pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desodorisants-insecticides",
+   "url": "https://www.auchan.fr/recherche?text=d%C3%A9sodorisant#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/desodorisants/ca-n101104?redirect_keywords=d%C3%A9sodorisant&lark-cioSessionId=1+1793463231415&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Désodorisants pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desodorisants-insecticides",
+   "url": "https://www.auchan.fr/recherche?text=insecticide#livraison-perreux",
+   "final": "https://www.auchan.fr/entretien-maison/produits-d-entretien/insecticides/ca-n101106?redirect_keywords=insecticide&lark-cioSessionId=1+1793463240270&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 23,
+   "error": null,
+   "title": "Insecticides pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "desodorisants-insecticides",
+   "url": "https://www.auchan.fr/recherche?text=anti-moustique#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=anti-moustique&page=5",
+   "status": 200,
+   "products": 100,
+   "error": null,
+   "title": "Votre recherche anti-moustique sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "croquettes-chat",
+   "url": "https://www.auchan.fr/recherche?text=croquettes%20chat#livraison-perreux",
+   "final": "https://www.auchan.fr/animalerie/chat/croquettes-chat/ca-n110105?redirect_keywords=croquettes%20chat&lark-cioSessionId=1+1793463264292&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 73,
+   "error": null,
+   "title": "Croquettes chat pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "patee-chat",
+   "url": "https://www.auchan.fr/recherche?text=sachets%20fra%C3%AEcheur%20chat#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sachets%20fra%C3%AEcheur%20chat&page=2",
+   "status": 200,
+   "products": 54,
+   "error": null,
+   "title": "Votre recherche sachets fraîcheur chat sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "patee-chat",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2t%C3%A9e%20chat#livraison-perreux",
+   "final": "https://www.auchan.fr/animalerie/chat/boites-pates-sachets-chat/ca-n110102?redirect_keywords=p%C3%A2t%C3%A9e%20chat&lark-cioSessionId=1+1793463285600&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=3",
+   "status": 200,
+   "products": 81,
+   "error": null,
+   "title": "Pâtée, sachets repas, boîtes chat pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "patee-chat",
+   "url": "https://www.auchan.fr/recherche?text=friandises%20chat#livraison-perreux",
+   "final": "https://www.auchan.fr/animalerie/chat/friandises-chat/ca-n110101?redirect_keywords=friandises%20chat&lark-cioSessionId=1+1793463296520&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 12,
+   "error": null,
+   "title": "Friandises, laits chat pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "litiere",
+   "url": "https://www.auchan.fr/recherche?text=liti%C3%A8re%20chat#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=liti%C3%A8re%20chat&page=4",
+   "status": 200,
+   "products": 87,
+   "error": null,
+   "title": "Votre recherche litière chat sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "croquettes-chien",
+   "url": "https://www.auchan.fr/recherche?text=croquettes%20chien#livraison-perreux",
+   "final": "https://www.auchan.fr/animalerie/chien/croquettes-chien/ca-n110205?redirect_keywords=croquettes%20chien&lark-cioSessionId=1+1793463318351&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=2",
+   "status": 200,
+   "products": 48,
+   "error": null,
+   "title": "Croquettes chien pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "patee-chien",
+   "url": "https://www.auchan.fr/recherche?text=p%C3%A2t%C3%A9e%20chien#livraison-perreux",
+   "final": "https://www.auchan.fr/animalerie/chien/boites-pates-sachets-chien/ca-n110203?redirect_keywords=p%C3%A2t%C3%A9e%20chien&lark-cioSessionId=1+1793463327669&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 18,
+   "error": null,
+   "title": "Pâtée, sachets repas, boîtes chien pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "patee-chien",
+   "url": "https://www.auchan.fr/recherche?text=friandises%20chien#livraison-perreux",
+   "final": "https://www.auchan.fr/animalerie/chien/hygiene-dentaire-friandises-chien/ca-n110201?redirect_keywords=friandises%20chien&lark-cioSessionId=1+1793463334979&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 22,
+   "error": null,
+   "title": "Hygiène dentaire, friandises chien pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "patee-chien",
+   "url": "https://www.auchan.fr/recherche?text=os%20%C3%A0%20m%C3%A2cher#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=os%20%C3%A0%20m%C3%A2cher#livraison-perreux",
+   "status": 200,
+   "products": 7,
+   "error": null,
+   "title": "Votre recherche os à mâcher sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "autres-animaux",
+   "url": "https://www.auchan.fr/recherche?text=graines%20oiseaux#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=graines%20oiseaux#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche graines oiseaux sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "autres-animaux",
+   "url": "https://www.auchan.fr/recherche?text=rongeurs#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=rongeurs&page=3",
+   "status": 200,
+   "products": 49,
+   "error": null,
+   "title": "Votre recherche rongeurs sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "autres-animaux",
+   "url": "https://www.auchan.fr/recherche?text=aquarium#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=aquarium&page=4",
+   "status": 200,
+   "products": 49,
+   "error": null,
+   "title": "Votre recherche aquarium sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "autres-animaux",
+   "url": "https://www.auchan.fr/recherche?text=poules#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=poules&page=7",
+   "status": 200,
+   "products": 137,
+   "error": null,
+   "title": "Votre recherche poules sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "halal",
+   "url": "https://www.auchan.fr/recherche?text=halal#livraison-perreux",
+   "final": "https://www.auchan.fr/produits-de-nos-regions-et-du-monde/moyen-orient-halal/ca-b0805?sort=default&phalal=phalal_oui&redirect_keywords=halal&lark-cioSessionId=1+1793463401219&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 28,
+   "error": null,
+   "title": "Alimentation Moyen-Orient, halal pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "halal",
+   "url": "https://www.auchan.fr/recherche?text=charcuterie%20halal#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=charcuterie%20halal#livraison-perreux",
+   "status": 200,
+   "products": 27,
+   "error": null,
+   "title": "Votre recherche charcuterie halal sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "halal",
+   "url": "https://www.auchan.fr/recherche?text=viande%20halal#livraison-perreux",
+   "final": "https://www.auchan.fr/produits-de-nos-regions-et-du-monde/moyen-orient-halal/viande-charcuterie-halal/ca-b0800?redirect_keywords=viande%20halal&lark-cioSessionId=1+1793463415884&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=#livraison-perreux",
+   "status": 200,
+   "products": 29,
+   "error": null,
+   "title": "Viande et charcuterie halal pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "casher",
+   "url": "https://www.auchan.fr/recherche?text=casher#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=casher#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche casher sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "casher",
+   "url": "https://www.auchan.fr/recherche?text=cacher#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=cacher#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche cacher sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "sans-gluten",
+   "url": "https://www.auchan.fr/recherche?text=sans%20gluten#livraison-perreux",
+   "final": "https://www.auchan.fr/bio-et-nutrition/sans-gluten/ca-b020201?redirect_keywords=sans%20gluten&lark-cioSessionId=1+1793463426001&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 132,
+   "error": null,
+   "title": "Aliments et produits sans gluten pas cher | Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vegan",
+   "url": "https://www.auchan.fr/recherche?text=vegan#livraison-perreux",
+   "final": "https://www.auchan.fr/bio-et-nutrition/vegetarien-vegetal/100-vegan/ca-b020108?redirect_keywords=vegan&lark-cioSessionId=1+1793463457270&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=4",
+   "status": 200,
+   "products": 117,
+   "error": null,
+   "title": "100% Vegan pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "vegan",
+   "url": "https://www.auchan.fr/recherche?text=v%C3%A9g%C3%A9tal#livraison-perreux",
+   "final": "https://www.auchan.fr/bio-et-nutrition/vegetarien-vegetal/ca-b0201?redirect_keywords=v%C3%A9g%C3%A9tal&lark-cioSessionId=1+1793463467600&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=6",
+   "status": 200,
+   "products": 179,
+   "error": null,
+   "title": "Produits végétariens et vegan pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "asie",
+   "url": "https://www.auchan.fr/recherche?text=cuisine%20asiatique#livraison-perreux",
+   "final": "https://www.auchan.fr/produits-de-nos-regions-et-du-monde/asie/ca-b0801?redirect_keywords=cuisine%20asiatique&lark-cioSessionId=1+1793463481767&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 149,
+   "error": null,
+   "title": "Epicerie et cuisine asiatique - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "asie",
+   "url": "https://www.auchan.fr/recherche?text=nouilles%20asiatiques#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=nouilles%20asiatiques#livraison-perreux",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Votre recherche nouilles asiatiques sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "asie",
+   "url": "https://www.auchan.fr/recherche?text=sushi%20kit#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=sushi%20kit#livraison-perreux",
+   "status": 200,
+   "products": 0,
+   "error": null,
+   "title": "Votre recherche sushi kit sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mexique-usa",
+   "url": "https://www.auchan.fr/recherche?text=tortillas#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tortillas&page=2",
+   "status": 200,
+   "products": 31,
+   "error": null,
+   "title": "Votre recherche tortillas sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mexique-usa",
+   "url": "https://www.auchan.fr/recherche?text=tacos%20kit#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=tacos%20kit#livraison-perreux",
+   "status": 200,
+   "products": 1,
+   "error": null,
+   "title": "Votre recherche tacos kit sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "mexique-usa",
+   "url": "https://www.auchan.fr/recherche?text=saveurs%20am%C3%A9ricaines#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=saveurs%20am%C3%A9ricaines#livraison-perreux",
+   "status": 200,
+   "products": 5,
+   "error": null,
+   "title": "Votre recherche saveurs américaines sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "oriental",
+   "url": "https://www.auchan.fr/recherche?text=couscous#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=couscous#livraison-perreux",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Votre recherche couscous sur Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "oriental",
+   "url": "https://www.auchan.fr/recherche?text=cuisine%20orientale#livraison-perreux",
+   "final": "https://www.auchan.fr/produits-de-nos-regions-et-du-monde/moyen-orient-halal/ca-b0805?redirect_keywords=cuisine%20orientale&lark-cioSessionId=1+1793463542278&lark-cioClientId=31801c67-584a-4cc2-b417-a2686f703df9&lark-engineRolloutSessionId=08087e1b-fe50-4d57-87de-f92f1f41796a&storeCateringSellerId=&storeCateringSelectedDate=&page=5",
+   "status": 200,
+   "products": 131,
+   "error": null,
+   "title": "Alimentation Moyen-Orient, halal pas cher - Auchan.fr"
+  },
+  {
+   "retailer": "auchan-livraison-perreux",
+   "rayon": "oriental",
+   "url": "https://www.auchan.fr/recherche?text=harissa#livraison-perreux",
+   "final": "https://www.auchan.fr/recherche?text=harissa#livraison-perreux",
+   "status": 200,
+   "products": 3,
+   "error": null,
+   "title": "Votre recherche harissa sur Auchan.fr"
+  }
+ ],
+ "decouvertes": [],
+ "bilan": {
+  "auchan-livraison-perreux": {
+   "pages": 334,
+   "lues": 325,
+   "produits": 11621
+  }
+ }
+}
