@@ -482,7 +482,7 @@
     const rows = d.os.map((o, i) => `<li class="${i === 0 ? "low" : ""}"><span>${esc(retName(o.ret))}</span>${i === 0 ? `<span class="sticker">${eur(o.price)}</span>` : `<span class="num">${eur(o.price)}</span>`}</li>`).join("") +
       missing.map((r) => `<li class="nr"><span>${esc(r.name)}</span><span>non relevé</span></li>`).join("");
     return `<article class="deal"><div class="dh"><a class="di" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p)}</a><div class="dtx"><a class="dt" href="${hp(p.id)}"><b>${esc(p.brand)}</b> ${esc(p.name)}</a><div class="pfmt">${esc(p.format)}</div></div></div>` +
-      `<ul class="ladder">${rows}</ul><div class="df"><span class="gap"><span>${eur(d.gap)}</span> d'écart</span>${buyCtl(p.id, "flat")}</div></article>`;
+      `<ul class="ladder">${rows}</ul><div class="df"><span class="gap"><span>${eur(d.gap)}</span> d'écart</span><button class="icbtn dsh" type="button" data-act="sharegap" data-id="${esc(p.id)}" aria-label="Partager cet écart de prix">${ic("share")}</button>${buyCtl(p.id, "flat")}</div></article>`;
   }
   function catTile(r) {
     const rep = S.list.find((p) => p.r === r.id && offers(p, false).length > 1) || S.list.find((p) => p.r === r.id);
@@ -955,7 +955,7 @@
         `<button class="row" type="button" data-act="budget"><span class="rt">Budget par panier<small>Le panier dit ce qu'il reste ou de combien tu dépasses.</small></span><span class="val">${parseFloat(S.prefs.budget) > 0 ? eurR(parseFloat(S.prefs.budget)) : "Aucun"}</span>${ic("chev", "chev")}</button>` +
         (Object.keys(S.prefs.keep || {}).length ? `<div class="row"><span class="rt">Marques gardées<small>${plural(Object.keys(S.prefs.keep).length, "produit n'est", "produits ne sont")} plus proposés au remplacement par un équivalent moins cher.</small></span><button class="btn sm plain" type="button" data-act="keepreset">Tout reproposer</button></div>` : "") +
         `<label class="row" for="extra"><span class="rt">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
-        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<div class="row"><span class="rt">Version</span><span class="val">1.1</span></div></div>` +
+        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/comment"><span class="rt">Comment ça marche</span>${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="install"><span class="rt">Installer Cabas sur l'iPhone</span>${ic("chev", "chev")}</button>`}<button class="row" type="button" data-act="shareapp"><span class="rt">Faire connaître Cabas<small>Une image et un lien à envoyer à qui fait ses courses</small></span>${ic("share", "chev")}</button><div class="row"><span class="rt">Version</span><span class="val">1.2</span></div></div>` +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
     };
   };
@@ -1549,7 +1549,7 @@
     const H = S.hist || [];
     if (!H.length) return "";
     const s = H.reduce((a, x) => a + (x.s || 0), 0);
-    return `<a class="savings" href="#/economies">${ic("coin", "si")}<span><b>${eurC(s)} économisés avec Cabas</b><small>Sur ${plural(H.length, "panier", "paniers")} depuis le ${esc(dateFr(H[0].d).replace(/ \d{4}$/, ""))}, grâce aux meilleurs prix et aux remplacements.</small></span>${ic("chev", "chev")}</a>`;
+    return `<div class="savings"><a class="sv-main" href="#/economies">${ic("coin", "si")}<span><b>${eurC(s)} économisés avec Cabas</b><small>Sur ${plural(H.length, "panier", "paniers")} depuis le ${esc(dateFr(H[0].d).replace(/ \d{4}$/, ""))}, grâce aux meilleurs prix et aux remplacements.</small></span></a><button class="icbtn" type="button" data-act="sharesave" aria-label="Partager mes économies">${ic("share")}</button></div>`;
   }
   VIEWS.economies = () => {
     const H = (S.hist || []).slice().reverse(), s = H.reduce((a, x) => a + (x.s || 0), 0);
@@ -1558,6 +1558,7 @@
       html: `<h1 class="lt">Tes économies</h1><p class="lt-sub">${H.length ? `${eurC(s)} sur ${plural(H.length, "panier", "paniers")}` : "Aucun panier commandé pour l'instant"}</p>` +
         (H.length ? `<div class="group">${H.map((x, i) => `<div class="row"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${x.o && x.o.length ? ", " + esc(joinEt(x.o)) : ""}, ${eurC(x.t)}${x.s ? ", " + eurC(x.s) + " économisés" : ""}</small></span>${x.items ? `<button class="btn sm plain" type="button" data-act="reorder" data-id="${S.hist.length - 1 - i}">Recommander</button>` : `<span class="val num">${x.s ? eurC(x.s) : "–"}</span>`}</div>`).join("")}</div>` +
           `<p class="gf">Un panier compte quand toutes ses commandes sont notées comme passées. L'économie d'un panier additionne, pour chaque produit, l'écart entre le prix payé et son prix moyen dans les enseignes qui le vendent, et ce que les remplacements par un équivalent moins cher ont fait gagner. Selon les prix relevés.</p>` +
+          `<div class="pad btns" style="padding-top:18px"><button class="btn tint" type="button" data-act="sharesave">${ic("share")}Partager mes économies</button></div>` +
           `<div class="group" style="margin-top:28px"><button class="row danger" type="button" data-act="histclear">Effacer l'historique</button></div>` :
           `<div class="empty">${emptyArt("coin")}<h2>Rien pour l'instant</h2><p>Dans le panier, touche «\u00a0Passer la commande\u00a0» pour chaque enseigne\u00a0: quand tout est commandé, l'économie s'ajoute ici.</p></div>`),
     };
@@ -2311,8 +2312,10 @@
         else S.prefs.pick = Object.assign({}, S.prefs.pick, { [g]: id });
         savePrefs(); applyGroups(); renderChrome(); rerender(); toast(isPickup(m) ? "Point de retrait choisi" : "Zone de livraison choisie"); break;
       }
-      case "share": shareProduct(id); break;
+      case "share": shareGap(id); break;
       case "shareapp": shareApp(); break;
+      case "sharesave": shareSavings(); break;
+      case "sharegap": shareGap(id); break;
       case "hideinstall": S.seen.install = true; store.set("seen", S.seen); t.closest(".install").remove(); break;
       case "install": installSheet(); break;
       case "savelist": nameSheet("Nouvelle liste", "Courses du " + new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" }), "savelistok"); break;
@@ -2512,9 +2515,82 @@
     }
   });
   const APP_URL = "https://59g59sy5w6-design.github.io/";
+  const APP_HOST = "59g59sy5w6-design.github.io";
+  /* ---------- images à partager (réseaux sociaux, messageries) ----------
+     Une carte sobre dessinée sur un canvas : le wordmark, un gros chiffre, deux lignes, le nom de l'appli. Partagée en
+     fichier quand le téléphone le permet (navigator.canShare), sinon le texte et le lien, sinon l'image se télécharge. */
+  const CARD_FONT = '-apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Inter, Roboto, Arial, sans-serif';
+  function drawLogo(cx, x, y, s) {
+    cx.save(); cx.translate(x, y); cx.scale(s / 64, s / 64);
+    cx.fillStyle = "#0a7a4a"; cx.beginPath(); cx.roundRect(0, 0, 64, 64, 14); cx.fill();
+    cx.fillStyle = "#fff"; cx.fill(new Path2D("M18.2 26h27.6l1.5 23.4a3.4 3.4 0 0 1-3.4 3.6H20.1a3.4 3.4 0 0 1-3.4-3.6z"));
+    cx.strokeStyle = "#fff"; cx.lineWidth = 2.8; cx.lineCap = "round"; cx.stroke(new Path2D("M24.2 27v-4.6a7.8 7.8 0 0 1 15.6 0V27"));
+    cx.beginPath(); cx.arc(45.6, 47.4, 7.6, 0, Math.PI * 2); cx.fillStyle = "#ffd60a"; cx.fill(); cx.strokeStyle = "#0a7a4a"; cx.lineWidth = 2.4; cx.stroke();
+    cx.restore();
+  }
+  function wrapText(cx, text, maxW) {
+    const words = String(text).split(" "), lines = [];
+    let cur = "";
+    for (const w of words) { const t = cur ? cur + " " + w : w; if (cx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+  /* spec : { big, label, lines, note } ; renvoie un Blob PNG 1080 x 1080 */
+  function cardPng(spec) {
+    return new Promise((ok) => {
+      const W = 1080, c = document.createElement("canvas"); c.width = W; c.height = W;
+      const cx = c.getContext("2d");
+      cx.fillStyle = "#ffffff"; cx.fillRect(0, 0, W, W);
+      drawLogo(cx, 80, 80, 96);
+      cx.fillStyle = "#111"; cx.font = "800 72px " + CARD_FONT; cx.textBaseline = "middle"; cx.fillText("Cabas", 196, 128);
+      let y = spec.big ? 330 : 400;
+      if (spec.big) { cx.font = "800 " + (spec.big.length > 9 ? 150 : 190) + "px " + CARD_FONT; cx.textBaseline = "alphabetic"; cx.fillText(spec.big, 80, y + 120); y += 190; }
+      cx.font = "700 60px " + CARD_FONT; cx.textBaseline = "alphabetic";
+      for (const l of wrapText(cx, spec.label || "", 920)) { cx.fillText(l, 80, y + 20); y += 72; }
+      y += 22;
+      cx.font = "400 42px " + CARD_FONT; cx.fillStyle = "#4b4f55";
+      for (const t of spec.lines || []) for (const l of wrapText(cx, t, 920)) { cx.fillText(l, 80, y + 20); y += 56; }
+      cx.strokeStyle = "#e3e5e8"; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(80, 910); cx.lineTo(1000, 910); cx.stroke();
+      cx.font = "600 36px " + CARD_FONT; cx.fillStyle = "#111"; cx.fillText(spec.note || "Gratuit, sans compte, sans publicité", 80, 968);
+      cx.font = "600 36px " + CARD_FONT; cx.fillStyle = "#0a7a4a"; cx.fillText(APP_HOST, 80, 1022);
+      c.toBlob((b) => ok(b), "image/png");
+    });
+  }
+  async function shareCard(spec, name, title, text) {
+    let blob = null;
+    try { blob = await cardPng(spec); } catch (e) { blob = null; }
+    if (blob && navigator.share && navigator.canShare) {
+      const file = new File([blob], name, { type: "image/png" });
+      if (navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title, text: text + " " + APP_URL }); } catch (err) { /* partage annulé */ } return; }
+    }
+    if (navigator.share) { try { await navigator.share({ title, text, url: APP_URL }); } catch (err) { /* partage annulé */ } return; }
+    if (blob) {
+      const u = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+      toast("Image enregistrée, à partager où tu veux");
+      return;
+    }
+    try { await navigator.clipboard.writeText(text + "\n" + APP_URL); toast("Texte copié"); } catch (err) { toast("Partage impossible sur cet appareil"); }
+  }
+  const RET_LIST = () => joinEt([...new Set(S.allRets.filter((r) => !r.simulated).map((r) => r.name.split(" ")[0]))]);
   async function shareApp() {
-    const text = "Cabas compare les prix des courses chez Monoprix, Carrefour, Houra et Auchan et répartit le panier pour payer le moins cher, livraison comprise. Gratuit, sans compte.";
-    await shareText("Cabas", text, APP_URL);
+    const text = "Cabas compare les prix des courses chez " + RET_LIST() + " et répartit le panier pour payer le moins cher, livraison comprise. Gratuit, sans compte.";
+    await shareCard({ big: "", label: "Tes courses au prix le plus bas, livraison comprise.", lines: ["Les mêmes produits chez " + RET_LIST() + ", aux prix relevés sur leurs sites. Écris ta liste, Cabas répartit tes commandes."] }, "cabas.png", "Cabas", text);
+  }
+  async function shareSavings() {
+    const H = S.hist || [], s = H.reduce((a, x) => a + (x.s || 0), 0);
+    if (!H.length) { shareApp(); return; }
+    const text = "J'ai économisé " + eurC(s) + " sur mes courses avec Cabas, qui compare " + RET_LIST() + ". Gratuit, sans compte.";
+    await shareCard({ big: eurC(s), label: "économisés sur mes courses", lines: ["Sur " + plural(H.length, "panier", "paniers") + " depuis le " + dateFr(H[0].d).replace(/ \d{4}$/, "") + ", aux meilleurs prix de " + RET_LIST() + ", livraison comprise."] }, "cabas-economies.png", "Mes économies avec Cabas", text);
+  }
+  async function shareGap(id) {
+    const p = S.prods.get(id);
+    if (!p) return;
+    const os = offers(p, false).filter((o) => !o.sim);
+    if (os.length < 2) { shareProduct(id); return; }
+    const lo = os[0], hi = os[os.length - 1], name = (p.brand + " " + p.name + (p.format ? ", " + p.format : "")).trim();
+    const text = name + " : " + eur(lo.price) + " chez " + retName(lo.ret) + ", " + eur(hi.price) + " chez " + retName(hi.ret) + ". Même produit, pas le même prix. Vu sur Cabas.";
+    await shareCard({ big: eur(hi.price - lo.price), label: "d'écart sur le même produit", lines: [name, eur(lo.price) + " chez " + retName(lo.ret) + ", " + eur(hi.price) + " chez " + retName(hi.ret) + ". Prix relevés le " + dateFr(lo.at || S.meta.updatedAt) + "."] }, "cabas-ecart.png", name, text);
   }
   async function shareProduct(id) {
     const p = S.prods.get(id);
