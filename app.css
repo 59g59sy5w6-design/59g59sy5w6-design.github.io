@@ -484,6 +484,25 @@ body.grouped .empty .art { background: var(--card); }
 .wl { display: block; width: 100%; min-height: 172px; padding: 12px 14px; border: 0; border-radius: 14px; background: var(--card); font: inherit; font-size: 17px; line-height: 25px; letter-spacing: -0.02em; color: var(--ink); resize: vertical; -webkit-appearance: none; appearance: none; }
 .wl::placeholder { color: var(--ink-3); }
 .wl:focus { outline: none; box-shadow: 0 0 0 2px var(--brand) inset; }
+/* première visite : la promesse, puis la liste en un geste */
+.hero { padding: 0 calc(var(--g) + var(--sr)) 14px calc(var(--g) + var(--sl)); }
+.hero .tagline { font-size: 26px; line-height: 31px; font-weight: 700; letter-spacing: -0.025em; margin: 0 0 10px; max-width: 30ch; }
+.hero .lede { font-size: 16px; line-height: 23px; color: var(--ink-2); letter-spacing: -0.01em; margin: 0 0 16px; max-width: 60ch; }
+.hero .btn { margin-bottom: 14px; }
+.hero .try { font-size: 13px; color: var(--ink-2); margin: 0 0 8px; letter-spacing: -0.005em; }
+.hero .exrow { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero .exrow .chip { height: 36px; border-radius: 18px; background: var(--brand-tint); color: var(--brand-ink); font-weight: 600; }
+.hero .exrow .chip:active { background: var(--brand-tint-press); }
+.hero .trust { font-size: 13px; line-height: 18px; color: var(--ink-2); margin: 16px 0 0; letter-spacing: -0.005em; }
+.hero .trust a { color: var(--link); font-weight: 500; }
+button.wlcta { width: calc(100% - var(--g) * 2 - var(--sl) - var(--sr)); text-align: left; }
+/* comment ça marche : les quatre étapes */
+.steps { padding: 4px calc(var(--g) + var(--sr)) 6px calc(var(--g) + var(--sl)); }
+.step { display: flex; gap: 14px; padding: 12px 0; }
+.step + .step { border-top: 0.5px solid var(--sep); }
+.step .sn { flex: none; width: 30px; height: 30px; border-radius: 15px; background: var(--brand); color: var(--on-brand); font-family: var(--round); font-weight: 700; font-size: 15px; display: grid; place-items: center; margin-top: 1px; }
+.step b { display: block; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; line-height: 22px; }
+.step p { margin: 3px 0 0; font-size: 15px; line-height: 21px; color: var(--ink-2); letter-spacing: -0.01em; }
 .wlcta, .savings { display: flex; align-items: center; gap: 12px; margin: 6px calc(var(--g) + var(--sr)) 8px calc(var(--g) + var(--sl)); padding: 13px 14px; border-radius: 14px; background: var(--shelf); color: var(--ink); text-decoration: none; }
 .savings { background: var(--brand-tint); color: var(--brand-ink); }
 .savewrap { margin: 12px calc(var(--g) + var(--sr)) 0 calc(var(--g) + var(--sl)); }

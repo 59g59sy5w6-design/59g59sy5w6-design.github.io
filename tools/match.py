@@ -55,6 +55,17 @@ def union(a, b):
         parent[rb] = ra
 
 
+# un même code produit Auchan (pr-C..., dans le rid) lu dans plusieurs magasins ou zones de livraison : même produit,
+# sans heuristique ; sinon deux produits Auchan de même nom et de même contenance se retrouvaient dédoublés par magasin
+bycode = {}
+for it in items:
+    if it['ret'].split('-')[0] == 'auchan' and ':' in it['rid']:
+        code = it['rid'].split(':', 1)[1]
+        if code in bycode:
+            union(bycode[code], it['rid'])
+        else:
+            bycode[code] = it['rid']
+
 groups = collections.defaultdict(list)
 for it in items:
     groups[(it['ray'], it['fam'], it['q'])].append(it)

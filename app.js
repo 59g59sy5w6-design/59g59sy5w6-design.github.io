@@ -55,7 +55,8 @@
     ready: false, failed: false,
     rayons: [], prods: new Map(), list: [], rets: [], retMap: new Map(), meta: {},
     basket: store.get("basket", {}),
-    prefs: Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {} }, store.get("prefs", {})),
+    /* premier lancement : E.Leclerc, aux prix simulés, est proposé mais pas choisi d'office (questions de départ, réglages) */
+    prefs: Object.assign({}, PREFS0, { off: store.get("prefs", null) ? {} : { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, offv: store.get("prefs", null) ? undefined : 1 }, store.get("prefs", {})),
     lists: store.get("lists", []),
     recent: store.get("recent", []),
     seen: store.get("seen", {}),
@@ -560,18 +561,37 @@
   /* ---------- écrans ---------- */
   const VIEWS = {};
 
+  /* listes toutes faites, pour voir en un geste ce que fait Cabas (produits des rayons couverts) */
+  const EXAMPLES = [
+    ["semaine", "La semaine", "lait, 2 paquets de pâtes, 6 œufs, beurre, yaourts nature, 6 bouteilles d'eau, papier toilette, café"],
+    ["petitdej", "Petit-déjeuner", "café moulu, lait demi-écrémé, jus d'orange, madeleines, sucre en poudre, beurre"],
+    ["pates", "Dîner de pâtes", "spaghetti, thon au naturel, tomates pelées, huile d'olive, emmental râpé"],
+    ["menage", "Ménage", "lessive liquide, liquide vaisselle, papier toilette x2"],
+  ];
+  /* quelqu'un qui découvre Cabas : rien dans le panier, pas de liste, pas de commande, questions de départ pas encore vues */
+  const newcomer = () => !S.seen.welcome && !count() && !S.hist.length && !S.lists.length;
+  function heroHtml() {
+    const ex = EXAMPLES.map(([k, l]) => `<button class="chip" type="button" data-act="wlex" data-k="${k}">${esc(l)}</button>`).join("");
+    return `<div class="hero"><p class="tagline">Tes courses au prix le plus bas, livraison comprise.</p>` +
+      `<p class="lede">Les mêmes produits chez Monoprix, Carrefour, Houra et Auchan, aux prix relevés sur leurs sites. Écris ta liste\u00a0: Cabas trouve chaque produit au meilleur prix et répartit tes commandes, frais compris.</p>` +
+      `<a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><p class="try">Ou essaie avec une liste toute faite</p><div class="exrow">${ex}</div>` +
+      `<p class="trust">Gratuit, sans compte, sans publicité. En Île-de-France pour l'instant. <a href="#/comment">Comment ça marche</a></p></div>`;
+  }
   VIEWS.home = () => {
     const ds = deals(8);
     const tiles = S.rayons.slice(0, 7).map(catTile).join("") + `<a class="cat" href="#/rayons"><span class="ct all">${ic("grid")}</span><span>Tous les rayons</span></a>`;
     const sg = suggestion();
+    const first = newcomer();
     return {
       title: "",
       left: `<button class="loc" type="button" data-act="zip">${ic("pin")}<span>${S.prefs.zip ? "Livraison à " + esc(S.prefs.zip) : "Où te livrer\u00a0?"}</span>${ic("down", "chev")}</button>`,
       right: `<a class="icbtn" href="#/reglages" aria-label="Réglages">${ic("gear")}</a>`,
       html: `<h1 class="lt wordmark"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</h1>` +
+        (first ? heroHtml() : "") +
         `<div class="srow"><button class="search" type="button" data-act="gosearch">${ic("search")}<span>Produits, marques</span></button><a class="icbtn" href="#/scan" aria-label="Scanner un code-barres">${ic("scan")}</a></div>` +
         `<p class="fresh${isStale() ? " old" : ""}">${ic("clock")}<span>${esc(freshText())}${isStale() ? ", ils ont pu changer depuis" : ""}</span></p>` +
-        `<a class="wlcta" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>` +
+        (first ? "" : `<a class="wlcta" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>`) +
+        (!first && !S.seen.welcome ? `<button class="wlcta" type="button" data-act="welcome">${ic("gear", "si")}<span><b>Dis-nous où tu fais tes courses</b><small>Enseignes, déplacement ou tout livré, nombre de personnes</small></span>${ic("chev", "chev")}</button>` : "") +
         ordersCard() +
         savingsCard() +
         installCard() +
@@ -961,6 +981,29 @@
         `<div class="group" style="margin-top:28px"><a class="row link" href="${esc(R0.home)}" target="_blank" rel="noopener"><span class="rt">Ouvrir ${esc(R0.service)}</span>${ic("ext", "ext")}</a></div>`,
     };
   };
+  /* ce que se demande quelqu'un qui découvre Cabas : ce que ça fait, d'où viennent les prix, ce que ça coûte, où ça marche */
+  VIEWS.comment = () => {
+    const m = S.meta || {};
+    const rets = S.allRets.filter((r) => !r.simulated).map((r) => r.group ? null : r.name).filter(Boolean);
+    const names = joinEt([...new Set(S.allRets.filter((r) => !r.simulated).map((r) => r.name.split(" ")[0]))]);
+    const step = (n, t, d) => `<div class="step"><span class="sn">${n}</span><div><b>${t}</b><p>${d}</p></div></div>`;
+    return {
+      title: "Comment ça marche", grouped: true,
+      html: `<h1 class="lt">Comment ça marche</h1><p class="lt-sub">Cabas compare les prix des courses en ligne et répartit ton panier pour payer le moins cher, livraison comprise.</p>` +
+        `<div class="steps">` +
+        step(1, "Écris ta liste, ou ajoute des produits", "Une ligne par produit, avec les quantités (« 2 paquets de pâtes », « 6 œufs »). Tu peux aussi dicter, parcourir les rayons ou scanner un code-barres en magasin.") +
+        step(2, "Cabas trouve chaque produit au meilleur prix", `Les mêmes produits sont comparés chez ${esc(names)}, avec leurs prix au kilo ou au litre. Un produit équivalent moins cher t'est proposé, jamais imposé.`) +
+        step(3, "Ton panier est réparti entre les enseignes", "Une ou plusieurs commandes, en tenant compte des minimums d'achat et des frais de livraison de chacune : le total affiché est celui que tu paieras, frais compris. Si une seule commande revient moins cher, Cabas le dit.") +
+        step(4, "Tu commandes sur les sites des enseignes", "Cabas te donne la liste de chaque commande avec les liens. Il ne vend rien, ne prend aucune commission et n'est lié à aucune enseigne.") +
+        `</div>` +
+        `<h2 class="gh">D'où viennent les prix</h2><div class="group"><div class="prose" style="padding:12px 16px"><p>Les prix sont relevés sur les sites des enseignes, page de rayon par page de rayon, et chaque prix garde la date de son relevé${m.updatedAt ? " (dernier relevé le " + esc(dateFr(m.updatedAt)) + ")" : ""}. Rien n'est estimé${S.allRets.some((r) => r.simulated) ? ", sauf E.Leclerc, dont les prix sont simulés et signalés comme tels partout" : ""}. Les offres en cours sont signalées mais pas déduites.</p><p>Les prix Auchan dépendent du magasin : Cabas relève plusieurs points de retrait et zones de livraison, et tu choisis le tien.</p></div></div>` +
+        `<h2 class="gh">Où ça marche</h2><div class="group"><div class="prose" style="padding:12px 16px"><p>Pour l'instant en Île-de-France, là où ${esc(names)} livrent ou proposent un retrait. Les rayons couverts\u00a0: ${esc(joinEt(S.rayons.map((r) => r.name.toLowerCase())))}. D'autres suivent.</p></div></div>` +
+        `<h2 class="gh">Ce que ça coûte</h2><div class="group"><div class="prose" style="padding:12px 16px"><p>Rien. Pas de compte, pas de publicité, pas de suivi. Tes listes, ton panier et tes commandes restent dans ton téléphone. Cabas s'installe sur l'écran d'accueil et marche sans réseau avec le dernier relevé.</p></div></div>` +
+        `<div class="pad btns" style="padding-top:18px"><a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><button class="btn tint" type="button" data-act="shareapp">${ic("share")}Faire connaître Cabas</button></div>` +
+        `<p class="gf"><a href="#/apropos">À propos des prix</a>, enseigne par enseigne.</p>`,
+    };
+  };
+
   VIEWS.apropos = () => {
     const m = S.meta || {}, cov = m.coverage || {};
     return {
@@ -990,6 +1033,7 @@
       case "reglages": return { name: "reglages" };
       case "enseigne": return { name: "enseigne", id };
       case "apropos": return { name: "apropos" };
+      case "comment": return { name: "comment" };
       case "ecrire": return { name: "ecrire" };
       case "partage": return { name: "partage", id };
       case "economies": return { name: "economies" };
@@ -1018,6 +1062,7 @@
       case "reglages": return "Réglages";
       case "enseigne": return retName(r.id);
       case "apropos": return "À propos";
+      case "comment": return "Comment ça marche";
       case "ecrire": return "Ma liste";
       case "partage": return "Liste partagée";
       case "economies": return "Économies";
@@ -1091,6 +1136,9 @@
     window.scrollTo(0, S.dir === "push" ? 0 : S.scroll[h] || 0);
     S.dir = "none";
     if (V.mount) V.mount();
+    /* questions de départ (enseignes, déplacement, foyer, secteur) : à la première visite du panier avec des produits,
+       quand elles changent le total, et jamais avant d'avoir vu ce que fait Cabas */
+    if (S.ready && !S.seen.welcome && r.name === "panier" && count() > 0 && !location.hash.startsWith("#/partage")) setTimeout(() => { if ($("#sheet").hidden && S.route.name === "panier") welcomeSheet(); }, 450);
     onScroll();
   }
   function rerender() { S.scroll[S.cur] = window.scrollY; S.dir = "none"; render(); }
@@ -1210,6 +1258,11 @@
     S.list.forEach((p) => { const w = p._b.split(" ")[0]; if (w && w.length > 2 && w !== "sans") CATW.add(stem(w)); });
     return CATW;
   }
+  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "leger"];
+  /* « beurre doux 60 % MG » : un beurre allégé qui ne dit pas son nom (le beurre est à 80 % ou plus) */
+  const lowFat = (p) => p.r === "beurre" && /\b(1[0-9]|[2-6][0-9]|7[0-4]) ?mg\b/.test(norm(p.name));
+  /* le mot est dans le produit lui-même (marque, nom, format, étiquettes), pas seulement dans le nom de son rayon */
+  const ownHas = (p, t) => { if (!p._ow) p._ow = new Set((p._b + " " + norm(p.name).replace(/\b1 2 /g, "demi ") + " " + norm(p.format) + " " + norm((p.tags || []).join(" "))).split(" ").filter(Boolean).map(stem)); return p._ow.has(t); };
   function matchLine(L) {
     const out = { raw: L.raw, q: L.q, n: L.n, cands: [], avail: 0, pick: null };
     if (!L.q) return out;
@@ -1225,6 +1278,11 @@
     if (exact.length) rel = exact;
     /* « sardines à l'huile » n'est pas « sauce tomate sans huile » */
     if (!toks.includes("san")) { const noSans = rel.filter((p) => !toks.some((t) => sig(p).includes("sans " + t))); if (noSans.length) rel = noSans; }
+    /* « jus d'orange » n'est pas une boisson au jus, « papier toilette » n'est pas des lingettes : un mot qui change la
+       nature du produit l'écarte, sauf si on l'a écrit */
+    const dn = NOTSAME.filter((w) => !toks.includes(w)), light = ["leger", "allege", "light"].some((w) => toks.includes(w));
+    const noDown = rel.filter((p) => !dn.some((w) => allW(p).has(w)) && (light || !lowFat(p)));
+    if (noDown.length) rel = noDown;
     const inRay = rel.filter((p) => { const rw = rayWords(p.r); return toks.some((t) => rw.has(t)); });
     if (inRay.length) rel = inRay;
     /* d'abord ce qui est vendu par tes enseignes, puis les résultats les plus pertinents parmi ceux-là */
@@ -1244,7 +1302,13 @@
     /* le nom du rayon tout seul (« huile », « lait ») : toutes les variantes se valent, le moins cher l'emporte */
     const bare = avail.length && toks.every((t) => rayWords(avail[0].r).has(t));
     const minX = bare ? -1 : Math.min(...avail.map(extra));
-    const plain = bare ? avail : avail.filter((p) => extra(p) === minX);
+    let plain = bare ? avail : avail.filter((p) => extra(p) === minX);
+    /* rayon « Jus d'orange » demandé par son nom : un pur jus de pamplemousse rangé là n'est pas un jus d'orange ;
+       un mot de parfum ou de variété du nom du rayon doit être dans le produit lui-même, quand c'est le cas de certains */
+    if (bare) {
+      const spec = toks.filter((t) => VARIANT.has(t) || ATTR.has(t));
+      if (spec.length) { const own = plain.filter((p) => spec.every((t) => ownHas(p, t))); if (own.length) plain = own; }
+    }
     let pick = null, n = L.n;
     if (L.size) {
       const same = plain.filter((p) => p.qty && p.qty.u === L.size.u);
@@ -2248,6 +2312,7 @@
         savePrefs(); applyGroups(); renderChrome(); rerender(); toast(isPickup(m) ? "Point de retrait choisi" : "Zone de livraison choisie"); break;
       }
       case "share": shareProduct(id); break;
+      case "shareapp": shareApp(); break;
       case "hideinstall": S.seen.install = true; store.set("seen", S.seen); t.closest(".install").remove(); break;
       case "install": installSheet(); break;
       case "savelist": nameSheet("Nouvelle liste", "Courses du " + new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" }), "savelistok"); break;
@@ -2272,7 +2337,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); break;
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: {}, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -2315,6 +2380,14 @@
       case "shop": shopSheet(); break;
       case "shopck": { const k = "mag|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); break; }
       /* liste écrite ou dictée */
+      case "wlex": {
+        const ex = EXAMPLES.find((x) => x[0] === t.dataset.k);
+        if (!ex) break;
+        S.wl = { text: ex[2], lines: readList(ex[2]) };
+        store.set("draft", ex[2]);
+        push("#/ecrire");
+        break;
+      }
       case "wlgo": {
         const tx = ($("#wlIn") || {}).value || "";
         S.wl = { text: tx, lines: readList(tx) };
@@ -2438,6 +2511,11 @@
       else if (e.target.id === "fmax") { e.preventDefault(); e.target.blur(); }
     }
   });
+  const APP_URL = "https://59g59sy5w6-design.github.io/";
+  async function shareApp() {
+    const text = "Cabas compare les prix des courses chez Monoprix, Carrefour, Houra et Auchan et répartit le panier pour payer le moins cher, livraison comprise. Gratuit, sans compte.";
+    await shareText("Cabas", text, APP_URL);
+  }
   async function shareProduct(id) {
     const p = S.prods.get(id);
     if (!p) return;
@@ -2485,7 +2563,7 @@
     try { await load(); S.ready = true; } catch (err) { S.failed = true; }
     if (S.ready) { try { trackDrops(); } catch (e) { /* stockage indisponible */ } }
     render();
-    if (S.ready && !S.seen.welcome && !location.hash.startsWith("#/partage")) setTimeout(() => { if ($("#sheet").hidden) welcomeSheet(); }, 500);
+    /* les questions de départ ne bloquent pas le premier écran : elles viennent à la première visite du panier (voir render) */
   })();
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
     let had = !!navigator.serviceWorker.controller;
