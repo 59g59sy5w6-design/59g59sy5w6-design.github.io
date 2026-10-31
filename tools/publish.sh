@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Publie un relevé : repart du dernier état publié sur main (relevés de l'autre source compris), reconstruit
 # le catalogue avec les lectures de tools/work/fetches.json, vérifie l'appli, puis pousse sur main.
-# Utilisé par le robot GitHub (tools/ci.sh) et par le relevé de Claude (voir CLAUDE.md).
+# Utilisé par le robot GitHub (tools/ci.sh, une publication par cible de la matrice) et par le relevé de Claude
+# (voir CLAUDE.md). Quand main a bougé entre-temps (autre cible, autre session), tout est refait depuis le nouvel
+# état, jusqu'à 8 fois, après une attente tirée au sort pour que les cibles ne se gênent pas.
 # Usage : bash tools/publish.sh <source>   (source : robot ou claude, pour le message de commit)
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -16,9 +18,10 @@ if [ -z "$(git config user.name || true)" ]; then
   git config user.name "github-actions[bot]"
   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 fi
-for attempt in 1 2 3; do
+for attempt in 1 2 3 4 5 6 7 8; do
   git fetch -q origin main
   git reset -q --hard origin/main
+  # build.py fusionne aussi les pages Houra trouvées ce passage (tools/work/discovered.json) dans tools/state/discovered.json
   python3 tools/build.py > tools/work/build.log
   grep -v "^    (" tools/work/build.log || true
   python3 tools/match.py > tools/work/match.log
@@ -28,7 +31,7 @@ for attempt in 1 2 3; do
   READ=$(python3 -c "import json; r=json.load(open('tools/work/report.json')); n={x['id']: x['name'] for x in json.load(open('data/retailers.json'))}; print(', '.join(sorted({n.get(p['retailer'], p['retailer']) for p in r['pages'] if p['products']})) or 'aucune page lue')")
   WHEN=$(TZ=Europe/Paris date +'%d/%m/%Y à %Hh%M')
   if git diff --quiet -- data/catalog.json data/meta.json; then
-    git add data/status.json tools/state/ids.json
+    git add data/status.json tools/state/ids.json tools/state/discovered.json
     git commit -q -m "Prix vérifiés le $WHEN ($READ, $SRC), sans changement" || { echo "Rien à publier."; exit 0; }
   else
     node tools/smoke.js
@@ -49,8 +52,9 @@ MSG
     fi
     exit 0
   fi
-  echo "main a bougé pendant la publication : nouvelle tentative ($attempt)."
-  sleep 15
+  WAIT=$((10 + RANDOM % 51))
+  echo "main a bougé pendant la publication : nouvelle tentative ($attempt) dans $WAIT s."
+  sleep "$WAIT"
 done
-echo "Publication impossible après 3 tentatives."
+echo "Publication impossible après 8 tentatives."
 exit 1

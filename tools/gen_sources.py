@@ -117,9 +117,10 @@ def write_lots(src):
         mine = [p for p in src['pages'] if robot.get(p['retailer']) is False and p['lot'] == lot]
         names = ', '.join(lib.UNIVERS_NAME[u] for u in univ)
         lines = [f"# Lot {lot} : {names}", '',
-                 f"Relevé Monoprix et Carrefour du lot {lot} ({len(mine)} pages). Suivre CLAUDE.md, « Mettre à jour les prix », avec "
-                 f"`python3 tools/dump.py --reset --lot {lot}` ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, "
-                 "par séries de 7 ; `python3 tools/dump.py --lot " + lot + "` après chaque série ; `bash tools/publish.sh claude` à la fin.", '']
+                 f"Relevé Monoprix et Carrefour du lot {lot} ({len(mine)} pages). Suivre CLAUDE.md, « Mettre à jour les prix » : "
+                 f"`python3 tools/dump.py --reset --lot {lot}` (ou `--list --lot {lot}` pour la liste seule) ; lire chaque page avec WebFetch, "
+                 f"avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot {lot}` après chaque série ; "
+                 f"relire une fois les pages encore sans lecture ; `bash tools/publish.sh claude` à la fin.", '']
         for p in mine:
             lines.append(f"- {lib.RAYON_BY_ID[p['rayon']]['nom']} ({p['retailer']}) : {p['url']}")
             lines.append(f"  prompt : {p['prompt']}")

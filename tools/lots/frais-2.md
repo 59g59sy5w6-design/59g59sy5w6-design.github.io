@@ -1,6 +1,6 @@
 # Lot frais-2 : Crèmerie
 
-Relevé Monoprix et Carrefour du lot frais-2 (58 pages). Suivre CLAUDE.md, « Mettre à jour les prix », avec `python3 tools/dump.py --reset --lot frais-2` ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot frais-2` après chaque série ; `bash tools/publish.sh claude` à la fin.
+Relevé Monoprix et Carrefour du lot frais-2 (58 pages). Suivre CLAUDE.md, « Mettre à jour les prix » : `python3 tools/dump.py --reset --lot frais-2` (ou `--list --lot frais-2` pour la liste seule) ; lire chaque page avec WebFetch, avec exactement l'url et le prompt ci-dessous, par séries de 7 ; `python3 tools/dump.py --lot frais-2` après chaque série ; relire une fois les pages encore sans lecture ; `bash tools/publish.sh claude` à la fin.
 
 - Lait demi-écrémé (monoprix) : https://courses.monoprix.fr/categories/produits-laitiers-%C5%93ufs-et-fromages/laits/lait-uht-demi-%C3%A9cr%C3%A9m%C3%A9/b965e8e2-5f8c-499d-bd3d-e15629a4b4f8?sortBy=favorite
   prompt : Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {"name": full product name exactly as written (brand + name), "format": pack size text as written (e.g. "6 x 1,5 L"), "price": current price as a number in euros, "was": previous crossed-out price as number or null, "unit": price per unit text as written (e.g. "0,25 €/l") or null, "promo": promotion text or null, "url": absolute product page URL or null}. Include every product on the page, do not skip any.

@@ -12474,6 +12474,33 @@
   "auchan-livraison-paris14": true
  },
  "robot_note": "Le 29 octobre 2026, depuis GitHub Actions, Monoprix répond par une page de vérification humaine et Carrefour par une page d'attente anti-robot (403). Ces deux enseignes sont relues par Claude avec WebFetch (voir CLAUDE.md), jamais en contournant leur protection.",
+ "lots_robot": {
+  "frais": [
+   "fruits-legumes",
+   "viandes-poissons",
+   "cremerie",
+   "charcuterie-traiteur",
+   "pain-patisserie",
+   "surgeles"
+  ],
+  "epicerie": [
+   "epicerie-salee",
+   "petit-dejeuner",
+   "epicerie-sucree",
+   "boissons",
+   "cave"
+  ],
+  "nonalim": [
+   "bebe",
+   "hygiene-beaute",
+   "parapharmacie",
+   "entretien",
+   "animaux",
+   "regimes-bio",
+   "monde"
+  ]
+ },
+ "lots_robot_note": "Lots du robot (tools/scrape.js --lot, matrice de .github/workflows/prix.yml) : chaque lot est une liste d'univers de tools/rayons.json ; les trois lots couvrent les 18 univers. Les lots de lecture de Claude (champ lot des pages) sont dans lib.LOTS.",
  "magasins": {
   "auchan": {
    "enseigne": "auchan",

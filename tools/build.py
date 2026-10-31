@@ -1,6 +1,9 @@
 """Normalise les produits relevés : marque, désignation, contenance, prix, rayon, régimes.
 
-Entrée : tools/work/fetches.json (tools/dump.py ou tools/scrape.js) et tools/state/items.json (relevé précédent).
+Entrée : tools/work/fetches.json (tools/dump.py ou tools/scrape.js) et tools/state/items.json (relevé précédent) ;
+les pages Houra trouvées par le robot ce passage (tools/work/discovered.json) sont d'abord fusionnées dans
+tools/state/discovered.json, que lib.route lit. Chaque page est reconnue par l'adresse demandée ; l'adresse finale
+(après redirection, notée par le robot) sert de secours et les pages redirigées sont listées pour tools/rayons.json.
 Sortie : tools/work/items.json et tools/work/report.json.
 
 Une page qui n'a pas pu être lue cette fois garde les produits du relevé précédent, avec leur date, pendant au plus
@@ -86,6 +89,23 @@ def route_label(it):
 
 F_PATH = os.path.join(lib.WORK, "fetches.json")
 F = json.load(open(F_PATH, encoding="utf-8")) if os.path.exists(F_PATH) else []
+# pages Houra trouvées par le robot ce passage : fusionnées dans tools/state/discovered.json avant de reconnaître les pages
+D_PATH = os.path.join(lib.WORK, "discovered.json")
+if os.path.exists(D_PATH):
+    lib.merge_discovered(json.load(open(D_PATH, encoding="utf-8")))
+
+
+def page_id(url):
+    """Ce qui identifie une page : chez Houra, le code et le numéro (« B1557897-2 », le chemin est décoratif) ;
+    ailleurs, l'adresse sans requête ni fragment."""
+    m = re.search(r"-(B\d+-\d+)\.html", (url or "").split("?")[0])
+    return m.group(1) if m else (url or "").split("?")[0].split("#")[0].rstrip("/")
+
+
+# pages de la liste redirigées par le site vers un autre code (adresse finale notée par le robot) : à remplacer dans
+# tools/rayons.json par la page actuelle ; les pages suivantes d'un rayon suivent la page redirigée et ne sont pas listées
+listed = {page_key(p["url"]) for p in lib.load_sources()["pages"] if p.get("url")} | {page_key(d["url"]) for d in lib.load_discovered() if d.get("url")}
+redirected = {f["url"]: f["final"] for f in F if f.get("final") and page_key(f["url"]) in listed and page_id(f["final"]) != page_id(f["url"])}
 # une page relue plusieurs fois : garder la lecture la plus complète (produits nommés avec un prix, puis liens),
 # à égalité la plus récente ; une relecture qui a moins bien lu la page ne remplace pas la bonne lecture
 def score(f):
@@ -108,7 +128,8 @@ for it in prev:
 
 raw, ok_pages, read_pages, rejected = [], collections.Counter(), set(), []
 for f in F:
-    rs = lib.routes(f["url"])
+    # la page est reconnue par l'adresse demandée, à défaut par l'adresse finale notée par le robot
+    rs = lib.routes(f["url"]) or (lib.routes(f["final"]) if f.get("final") else [])
     if not rs:
         continue
     read_pages.add(page_key(f["url"]))
@@ -206,10 +227,10 @@ for r in raw:
         url = r.get('url')
         ean = None
         if ret == 'houra':
-            # "Brand Label, 6x1,5L"
+            # « Marque Désignation, 6x1,5L » ; au poids variable, « Désignation, la pièce », « ..., le kg », « ..., la botte »
             if ', ' in label:
                 lab, _, tail = label.rpartition(', ')
-                if parse_qty(tail) or parse_rolls(tail) or re.search(r'\d', tail):
+                if parse_qty(tail) or parse_rolls(tail) or re.search(r'\d', tail) or re.match(r'(?:la|le|les)\s+(?:pi[eè]ces?|kg|kilo|botte|filet|barquette|sachet|lot|demi)\b', tail.lower()):
                     label, fmt = lab.strip(), tail.strip()
             rid = (re.search(r'/(\d+)/?$', url or '') or [None, key(name)])[1]
         elif ret.startswith('auchan'):
@@ -247,6 +268,9 @@ for r in raw:
             p = parse_pieces(fmt, unite) or parse_pieces(full, unite)
             if p:
                 rolls, pcs = p
+        if not qty and re.search(r'\b(?:le|au) (?:kg|kilo)\b', key(qtext)):
+            # vendu au poids (« Tomate grappe, le kg ») : le prix affiché est celui du kilo
+            qty = {'n': 1, 'v': 1000.0, 'u': 'g'}
         if not qty and ray in lib.RAYON_FRAIS:
             # frais vendu à la pièce sans poids écrit : poids de référence (PIECE_WEIGHT), contenance approximative
             g = lib.piece_weight(label)
@@ -254,6 +278,9 @@ for r in raw:
                 m = re.search(r'(?:lot de|x)\s*(\d+)\b|(\d+)\s*pi[eè]ces', qtext.lower())
                 n = int(m.group(1) or m.group(2)) if m else 1
                 qty, approx = {'n': n if 1 <= n <= 24 else 1, 'v': float(g), 'u': 'g'}, True
+        if qty and re.search(r'\b(?:environ|env|approx)\b', key(qtext)):
+            # poids écrit à titre indicatif (« 1,2 kg environ », « la pièce de 300 g env. ») : prix ajusté à la pesée
+            approx = True
     doubt = None
     if ret in CHECKED and ray not in NO_UNIT_CHECK and not approx:
         # le prix doit concorder avec le prix au kilo ou au litre pour l'une des contenances écrites
@@ -339,13 +366,17 @@ for rid, lst in by_rid.items():
 items = [it for it in items if not lib.hors_courses(it.get("label") or "") and not lib.hors_rayon(it["ray"], full_label(it))]
 
 pages = lib.load_sources()["pages"]
+# une page à découvrir (réglages from et find, sans url) est comptée à l'adresse que le robot lui a trouvée
+disc_url = {lib.discovered_key(d): d["url"] for d in lib.load_discovered() if d.get("url")}
 report = {"date": today.strftime("%Y-%m-%d"), "pages": [], "rayons": {}, "multi_rayon": multi_rayon,
-          "deplaces": {f"{a} -> {b}": n for (a, b), n in sorted(moved.items())}}
+          "deplaces": {f"{a} -> {b}": n for (a, b), n in sorted(moved.items())}, "redirections": redirected}
 for p in pages:
-    k = page_key(p["url"])
-    report["pages"].append({"retailer": p["retailer"], "rayon": p["rayon"], "url": p["url"], "read": k in read_pages, "products": ok_pages.get(k, 0),
+    url = p["url"] or disc_url.get(lib.discovered_key(p), "")
+    k = page_key(url)
+    report["pages"].append({"retailer": p["retailer"], "rayon": p["rayon"], "url": url, "read": bool(k) and k in read_pages, "products": ok_pages.get(k, 0),
                             "rejected": any(page_key(r[2]) == k for r in rejected) or k in bad_pages,
-                            "doubtful": sum(n for src, n in doubt_by_page.items() if page_key(src) == k)})
+                            "doubtful": sum(n for src, n in doubt_by_page.items() if page_key(src) == k),
+                            **({"final": redirected[url]} if url in redirected else {})})
 for it in items:
     r = report["rayons"].setdefault(f"{it['ret']}:{it['ray']}", {"nouveaux": 0, "repris": 0})
     r["repris" if it.get("carried") else "nouveaux"] += 1
@@ -363,6 +394,10 @@ for u in unbranded[:30]:
     print("   ", u)
 for ret, ray, url, n, n0, l, l0 in rejected:
     print(f"lecture écartée (moins complète que la précédente : {n} produits dont {l} avec lien, contre {n0} dont {l0}) : {ret} {ray} {url}")
+if redirected:
+    print("pages redirigées par le site (remplacer l'adresse dans tools/rayons.json par la page actuelle) :", len(redirected))
+    for url, final in sorted(redirected.items())[:40]:
+        print("   ", url, "->", final)
 for ret, ray, src, name, price, unit, exp in doubtful:
     print(f"prix douteux, prix précédent gardé : {ret} {ray} {name} lu {price} € mais {unit} donne {exp} €" + (" (page entière écartée)" if page_key(src) in bad_pages else ""))
 if F and fails:

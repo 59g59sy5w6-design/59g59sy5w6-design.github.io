@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
-# Relance le robot GitHub (relevé Houra, .github/workflows/prix.yml) si son dernier relevé date de plus de
-# 70 minutes : les déclenchements programmés de GitHub Actions arrivent parfois en retard, voire pas du tout.
+# Relance le robot GitHub (relevé Houra et Auchan, .github/workflows/prix.yml) si son dernier relevé date de plus de
+# 150 minutes (un passage complet de la matrice dure un peu plus de deux heures) : les déclenchements programmés de
+# GitHub Actions arrivent parfois en retard, voire pas du tout.
 # Lancé au début de chaque relevé de Claude (voir CLAUDE.md). Ne fait rien si le robot tourne normalement.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 REPO="${GITHUB_REPOSITORY:-59g59sy5w6-design/59g59sy5w6-design.github.io}"
+MAX_AGE=150
 AGE=$(python3 -c "
 import json, datetime
 t = (json.load(open('data/status.json')).get('retailers', {}).get('houra') or {}).get('checkedAt')
 now = datetime.datetime.now(datetime.timezone.utc)
 print(int((now - datetime.datetime.fromisoformat(t.replace('Z', '+00:00'))).total_seconds() // 60) if t else 99999)
 ")
-if [ "$AGE" -lt 70 ]; then
+if [ "$AGE" -lt "$MAX_AGE" ]; then
   echo "Houra vérifié il y a $AGE min : le robot tourne, rien à faire."
   exit 0
 fi
