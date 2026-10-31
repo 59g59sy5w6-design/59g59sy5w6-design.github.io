@@ -1,31 +1,29 @@
 # Cabas
 
-Cabas compare les prix de tes courses chez Monoprix, Carrefour, Houra et Auchan, puis calcule où commander pour payer le moins cher, livraison comprise.
+Tes courses au prix le plus bas, livraison comprise.
 
-## Installer sur iPhone
+Cabas est une application web gratuite, sans compte et sans publicité, qui compare les prix des courses chez Monoprix, Carrefour, Houra et Auchan (Île-de-France) et répartit le panier entre les enseignes pour payer le moins cher, minimums de commande et frais de livraison compris.
 
-1. Ouvre https://59g59sy5w6-design.github.io dans Safari.
-2. Touche Partager, puis « Sur l'écran d'accueil ».
+Elle s'ouvre à l'adresse https://59g59sy5w6-design.github.io et s'installe sur l'écran d'accueil du téléphone.
 
-L'appli s'ouvre alors en plein écran depuis son icône et fonctionne sans réseau avec les prix du dernier relevé.
+## Ce qu'elle fait
 
-## Ce que fait l'appli
+- **Ma liste** : une liste écrite ou dictée (« 2 paquets de pâtes, 6 œufs, lait ») ; chaque produit est trouvé au meilleur prix, puis la liste entière est répartie entre les enseignes, livraison comprise.
+- **Le panier** : une, deux ou trois commandes, calculées exactement avec les minimums d'achat et les paliers de frais de chaque enseigne ; les produits qu'aucune commande ne prend sont à acheter en magasin, et un réglage « Sans achat en magasin » fait tout livrer.
+- **Économiser encore** : pour chaque produit, un équivalent moins cher au kilo ou au litre, jamais imposé.
+- **Repas à petit prix** : des recettes simples au coût de la portion, et « Ma semaine » qui met les ingrédients en commun.
+- **Scanner** : en magasin, le code-barres d'un produit dit où il est le moins cher.
+- **Suivi des commandes** : quand une commande arrive, un rappel dans le calendrier, et les paniers à recommander.
+- **Partage** : la répartition en texte, une liste par lien, une image d'économies à publier.
 
-- Près de 1 800 produits dans 13 rayons, avec les prix des pages rayon de courses.monoprix.fr, carrefour.fr et houra.fr. Les relevés se lancent à la demande : Houra par un robot (GitHub Actions), Monoprix et Carrefour par Claude, car leurs sites refusent les robots.
-- Un même produit est rapproché entre enseignes par marque, désignation et contenance, ce qui rend environ 200 produits comparables.
-- Le panier est réparti en une, deux ou trois commandes pour obtenir le total le plus bas, en tenant compte des minimums d'achat et des frais de livraison de chaque enseigne.
-- Des listes permettent de remettre un panier entier en un geste.
-- Le panier, les listes et les réglages restent sur l'appareil.
+## D'où viennent les prix
 
-L'appli affiche l'heure de la dernière vérification de chaque enseigne. Le total exact s'affiche sur le site de l'enseigne au moment de commander. Cabas n'est lié à aucune enseigne et les visuels des produits sont des illustrations.
+Les prix sont relevés sur les pages de rayon publiques des sites des enseignes, et chaque prix garde la date de son relevé. Rien n'est estimé, sauf E.Leclerc, dont les prix sont simulés et signalés comme tels partout. Les relevés sont décrits dans `CLAUDE.md`, section « Mettre à jour les prix ».
 
-## Fichiers
+## Le dépôt
 
-- `index.html`, `app.css`, `app.js` : l'interface.
-- `packs.js` : les illustrations des produits.
-- `optimizer.js`, `worker.js` : le calcul de la répartition du panier.
-- `data/` : catalogue, enseignes et frais de livraison, informations sur le relevé, heure de vérification.
-- `tools/` : le robot de relevé (`scrape.js`, lancé par `.github/workflows/prix.yml`), la lecture des pages par Claude (`dump.py`, voir `CLAUDE.md`) et la reconstruction du catalogue.
-- `sw.js`, `manifest.webmanifest`, `icons/` : installation et fonctionnement hors ligne.
+Site statique servi par GitHub Pages : `index.html`, `app.css`, `app.js` (l'interface), `optimizer.js` et `worker.js` (la répartition du panier), `packs.js` (les illustrations, dessinées sans photo ni logo), `scan.js` (la lecture des codes-barres), `sw.js` (hors ligne), `data/` (le catalogue et les enseignes) et `tools/` (la chaîne de relevé des prix). Tout est décrit dans `CLAUDE.md`.
 
-À chaque mise à jour du code, changer `VERSION` dans `sw.js` (`python3 tools/bump.py`) pour que les téléphones récupèrent la nouvelle version. Les prix, eux, arrivent sans cela.
+Tester en local : `python3 -m http.server 8000` à la racine, puis `node tools/smoke.js`, `node tools/optcheck.js` et `node tools/perf.js`.
+
+Le dépôt ne contient aucune donnée personnelle. Les noms des enseignes et des marques appartiennent à leurs propriétaires ; Cabas n'est lié à aucune enseigne.
