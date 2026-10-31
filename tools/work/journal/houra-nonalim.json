@@ -1,0 +1,712 @@
+{
+ "cible": "houra-nonalim",
+ "debut": "2026-10-31T15:26:39.377Z",
+ "fin": "2026-10-31T15:35:44.053Z",
+ "only": [
+  "houra"
+ ],
+ "lot": [
+  "nonalim"
+ ],
+ "max": 0,
+ "pages": [
+  {
+   "retailer": "houra",
+   "rayon": "lait-infantile",
+   "url": "https://www.houra.fr/catalogue/bebe/laits-infantiles/lait-2eme-age-6-12-mois-B1554905-1.html",
+   "final": "https://www.houra.fr/catalogue/bebe/lait-2eme-age-6-12-mois-pour-bebe-B1557804-1.html",
+   "status": 200,
+   "products": 14,
+   "error": null,
+   "title": "Lait 2ème âge (6-12 mois) pour bébé en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "lait-infantile",
+   "url": "https://www.houra.fr/catalogue/bebe/lait-de-croissance-B1481071-1.html",
+   "final": "https://www.houra.fr/catalogue/bebe/lait-de-croissance-des-10-mois-B1557805-1.html",
+   "status": 200,
+   "products": 39,
+   "error": null,
+   "title": "Lait de croissance (dès 10 mois) pour bébé en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "lait-infantile",
+   "url": "https://www.houra.fr/catalogue/bebe/laits-infantiles-biberons-tetines-B1557800-1.html",
+   "final": "https://www.houra.fr/catalogue/bebe/laits-infantiles-biberons-tetines-B1557800-1.html",
+   "status": 200,
+   "products": 74,
+   "error": null,
+   "title": "Laits infantiles, biberons et tétines pour bébé en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "repas-bebe",
+   "url": "https://www.houra.fr/catalogue/bebe/alimentation/assiettes-et-petits-pots-8-a-12-mois-B1480626-1.html",
+   "final": "https://www.houra.fr/404",
+   "status": 404,
+   "products": 0,
+   "error": null,
+   "title": "Page introuvable – Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "repas-bebe",
+   "url": "https://www.houra.fr/catalogue/bebe/repas-du-soir-pour-bebe-B1557830-1.html",
+   "final": "https://www.houra.fr/catalogue/bebe/repas-du-soir-pour-bebe-B1557830-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Repas du Soir pour Bébé : Petits Pots Bio & Conseils Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "repas-bebe",
+   "url": "https://www.houra.fr/catalogue/bebe/repas-du-midi-pour-bebe-B1557852-1.html",
+   "final": "https://www.houra.fr/catalogue/bebe/repas-du-midi-pour-bebe-B1557852-1.html",
+   "status": 200,
+   "products": 144,
+   "error": null,
+   "title": "Repas du midi pour bébé en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "desserts-bebe",
+   "url": "https://www.houra.fr/catalogue/bebe/desserts-lactes-et-aux-fruits-pour-bebe-B1557834-1.html",
+   "final": "https://www.houra.fr/catalogue/bebe/desserts-lactes-et-aux-fruits-pour-bebe-B1557834-1.html",
+   "status": 200,
+   "products": 87,
+   "error": null,
+   "title": "Desserts lactés et aux fruits pour bébé en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "couches",
+   "url": "https://www.houra.fr/catalogue/bebe/couches-pour-bebe-B1557806-1.html",
+   "final": "https://www.houra.fr/catalogue/bebe/couches-pour-bebe-B1557806-1.html",
+   "status": 200,
+   "products": 67,
+   "error": null,
+   "title": "Couches pour bébé en ligne Livraison rapide Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "toilette-bebe",
+   "url": "https://www.houra.fr/catalogue/bebe/toilette-et-soins-pour-bebe-B1557867-1.html",
+   "final": "https://www.houra.fr/catalogue/bebe/toilette-et-soins-pour-bebe-B1557867-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Toilette et soins pour bébé en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "gel-douche",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/gel-douche-B1557304-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/gel-douche-B1557304-1.html",
+   "status": 200,
+   "products": 97,
+   "error": null,
+   "title": "Gel douche en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "gel-douche",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-corps/savons-solides-B1557308-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-corps/savons-solides-B1557308-1.html",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Savons solides pour le corps en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "gel-douche",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/gel-douche-dermatologique-et-de-soin-B1558698-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/gel-douche-dermatologique-et-de-soin-B1558698-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Gel douche dermatologique et de soin en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "deodorants",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/hygiene-et-beaute-pour-homme/deodorants-pour-homme-B1558466-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/hygiene-et-beaute-pour-homme/deodorants-pour-homme-B1558466-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Déodorants pour homme en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "deodorants",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « ^deodorants? » sur https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout et papier toilette | Mouchoir, Coton | Soin du corps | Soin du visage | Soin des cheveux | Hygiène féminine | Hygiène dentaire | Homme | Textile | Petite Pharmacie | Produit du quotidien recharge | Entretien, zéro déchet, local | soins corporels nourrissants | formules pour visage exigeant | capillaire adaptés à votre nature de cheveux | serviettes discrètes | tampons absorbants | culottes menstruelles lavables | gels de toilette intime | protections contre l'incontinence | crèmes hydratantes pour visage | gommages exfoliants | soins ciblés pour le contour des yeux | rasoirs visage | shampooings doux | après-shampooings | huiles capillaires | brosses à dents classiques | électriques | dentifrices spécialisés | bain de bouche rafraîchissant | articles de soin comme les cotons et mouchoirs | textiles du quotidien | pharmacie de première nécessité | pansements, désinfectants | tests de grossesse | solutions contre les moustiques | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "shampoing",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/soin-des-cheveux-B1557324-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/soin-des-cheveux-B1557324-1.html",
+   "status": 200,
+   "products": 163,
+   "error": null,
+   "title": "Soin des cheveux : shampooings et soins Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "dentifrice",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/dentifrice-B1557321-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/dentifrice-B1557321-1.html",
+   "status": 200,
+   "products": 88,
+   "error": null,
+   "title": "Dentifrice en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "dentifrice",
+   "url": "https://www.houra.fr/catalogue/hygiene-et-beaute/dentifrice-brosse-a-dents/dentifrices-B1450934-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/dentifrice-B1557321-1.html",
+   "status": 200,
+   "products": 88,
+   "error": null,
+   "title": "Dentifrice en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "rasage",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/produits-d-epilation-et-de-rasage-B1557303-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/produits-d-epilation-et-de-rasage-B1557303-1.html",
+   "status": 200,
+   "products": 88,
+   "error": null,
+   "title": "Produits d'épilation et de rasage en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "hygiene-feminine",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/hygiene-feminine-B1557287-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/hygiene-feminine-B1557287-1.html",
+   "status": 200,
+   "products": 191,
+   "error": null,
+   "title": "Hygiène féminine : protections et soins du quotidien – Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "soins-corps",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/laits-et-soins-pour-le-corps-B1557305-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/laits-et-soins-pour-le-corps-B1557305-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Laits et soins pour le corps en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "soins-corps",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-corps-B1557299-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-corps-B1557299-1.html",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Soin du corps : gels douche, crèmes, déodorants Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "soins-visage",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-visage-B1557334-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-visage-B1557334-1.html",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Soin du visage : routine, crèmes et nettoyants Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "papier",
+   "url": "https://www.houra.fr/catalogue/entretien/papier-toilette-B1557359-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/papier-toilette-B1557359-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Papier toilette en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "mouchoirs-cotons",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/mouchoirs-et-cotons-B1557283-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute/mouchoirs-et-cotons-B1557283-1.html",
+   "status": 200,
+   "products": 98,
+   "error": null,
+   "title": "Mouchoirs et cotons : douceur et praticité Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "premiers-soins",
+   "url": "https://www.houra.fr/catalogue/hygiene-et-beaute/parapharmacie-B1488489-1.html",
+   "final": "https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Hygiène et beauté en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "lessive",
+   "url": "https://www.houra.fr/catalogue/entretien/lessive-liquide-B1557353-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/lessive-liquide-B1557353-1.html",
+   "status": 200,
+   "products": 128,
+   "error": null,
+   "title": "Lessive liquide en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "lessive-capsules-poudre",
+   "url": "https://www.houra.fr/catalogue/entretien/lessive-pour-le-linge-B1557346-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/lessive-pour-le-linge-B1557346-1.html",
+   "status": 200,
+   "products": 118,
+   "error": null,
+   "title": "Lessive pour le linge : liquide, poudre, capsules Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "adoucissant",
+   "url": "https://www.houra.fr/catalogue/entretien/adoucissant-B1557356-1.html",
+   "final": "https://www.houra.fr/404",
+   "status": 404,
+   "products": 0,
+   "error": null,
+   "title": "Page introuvable – Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "vaisselle",
+   "url": "https://www.houra.fr/catalogue/entretien/liquide-vaisselle-a-la-main-B1557343-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/liquide-vaisselle-a-la-main-B1557343-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Liquide vaisselle à la main en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "lave-vaisselle",
+   "url": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « ^vaisselle$|lave vaisselle|^vaisselle  » sur https://www.houra.fr/catalogue/entretien-B4000008-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout, Papier toilette | Lessive | Soin du linge | Produit nettoyant | Nettoyant vaisselle | Entretien chaussure | Désodorisant, bougie | Accessoire ménager | Sac Poubelle | Insecticide | Produit du quotidien recharge | Entretien, zéro déchet, local | références fraîchement arrivées | meilleures offres du moment | lessive | formules liquides | poudres concentrées | capsules prêtes à l'emploi | adoucissants parfumés | essuie-tout et papier toilette | essuie-tout absorbants | papier toilette confortable | papier toilette humide | nettoyants pour toutes surfaces | nettoyage de la cuisine | formules pour la salle de bain | produits spécial vitres | désinfections en profondeur | solutions écologiques | bons plans exclusifs | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.houra.fr/catalogue/entretien/nettoyants-multi-usages-B1557387-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/nettoyants-multi-usages-B1557387-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Nettoyants multi-usages en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.houra.fr/catalogue/entretien/nettoyants-pour-vitres-B1557391-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/nettoyants-pour-vitres-B1557391-1.html",
+   "status": 200,
+   "products": 15,
+   "error": null,
+   "title": "Nettoyants pour vitres en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.houra.fr/catalogue/entretien/produits-nettoyants-pour-le-sol-B1557389-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/produits-nettoyants-pour-le-sol-B1557389-1.html",
+   "status": 200,
+   "products": 44,
+   "error": null,
+   "title": "Produits nettoyants pour le sol en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "nettoyants-menagers",
+   "url": "https://www.houra.fr/catalogue/entretien/produits-nettoyants-menagers-B1557380-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/produits-nettoyants-menagers-B1557380-1.html",
+   "status": 200,
+   "products": 199,
+   "error": null,
+   "title": "Produits nettoyants ménagers en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "wc-deboucheurs",
+   "url": "https://www.houra.fr/catalogue/entretien/wc-et-canalisation-B1557392-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/wc-et-canalisation-B1557392-1.html",
+   "status": 200,
+   "products": 145,
+   "error": null,
+   "title": "Produits nettoyants pour WC et canalisations en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "wc-deboucheurs",
+   "url": "https://www.houra.fr/catalogue/entretien/deboucheur-entretien-canalisation-B1557394-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/deboucheur-entretien-canalisation-B1557394-1.html",
+   "status": 200,
+   "products": 45,
+   "error": null,
+   "title": "Livraison Déboucheur, Entretien canalisation dans WC & Canalisation – Houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "essuie-tout",
+   "url": "https://www.houra.fr/catalogue/entretien/essuie-tout-B1557358-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/essuie-tout-B1557358-1.html",
+   "status": 200,
+   "products": 31,
+   "error": null,
+   "title": "Essuie-tout en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sacs-poubelle",
+   "url": "https://www.houra.fr/catalogue/entretien/sacs-poubelle-B1557361-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/sacs-poubelle-B1557361-1.html",
+   "status": 200,
+   "products": 91,
+   "error": null,
+   "title": "Sacs poubelle en ligne Livraison à domicile - Houra"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "conservation",
+   "url": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+   "final": null,
+   "status": 0,
+   "products": 0,
+   "error": "aucun lien « conservation|congelation|aluminium » sur https://www.houra.fr/catalogue/entretien-B4000008-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout, Papier toilette | Lessive | Soin du linge | Produit nettoyant | Nettoyant vaisselle | Entretien chaussure | Désodorisant, bougie | Accessoire ménager | Sac Poubelle | Insecticide | Produit du quotidien recharge | Entretien, zéro déchet, local | références fraîchement arrivées | meilleures offres du moment | lessive | formules liquides | poudres concentrées | capsules prêtes à l'emploi | adoucissants parfumés | essuie-tout et papier toilette | essuie-tout absorbants | papier toilette confortable | papier toilette humide | nettoyants pour toutes surfaces | nettoyage de la cuisine | formules pour la salle de bain | produits spécial vitres | désinfections en profondeur | solutions écologiques | bons plans exclusifs | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "desodorisants-insecticides",
+   "url": "https://www.houra.fr/catalogue/entretien/insecticide-B1557345-1.html",
+   "final": "https://www.houra.fr/catalogue/entretien/insecticide-B1557345-1.html",
+   "status": 200,
+   "products": 38,
+   "error": null,
+   "title": "Insecticide en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "croquettes-chat",
+   "url": "https://www.houra.fr/catalogue/animaux/chats/croquettes-pour-chat-B1423865-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/croquettes-pour-chat-B1557540-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Croquettes pour chat en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "croquettes-chat",
+   "url": "https://www.houra.fr/catalogue/animaux/chats-B1423845-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/produits-pour-chats-B1557533-1.html",
+   "status": 200,
+   "products": 200,
+   "error": null,
+   "title": "Produits pour chats en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "patee-chat",
+   "url": "https://www.houra.fr/catalogue/animaux/sachets-fraicheur-pour-chat-B1557550-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/sachets-fraicheur-pour-chat-B1557550-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Sachets fraîcheur pour chat en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "patee-chat",
+   "url": "https://www.houra.fr/catalogue/animaux/chats/friandises-lait-pour-chats-B1483567-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/lait-et-friandises-pour-chat-B1557544-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Lait et friandises pour chat en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "litiere",
+   "url": "https://www.houra.fr/catalogue/animaux/soin-distraction-et-litiere-pour-chat-B1557553-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/soin-distraction-et-litiere-pour-chat-B1557553-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Soin, distraction et litière pour chat en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "litiere",
+   "url": "https://www.houra.fr/catalogue/animaux/chats/soin-distraction-litiere-pour-chat-B1423869-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/soin-distraction-et-litiere-pour-chat-B1557553-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Soin, distraction et litière pour chat en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "croquettes-chien",
+   "url": "https://www.houra.fr/catalogue/animaux/chiens/croquettes-pour-chien-B1423872-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/croquettes-pour-chien-B1557582-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Croquettes pour chien en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "croquettes-chien",
+   "url": "https://www.houra.fr/catalogue/animaux/chiens/petit-chien-1-10kg-B1557589-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/chiens/petit-chien-1-10kg-B1557589-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Alimentation pour petit chien (1-10kg) en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "patee-chien",
+   "url": "https://www.houra.fr/catalogue/animaux/produits-pour-chiens-B1557571-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/produits-pour-chiens-B1557571-1.html",
+   "status": 200,
+   "products": 189,
+   "error": null,
+   "title": "Produits pour chiens en livraison à domicile - houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "autres-animaux",
+   "url": "https://www.houra.fr/catalogue/animaux/oiseaux-rongeurs-poissons-B1557612-1.html",
+   "final": "https://www.houra.fr/catalogue/animaux/oiseaux-rongeurs-poissons-B1557612-1.html",
+   "status": 200,
+   "products": 32,
+   "error": null,
+   "title": "Livraison Oiseaux, Rongeurs, Poissons dans Animaux sur houra.fr"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "asie",
+   "url": "https://www.houra.fr/catalogue/epicerie-salee/couscous-paella-cuisine-du-monde-B1557043-1.html",
+   "final": "https://www.houra.fr/catalogue/epicerie-salee/couscous-paella-cuisine-du-monde-B1557043-1.html",
+   "status": 200,
+   "products": 50,
+   "error": null,
+   "title": "Couscous, paëlla et cuisine du monde en conserve en livraison à domicile - houra.fr"
+  }
+ ],
+ "decouvertes": [
+  {
+   "retailer": "houra",
+   "rayon": "lait-infantile",
+   "host": "houra.fr",
+   "match": "B1557800",
+   "url": "https://www.houra.fr/catalogue/bebe/laits-infantiles-biberons-tetines-B1557800-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/bebe-B4000044-1.html",
+   "find": [
+    "laits? infantiles?|1er age"
+   ],
+   "text": "Laits Infantiles, Biberons",
+   "at": "2026-10-31T15:27:02.090Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "repas-bebe",
+   "host": "houra.fr",
+   "match": "B1557852",
+   "url": "https://www.houra.fr/catalogue/bebe/repas-du-midi-pour-bebe-B1557852-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/bebe-B4000044-1.html",
+   "find": [
+    "repas et petits pots|^repas|petits? pots?"
+   ],
+   "text": "Repas du Midi",
+   "at": "2026-10-31T15:27:35.035Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "desserts-bebe",
+   "host": "houra.fr",
+   "match": "B1557834",
+   "url": "https://www.houra.fr/catalogue/bebe/desserts-lactes-et-aux-fruits-pour-bebe-B1557834-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/bebe-B4000044-1.html",
+   "find": [
+    "desserts? bebe|diversification|^desserts?"
+   ],
+   "text": "Desserts pour Bébé",
+   "at": "2026-10-31T15:27:49.797Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "couches",
+   "host": "houra.fr",
+   "match": "B1557806",
+   "url": "https://www.houra.fr/catalogue/bebe/couches-pour-bebe-B1557806-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/bebe-B4000044-1.html",
+   "find": [
+    "couches? et lingettes?|^couches?"
+   ],
+   "text": "Couches",
+   "at": "2026-10-31T15:28:02.367Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "hygiene-feminine",
+   "host": "houra.fr",
+   "match": "B1557287",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/hygiene-feminine-B1557287-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html",
+   "find": [
+    "hygiene feminine"
+   ],
+   "text": "Hygiène féminine",
+   "at": "2026-10-31T15:29:48.496Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "soins-visage",
+   "host": "houra.fr",
+   "match": "B1557334",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-visage-B1557334-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html",
+   "find": [
+    "soin du visage|^visage"
+   ],
+   "text": "Soin du visage",
+   "at": "2026-10-31T15:30:26.912Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "mouchoirs-cotons",
+   "host": "houra.fr",
+   "match": "B1557283",
+   "url": "https://www.houra.fr/catalogue/hygiene-beaute/mouchoirs-et-cotons-B1557283-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html",
+   "find": [
+    "mouchoirs?|cotons?"
+   ],
+   "text": "Mouchoir, Coton",
+   "at": "2026-10-31T15:30:49.996Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "lessive-capsules-poudre",
+   "host": "houra.fr",
+   "match": "B1557346",
+   "url": "https://www.houra.fr/catalogue/entretien/lessive-pour-le-linge-B1557346-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+   "find": [
+    "^lessives?$|^lessives? "
+   ],
+   "text": "Lessive",
+   "at": "2026-10-31T15:31:26.927Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "adoucissant",
+   "host": "houra.fr",
+   "match": "B1557356",
+   "url": "https://www.houra.fr/catalogue/entretien/adoucissant-B1557356-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+   "find": [
+    "^adoucissants?"
+   ],
+   "text": "adoucissants parfumés",
+   "at": "2026-10-31T15:31:39.481Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "sacs-poubelle",
+   "host": "houra.fr",
+   "match": "B1557361",
+   "url": "https://www.houra.fr/catalogue/entretien/sacs-poubelle-B1557361-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+   "find": [
+    "sacs? poubelle|accessoires? de menage|eponges?"
+   ],
+   "text": "Sac Poubelle",
+   "at": "2026-10-31T15:33:16.068Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "desodorisants-insecticides",
+   "host": "houra.fr",
+   "match": "B1557345",
+   "url": "https://www.houra.fr/catalogue/entretien/insecticide-B1557345-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/entretien-B4000008-1.html",
+   "find": [
+    "^desodorisants?|^insecticides?"
+   ],
+   "text": "Insecticide",
+   "at": "2026-10-31T15:33:32.532Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "patee-chien",
+   "host": "houra.fr",
+   "match": "B1557571",
+   "url": "https://www.houra.fr/catalogue/animaux/produits-pour-chiens-B1557571-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/animaux-B4000023-1.html",
+   "find": [
+    "^chiens?$|patees? pour chien|friandises? pour chien"
+   ],
+   "text": "Chiens",
+   "at": "2026-10-31T15:35:07.296Z"
+  },
+  {
+   "retailer": "houra",
+   "rayon": "autres-animaux",
+   "host": "houra.fr",
+   "match": "B1557612",
+   "url": "https://www.houra.fr/catalogue/animaux/oiseaux-rongeurs-poissons-B1557612-1.html",
+   "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+   "from": "https://www.houra.fr/catalogue/animaux-B4000023-1.html",
+   "find": [
+    "^oiseaux?|^rongeurs?|^poissons?"
+   ],
+   "text": "Oiseaux, Rongeurs, Poissons",
+   "at": "2026-10-31T15:35:20.943Z"
+  }
+ ],
+ "bilan": {
+  "houra": {
+   "pages": 51,
+   "lues": 46,
+   "produits": 3802
+  }
+ }
+}
