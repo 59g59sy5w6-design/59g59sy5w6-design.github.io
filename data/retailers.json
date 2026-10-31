@@ -32,7 +32,24 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "search": "https://courses.monoprix.fr/search?q={q}",
+  "searchNote": "Adresse de recherche de courses.monoprix.fr, nommée dans son robots.txt (« Disallow: /search?q=* », lu le 31 octobre 2026) : interdite aux robots, elle s'ouvre seulement dans le navigateur de la personne. Cabas ne lit jamais la page de résultats.",
+  "firstSteps": {
+   "verifiedAt": "2026-10-31",
+   "source": "Page Monoprix Plus (courses.monoprix.fr/content/presentation-monoprix-plus), lue le 31 octobre 2026",
+   "steps": [
+    "Connecte-toi à ton compte Monoprix, ou crée-le : les créneaux de livraison s'affichent une fois connecté.",
+    "Touche « Sélectionner votre emplacement de livraison » et indique ton adresse.",
+    "Les créneaux vont de 6 h à 23 h, 7 jours sur 7, et une commande se modifie jusqu'à la veille."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Livraison en 24 h, sur un créneau de 6 h à 23 h, 7 jours sur 7",
+   "source": "Page Monoprix Plus (courses.monoprix.fr/content/presentation-monoprix-plus), lue le 31 octobre 2026 : « Livraison courses à domicile en 24h »",
+   "verifiedAt": "2026-10-31"
+  }
  },
  {
   "id": "carrefour",
@@ -71,7 +88,25 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "search": "https://www.carrefour.fr/s?q={q}",
+  "searchEan": true,
+  "searchNote": "Format de l'adresse de recherche de carrefour.fr, connu mais pas revérifié le 31 octobre 2026 : le site répond 403 aux lectures automatiques. Cabas y cherche le code EAN du produit quand il le connaît, sinon son nom.",
+  "firstSteps": {
+   "verifiedAt": null,
+   "source": "Parcours habituel de carrefour.fr, pas revérifié : le site répond 403 aux lectures automatiques (31 octobre 2026).",
+   "steps": [
+    "Connecte-toi à ton compte Carrefour, ou crée-le.",
+    "Choisis la livraison à domicile et indique ton adresse : les produits et les prix suivent le magasin qui te livre.",
+    "Le créneau se choisit au moment de payer."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent sur un créneau du lendemain",
+   "source": "Guides Mes listes de courses et Bons Plans Mania (2026) ; pas vérifié sur carrefour.fr, qui répond 403 aux lectures automatiques",
+   "verifiedAt": null
+  }
  },
  {
   "id": "houra",
@@ -110,7 +145,22 @@
     }
    ]
   },
-  "magasin": false
+  "magasin": false,
+  "searchNote": "Pas d'adresse de recherche : la FAQ et les pages lues le 31 octobre 2026 n'en donnent pas. Sans lien vers la fiche, Cabas ouvre houra.fr et donne le nom du produit à chercher.",
+  "firstSteps": {
+   "verifiedAt": "2026-10-31",
+   "source": "FAQ Houra (houra.fr/faq), lue le 31 octobre 2026",
+   "steps": [
+    "Connecte-toi avec ton identifiant, ton mot de passe et ton code postal, ou crée ton compte : sans compte, le panier est effacé à la connexion suivante.",
+    "Pour voir les créneaux, touche « Mes créneaux de livraison » et indique ton code postal. Un créneau choisi reste réservé une heure."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent le lendemain, selon les créneaux de ta commune",
+   "source": "FAQ Houra (créneaux par code postal, sans délai écrit) et avis de clients (Savoo, ebuyclub), 31 octobre 2026",
+   "verifiedAt": null
+  }
  },
  {
   "id": "auchan",
@@ -140,7 +190,23 @@
   },
   "group": "auchan",
   "livraison": "auchan-livraison-perreux",
-  "magasin": true
+  "magasin": true,
+  "search": "https://www.auchan.fr/recherche?text={q}",
+  "searchNote": "Adresse de recherche que le robot de relevé de Cabas ouvre dans chaque magasin et zone (tools/sources.json, 31 octobre 2026). Elle s'ouvre ici dans le navigateur de la personne, avec son magasin.",
+  "firstSteps": {
+   "verifiedAt": "2026-10-31",
+   "source": "Parcours que suit chaque jour le robot de relevé de Cabas sur auchan.fr (tools/scrape.js), 31 octobre 2026",
+   "steps": [
+    "Sur auchan.fr, touche « Choisir vos courses », écris la ville de ton point de retrait et choisis-le : {where}.",
+    "Connecte-toi à ton compte Auchan, ou crée-le."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent le lendemain, selon les créneaux du point de retrait",
+   "source": "Pas de délai écrit dans les pages lues ; Auchan affiche les créneaux avant de valider le panier (31 octobre 2026)",
+   "verifiedAt": null
+  }
  },
  {
   "id": "auchan-alesia",
@@ -170,7 +236,23 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "search": "https://www.auchan.fr/recherche?text={q}",
+  "searchNote": "Adresse de recherche que le robot de relevé de Cabas ouvre dans chaque magasin et zone (tools/sources.json, 31 octobre 2026). Elle s'ouvre ici dans le navigateur de la personne, avec son magasin.",
+  "firstSteps": {
+   "verifiedAt": "2026-10-31",
+   "source": "Parcours que suit chaque jour le robot de relevé de Cabas sur auchan.fr (tools/scrape.js), 31 octobre 2026",
+   "steps": [
+    "Sur auchan.fr, touche « Choisir vos courses », écris la ville de ton point de retrait et choisis-le : {where}.",
+    "Connecte-toi à ton compte Auchan, ou crée-le."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent le lendemain, selon les créneaux du point de retrait",
+   "source": "Pas de délai écrit dans les pages lues ; Auchan affiche les créneaux avant de valider le panier (31 octobre 2026)",
+   "verifiedAt": null
+  }
  },
  {
   "id": "auchan-bellesfeuilles",
@@ -200,7 +282,23 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "search": "https://www.auchan.fr/recherche?text={q}",
+  "searchNote": "Adresse de recherche que le robot de relevé de Cabas ouvre dans chaque magasin et zone (tools/sources.json, 31 octobre 2026). Elle s'ouvre ici dans le navigateur de la personne, avec son magasin.",
+  "firstSteps": {
+   "verifiedAt": "2026-10-31",
+   "source": "Parcours que suit chaque jour le robot de relevé de Cabas sur auchan.fr (tools/scrape.js), 31 octobre 2026",
+   "steps": [
+    "Sur auchan.fr, touche « Choisir vos courses », écris la ville de ton point de retrait et choisis-le : {where}.",
+    "Connecte-toi à ton compte Auchan, ou crée-le."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent le lendemain, selon les créneaux du point de retrait",
+   "source": "Pas de délai écrit dans les pages lues ; Auchan affiche les créneaux avant de valider le panier (31 octobre 2026)",
+   "verifiedAt": null
+  }
  },
  {
   "id": "auchan-livraison-perreux",
@@ -241,7 +339,23 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "search": "https://www.auchan.fr/recherche?text={q}",
+  "searchNote": "Adresse de recherche que le robot de relevé de Cabas ouvre dans chaque magasin et zone (tools/sources.json, 31 octobre 2026). Elle s'ouvre ici dans le navigateur de la personne, avec son magasin.",
+  "firstSteps": {
+   "verifiedAt": "2026-10-31",
+   "source": "Parcours que suit chaque jour le robot de relevé de Cabas sur auchan.fr (tools/scrape.js), 31 octobre 2026",
+   "steps": [
+    "Sur auchan.fr, touche « Choisir vos courses », choisis « Livraison à domicile » et indique ton adresse.",
+    "Connecte-toi à ton compte Auchan, ou crée-le."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent le lendemain, selon les créneaux de la zone",
+   "source": "Pas de délai écrit dans les pages lues ; Auchan affiche les créneaux avant de valider le panier (31 octobre 2026)",
+   "verifiedAt": null
+  }
  },
  {
   "id": "auchan-livraison-paris16",
@@ -282,7 +396,23 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "search": "https://www.auchan.fr/recherche?text={q}",
+  "searchNote": "Adresse de recherche que le robot de relevé de Cabas ouvre dans chaque magasin et zone (tools/sources.json, 31 octobre 2026). Elle s'ouvre ici dans le navigateur de la personne, avec son magasin.",
+  "firstSteps": {
+   "verifiedAt": "2026-10-31",
+   "source": "Parcours que suit chaque jour le robot de relevé de Cabas sur auchan.fr (tools/scrape.js), 31 octobre 2026",
+   "steps": [
+    "Sur auchan.fr, touche « Choisir vos courses », choisis « Livraison à domicile » et indique ton adresse.",
+    "Connecte-toi à ton compte Auchan, ou crée-le."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent le lendemain, selon les créneaux de la zone",
+   "source": "Pas de délai écrit dans les pages lues ; Auchan affiche les créneaux avant de valider le panier (31 octobre 2026)",
+   "verifiedAt": null
+  }
  },
  {
   "id": "auchan-livraison-paris14",
@@ -323,7 +453,23 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "search": "https://www.auchan.fr/recherche?text={q}",
+  "searchNote": "Adresse de recherche que le robot de relevé de Cabas ouvre dans chaque magasin et zone (tools/sources.json, 31 octobre 2026). Elle s'ouvre ici dans le navigateur de la personne, avec son magasin.",
+  "firstSteps": {
+   "verifiedAt": "2026-10-31",
+   "source": "Parcours que suit chaque jour le robot de relevé de Cabas sur auchan.fr (tools/scrape.js), 31 octobre 2026",
+   "steps": [
+    "Sur auchan.fr, touche « Choisir vos courses », choisis « Livraison à domicile » et indique ton adresse.",
+    "Connecte-toi à ton compte Auchan, ou crée-le."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent le lendemain, selon les créneaux de la zone",
+   "source": "Pas de délai écrit dans les pages lues ; Auchan affiche les créneaux avant de valider le panier (31 octobre 2026)",
+   "verifiedAt": null
+  }
  },
  {
   "id": "leclerc-livraison",
@@ -369,7 +515,22 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "searchNote": "Pas d'adresse de recherche commune : elle dépend du magasin choisi sur leclercdrive.fr.",
+  "firstSteps": {
+   "verifiedAt": null,
+   "source": "leclercdrive.fr répond 403 aux lectures automatiques (31 octobre 2026) : étapes tirées des pages de conseils déjà citées pour les frais.",
+   "steps": [
+    "Sur leclercdrive.fr, choisis ton magasin E.Leclerc : les produits et les prix sont ceux de ce magasin.",
+    "Les prix de Cabas pour E.Leclerc sont simulés : le vrai total s'affiche sur le site."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Livraison possible le lendemain sur certains créneaux, selon la zone",
+   "source": "Conditions de leclercdrive.fr déjà citées pour les frais ; pas revérifiées le 31 octobre 2026 (403)",
+   "verifiedAt": null
+  }
  },
  {
   "id": "leclerc-drive",
@@ -416,6 +577,21 @@
     }
    ]
   },
-  "magasin": true
+  "magasin": true,
+  "searchNote": "Pas d'adresse de recherche commune : elle dépend du magasin choisi sur leclercdrive.fr.",
+  "firstSteps": {
+   "verifiedAt": null,
+   "source": "leclercdrive.fr répond 403 aux lectures automatiques (31 octobre 2026) : étapes tirées des pages de conseils déjà citées pour les frais.",
+   "steps": [
+    "Sur leclercdrive.fr, choisis ton magasin E.Leclerc : les produits et les prix sont ceux de ce magasin.",
+    "Les prix de Cabas pour E.Leclerc sont simulés : le vrai total s'affiche sur le site."
+   ]
+  },
+  "lead": {
+   "days": 1,
+   "text": "Le plus souvent le lendemain, selon les créneaux du drive",
+   "source": "Conditions de leclercdrive.fr déjà citées pour les frais ; pas revérifiées le 31 octobre 2026 (403)",
+   "verifiedAt": null
+  }
  }
 ]

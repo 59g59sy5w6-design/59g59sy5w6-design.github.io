@@ -76,20 +76,22 @@
   }
 
   /* ---------- état ---------- */
-  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, maxOrders: 3, extraCost: 0 };
+  const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, maxOrders: 3, extraCost: 0, manualCk: false, badge: true };
   const ROOTS = { accueil: "#/", rayons: "#/rayons", recherche: "#/recherche", listes: "#/listes", panier: "#/panier" };
   const S = {
     ready: false, failed: false,
     rayons: [], prods: new Map(), list: [], rets: [], retMap: new Map(), meta: {},
     basket: store.get("basket", {}),
     /* premier lancement : E.Leclerc, aux prix simulés, est proposé mais pas choisi d'office (questions de départ, réglages) */
-    prefs: Object.assign({}, PREFS0, { off: store.get("prefs", null) ? {} : { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, offv: store.get("prefs", null) ? undefined : 1 }, store.get("prefs", {})),
+    prefs: Object.assign({}, PREFS0, { off: store.get("prefs", null) ? {} : { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, offv: store.get("prefs", null) ? undefined : 1 }, store.get("prefs", {})),
     lists: store.get("lists", []),
     recent: store.get("recent", []),
     seen: store.get("seen", {}),
     hist: store.get("hist", []),
     menu: store.get("menu", []),
+    /* commandes : remplissage en cours (snap, coches, créneaux, liens à revoir), produits qui manquaient à la livraison */
     guide: Object.assign({ ck: {}, done: {} }, store.get("guide", {})),
+    todo: store.get("todo", []),
     /* lignes libres : produits absents du catalogue, gardés en texte (cabas.free) */
     free: store.get("free", {}),
     tab: "accueil",
@@ -440,7 +442,8 @@
     const add = (w, n) => { if (w.length > 2 && !/\d/.test(w) && !STOP.has(w)) FUZZW.set(w, (FUZZW.get(w) || 0) + n); };
     /* les mots justes seulement : jamais une faute connue de SYN, qu'on ne veut pas proposer */
     Object.keys(SYN).forEach((k) => { if (!TYPO.has(k)) add(k, 1); SYN[k].forEach((w) => add(w, 1)); });
-    S.rayons.forEach((r) => norm(r.name).split(" ").forEach((w) => { add(w, 1); add(stem(w), 1); }));
+    /* les noms de rayons pèsent plus que les mots des produits : ce sont les mots des listes de courses (« eaix », eaux plutôt que paix) */
+    S.rayons.forEach((r) => norm(r.name).split(" ").forEach((w) => { add(w, 20); add(stem(w), 20); }));
     S.list.forEach((p) => add(idx(p)._b.split(" ")[0] || "", 1));
     S.list.slice(0, 500).forEach((p) => idx(p)._w.forEach((w) => { add(w, 1); add(stem(w), 1); }));
     return FUZZW;
@@ -464,7 +467,8 @@
   }
   function fuzzyWord(tok) {
     tok = norm(tok).split(" ")[0] || "";
-    if (tok.length < 4 || /\d/.test(tok) || !S.list.length) return null;
+    /* un mot connu n'est jamais « corrigé » */
+    if (tok.length < 4 || /\d/.test(tok) || !S.list.length || fuzzyWords().has(tok)) return null;
     const max = tok.length >= 8 ? 2 : 1;
     let best = null, bd = max + 1, bn = 0;
     for (const [w, n] of fuzzyWords()) {
@@ -710,6 +714,8 @@
   }
   /* une étape du calcul est arrivée : le panier n'est redessiné que si le nombre de commandes choisi est concerné */
   function cartUpdate(d) {
+    /* « Remplir mes paniers » avant le premier geste montre la répartition en cours : redessinée quand elle arrive */
+    if (S.route.name === "remplir") { if ((d.done || d.k === RES.K) && $("#sheet").hidden && (!fillUsable() || (S.route.id && !fillOrd(S.route.id)))) { clearTimeout(cartTimer); cartTimer = setTimeout(rerender, 40); } return; }
     if (S.route.name !== "panier") return;
     const K = RES.K, st = RES.steps[K];
     let redraw = false;
@@ -964,6 +970,10 @@
         `<p class="fresh${isStale() ? " old" : ""}">${ic("clock")}<span>${esc(freshText())}${isStale() ? ", ils ont pu changer depuis" : ""}</span></p>` +
         (first ? "" : `<a class="hcard" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>`) +
         (!first && !S.seen.welcome ? `<button class="hcard" type="button" data-act="welcome">${ic("gear", "si")}<span><b>Dis-nous où tu fais tes courses</b><small>Enseignes, déplacement ou tout livré, nombre de personnes</small></span>${ic("chev", "chev")}</button>` : "") +
+        fillHomeCard() +
+        arrivalCard() +
+        todoCard() +
+        nextCard() +
         ordersCard() +
         savingsCard() +
         installCard() +
@@ -1166,6 +1176,11 @@
   function plainItems(ids) {
     return ids.map((id) => { const p = S.prods.get(id), b = best(p), q = S.basket[id]; return itemRow(id, b ? Math.round(b.price * 100) * q : 0, q); }).join("");
   }
+  /* le bouton de chaque commande du panier : remplir son panier chez l'enseigne, ou reprendre là où on en est */
+  function fillLabel(r) {
+    const o = fillActive() && !stale(snapOf()) ? fillOrd(r.id) : null, st = o && ordState(o);
+    return st && st.k ? `Reprendre, ${st.k} sur ${plural(st.n, "produit", "produits")}` : "Remplir mon panier sur " + esc(r.service);
+  }
   function orderHtml(o) {
     const r = S.retMap.get(o.ch.id), P = o.ch.P;
     const fee = o.fee - P.fixed;
@@ -1185,7 +1200,7 @@
       (P.fixed ? `<div class="ln"><span>Frais de service</span><span>${eurC(P.fixed)}</span></div>` : "") +
       `<div class="ln tot"><span>Total ${esc(r.name)}</span><span>${eurC(o.sub + o.fee)}</span></div>` + bar +
       (r.simulated ? `<p class="hint">Prix simulés, pas relevés : le vrai total s'affiche sur ${esc(r.service)}.</p>` : "") +
-      (S.guide.done[r.id] ? `<button class="btn tint" type="button" data-act="guide" data-id="${esc(r.id)}">${ic("check")}Commande passée</button>` + when : `<button class="btn" type="button" data-act="guide" data-id="${esc(r.id)}">Passer la commande sur ${esc(r.service)}</button>`) +
+      (S.guide.done[r.id] ? `<button class="btn tint" type="button" data-act="fill" data-id="${esc(r.id)}">${ic("check")}Commande passée</button>` + when : `<button class="btn tint" type="button" data-act="fill" data-id="${esc(r.id)}">${fillLabel(r)}</button>`) +
       `</div></section>`;
   }
   function compHtml(r) {
@@ -1310,13 +1325,14 @@
         ` Pour tout recevoir chez toi, choisis la livraison à domicile dans les <a href="#/reglages">réglages</a>.`;
       const compRow = noCompRow() +
         (modeCmp ? `<p class="sn">${modeCmp}</p>` : "") + (pickNote ? `<p class="sn">${pickNote}</p>` : "");
-      /* toutes les commandes notées comme passées : l'économie rejoint l'historique */
-      const allDone = complete && bst.orders.every((o) => S.guide.done[o.ch.id]);
-      if (allDone) recordDone();
+      /* toutes les commandes du remplissage notées comme passées : le panier est déjà dans l'historique (recordFill) */
+      const fs = snapOf(), allDone = complete && !!fs && finished(fs) && !stale(fs) && fs.orders.some((o) => S.guide.done[o.rid]);
+      const going = fillActive() && !stale(fs);
+      const fillCta = !allDone && !alt ? `<div class="btns" style="margin-top:14px"><button class="btn" type="button" data-act="fillgo">${going ? "Reprendre le remplissage" : k === 1 ? "Remplir mon panier " + esc(names[0]) : "Remplir mes paniers"}</button></div>` : "";
       const doneBox = allDone ? `<div class="alt"><p><b>Toutes tes commandes sont passées.</b>${S.guide.saved ? ` Tu as économisé ${eurC(S.guide.saved)}, meilleurs prix et remplacements compris.` : ""}</p><div class="btns two"><button class="btn sm tint" type="button" data-act="savelist">Garder en liste</button><button class="btn sm" type="button" data-act="clearok">Vider le panier</button></div></div>` : "";
       const sw = swaps(), swTot = sw.reduce((a, x) => a + x.save, 0);
       const swapCard = sw.length && !allDone ? `<button class="hcard" type="button" data-act="swaps">${ic("swap", "si")}<span><b>Économiser encore, environ ${eur(swTot)}</b><small>${plural(sw.length, "produit a", "produits ont")} un équivalent moins cher, d'une autre marque</small></span>${ic("chev", "chev")}</button>` : "";
-      side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${budgetLine(money, complete)}${doneBox}${altBox}` +
+      side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${budgetLine(money, complete)}${fillCta}${doneBox}${altBox}` +
         (save ? `<p class="sv">${save}</p>` : "") + (why ? `<p class="sn">${why}</p>` : "") + (more ? `<p class="sn">${more}</p>` : "") +
         (notCheapest ? `<p class="sn">Certains produits ne sont pas pris là où ils sont le moins chers\u00a0: avec les minimums d'achat et la livraison, ce regroupement revient moins cher.</p>` : "") +
         (st.truncated ? `<p class="sn">Gros panier\u00a0: le calcul a été écourté, le vrai minimum peut être un peu plus bas.</p>` : "") +
@@ -1377,6 +1393,18 @@
     if (pickup(r)) return `Retrait ${ch.where ? "à " + ch.where : "en magasin"}, ${T[0].fee > 0 ? eur(T[0].fee) : "gratuit"}${ch.minOrder ? `, minimum ${eurR(ch.minOrder)}` : ""}`;
     return `Minimum ${eurR(ch.minOrder || 0)}, livraison ${eur(T[0].fee)}${free ? `, offerte dès ${eurR(free.from)}` : ""}${ch.fixedFee ? `, frais de service ${eur(ch.fixedFee)}` : ""}`;
   }
+  /* Réglages > Commandes : cocher à la main, rappel dans le mini panier, délais de livraison, liens à revoir */
+  function commandesHtml() {
+    const nb = Object.keys(S.guide.broken || {}).length, nf = Object.keys(S.seen.first || {}).length;
+    const sw = (act, id, label, hint, on) => `<div class="row"><span class="rt" id="${id}">${label}<small>${hint}</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="${act}" aria-labelledby="${id}"${on ? " checked" : ""}><span></span></label></div>`;
+    return `<h2 class="gh">Commandes</h2><div class="group">` +
+      sw("manualck", "manckL", "Cocher à la main", "Sinon, Cabas coche un produit quand tu reviens dans l'appli après l'avoir ouvert sur le site.", !!S.prefs.manualCk) +
+      sw("badge", "badgeL", "Rappel dans le mini panier", "Tant que tu remplis tes paniers\u00a0: «\u00a0Il te reste 3 produits à mettre chez Carrefour\u00a0».", S.prefs.badge !== false) +
+      `<button class="row" type="button" data-act="leads"><span class="rt">Délais de livraison<small>Pour te dire quand commander.</small></span>${ic("chev", "chev")}</button>` +
+      `<a class="row" href="#/recommander"><span class="rt">Recommander un panier</span>${ic("chev", "chev")}</a>` +
+      (nb ? `<button class="row" type="button" data-act="brokenclear"><span class="rt">Liens à revoir<small>${plural(nb, "lien ne menait", "liens ne menaient")} pas au bon produit\u00a0: Cabas ouvre la recherche du site à la place.</small></span><span class="val">Tout reproposer</span></button>` : "") +
+      (nf ? `<button class="row link" type="button" data-act="firstreset">Revoir les étapes «\u00a0Avant de commencer\u00a0»</button>` : "") + `</div>`;
+  }
   VIEWS.reglages = () => {
     const K = Math.max(1, Math.min(S.rets.length, S.prefs.maxOrders || 3));
     const seg = (id, label, opts, act, key, cur, hint) => `<div class="row stack"><span class="rt" id="${id}">${label}${hint ? `<small>${hint}</small>` : ""}</span><div class="seg" role="radiogroup" aria-labelledby="${id}">${opts.map((v) => `<button type="button" role="radio" data-act="${act}" data-${key}="${v}" aria-checked="${v === cur}">${v}</button>`).join("")}</div></div>`;
@@ -1398,6 +1426,7 @@
         seg("foyerL", "Personnes à la maison", [1, 2, 3, 4, 5, 6], "wfoyer", "v", S.prefs.foyer || 0, "Pour les portions des repas.") +
         `<button class="row" type="button" data-act="budget"><span class="rt">Budget par panier<small>Le panier dit ce qu'il reste ou de combien tu dépasses.</small></span><span class="val">${parseFloat(S.prefs.budget) > 0 ? eurR(parseFloat(S.prefs.budget)) : "Aucun"}</span>${ic("chev", "chev")}</button>` +
         `<div class="row stack"><span class="rt" id="extraL">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><div class="field" data-field="extra"><span class="in"><input id="extra" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="${esc(frNum(S.prefs.extraCost || 0))}" aria-labelledby="extraL"><span class="suf">€</span></span><small></small></div></div></div>` +
+        commandesHtml() +
         `<h2 class="gh">Alimentation</h2><div class="group"><button class="row" type="button" data-act="diet"><span class="rt">Mon régime<small>Filtre la recherche, les rayons, Ma liste, les repas et les remplacements, d'après ce que les enseignes indiquent.</small></span><span class="val">${esc(dietLabel())}</span>${ic("chev", "chev")}</button></div>` +
         `<h2 class="gh">Mes choix et mes marques</h2><div class="group"><button class="row" type="button" data-act="usual"><span class="rt">Mes choix habituels<small>${usualCount() ? "Ce que tu as choisi dans Ma liste revient d'office, tant que le prix suit." : "Choisis un produit dans Ma liste : Cabas s'en souvient."}</small></span>${usualCount() ? `<span class="val num">${usualCount()}</span>` : ""}${ic("chev", "chev")}</button></div>` +
         `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/comment"><span class="rt">Comment ça marche</span>${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="${installEvt ? "installnow" : "install"}"><span class="rt">${isIOS ? "Installer Cabas sur l'iPhone" : "Installer Cabas sur le téléphone"}</span>${ic("chev", "chev")}</button>`}<button class="row" type="button" data-act="shareapp"><span class="rt">Faire connaître Cabas<small>Une image et un lien à envoyer à qui fait ses courses</small></span>${ic("share", "chev")}</button><div class="row"><span class="rt">Version</span><span class="val">1.2</span></div></div>` +
@@ -1441,7 +1470,7 @@
         step(1, "Écris ta liste, ou ajoute des produits", "Une ligne par produit, avec les quantités (« 2 paquets de pâtes », « 6 œufs »). Tu peux aussi dicter, parcourir les rayons ou scanner un code-barres en magasin.") +
         step(2, "Cabas trouve chaque produit au meilleur prix", `Les mêmes produits sont comparés chez ${esc(names)}, avec leurs prix au kilo ou au litre. Un produit équivalent moins cher t'est proposé, jamais imposé.`) +
         step(3, "Ton panier est réparti entre les enseignes", "Une ou plusieurs commandes, en tenant compte des minimums d'achat et des frais de livraison de chacune : le total affiché est celui que tu paieras, frais compris. Si une seule commande revient moins cher, Cabas le dit.") +
-        step(4, "Tu commandes sur les sites des enseignes", "Cabas te donne la liste de chaque commande avec les liens. Il ne vend rien, ne prend aucune commission et n'est lié à aucune enseigne.") +
+        step(4, "Tu remplis tes paniers sur les sites des enseignes", "«\u00a0Remplir mes paniers\u00a0» ouvre chaque produit sur le site de l'enseigne\u00a0: tu l'ajoutes à ton panier là-bas, tu reviens, Cabas le coche. Il ne vend rien, ne commande rien à ta place, ne prend aucune commission et n'est lié à aucune enseigne.") +
         `</div>` +
         `<h2 class="gh">D'où viennent les prix</h2><div class="group"><div class="prose"><p>Les prix sont relevés sur les sites des enseignes, page de rayon par page de rayon, et chaque prix garde la date de son relevé${m.updatedAt ? " (dernier relevé le " + esc(dateFr(m.updatedAt)) + ")" : ""}. Rien n'est estimé${S.allRets.some((r) => r.simulated) ? ", sauf E.Leclerc, dont les prix sont simulés et signalés comme tels partout" : ""}. Les offres en cours sont signalées mais pas déduites.</p><p>Les prix Auchan dépendent du magasin : Cabas relève plusieurs points de retrait et zones de livraison, et tu choisis le tien.</p></div></div>` +
         `<h2 class="gh">Où ça marche</h2><div class="group"><div class="prose"><p>Pour l'instant en Île-de-France, là où ${esc(names)} livrent ou proposent un retrait. ${esc(coverText())}. D'autres rayons suivent.</p></div></div>` +
@@ -1503,6 +1532,8 @@
       case "economies": return { name: "economies" };
       case "repas": return id ? { name: "recette", id } : { name: "repas" };
       case "scan": return { name: "scan" };
+      case "remplir": return { name: "remplir", id };
+      case "recommander": return { name: "recommander" };
       default: return { name: "home" };
     }
   }
@@ -1533,6 +1564,8 @@
       case "repas": return "Repas";
       case "scan": return "Scanner";
       case "recette": return ((S.recs || []).find((x) => x.id === r.id) || {}).name || "Recette";
+      case "remplir": return r.id ? retName(r.id) : "Remplir";
+      case "recommander": return "Recommander";
     }
     return "Retour";
   }
@@ -1588,6 +1621,10 @@
     const V = (VIEWS[r.name] || VIEWS.home)(r) || notFound();
     lastV = V;
     document.body.classList.toggle("grouped", !!V.grouped);
+    /* mode guidé de « Remplir mes paniers » : plein écran, sans barre d'onglets */
+    document.body.classList.toggle("solo", !!V.solo);
+    /* sur grand écran, le dock n'existe que pour les vues qui y mettent leur action principale */
+    document.body.classList.toggle("dockd", !!V.dockAll);
     const st = S.stacks[S.tab], pushed = st.length > 1;
     let bl = pushed ? titleOf(st[st.length - 2]) : "";
     if (bl.length > 14) bl = "Retour";
@@ -1612,9 +1649,19 @@
     onScroll();
   }
   function rerender() { S.scroll[S.cur] = window.scrollY; S.dir = "none"; render(); }
+  /* redessin après un geste : le focus revient au même bouton, sinon à l'élément de repli (le titre du produit suivant) */
+  function rerenderKeep(t, alt) {
+    const key = t && t.dataset && t.dataset.act ? sameAs(t) : "", had = !!t && document.activeElement === t;
+    rerender();
+    const n = (key && $(key, $("#view"))) || (alt && $(alt, $("#view")));
+    if (n && (had || !t)) { if (!n.hasAttribute("tabindex") && !/^(BUTTON|A|INPUT)$/.test(n.tagName)) n.setAttribute("tabindex", "-1"); try { n.focus({ preventScroll: true }); } catch (e) { /* focus refusé */ } }
+  }
+  const focusView = () => { try { $("#view").focus({ preventScroll: true }); } catch (e) { /* focus refusé */ } };
   function miniHtml() {
     const n = count(), nf = Object.keys(S.free || {}).length;
     if (!n) return "";
+    const fm = fillMini();
+    if (fm) return fm;
     /* les lignes libres ne comptent pas dans la pastille : elles n'ont pas de prix relevé */
     return `<a class="mini" href="#/panier" data-tab="panier"><span class="mn">${n}</span><span class="ml">Voir le panier${nf ? `<small>+ ${plural(nf, "ligne libre", "lignes libres")}</small>` : ""}</span><span class="mp">${eur(subtotal())}</span></a>`;
   }
@@ -1627,12 +1674,12 @@
     $("#tabbar").innerHTML = tabs.map(([t, l, i]) => `<a class="tab" href="${ROOTS[t]}" data-tab="${t}"${S.tab === t ? ' aria-current="page"' : ""}${lab(t)}>${ic(i, "off")}${ic(i + "-f", "on")}<span>${l}</span>${bdg(t)}</a>`).join("");
     $("#side").innerHTML = `<a class="wordmark" href="#/" data-tab="accueil" aria-label="Cabas, accueil"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</a>` +
       tabs.map(([t, l, i]) => `<a class="sitem" href="${ROOTS[t]}" data-tab="${t}"${S.tab === t ? ' aria-current="page"' : ""}${lab(t)}>${ic(i, "off")}${ic(i + "-f", "on")}<span>${l}</span>${bdg(t)}</a>`).join("") +
-      `<a class="sitem" href="#/reglages"${S.route.name === "reglages" ? ' aria-current="page"' : ""}>${ic("gear")}<span>Réglages</span></a><div class="smini">${S.route.name === "panier" ? "" : miniHtml()}</div>`;
+      `<a class="sitem" href="#/reglages"${S.route.name === "reglages" ? ' aria-current="page"' : ""}>${ic("gear")}<span>Réglages</span></a><div class="smini">${S.route.name === "panier" || S.route.name === "remplir" ? "" : miniHtml()}</div>`;
     const dock = $("#dock"), view = $("#view");
     let dh = "";
     if (V.dock === "bar" && V.dockId) dh = `<div class="wrap">${buyCtl(V.dockId, "bar")}</div>`;
     else if (V.dockHtml) dh = `<div class="wrap">${V.dockHtml}</div>`;
-    else if (n && S.route.name !== "panier") dh = `<div class="wrap">${miniHtml()}</div>`;
+    else if (n && S.route.name !== "panier" && S.route.name !== "remplir") dh = `<div class="wrap">${miniHtml()}</div>`;
     const was = !dock.hidden;
     dock.innerHTML = dh;
     dock.hidden = !dh;
@@ -1874,7 +1921,7 @@
   /* La liste entière, livraison comprise : pour chaque ensemble d'une à trois enseignes, chaque ligne prend le produit
      du vivier le moins cher dans ces enseignes ; une enseigne dont la commande n'atteint pas son minimum disqualifie
      l'ensemble ; frais de livraison et de service comptés. Renvoie le meilleur plan : lignes couvertes, puis total. */
-  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored });
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun });
   /* jeu d'essai (tests) : un petit catalogue v2 ajouté au catalogue chargé, rayons et produits compris */
   function mergeCatalog(extra) {
     const c = unpack(extra), seen = new Set(S.list.map((p) => p.id));
@@ -2014,7 +2061,7 @@
         html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">Écris ou dicte tes courses, Cabas trouve chaque produit au meilleur prix.</p>` +
           `<div class="pad"><textarea id="wlIn" class="wl" rows="7" placeholder="lait&#10;2 paquets de pâtes&#10;coca zéro x3&#10;papier toilette" aria-label="Ta liste de courses" autocapitalize="off" spellcheck="true">${esc(W.text)}</textarea></div>` +
           `<p class="gf">Une ligne par produit, ou sépare-les par des virgules. Une quantité au début (2 paquets de pâtes) ou à la fin (coca zéro x3), un poids ou un volume (1 kg de café) sont compris.</p>` +
-          `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wlgo">Trouver les produits</button>${speechOK() ? `<button class="btn tint" type="button" data-act="wlmic" id="wlMic" aria-pressed="false">${ic("mic")}Dicter ma liste</button>` : ""}</div>` +
+          `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wlgo">Trouver les produits</button>${speechOK() ? `<button class="btn tint" type="button" data-act="wlmic" id="wlMic" aria-pressed="false">${ic("mic")}Dicter ma liste</button>` : ""}${pasteOK() ? `<button class="btn tint" type="button" data-act="wlpaste">${ic("paste")}Coller ma liste</button>` : ""}</div>` +
           (speechOK() ? `<p class="gf" id="wlMicNote">Dis tes produits en marquant une pause entre chacun\u00a0: la dictée passe par le service de reconnaissance vocale de ton téléphone.</p>` : "") +
           `<p class="gf" style="padding-top:14px">${esc(coverText())}. <a href="#/rayons">Voir les rayons</a></p>`,
       };
@@ -2063,6 +2110,8 @@
   /* ---------- dictée (Web Speech API, quand le navigateur la propose) ---------- */
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const speechOK = () => !!SR;
+  /* « Coller ma liste » : le presse-papiers lu sur demande (une liste copiée d'une note, d'un message) */
+  const pasteOK = () => !!(navigator.clipboard && navigator.clipboard.readText);
   let rec = null;
   function micStop() {
     if (rec) { try { rec.stop(); } catch (e) { /* déjà arrêtée */ } rec = null; }
@@ -2090,6 +2139,13 @@
     try { r.start(); } catch (e) { toast("La dictée n'est pas disponible ici."); return; }
     rec = r;
     const b = $("#wlMic"); if (b) { b.setAttribute("aria-pressed", "true"); b.innerHTML = `${ic("mic")}J'ai fini`; }
+  }
+  /* une liste reçue (collée, partagée depuis une autre appli) : lue tout de suite, comme « Trouver les produits » */
+  function listFrom(text) {
+    S.wl = { text, lines: readList(text) }; store.set("draft", text);
+    if (!S.wl.lines.length) { S.wl.lines = null; if (S.route.name === "ecrire") rerender(); toast("Rien à lire dans cette liste"); return; }
+    if (S.route.name === "ecrire") { window.scrollTo(0, 0); rerender(); } else push("#/ecrire");
+    toast(plural(S.wl.lines.length, "ligne lue", "lignes lues"), null, "check");
   }
   function wlAltSheet(i) {
     const x = S.wl.lines[i];
@@ -2317,63 +2373,515 @@
     openSheet({ title: "Économiser encore", body: o.body, foot: o.foot, build });
   }
 
-  /* ---------- commande guidée ---------- */
-  /* Pour chaque commande de la répartition : le site à ouvrir, chaque produit à ajouter (lien direct, nom affiché par
-     l'enseigne), une case à cocher et la progression ; « J'ai passé cette commande » la note. Quand toutes les commandes
-     sont passées, l'économie du panier rejoint l'historique (S.hist), affiché sur l'accueil. */
-  function guideOrder(rid) {
-    const st = RES.steps[RES.K], bst = st && (st.full || st.partial);
-    return bst ? bst.orders.find((o) => o.ch.id === rid) || null : null;
-  }
+  /* ---------- remplir mes paniers ---------- */
+  /* Le panier réparti, Cabas aide à remplir le panier de chaque enseigne, produit par produit : un gros bouton ouvre la
+     fiche du produit sur le site de l'enseigne (sinon sa recherche, sinon le site), la personne l'ajoute elle-même et
+     revient ; au retour dans l'appli, 1,5 s passées dehors au moins, le produit est coché, avec « Annuler ». Rien n'est
+     automatisé chez les enseignes : Cabas ouvre seulement des liens. La répartition est figée au moment où l'on commence
+     (S.guide.snap) : les prix peuvent changer ensuite, la liste à remplir reste celle-là. */
   function saveGuide() { store.set("guide", S.guide); }
-  function guideSheet(rid) {
-    const r = S.retMap.get(rid);
-    if (!r) return;
-    let asked = false;
-    const build = () => {
-      const o = guideOrder(rid), G = S.guide;
-      if (!o) return { body: `<p>Cette commande n'est plus dans ta répartition.</p>`, foot: "" };
-      const n = o.items.length, k = o.items.filter((x) => G.ck[rid + "|" + x.l.id]).length, done = !!G.done[rid];
-      const where = r.channel && r.channel.where ? (pickup(r) ? ", choisis le retrait à " + r.channel.where : ", choisis la livraison à domicile (" + r.channel.where + ")") : "";
-      /* liens et noms chez l'enseigne : des détails par univers ; en attendant, le site de l'enseigne et le nom Cabas */
-      const ps = o.items.map((x) => S.prods.get(x.l.id));
-      if (!asked && ps.some((p) => !detailsNow(p))) { asked = true; detailsAll(ps, () => { if (sheetCtx && sheetCtx.rid === rid) refreshSheet(); }); }
-      const row = (x) => {
-        const p = S.prods.get(x.l.id), of = p.offers[rid] || {}, det = detailsNow(p), d = det && det[rid], on = !!G.ck[rid + "|" + p.id];
-        return `<div class="gi${on ? " on" : ""}"><button class="box hit" type="button" data-act="guideck" data-id="${esc(rid)}" data-p="${esc(p.id)}" role="checkbox" aria-checked="${on}" aria-label="Ajouté au panier ${esc(r.service)}, ${esc(p.brand + " " + p.name)}">${ic("check")}</button>` +
-          `<a class="gt" href="${esc(offerUrl(det, rid))}" target="_blank" rel="noopener"><b>${x.l.q > 1 ? `<span class="gq">${x.l.q} ×</span> ` : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}, ${eurC(x.cost)}${of.cat ? ", sur la page du rayon" : ""}</small>${d && d.name ? `<small>Sur le site\u00a0: ${esc(d.name)}</small>` : det ? "" : `<small class="skl s" aria-hidden="true"></small>`}</a>${ic("ext", "ext")}</div>`;
-      };
+  const saveTodo = () => store.set("todo", S.todo);
+  const basketKey = () => JSON.stringify(Object.keys(S.basket).filter((id) => S.basket[id] > 0).sort().map((id) => [id, S.basket[id]]));
+  const pname = (p) => (p ? p.brand + " " + p.name : "");
+  /* instantané de la répartition affichée : commandes (avec leurs règles de frais), achats en magasin, produits hors commande */
+  function fillSnap() {
+    const res = cartResult(), st = res.steps[res.K], bst = st && (st.full || st.partial);
+    if (!bst || !bst.orders.length) return null;
+    const it = (l, cost) => { const p = S.prods.get(l.id); return { id: l.id, q: l.q, cost, nm: pname(p), f: (p && p.format) || "" }; };
+    return {
+      id: Date.now().toString(36), at: new Date().toISOString(), key: basketKey(), full: !!st.full,
+      orders: bst.orders.map((o) => ({ rid: o.ch.id, P: o.ch.P, items: o.items.map((x) => it(x.l, x.cost)) })),
+      comp: (bst.completed || []).map((x) => Object.assign(it(x.l, x.cost), { ret: x.ret })),
+      skipped: (bst.skipped || []).map((x) => it(x.l, 0)),
+    };
+  }
+  const snapOf = () => (S.guide && S.guide.snap) || null;
+  const ckOf = (rid, id) => !!S.guide.ck[rid + "|" + id];
+  /* une commande de l'instantané : produits à mettre sur le site (ni laissés de côté, ni pour le magasin), cochés,
+     sous-total et frais ; pv (aperçu avant de commencer) ne lit aucune coche */
+  function ordState(o, pv) {
+    const L = o.items.filter((x) => !x.st), k = pv ? 0 : L.filter((x) => ckOf(o.rid, x.id)).length;
+    const sub = L.reduce((a, x) => a + x.cost, 0), fee = sub > 0 ? feeAt(o.P, sub) : 0;
+    return { L, n: L.length, k, sub, fee, tot: sub + fee, done: !pv && !!S.guide.done[o.rid], drop: !pv && !!(S.guide.drop || {})[o.rid] };
+  }
+  const closed = (o) => !!(S.guide.done[o.rid] || (S.guide.drop || {})[o.rid]);
+  const finished = (s) => !!s && s.orders.every(closed);
+  const stale = (s) => !!s && s.key !== basketKey();
+  /* remplissage en cours : un instantané pas fini, de moins de 14 jours */
+  const fillActive = () => { const s = snapOf(); return !!s && !finished(s) && Date.now() - Date.parse(s.at) < 14 * 864e5; };
+  /* l'instantané sert encore : remplissage en cours, ou fini pour le panier tel qu'il est */
+  const fillUsable = () => { const s = snapOf(); return !!s && (finished(s) ? !stale(s) : fillActive()); };
+  const fillNext = () => { const s = snapOf(); return s ? s.orders.find((o) => !closed(o)) || null : null; };
+  const fillOrd = (rid) => { const s = snapOf(); return s ? s.orders.find((o) => o.rid === rid) || null : null; };
+  /* achats en magasin de l'instantané : ceux de la répartition et ceux que « Pas trouvé » y a envoyés */
+  const magOf = (s) => s.comp.concat(...s.orders.map((o) => o.items.filter((x) => x.st === "mag" && x.mag).map((x) => Object.assign({}, x, { ret: x.mag.ret, cost: x.mag.cost }))));
+  const snapTotal = (s, pv) => s.orders.reduce((a, o) => a + ordState(o, pv).tot, 0) + magOf(s).reduce((a, x) => a + x.cost, 0);
+  /* un nouveau remplissage repart de zéro ; les liens à revoir, les rappels repoussés et les créneaux des autres enseignes restent */
+  const freshGuide = (snap) => { const g = S.guide || {}, when = Object.assign({}, g.when); snap.orders.forEach((o) => { delete when[o.rid]; }); return { ck: {}, done: {}, drop: {}, cur: {}, opened: {}, when, broken: g.broken || {}, snooze: g.snooze || {}, snap }; };
+  function ensureSnap() {
+    const s = snapOf();
+    if (s && !finished(s) && fillActive()) return s;
+    const ns = fillSnap();
+    if (!ns) return null;
+    S.guide = freshGuide(ns); saveGuide();
+    return ns;
+  }
+  /* le lien d'un produit chez l'enseigne : sa fiche (data/details), sinon la recherche du site (l'EAN chez Carrefour), sinon le site */
+  function fillLink(rid, x) {
+    const r = S.allMap.get(rid) || {}, p = S.prods.get(x.id), det = p && detailsNow(p), d = det && det[rid], home = r.home || "#";
+    if (d && d.url && d.url !== home && !(S.guide.broken || {})[rid + "|" + x.id]) return { url: d.url, kind: "fiche" };
+    return fillSearch(r, p, x);
+  }
+  function fillSearch(r, p, x) {
+    if (r.search) {
+      const q = r.searchEan && p && p.ean ? p.ean : (p ? pname(p) : x.nm).replace(/\s+/g, " ").trim().slice(0, 90);
+      return { url: r.search.replace("{q}", encodeURIComponent(q)), kind: "recherche" };
+    }
+    return { url: r.home || "#", kind: "site" };
+  }
+  const openLabel = (r, L) => (L.kind === "fiche" ? "Ouvrir sur " : L.kind === "recherche" ? "Chercher sur " : "Ouvrir ") + r.service;
+  /* nom du produit tel que l'enseigne l'affiche, sinon le nom Cabas gardé dans l'instantané */
+  const siteName = (rid, x) => { const p = S.prods.get(x.id), det = p && detailsNow(p), d = det && det[rid]; return (d && d.name) || ""; };
+  const curIdx = (o, st) => { let i = (S.guide.cur || {})[o.rid]; if (!(i >= 0 && i < st.n)) { i = st.L.findIndex((x) => !ckOf(o.rid, x.id)); if (i < 0) i = 0; } return i; };
+  function fillAdvance(o) {
+    const st = ordState(o), i0 = curIdx(o, st);
+    for (let k = 1; k <= st.n; k++) { const j = (i0 + k) % st.n; if (!ckOf(o.rid, st.L[j].id)) { S.guide.cur = Object.assign({}, S.guide.cur, { [o.rid]: j }); return; } }
+  }
+  /* ce que devient une commande quand son sous-total change : son total, ses frais, son minimum d'achat */
+  const feeWord = (r, fee) => (fee > 0 ? eurC(fee) : pickup(r) ? "gratuit" : "offerte");
+  function feeEffect(o, sub2) {
+    const r = S.allMap.get(o.rid) || { name: o.rid }, st = ordState(o), fee2 = sub2 > 0 ? feeAt(o.P, sub2) : 0;
+    if (sub2 <= 0) return `Ta commande ${r.name} n'aurait plus aucun produit.`;
+    let t = `Ta commande ${r.name} passe à ${eurC(sub2 + fee2)}`;
+    if (fee2 !== st.fee) t += `, ${pickup(r) ? "retrait" : "livraison"} ${feeWord(r, fee2 - o.P.fixed)} au lieu de ${feeWord(r, st.fee - o.P.fixed)}`;
+    if (o.P.min && sub2 < o.P.min) t += `\u00a0; sous le minimum de ${eurC(o.P.min).replace(",00", "")}, il manquera ${eurC(o.P.min - sub2)}`;
+    return t + ".";
+  }
+  /* un équivalent vendu par la même enseigne : même rayon, mêmes caractéristiques, même nombre d'unités, contenance à 25 % près */
+  function equivOf(p, rid) {
+    if (!p) return [];
+    const s = sig(p), n = packsOf(p), diet = dietOn(), simOk = !!(S.allMap.get(rid) || {}).simulated, out = [];
+    for (const e of inRayon(p.r)) {
+      const o = e.offers[rid];
+      if (e === p || e.r !== p.r || !o || !(o.price > 0) || (o.sim && !simOk) || sig(e) !== s || packsOf(e) !== n || (diet && !dietOk(e))) continue;
+      if (p.qty && p.qty.v && (!e.qty || e.qty.u !== p.qty.u || Math.abs(e.qty.v - p.qty.v) / p.qty.v > 0.25)) continue;
+      out.push({ e, price: o.price, u: perUnit(e, o.price) });
+    }
+    return out.sort((a, b) => (a.u != null && b.u != null ? a.u - b.u : a.price - b.price)).slice(0, 4);
+  }
+  /* en magasin : l'enseigne qui a des magasins et le prix relevé le plus bas, jamais un prix simulé */
+  function magFor(p, q) {
+    let b = null;
+    for (const r of S.rets) { const o = p && p.offers[r.id]; if (!r.magasin || r.simulated || !retOn(r.id) || !o || !(o.price > 0) || o.sim) continue; const cost = Math.round(o.price * 100) * q; if (!b || cost < b.cost) b = { ret: r.id, cost }; }
+    return b;
+  }
+  /* délai usuel d'une enseigne (data/retailers.json, ou celui que la personne a choisi dans les réglages) */
+  const leadDays = (rid) => { const v = (S.prefs.lead || {})[rid]; if (v >= 0 && v <= 7) return v; const r = S.allMap.get(rid) || {}; return r.lead && r.lead.days >= 0 ? r.lead.days : 1; };
+  /* « Commande avant mercredi soir chez Houra pour être livré jeudi », ou le délai usuel quand aucune date n'est visée */
+  function leadText(rid, by) {
+    const r = S.allMap.get(rid) || { name: rid }, days = leadDays(rid);
+    if (!by) return (r.lead && r.lead.text) || (days ? `Livré en ${plural(days, "jour", "jours")} en général` : "Livré le jour même en général");
+    const cut = isoDay(new Date(Date.parse(by + "T12:00:00") - days * 864e5)), today = isoDay(new Date()), what = pickup(r) ? "prêt" : "livré";
+    if (cut < today) return `Pour être ${what} ${dayLabel(by)}, il est sans doute trop tard chez ${r.name}\u00a0: compte ${plural(days, "jour", "jours")} de délai.`;
+    if (!days) return `Commande ${dayLabel(by)}, assez tôt, chez ${r.name} pour être ${what} le jour même.`;
+    const lab = dayLabel(cut);
+    return `Commande avant ${cut === today ? "ce soir" : lab === "demain" ? "demain soir" : lab + " au soir"} chez ${r.name} pour être ${what} ${dayLabel(by)}.`;
+  }
+  /* la liste d'une commande, ou de toutes, au format lisible (nom affiché par l'enseigne quand il est connu) */
+  function fillText(rid) {
+    const s = (fillActive() && snapOf()) || fillSnap();
+    if (!s) return "";
+    const L = [], pv = !fillActive();
+    if (!rid) L.push(`Mes courses du ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}, avec Cabas`, "");
+    const line = (x, nm) => `- ${x.q > 1 ? x.q + " x " : ""}${nm}${x.f && !norm(nm).includes(norm(x.f)) ? ", " + x.f : ""}`;
+    for (const o of s.orders.filter((y) => !rid || y.rid === rid)) {
+      const r = S.allMap.get(o.rid) || { name: o.rid, service: o.rid }, st = ordState(o, pv), ch = r.channel || {};
+      L.push(`${r.name} (${r.service}${ch.where ? ", " + (pickup(r) ? "retrait à " : "livraison ") + ch.where : ""}) : ${plural(st.n, "produit", "produits")}, ${eurC(st.tot)}${r.simulated ? ", prix simulés" : ""}`);
+      st.L.forEach((x) => L.push(line(x, siteName(o.rid, x) || x.nm)));
+      L.push("");
+    }
+    if (!rid) {
+      const m = magOf(s);
+      if (m.length) { L.push("En magasin, aux prix relevés en ligne :"); m.forEach((x) => L.push(line(x, x.nm) + ", chez " + retName(x.ret))); L.push(""); }
+      const fr = freeList();
+      if (fr.length) { L.push("À chercher :"); fr.forEach((f) => L.push(`- ${f.q > 1 ? f.q + " x " : ""}${f.t}${f.price > 0 ? ", " + eur(f.price) + " prix saisi par toi" : ""}`)); L.push(""); }
+      L.push(`Total : ${eurC(snapTotal(s, pv))}, frais compris, aux prix relevés`);
+    }
+    return L.join("\n").trim();
+  }
+  function copyText(tx, ok) {
+    (navigator.clipboard && tx ? navigator.clipboard.writeText(tx) : Promise.reject()).then(() => toast(ok || "Liste copiée", null, "check"), () => toast("Copie impossible sur cet appareil"));
+  }
+  /* commandes notées comme passées : le panier rejoint l'historique quand chaque commande est passée ou abandonnée */
+  const whenOf = (rids) => rids.map((rid) => { const r = S.allMap.get(rid), w = (S.guide.when || {})[rid]; return r && w && w.d ? { rid, name: r.name, pick: pickup(r), d: w.d, s: w.s || "", where: (r.channel || {}).where || "" } : null; }).filter(Boolean);
+  function recordFill() {
+    const s = snapOf();
+    if (!s || !finished(s) || S.guide.rec === s.id) return;
+    S.guide.rec = s.id;
+    const os = s.orders.filter((o) => S.guide.done[o.rid]);
+    if (!os.length) { saveGuide(); return; }
+    const items = {}, lines = [], add = (y, sim) => { items[y.id] = Math.min(99, (items[y.id] || 0) + y.q); if (!sim) lines.push(y); };
+    const o = os.map((x) => { const st = ordState(x), r = S.allMap.get(x.rid) || {}, its = {}; st.L.forEach((y) => { its[y.id] = y.q; add(y, r.simulated); }); return { rid: x.rid, name: r.name || x.rid, pick: pickup(r), t: st.tot, items: its }; });
+    const mag = magOf(s);
+    mag.forEach((y) => add(y, false));
+    const t = o.reduce((a, x) => a + x.t, 0) + mag.reduce((a, y) => a + y.cost, 0);
+    /* économie : chaque produit payé au prix de la répartition plutôt qu'à son prix moyen relevé, plus les remplacements */
+    let saved = 0;
+    for (const y of lines) { const p = S.prods.get(y.id), vs = p ? offers(p, true).filter((v) => !v.sim) : []; if (vs.length >= 2) saved += Math.round((vs.reduce((a, v) => a + v.price, 0) / vs.length) * 100) * y.q - y.cost; }
+    const sp = S.swapPrev;
+    if (sp && sp.key === JSON.stringify(S.basket)) saved += Math.max(0, sp.total - snapTotal(s));
+    saved = Math.max(0, Math.round(saved));
+    S.hist.push({ d: isoDay(new Date()), t, s: saved, n: Object.values(items).reduce((a, q) => a + q, 0), o, items, when: whenOf(o.map((x) => x.rid)), sid: s.id });
+    store.set("hist", S.hist); S.guide.saved = saved; saveGuide();
+  }
+  /* « Commande pas encore passée » après coup : le panier sort de l'historique */
+  function unrecord() {
+    const s = snapOf();
+    if (!s || S.guide.rec !== s.id) return;
+    S.hist = S.hist.filter((h) => h.sid !== s.id); store.set("hist", S.hist);
+    S.guide.rec = ""; S.guide.saved = 0;
+  }
+  /* au retour dans l'appli, au moins 1,5 s après avoir ouvert un produit : il est coché (sauf « Cocher à la main ») */
+  let awayAt = 0;
+  function fillBack(away) {
+    const op = S.guide.open;
+    if (!op) return;
+    S.guide.open = null; saveGuide();
+    const o = fillOrd(op.rid), here = S.route.name === "remplir" && $("#sheet").hidden;
+    if (away < 1500 || S.prefs.manualCk || !o || ckOf(op.rid, op.id) || !o.items.some((x) => x.id === op.id && !x.st)) { if (here && S.route.id === op.rid) rerender(); return; }
+    const cur0 = (S.guide.cur || {})[op.rid], x = o.items.find((y) => y.id === op.id);
+    S.guide.ck[op.rid + "|" + op.id] = 1;
+    fillAdvance(o);
+    saveGuide(); renderChrome();
+    if (here) { if (ordState(o).k === ordState(o).n) window.scrollTo(0, 0); rerender(); }
+    undoable(`${x.nm || "Produit"} coché`, () => { delete S.guide.ck[op.rid + "|" + op.id]; S.guide.cur = Object.assign({}, S.guide.cur, { [op.rid]: cur0 }); saveGuide(); }, 6000);
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") { awayAt = Date.now(); return; }
+    const a = awayAt ? Date.now() - awayAt : 0;
+    awayAt = 0;
+    if (S.ready) fillBack(a);
+  });
+  /* « Tout ouvrir » : sur ordinateur seulement, un onglet par produit (un téléphone n'ouvre qu'une page par geste) */
+  const desktop = () => !isIOS && !!window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  /* univers dont les détails n'ont pas pu être chargés (hors ligne) : le guide passe à la recherche du site */
+  const DETF = new Set();
+  window.addEventListener("online", () => DETF.clear());
+
+  const fillBase = { title: "Remplir mes paniers", grouped: true };
+  const fillWait = (title) => ({ title, grouped: true, html: `<h1 class="lt">${esc(title)}</h1><div class="sum loading" aria-busy="true"><p class="sl" role="status">Calcul de la meilleure répartition…</p><div class="skl"></div><div class="skl s"></div></div>` });
+  function fillOrdCard(o, s) {
+    const r = S.allMap.get(o.rid) || { name: o.rid, service: o.rid }, st = ordState(o, s.preview), ch = r.channel || {};
+    const W = (S.guide.when || {})[o.rid];
+    if (st.done) st.k = st.n;
+    const full = st.n && st.k === st.n;
+    const status = st.done ? `${ic("check")}Commande passée${W && W.d ? ", " + (pickup(r) ? "retrait " : "livraison ") + esc(whenText(W)) : ""}` : st.drop ? "Pas passée" : full ? `${ic("check")}Panier rempli, reste à payer sur ${esc(r.service)}` : `${st.k} sur ${plural(st.n, "produit ajouté", "produits ajoutés")}`;
+    const label = st.done || st.drop ? "Voir le récapitulatif" : s.preview || !st.k ? "Commencer" : full ? "Terminer" : "Reprendre";
+    const moved = o.items.filter((x) => x.st === "skip").length;
+    return `<section class="order fillc" aria-labelledby="fc-${esc(o.rid)}"><div class="oh"><span class="mono" aria-hidden="true">${esc(r.name.slice(0, 1))}</span><div class="rt"><h2 class="t3" id="fc-${esc(o.rid)}">${esc(r.name)}</h2><small>${esc(r.service)}${ch.where ? ", " + esc((pickup(r) ? "retrait à " : "livraison ") + ch.where) : ""}</small></div>${px(st.tot / 100)}</div>` +
+      `<div class="of"><div class="ln"><span>${plural(st.n, "produit", "produits")}</span><span>${pickup(r) ? "Retrait" : "Livraison"} ${feeWord(r, st.fee - o.P.fixed)}${o.P.fixed ? ", service " + eurC(o.P.fixed) : ""}</span></div>` +
+      `<div class="prog thin" role="progressbar" aria-label="Produits ajoutés chez ${esc(r.name)}" aria-valuemin="0" aria-valuemax="${st.n}" aria-valuenow="${st.k}"><span style="width:${st.n ? Math.round((100 * st.k) / st.n) : 0}%"></span></div>` +
+      `<p class="progl${st.done || full ? " done" : ""}">${status}</p>` +
+      (st.done || st.drop ? "" : `<p class="hint muted">${esc(leadText(o.rid))}.</p>`) +
+      (moved ? `<p class="hint muted">${plural(moved, "produit laissé", "produits laissés")} de côté, pour ton prochain panier.</p>` : "") +
+      (r.simulated ? `<p class="hint muted">Prix simulés, pas relevés\u00a0: le vrai total s'affiche sur ${esc(r.service)}.</p>` : "") +
+      `<button class="btn tint" type="button" data-act="fill" data-id="${esc(o.rid)}">${label}</button></div></section>`;
+  }
+  /* #/remplir : une carte par commande, la progression, « Commencer » ; avant le premier geste, un aperçu de la répartition en cours */
+  function fillHome() {
+    const s0 = snapOf(), keep = fillUsable();
+    const ids = Object.keys(S.basket).filter((id) => S.basket[id] > 0 && S.prods.has(id));
+    if (!keep && !ids.length) return Object.assign({}, fillBase, { html: `<h1 class="lt">Remplir mes paniers</h1><div class="empty">${emptyArt("bag")}<h2>Ton panier est vide</h2><p>Écris ta liste ou recommande un panier déjà commandé\u00a0: Cabas le répartit, puis t'aide à remplir le panier de chaque enseigne.</p><a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a>${S.hist.some((h) => h.items) ? `<a class="btn tint" href="#/recommander">Recommander un panier</a>` : ""}</div>` });
+    let s = keep ? s0 : null;
+    if (!s) {
+      const res = cartResult();
+      if (!res.steps[res.K] && !res.done) return fillWait("Remplir mes paniers");
+      s = fillSnap();
+      if (!s) return Object.assign({}, fillBase, { html: `<h1 class="lt">Remplir mes paniers</h1><div class="empty">${emptyArt("bag")}<h2>Pas encore de commande</h2><p>Ton panier ne suffit pas pour une commande en ligne\u00a0: chaque enseigne demande un minimum d'achat.</p><a class="btn" href="#/panier" data-tab="panier">Voir le panier</a></div>` });
+      s.preview = true;
+    }
+    const fin = !s.preview && finished(s), nxt = s.preview ? s.orders[0] : fillNext(), pv = !!s.preview;
+    const nr = nxt && (S.allMap.get(nxt.rid) || { name: nxt.rid });
+    const nst = nxt && ordState(nxt, pv);
+    const sub = pv ? `${s.orders.length === 1 ? "Une commande" : plural(s.orders.length, "commande", "commandes")}, ${eurC(snapTotal(s, true))} frais compris. Pour chaque produit, Cabas ouvre le site de l'enseigne\u00a0: tu l'ajoutes à ton panier là-bas, puis tu reviens ici.`
+      : `Répartition faite ${whenFr(s.at)}, gardée telle quelle même si les prix changent. ${eurC(snapTotal(s))} frais compris.`;
+    const stl = !pv && !fin && stale(s) ? `<div class="banner warn" role="status">${ic("info")}<span><b>Ton panier a changé depuis</b>Cette liste reste celle du début du remplissage. Reprends avec le panier actuel pour la mettre à jour\u00a0: les produits cochés le restent.</span><button class="btn sm tint" type="button" data-act="fillresnap">Reprendre avec le panier actuel</button></div>` : "";
+    const done = fin ? `<div class="banner good" role="status">${ic("check")}<span><b>Toutes tes commandes sont passées</b>${S.guide.saved ? `Tu as économisé ${eurC(S.guide.saved)} sur ce panier, meilleurs prix et remplacements compris.` : "Ton panier rejoint tes économies."}</span></div>` : "";
+    const mag = magOf(s), skip = s.skipped.concat(...s.orders.map((o) => o.items.filter((x) => x.st === "skip")));
+    const magBox = mag.length ? `<section class="order" aria-labelledby="fc-mag"><div class="oh"><span class="mono" aria-hidden="true">${ic("store")}</span><div class="rt"><h2 class="t3" id="fc-mag">À acheter en magasin</h2><small>${plural(mag.reduce((a, x) => a + x.q, 0), "article", "articles")}, chez ${esc(joinEt([...new Set(mag.map((x) => retName(x.ret).split(" ")[0]))]))}</small></div>${px(mag.reduce((a, x) => a + x.cost, 0) / 100)}</div><div class="of"><p class="hint muted">Aux prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p><button class="btn tint" type="button" data-act="shop">${ic("list")}Liste pour le magasin</button></div></section>` : "";
+    const skipBox = skip.length ? `<h2 class="gh">Pas dans ces commandes</h2><div class="group">${skip.map((x) => `<div class="row"><span class="rt">${esc(x.nm)}<small>${x.q > 1 ? x.q + " × " : ""}${esc(x.f)}${x.st === "skip" ? ", laissé de côté pour ton prochain panier" : ", aucune commande ne le prend"}</small></span></div>`).join("")}</div>` : "";
+    const fr = freeList();
+    const freeBox = fr.length ? `<h2 class="gh">Tes lignes libres, à chercher toi-même</h2><div class="group">${fr.map((f) => `<div class="row"><span class="mono sm" aria-hidden="true">${ic("pen")}</span><span class="rt">${esc(f.t)}<small>${esc(freeWhere(f))}${f.price > 0 ? ", " + esc(eur(f.price)) + " l'unité, prix saisi par toi" : ""}</small></span><span class="val num">× ${f.q}</span></div>`).join("")}</div>` : "";
+    const dock = nxt && !fin ? `<button class="btn" type="button" data-act="fill" data-id="${esc(nxt.rid)}">${pv || !nst.k ? "Commencer chez " : nst.k === nst.n ? "Terminer chez " : "Reprendre chez "}${esc(nr.name)}</button>` : "";
+    return Object.assign({}, fillBase, {
+      dockHtml: dock, dockAll: true,
+      mount: () => { if (!pv) detailsAll(s.orders.flatMap((o) => o.items.map((x) => S.prods.get(x.id)).filter(Boolean)), () => {}); },
+      html: `<h1 class="lt">Remplir mes paniers</h1><p class="lt-sub">${sub}</p>` + stl + done +
+        s.orders.map((o) => fillOrdCard(o, s)).join("") + magBox + skipBox + freeBox +
+        `<div class="group" style="margin-top:28px"><button class="row link" type="button" data-act="fillcopy">Copier toutes les listes</button><button class="row link" type="button" data-act="fillshare">Partager les listes</button>${fin ? `<button class="row link" type="button" data-act="savelist">Garder en liste</button><button class="row danger" type="button" data-act="clear">Vider le panier</button>` : !pv ? `<button class="row danger" type="button" data-act="fillstop">Arrêter le remplissage</button>` : ""}</div>` +
+        `<p class="gf">Cabas ouvre seulement des liens\u00a0: c'est toi qui ajoutes chaque produit et qui paies sur le site de l'enseigne. Tes listes restent sur ton téléphone.</p>`,
+    });
+  }
+  /* « Avant de commencer » : la première fois chez une enseigne, ce qu'il faut faire sur son site (data/retailers.json) */
+  function fillBefore(r) {
+    const fs = r.firstSteps || { steps: [] }, where = (r.channel || {}).where || "";
+    const steps = fs.steps.map((t) => `<li><span>${esc(t.replace("{where}", where))}</span></li>`).join("") +
+      `<li><span>Reviens dans Cabas\u00a0: pour chaque produit, touche «\u00a0${esc(openLabel(r, { kind: "fiche" }))}\u00a0», ajoute-le au panier du site, puis reviens ici. ${S.prefs.manualCk ? "Coche-le." : "Cabas le coche."}</span></li>`;
+    return {
+      title: r.name, grouped: true, solo: true,
+      dockHtml: `<button class="btn" type="button" data-act="fillready" data-id="${esc(r.id)}">C'est prêt, on commence</button>`,
+      html: `<h1 class="lt">Avant de commencer</h1><p class="lt-sub">Sur ${esc(r.service)}, la première fois</p><ol class="steps">${steps}</ol>` +
+        (fs.source ? `<p class="gf">${fs.verifiedAt ? "Source\u00a0: " : "À confirmer sur le site. "}${esc(fs.source)}.</p>` : "") +
+        `<div class="pad btns" style="padding-top:18px"><a class="btn tint" href="${esc(r.home)}" target="_blank" rel="noopener">Ouvrir ${esc(r.service)}${ic("ext")}</a></div>` +
+        `<p class="gf">Rien n'est commandé à ta place\u00a0: c'est toi qui ajoutes chaque produit et qui paies sur ${esc(r.service)}.</p>`,
+    };
+  }
+  /* le produit en cours, plein écran : quantité et nom chez l'enseigne bien visibles, « Ouvrir sur … » en bas, sous le pouce */
+  function fillProduct(r, o, st) {
+    const rid = o.rid, i = curIdx(o, st), x = st.L[i], p = S.prods.get(x.id), on = ckOf(rid, x.id), L = fillLink(rid, x), dn = siteName(rid, x);
+    const qtxt = x.q > 1 ? x.q + " exemplaires" : "le produit";
+    const hint = L.kind === "site" ? `Cherche-le sur ${esc(r.service)}, ajoute ${qtxt} au panier, puis reviens ici.` : S.prefs.manualCk ? `Ajoute ${qtxt} au panier du site, puis touche «\u00a0C'est dans mon panier\u00a0».` : `Ajoute ${qtxt} au panier du site, puis reviens ici\u00a0: Cabas le coche.`;
+    const list = st.L.map((y, j) => { const c = ckOf(rid, y.id); return `<div class="gi${c ? " on" : ""}${j === i ? " cur" : ""}"><button class="box hit" type="button" data-act="fillck" data-id="${esc(rid)}" data-p="${esc(y.id)}" role="checkbox" aria-checked="${c}" aria-label="Dans mon panier ${esc(r.name)}, ${esc(y.nm)}">${ic("check")}</button><button class="gt" type="button" data-act="fillat" data-id="${esc(rid)}" data-v="${j}"${j === i ? ' aria-current="true"' : ""}><b>${y.q > 1 ? `<span class="gq">${y.q} ×</span> ` : ""}${esc(siteName(rid, y) || y.nm)}</b><small>${esc(y.f)}, ${eurC(y.cost)}</small></button><span></span></div>`; }).join("");
+    return {
+      title: r.name, grouped: true, solo: true, anchor: ".fhead",
+      dockHtml: `<a class="btn" href="${esc(L.url)}" target="_blank" rel="noopener" data-act="fillopen" data-id="${esc(rid)}" data-p="${esc(x.id)}">${esc(openLabel(r, L))}${ic("ext")}</a>`,
+      html: `<div class="fhead"><span class="mono" aria-hidden="true">${esc(r.name.slice(0, 1))}</span><div class="rt"><h1 class="t3">Ton panier ${esc(r.name)}</h1><small>${esc(r.service)}</small></div><span class="fk num">${st.k} sur ${st.n}</span></div>` +
+        `<div class="prog" role="progressbar" aria-label="Produits ajoutés" aria-valuemin="0" aria-valuemax="${st.n}" aria-valuenow="${st.k}" aria-valuetext="${st.k} sur ${plural(st.n, "produit ajouté", "produits ajoutés")}"><span style="width:${Math.round((100 * st.k) / st.n)}%"></span></div>` +
+        `<article class="fillp${on ? " on" : ""}" aria-labelledby="fpn"><div class="fimg">${p ? img(p, 240) : ic("bag")}</div><div class="fbody">` +
+        `<p class="fpos">Produit ${i + 1} sur ${st.n}</p><p class="fqty"><b>${x.q}</b> ${x.q > 1 ? "exemplaires" : "exemplaire"}</p>` +
+        `<h2 class="t1" id="fpn">${esc(x.nm)}</h2><p class="ff">${esc(x.f)}${x.q > 1 ? ", " + eurC(x.cost / x.q) + " l'unité" : ""}, ${eurC(x.cost)}${x.from ? ", déplacé depuis " + esc(retName(x.from)) : ""}${r.simulated ? ", prix simulé" : ""}</p>` +
+        (dn ? `<p class="fsite">Sur ${esc(r.service)}\u00a0: <b>${esc(dn)}</b></p>` : L.kind !== "fiche" ? `<p class="fsite">À chercher sur ${esc(r.service)}\u00a0: <b>${esc(x.nm)}</b></p>` : "") +
+        (on ? `<p class="fok">${ic("check")}Dans ton panier ${esc(r.name)}</p>` : `<p class="fhint">${hint}</p>`) +
+        (L.kind === "site" ? `<button class="act" type="button" data-act="fillname" data-id="${esc(rid)}" data-p="${esc(x.id)}">${ic("copy")}Copier le nom</button>` : "") +
+        `</div></article>` +
+        `<div class="pad btns two fbtns"><button class="btn tint" type="button" data-act="fillck" data-id="${esc(rid)}" data-p="${esc(x.id)}" aria-pressed="${on}">${on ? "Pas encore ajouté" : "C'est dans mon panier"}</button><button class="btn plain" type="button" data-act="fillmiss" data-id="${esc(rid)}" data-p="${esc(x.id)}">Pas trouvé</button></div>` +
+        `<div class="fnav"><button class="act" type="button" data-act="fillstep" data-id="${esc(rid)}" data-v="-1"${i === 0 ? " disabled" : ""}>${ic("back")}Précédent</button><button class="act" type="button" data-act="fillstep" data-id="${esc(rid)}" data-v="1"${i === st.n - 1 ? " disabled" : ""}>Suivant${ic("chev")}</button></div>` +
+        `<h2 class="gh">Toute la liste</h2><div class="group">${list}</div>` +
+        `<div class="group" style="margin-top:24px"><button class="row link" type="button" data-act="fillcopy" data-id="${esc(rid)}">Copier la liste</button>${desktop() ? `<button class="row link" type="button" data-act="fillall" data-id="${esc(rid)}"><span class="rt">Tout ouvrir<small>Un onglet par produit qui reste à ajouter</small></span></button>` : ""}<button class="row link" type="button" data-act="fillfirst" data-id="${esc(rid)}">Revoir les étapes avant de commencer</button></div>` +
+        `<p class="gf">${r.simulated ? "Prix simulés, pas relevés\u00a0: le vrai total s'affiche sur le site. " : "Prix relevés en ligne\u00a0; le total exact s'affiche sur le site. "}Rien n'est commandé à ta place.</p>`,
+    };
+  }
+  /* fin de commande : récapitulatif, « J'ai passé cette commande », créneau et rappel ; puis la commande suivante */
+  function fillEnd(r, o, st) {
+    const rid = o.rid, W = (S.guide.when || {})[rid], nxt = fillNext(), nn = nxt && (S.allMap.get(nxt.rid) || {}).name;
+    const head = st.done ? `Commande ${r.name} passée` : st.drop ? `Commande ${r.name} pas passée` : st.n ? `Ton panier ${r.name} est prêt` : `Plus rien à mettre chez ${r.name}`;
+    const moved = o.items.filter((x) => x.st === "skip").length, mag = o.items.filter((x) => x.st === "mag").length;
+    const text = st.done ? (W && W.d ? `${pickup(r) ? "Retrait" : "Livraison"} ${esc(whenText(W))}.` : "Dis à Cabas quand elle arrive\u00a0: il te le rappelle sur l'accueil.")
+      : st.drop ? "Elle ne compte pas dans tes économies."
+      : `${plural(st.n, "produit", "produits")} dans ton panier sur ${esc(r.service)}. Là-bas, vérifie le panier, choisis ton créneau et paie\u00a0: le total exact s'affiche sur le site.`;
+    const short = !st.done && !st.drop && o.P.min && st.sub > 0 && st.sub < o.P.min ? `<div class="banner warn" role="status">${ic("info")}<span><b>Sous le minimum de ${eurC(o.P.min).replace(",00", "")}</b>Il manque ${eurC(o.P.min - st.sub)} pour commander chez ${esc(r.name)}\u00a0: ajoute un produit sur le site.</span></div>` : "";
+    const lines = `<div class="of"><div class="ln"><span>Articles</span><span>${eurC(st.sub)}</span></div><div class="ln"><span>${pickup(r) ? "Retrait" : "Livraison"}</span><span>${feeWord(r, st.fee - o.P.fixed).replace(/^./, (c) => c.toUpperCase())}</span></div>${o.P.fixed ? `<div class="ln"><span>Frais de service</span><span>${eurC(o.P.fixed)}</span></div>` : ""}<div class="ln tot"><span>Total prévu</span><span>${eurC(st.tot)}</span></div>` +
+      (moved ? `<p class="hint muted">${plural(moved, "produit laissé", "produits laissés")} de côté, pour ton prochain panier.</p>` : "") + (mag ? `<p class="hint muted">${plural(mag, "produit", "produits")} à acheter en magasin.</p>` : "") +
+      (r.simulated ? `<p class="hint muted">Prix simulés, pas relevés\u00a0: le vrai total s'affiche sur ${esc(r.service)}.</p>` : "") + `</div>`;
+    const whenBox = st.done ? (W && W.d ? `<div class="acts fend-acts"><button class="act" type="button" data-act="when" data-id="${esc(rid)}">Modifier le créneau${ic("chev")}</button><button class="act" type="button" data-act="ics" data-id="${esc(rid)}" data-d="${esc(W.d)}" data-s="${esc(W.s || "")}">${ic("cal")}Ajouter au calendrier</button></div>` : `<div class="pad btns"><button class="btn tint" type="button" data-act="when" data-id="${esc(rid)}">${pickup(r) ? "Quand vas-tu la retirer\u00a0?" : "Quand est-ce livré\u00a0?"}</button></div>`) : "";
+    const actions = st.done ? `<button class="act" type="button" data-act="fillundone" data-id="${esc(rid)}">Commande pas encore passée</button>`
+      : st.drop ? `<button class="act" type="button" data-act="fillundrop" data-id="${esc(rid)}">Finalement, je la passe</button>`
+      : `<button class="act" type="button" data-act="filldrop" data-id="${esc(rid)}">Je ne passe pas cette commande</button>`;
+    const list = st.L.map((y) => { const c = st.done || ckOf(rid, y.id); return `<div class="gi${c ? " on" : ""}"><button class="box hit" type="button" data-act="fillck" data-id="${esc(rid)}" data-p="${esc(y.id)}" role="checkbox" aria-checked="${c}" aria-label="Dans mon panier ${esc(r.name)}, ${esc(y.nm)}"${st.done ? " disabled" : ""}>${ic("check")}</button><span class="gt"><b>${y.q > 1 ? `<span class="gq">${y.q} ×</span> ` : ""}${esc(siteName(rid, y) || y.nm)}</b><small>${esc(y.f)}, ${eurC(y.cost)}</small></span><span></span></div>`; }).join("");
+    const dock = st.done || st.drop ? (nxt ? `<button class="btn" type="button" data-act="fill" data-id="${esc(nxt.rid)}">Continuer chez ${esc(nn)}</button>` : `<a class="btn" href="#/remplir">Retour à mes paniers</a>`)
+      : st.n ? `<button class="btn" type="button" data-act="filldone" data-id="${esc(rid)}">J'ai passé cette commande</button>` : "";
+    return {
+      title: r.name, grouped: true, solo: true,
+      dockHtml: dock,
+      html: `<div class="fend"><span class="art" aria-hidden="true">${ic(st.drop ? "info" : "check")}</span><h1 class="t1">${esc(head)}</h1><p>${text}</p></div>` + short +
+        `<section class="order" aria-label="Récapitulatif ${esc(r.name)}">${lines}</section>` + whenBox +
+        (!st.done && !st.drop && st.n ? `<div class="pad btns" style="padding-top:14px"><a class="btn tint" href="${esc(r.cart || r.home)}" target="_blank" rel="noopener">Ouvrir ${esc(r.service)} pour payer${ic("ext")}</a></div>` : "") +
+        `<div class="fend-acts acts">${actions}</div>` +
+        (st.n ? `<h2 class="gh">Les produits</h2><div class="group">${list}</div>` : "") +
+        `<div class="group" style="margin-top:24px"><a class="row link" href="#/remplir">Tous mes paniers</a><button class="row link" type="button" data-act="fillcopy" data-id="${esc(rid)}">Copier la liste</button></div>`,
+    };
+  }
+  /* #/remplir/<rid> : « Avant de commencer » la première fois, puis produit par produit, puis le récapitulatif */
+  function fillGuide(rid) {
+    const r = S.allMap.get(rid);
+    if (!r) return notFound("enseigne");
+    const s0 = snapOf(), usable = fillUsable();
+    if (!usable || !fillOrd(rid)) {
+      /* lien direct (raccourci, panier) sans remplissage en cours : l'instantané se prend ici, une fois la répartition calculée */
+      if (usable && !finished(s0)) return { title: r.name, grouped: true, html: `<h1 class="lt">${esc(r.name)}</h1><div class="empty">${emptyArt("bag")}<h2>Pas de commande ${esc(r.name)}</h2><p>Le remplissage en cours ne passe pas par ${esc(r.name)}.</p><a class="btn" href="#/remplir">Remplir mes paniers</a></div>` };
+      const res = count() ? cartResult() : null;
+      if (res && !res.steps[res.K] && !res.done) return fillWait(r.name);
+      const ns = res && fillSnap();
+      if (!ns || !ns.orders.some((o) => o.rid === rid)) return { title: r.name, grouped: true, html: `<h1 class="lt">${esc(r.name)}</h1><div class="empty">${emptyArt("bag")}<h2>Pas de commande ${esc(r.name)}</h2><p>Ta répartition ne passe pas par ${esc(r.name)} pour l'instant.</p><a class="btn" href="#/remplir">Remplir mes paniers</a></div>` };
+      S.guide = freshGuide(ns); saveGuide();
+    }
+    const o = fillOrd(rid), st = ordState(o);
+    if (!(S.seen.first || {})[offKey(r)] && !st.done && !st.drop) return fillBefore(r);
+    const ps = st.L.map((x) => S.prods.get(x.id)).filter(Boolean);
+    if (ps.some((p) => p.u && !DETV.has(p.u) && !DETF.has(p.u))) {
+      /* les liens et les noms chez l'enseigne d'abord (data/details), un squelette en attendant ; hors ligne, la recherche du site */
       return {
-        body: `<p>Ouvre ${esc(r.service)}${esc(where)}, puis ajoute chaque produit et coche-le ici. Touche un produit pour l'ouvrir sur le site.</p>` +
-          `<div class="pad gbtn"><a class="btn sm tint" href="${esc(r.home)}" target="_blank" rel="noopener">Ouvrir le site${ic("ext")}</a><button class="btn sm plain" type="button" data-act="guidecopy" data-id="${esc(rid)}">${ic("copy")}Copier la liste</button></div>` +
-          `<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${k}" aria-valuetext="${k} sur ${plural(n, "produit ajouté", "produits ajoutés")}"><span style="width:${n ? Math.round((100 * k) / n) : 0}%"></span></div><p class="progl${n && k === n ? " done" : ""}" aria-live="polite">${n && k === n ? ic("check") : ""}${k} sur ${plural(n, "produit ajouté", "produits ajoutés")}</p>` +
-          `<div class="group">${o.items.map(row).join("")}</div>` +
-          (r.simulated ? `<p class="gf">Prix simulés, pas relevés\u00a0: le vrai total s'affiche sur ${esc(r.service)}.</p>` : ""),
-        foot: done ? `<button class="btn plain" type="button" data-act="guideundo" data-id="${esc(rid)}">Commande pas encore passée</button>` : `<button class="btn" type="button" data-act="guidedone" data-id="${esc(rid)}">J'ai passé cette commande, ${eurC(o.sub + o.fee)}</button>`,
+        title: r.name, grouped: true, solo: true,
+        html: `<div class="fhead" aria-busy="true"><span class="mono" aria-hidden="true">${esc(r.name.slice(0, 1))}</span><div class="rt"><h1 class="t3">Ton panier ${esc(r.name)}</h1><small>${esc(r.service)}</small></div></div><p class="sr" role="status">Chargement des liens vers ${esc(r.service)}</p><div class="fillp" aria-hidden="true"><div class="fimg sk"></div><div class="skl"></div><div class="skl s"></div><div class="skl"></div></div>`,
+        mount: () => detailsAll(ps, () => { ps.forEach((p) => { if (p.u && !DETV.has(p.u)) DETF.add(p.u); }); if (S.route.name === "remplir" && S.route.id === rid && $("#sheet").hidden) rerender(); }),
+      };
+    }
+    if (st.done || st.drop || !st.n || st.k === st.n) return fillEnd(r, o, st);
+    return fillProduct(r, o, st);
+  }
+  VIEWS.remplir = (r) => (r.id ? fillGuide(r.id) : fillHome());
+  /* « Pas trouvé » : un équivalent chez la même enseigne, une autre commande (avec l'effet sur les frais), le magasin, ou plus tard */
+  function fillMissSheet(rid, id) {
+    const build = () => {
+      const s = snapOf(), o = fillOrd(rid), x = o && o.items.find((y) => y.id === id && !y.st);
+      if (!x) return { body: `<p>Ce produit n'est plus dans cette commande.</p>`, foot: "" };
+      const r = S.allMap.get(rid), p = S.prods.get(id), st = ordState(o), L = fillLink(rid, x), without = feeEffect(o, st.sub - x.cost);
+      const alt = L.kind === "fiche" ? fillSearch(r, p, x) : null;
+      const eqs = equivOf(p, rid);
+      const others = s.orders.filter((o2) => o2.rid !== rid && !closed(o2)).map((o2) => { const v = p && p.offers[o2.rid]; return v && v.price > 0 ? { o2, cost: Math.round(v.price * 100) * x.q, sim: v.sim } : null; }).filter(Boolean);
+      const mag = S.prefs.comp !== false ? magFor(p, x.q) : null;
+      return {
+        body: `<p>${x.q > 1 ? x.q + " × " : ""}<b>${esc(x.nm)}</b>${x.f ? ", " + esc(x.f) : ""}, introuvable sur ${esc(r.service)}\u00a0? Choisis ce que Cabas en fait.</p>` +
+          (alt ? `<div class="group"><a class="row link" href="${esc(alt.url)}" target="_blank" rel="noopener" data-act="fillbroken" data-id="${esc(rid)}" data-p="${esc(id)}"><span class="rt">Le lien n'ouvre pas le bon produit<small>${alt.kind === "recherche" ? "Chercher sur " + esc(r.service) + " à la place" : "Ouvrir " + esc(r.service) + " pour le chercher"}. Cabas s'en souviendra.</small></span>${ic("ext", "ext")}</a></div>` : "") +
+          (eqs.length ? `<h3 class="gh">Un équivalent chez ${esc(r.name)}</h3><div class="group">${eqs.map((q) => `<button class="opt alt" type="button" data-act="fillequiv" data-id="${esc(rid)}" data-p="${esc(id)}" data-e="${esc(q.e.id)}"><span class="thumb">${img(q.e, 40)}</span><span class="at"><b>${esc(q.e.brand)}</b> ${esc(q.e.name)}<small>${esc(q.e.format)}${q.u != null ? ", " + esc(unitPrice(q.e, q.price)) : ""}</small></span><span class="ap">${eur(q.price)}</span>${ic("chev", "chev")}</button>`).join("")}</div>` : "") +
+          `<h3 class="gh">Ou bien</h3><div class="group">` +
+          others.map(({ o2, cost, sim }) => { const r2 = S.allMap.get(o2.rid) || { name: o2.rid }; return `<button class="row" type="button" data-act="fillmove" data-id="${esc(rid)}" data-p="${esc(id)}" data-to="${esc(o2.rid)}"><span class="rt">Le mettre chez ${esc(r2.name)}<small>${eurC(cost)} chez ${esc(r2.name)}${sim ? ", prix simulé" : ""}. ${esc(feeEffect(o2, ordState(o2).sub + cost))} ${esc(without)}</small></span>${ic("chev", "chev")}</button>`; }).join("") +
+          (mag ? `<button class="row" type="button" data-act="fillmag" data-id="${esc(rid)}" data-p="${esc(id)}"><span class="rt">L'acheter en magasin<small>Environ ${eurC(mag.cost)} chez ${esc(retName(mag.ret).split(" ")[0])}, au prix relevé en ligne. ${esc(without)}</small></span>${ic("chev", "chev")}</button>` : "") +
+          `<button class="row" type="button" data-act="fillskip" data-id="${esc(rid)}" data-p="${esc(id)}"><span class="rt">Le laisser de côté<small>Il reviendra dans ton prochain panier. ${esc(without)}</small></span>${ic("chev", "chev")}</button></div>`,
+        foot: "",
       };
     };
     const o = build();
-    openSheet({ title: "Commande " + r.name, rid, body: o.body, foot: o.foot, build, onClose: () => { if (S.route.name === "panier") rerender(); } });
+    openSheet({ title: "Pas trouvé", body: o.body, build });
   }
-  /* économie d'un panier : chaque produit payé au prix choisi par la répartition, plutôt qu'au prix moyen relevé dans
-     les enseignes qui le vendent ; les frais payés comptent dans les deux cas */
-  function savedOf(bst) {
-    let d = 0;
-    const lines = [].concat(...bst.orders.map((o) => o.items.map((x) => ({ l: x.l, cost: x.cost })))).concat((bst.completed || []).map((x) => ({ l: x.l, cost: x.cost })));
-    for (const x of lines) {
-      const os = offers(S.prods.get(x.l.id), true).filter((o) => !o.sim);
-      if (os.length < 2) continue;
-      d += Math.round((os.reduce((a, o) => a + o.price, 0) / os.length) * 100) * x.l.q - x.cost;
+  /* changement de l'instantané par « Pas trouvé » : le panier suit pour un équivalent, l'instantané reste à jour s'il l'était */
+  function fillEdit(rid, id, fn, label, keys) {
+    const s = snapOf(), o = fillOrd(rid), i = o ? o.items.findIndex((y) => y.id === id && !y.st) : -1;
+    if (i < 0) { closeSheet(); return; }
+    const fresh = !stale(s), undo = snap(...(keys || ["guide"]));
+    if (fn(o, o.items[i], i) === false) return;
+    if (fresh) s.key = basketKey();
+    delete S.guide.ck[rid + "|" + id];
+    saveGuide(); closeSheet(); renderChrome(); rerender();
+    undoable(label, undo, 6000);
+  }
+  /* un panier commandé remis en un geste (avec les produits qui manquaient à la dernière livraison), puis « Remplir mes paniers » */
+  function refill(h) {
+    if (!h || !h.items) return;
+    const items = {};
+    for (const id0 of Object.keys(h.items)) { const id = S.prods.has(id0) ? id0 : (S.alias || {})[id0]; if (id && S.prods.has(id) && h.items[id0] > 0) items[id] = Math.min(99, (items[id] || 0) + h.items[id0]); }
+    for (const t of S.todo) if (S.prods.has(t.id)) items[t.id] = Math.min(99, (items[t.id] || 0) + t.q);
+    if (!Object.keys(items).length) { toast("Ces produits ne sont plus au catalogue"); return; }
+    const had = count(), undo = snap("basket", "guide", "todo");
+    S.basket = items; S.todo = []; saveBasket(); saveTodo();
+    const g = S.guide; S.guide = { ck: {}, done: {}, when: g.when || {}, broken: g.broken || {}, snooze: g.snooze || {} }; saveGuide();
+    renderChrome(); bumpBadge(); push("#/remplir");
+    undoable((had ? "Panier remplacé par celui du " : "Panier du ") + dayFr(h.d) + (had ? "" : " remis"), undo, 8000);
+  }
+  /* ---------- après la commande : arrivée, total payé, à racheter ---------- */
+  /* la commande d'un panier passé dont la livraison est passée, sans réponse ni rappel repoussé : « Tout est arrivé ? » */
+  function arrival() {
+    const today = isoDay(new Date()), now = new Date(), floor = isoDay(new Date(Date.now() - 10 * 864e5));
+    for (let hi = S.hist.length - 1; hi >= 0; hi--) {
+      const h = S.hist[hi];
+      for (const o of (h.o || []).filter((x) => x && x.rid)) {
+        if ((h.arr || {})[o.rid] || ((S.guide.snooze || {})[(h.sid || h.d) + "|" + o.rid] || 0) > Date.now()) continue;
+        const w = (h.when || []).find((x) => x.rid === o.rid), due = w ? w.d : isoDay(new Date(Date.parse(h.d + "T12:00:00") + leadDays(o.rid) * 864e5));
+        const sl = w && SLOTS.find((x) => x[0] === w.s);
+        if (due > today || due < floor || (due === today && (!sl || now.getHours() < sl[3]))) continue;
+        return { h, hi, o, w };
+      }
     }
-    return Math.max(0, Math.round(d));
+    return null;
   }
-  function recordDone() {
-    const st = RES.steps[RES.K], bst = st && st.full, G = S.guide, key = JSON.stringify(S.basket);
-    if (!bst || G.rec === key) return;
-    const total = fullTotal(bst), sp = S.swapPrev, saved = savedOf(bst) + (sp && sp.key === key ? Math.max(0, sp.total - total) : 0);
-    S.hist.push({ d: new Date().toISOString().slice(0, 10), t: total, s: saved, n: count(), o: bst.orders.map((o) => S.retMap.get(o.ch.id).name), items: Object.assign({}, S.basket), when: histWhen(bst) });
-    store.set("hist", S.hist);
-    G.rec = key; G.saved = saved; saveGuide();
+  function arrivalCard() {
+    const a = arrival();
+    if (!a) return "";
+    const n = Object.values(a.o.items || {}).reduce((x, q) => x + q, 0);
+    return `<section class="hcard col arr" aria-labelledby="arrT"><div class="arrh">${ic(a.o.pick ? "store" : "truck", "si")}<span><b id="arrT">Ta commande ${esc(a.o.name)} est ${a.o.pick ? "retirée" : "arrivée"}\u00a0?</b><small>${a.w ? (a.o.pick ? "Retrait prévu " : "Livraison prévue ") + esc(whenText({ d: a.w.d, s: a.w.s })) : "Commandée le " + esc(dayFr(a.h.d))}, ${plural(n, "article", "articles")}, ${eurC(a.o.t)} prévus.</small></span><button class="x" type="button" data-act="arrlater" data-id="${a.hi}" data-r="${esc(a.o.rid)}" aria-label="Plus tard">${ic("x")}</button></div>` +
+      `<div class="btns two"><button class="btn sm tint" type="button" data-act="arrok" data-id="${a.hi}" data-r="${esc(a.o.rid)}">Oui, tout est là</button><button class="btn sm ghost" type="button" data-act="arrmiss" data-id="${a.hi}" data-r="${esc(a.o.rid)}">Il manquait quelque chose</button></div></section>`;
+  }
+  function arrMissSheet(hi, rid) {
+    const h = S.hist[hi], o = h && (h.o || []).find((x) => x && x.rid === rid);
+    if (!o) return;
+    S.arrSel = {};
+    const build = () => {
+      const ids = Object.keys(o.items || {}), n = Object.keys(S.arrSel).filter((k) => S.arrSel[k]).length;
+      return {
+        body: `<p>Coche ce qui manquait\u00a0: ces produits reviendront dans ton prochain panier.</p><div class="group" role="group" aria-label="Produits de la commande ${esc(o.name)}">${ids.map((id) => { const p = S.prods.get(id); return opt("arrsel", `${o.items[id] > 1 ? o.items[id] + " × " : ""}${esc(p ? pname(p) : id)}`, !!S.arrSel[id], `data-id="${esc(id)}"`); }).join("")}</div>`,
+        foot: `<button class="btn" type="button" data-act="arrmissok" data-id="${hi}" data-r="${esc(rid)}"${n ? "" : " disabled"}>${n ? "Pour le prochain panier, " + plural(n, "produit", "produits") : "Coche au moins un produit"}</button>`,
+      };
+    };
+    const b = build();
+    openSheet({ title: "Il manquait", body: b.body, foot: b.foot, build });
+  }
+  /* « Vrai total facturé » : saisi par la personne, d'après sa facture ; gardé à part des prix relevés (cabas.hist[].paid) */
+  function paidSheet(hi) {
+    const h = S.hist[hi];
+    if (!h) return;
+    const os = (h.o || []).filter((x) => x && x.rid), paid = h.paid || {};
+    const rows = os.length ? os : [{ rid: "all", name: "ce panier", t: h.t }];
+    openSheet({
+      title: "Total payé", focus: "#paid0", right: `<button class="txtbtn primary" type="button" data-act="paidok" data-id="${hi}">OK</button>`,
+      body: `<p>Le montant de ta facture, si tu veux le garder. Il est saisi par toi et reste à part\u00a0: Cabas ne s'en sert jamais comme prix relevé.</p>` +
+        rows.map((o, i) => field("paid" + i, os.length ? "Payé chez " + esc(o.name) : "Payé pour ce panier", `type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" data-r="${esc(o.rid)}" placeholder="Par exemple ${esc(frNum(Math.round(o.t) / 100))}" value="${paid[o.rid] ? esc(frNum(paid[o.rid] / 100)) : ""}"`, `Prévu ${eurC(o.t)} aux prix relevés.`, "€")).join(""),
+    });
+  }
+  const paidSum = (h) => Object.values(h.paid || {}).reduce((a, c) => a + (c > 0 ? c : 0), 0);
+  function todoCard() {
+    const L = S.todo.filter((t) => S.prods.has(t.id) && !S.basket[t.id]);
+    if (!L.length) return "";
+    return `<section class="hcard col" aria-labelledby="todoT"><span><b id="todoT">${L.length > 1 ? plural(L.length, "produit", "produits") + " à racheter" : "Un produit à racheter"}</b><small>Il manquait à ta dernière livraison\u00a0: ${esc(joinEt(L.slice(0, 3).map((t) => pname(S.prods.get(t.id)))))}${L.length > 3 ? ", et d'autres" : ""}.</small></span><div class="btns two"><button class="btn sm tint" type="button" data-act="todoadd">${ic("plus")}Ajouter au panier</button><button class="btn sm ghost" type="button" data-act="tododel">Oublier</button></div></section>`;
+  }
+  /* « Tes prochaines courses » : d'après l'écart médian entre les paniers commandés, et le délai de chaque enseigne */
+  function nextRun() {
+    const H = S.hist.filter((h) => h.items && h.d);
+    if (H.length < 2 || count() || fillActive()) return null;
+    const t = [...new Set(H.map((h) => h.d))].sort().map((d) => Date.parse(d + "T12:00:00"));
+    if (t.length < 2) return null;
+    const gaps = t.slice(1).map((x, i) => x - t[i]).sort((a, b) => a - b), med = gaps[Math.floor(gaps.length / 2)];
+    if (med < 3 * 864e5) return null;
+    const next = isoDay(new Date(t[t.length - 1] + med)), days = Math.round((Date.parse(next + "T12:00:00") - Date.parse(isoDay(new Date()) + "T12:00:00")) / 864e5);
+    if (days > 4 || days < -7) return null;
+    const last = H[H.length - 1], rids = (last.o || []).filter((x) => x && x.rid && S.allMap.has(x.rid)).map((x) => x.rid);
+    const rid = rids.sort((a, b) => leadDays(b) - leadDays(a))[0] || null;
+    return { next: days < 1 ? isoDay(new Date(Date.now() + Math.max(1, leadDays(rid || "")) * 864e5)) : next, med: Math.round(med / 864e5), rid };
+  }
+  function nextCard() {
+    const n = nextRun();
+    if (!n) return "";
+    return `<section class="hcard col" aria-labelledby="nextT"><span><b id="nextT">Tes prochaines courses, vers ${esc(dayLabel(n.next))}</b><small>Tu fais tes courses tous les ${n.med} jours environ.${n.rid ? " " + esc(leadText(n.rid, n.next)) : ""}</small></span><div class="btns"><button class="btn sm tint" type="button" data-act="refill" data-id="last">Recommander et remplir</button></div></section>`;
+  }
+  /* sur l'accueil, tant qu'un remplissage est en cours */
+  function fillHomeCard() {
+    if (!fillActive()) return "";
+    const s = snapOf(), o = fillNext();
+    if (!o) return "";
+    const r = S.allMap.get(o.rid) || { name: o.rid }, st = ordState(o), rest = st.n - st.k;
+    let K = 0, N = 0;
+    s.orders.forEach((x) => { const y = ordState(x); N += y.n; K += closed(x) ? y.n : y.k; });
+    return `<a class="hcard tint fillh" href="#/remplir">${ic("bag", "si")}<span><b>${rest ? `Il te reste ${plural(rest, "produit", "produits")} à mettre chez ${esc(r.name)}` : `Ton panier ${esc(r.name)} est prêt, reste à payer`}</b><small>Remplir mes paniers\u00a0: ${K} sur ${plural(N, "produit", "produits")}${s.orders.length > 1 ? ", " + plural(s.orders.length, "commande", "commandes") : ""}</small><span class="prog thin" aria-hidden="true"><span style="width:${N ? Math.round((100 * K) / N) : 0}%"></span></span></span>${ic("chev", "chev")}</a>`;
+  }
+  /* la pastille du mini panier : reprendre le remplissage là où il en est (réglage « Rappel dans le mini panier ») */
+  function fillMini() {
+    if (!S.ready || S.prefs.badge === false || !fillActive()) return "";
+    const o = fillNext();
+    if (!o) return "";
+    const r = S.allMap.get(o.rid) || { name: o.rid }, st = ordState(o), rest = st.n - st.k;
+    return `<a class="mini" href="#/remplir/${esc(o.rid)}"><span class="mn">${rest || ic("check")}</span><span class="ml">${rest ? "Reprendre chez " : "Terminer chez "}${esc(r.name)}<small>${rest ? `Il te reste ${plural(rest, "produit", "produits")} à mettre chez ${esc(r.name)}` : `Tout est dans ton panier ${esc(r.name)}`}</small></span>${ic("chev")}</a>`;
+  }
+  /* #/recommander : les paniers commandés, du plus récent, chacun remis et réparti en un geste */
+  VIEWS.recommander = () => {
+    const H = S.hist.map((h, i) => ({ h, i })).filter((x) => x.h.items).reverse();
+    const names = (h) => (h.o || []).map((v) => (typeof v === "string" ? v : v && v.name)).filter(Boolean);
+    return {
+      title: "Recommander", grouped: true,
+      html: `<h1 class="lt">Recommander</h1><p class="lt-sub">${H.length ? "Un panier déjà commandé, remis et réparti aux prix d'aujourd'hui." : "Aucun panier commandé pour l'instant"}</p>` +
+        (H.length ? `<div class="group">${H.map(({ h, i }) => `<div class="row stack"><span class="rt">${esc(dateFr(h.d))}<small>${plural(Object.keys(h.items).length, "produit", "produits")}${names(h).length ? ", " + esc(joinEt(names(h))) : ""}, ${eurC(h.t)} à l'époque</small></span><div class="acts"><button class="btn sm tint" type="button" data-act="refill" data-id="${i}">Recommander et remplir</button></div></div>`).join("")}</div>` +
+          (S.todo.length ? `<p class="gf">Les produits qui manquaient à ta dernière livraison sont ajoutés aussi.</p>` : "")
+          : `<div class="empty">${emptyArt("bag")}<h2>Rien à recommander</h2><p>Quand tu as rempli tes paniers et passé tes commandes, ils reviennent ici en un geste.</p><a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a></div>`),
+    };
+  };
+  /* délai de livraison de chaque enseigne, pour « Commande avant… » : celui du site, ou le tien */
+  function leadSheet() {
+    const build = () => ({
+      body: `<p>Pour te dire quand commander. Par défaut, le délai indiqué par chaque enseigne.</p>` + S.rets.filter((r) => retOn(r.id)).map((r) => {
+        const d = leadDays(r.id), L = r.lead || {};
+        return `<h3 class="gh" id="lead-${esc(r.id)}">${esc(r.name)}${r.group && (r.channel || {}).where ? ", " + esc(r.channel.where) : ""}</h3><div class="pad"><div class="seg" role="radiogroup" aria-labelledby="lead-${esc(r.id)}">${[0, 1, 2, 3].map((v) => `<button type="button" role="radio" data-act="leadset" data-id="${esc(r.id)}" data-v="${v}" aria-checked="${v === d}">${v ? plural(v, "jour", "jours") : "Le jour même"}</button>`).join("")}</div></div><p class="gf">${esc(L.text || "")}${L.text ? ". " : ""}${L.verifiedAt ? "Vérifié sur le site le " + esc(dateFr(L.verifiedAt)) : "À confirmer sur le site"}${L.source ? "\u00a0: " + esc(L.source) : ""}.</p>`;
+      }).join(""),
+    });
+    const b = build();
+    openSheet({ title: "Délais de livraison", body: b.body, build });
   }
   function savingsCard() {
     const H = S.hist || [];
@@ -2386,11 +2894,11 @@
     return {
       title: "Tes économies", grouped: true,
       html: `<h1 class="lt">Tes économies</h1><p class="lt-sub">${H.length ? `${eurC(s)} sur ${plural(H.length, "panier", "paniers")}` : "Aucun panier commandé pour l'instant"}</p>` +
-        (H.length ? `<div class="group">${H.map((x, i) => `<div class="row"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${x.o && x.o.length ? ", " + esc(joinEt(x.o)) : ""}, ${eurC(x.t)}${x.s ? ", " + eurC(x.s) + " économisés" : ""}</small></span>${x.items ? `<button class="btn sm plain" type="button" data-act="reorder" data-id="${S.hist.length - 1 - i}">Recommander</button>` : `<span class="val num">${x.s ? eurC(x.s) : "–"}</span>`}</div>`).join("")}</div>` +
-          `<p class="gf">Un panier compte quand toutes ses commandes sont notées comme passées. L'économie d'un panier additionne, pour chaque produit, l'écart entre le prix payé et son prix moyen dans les enseignes qui le vendent, et ce que les remplacements par un équivalent moins cher ont fait gagner. Selon les prix relevés.</p>` +
+        (H.length ? `<div class="group">${H.map((x, i) => { const hi = S.hist.length - 1 - i, names = (x.o || []).map((v) => (typeof v === "string" ? v : v && v.name)).filter(Boolean), pd = paidSum(x); return `<div class="row stack"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${names.length ? ", " + esc(joinEt(names)) : ""}, ${eurC(x.t)} aux prix relevés${x.s ? ", " + eurC(x.s) + " économisés" : ""}</small>${pd ? `<small>Payé ${eurC(pd)}, saisi par toi</small>` : ""}</span><div class="acts">${x.items ? `<button class="btn sm plain" type="button" data-act="refill" data-id="${hi}">Recommander et remplir</button>` : ""}<button class="act" type="button" data-act="paid" data-id="${hi}">${pd ? "Modifier le total payé" : "Indiquer le total payé"}</button></div></div>`; }).join("")}</div>` +
+          `<p class="gf">Un panier compte quand toutes ses commandes sont notées comme passées. L'économie d'un panier additionne, pour chaque produit, l'écart entre le prix payé et son prix moyen dans les enseignes qui le vendent, et ce que les remplacements par un équivalent moins cher ont fait gagner. Selon les prix relevés. Le total payé, quand tu l'indiques, est saisi par toi\u00a0: il reste à part et n'entre dans aucun calcul.</p>` +
           `<div class="pad btns" style="padding-top:18px"><button class="btn tint" type="button" data-act="sharesave">${ic("share")}Partager mes économies</button></div>` +
           `<div class="group" style="margin-top:28px"><button class="row danger" type="button" data-act="histclear">Effacer l'historique</button></div>` :
-          `<div class="empty">${emptyArt("coin")}<h2>Rien pour l'instant</h2><p>Dans le panier, touche «\u00a0Passer la commande\u00a0» pour chaque enseigne\u00a0: quand tout est commandé, l'économie s'ajoute ici.</p></div>`),
+          `<div class="empty">${emptyArt("coin")}<h2>Rien pour l'instant</h2><p>Dans le panier, touche «\u00a0Remplir mes paniers\u00a0»\u00a0: quand chaque commande est passée, l'économie s'ajoute ici.</p></div>`),
     };
   };
 
@@ -2414,7 +2922,7 @@
     return `${dayLabel(w.d)}${sl ? ", " + sl[1].toLowerCase() + ` (${sl[2]}h à ${sl[3]}h)` : ""}`;
   }
   function whenSheet(rid) {
-    const r = S.retMap.get(rid);
+    const r = S.retMap.get(rid) || S.allMap.get(rid);
     if (!r) return;
     const w = (S.guide.when || {})[rid] || {};
     const build = () => {
@@ -2428,17 +2936,17 @@
       };
     };
     const o = build();
-    openSheet({ title: `Rappel de ${pickup(r) ? "retrait" : "livraison"}, ${r.name}`, right: `<span></span>`, body: o.body, foot: o.foot, build, onClose: () => { if (S.route.name === "panier" || S.route.name === "home") rerender(); } });
+    openSheet({ title: `Rappel de ${pickup(r) ? "retrait" : "livraison"}, ${r.name}`, right: `<span></span>`, body: o.body, foot: o.foot, build, onClose: () => { if (["panier", "home", "remplir"].includes(S.route.name)) rerender(); } });
     return w;
   }
   /* créneaux des commandes du panier, tels que notés */
-  const histWhen = (bst) => bst.orders.map((o) => { const r = S.retMap.get(o.ch.id), w = (S.guide.when || {})[o.ch.id]; return r && w && w.d ? { rid: r.id, name: r.name, pick: pickup(r), d: w.d, s: w.s || "", where: (r.channel || {}).where || "" } : null; }).filter(Boolean);
   function saveWhen() {
     saveGuide();
     /* le panier est déjà dans l'historique : ses créneaux suivent */
-    const st = RES.steps[RES.K], bst = st && st.full, last = (S.hist || [])[S.hist.length - 1];
-    if (bst && last && S.guide.rec === JSON.stringify(S.basket)) { last.when = histWhen(bst); store.set("hist", S.hist); }
+    const s = snapOf(), h = s && S.hist.find((x) => x.sid === s.id);
+    if (h) { h.when = whenOf((h.o || []).map((x) => x && x.rid).filter(Boolean)); store.set("hist", S.hist); }
   }
+
   /* commandes passées, à venir : celles du panier en cours, puis celles des paniers d'avant pas encore livrées */
   function upcoming() {
     const today = isoDay(new Date()), out = [];
@@ -2504,7 +3012,7 @@
   function habitsRail() {
     const ps = habits(10);
     if (!ps.length) return "";
-    return `<div class="sh"><h2>Tes habitudes</h2>${S.hist.length ? `<button class="act" type="button" data-act="reorder" data-id="last" aria-label="Recommander le dernier panier">Recommander${ic("chev")}</button>` : ""}</div><div class="rail" role="region" aria-label="Tes habitudes">${ps.map((p) => card(p)).join("")}</div>`;
+    return `<div class="sh"><h2>Tes habitudes</h2>${S.hist.some((h) => h.items) ? `<button class="act" type="button" data-act="refill" data-id="last" aria-label="Recommander le dernier panier et remplir mes paniers">Recommander et remplir${ic("chev")}</button>` : ""}</div><div class="rail" role="region" aria-label="Tes habitudes">${ps.map((p) => card(p)).join("")}</div>`;
   }
 
   /* ---------- partager ---------- */
@@ -2642,7 +3150,9 @@
   /* ---------- courses en magasin ---------- */
   function shopSheet() {
     const build = () => {
-      const st = RES.steps[RES.K], bst = st && (st.full || st.partial), c = (bst && bst.completed) || [];
+      /* pendant un remplissage, les achats en magasin de l'instantané (avec ceux que « Pas trouvé » y a envoyés) */
+      const fs = snapOf(), st = RES.steps[RES.K], bst = st && (st.full || st.partial);
+      const c = (fs && fillUsable() ? magOf(fs).map((x, n) => ({ l: { id: x.id, q: x.q, n }, cost: x.cost, ret: x.ret })) : (bst && bst.completed) || []).filter((x) => S.prods.has(x.l.id));
       if (!c.length) return { body: `<p>Plus rien à acheter en magasin.</p>`, foot: "" };
       const by = new Map();
       c.forEach((x) => { if (!by.has(x.ret)) by.set(x.ret, []); by.get(x.ret).push(x); });
@@ -2659,7 +3169,7 @@
       };
     };
     const o = build();
-    openSheet({ title: "En magasin", body: o.body, build, onClose: () => { if (S.route.name === "panier") rerender(); } });
+    openSheet({ title: "En magasin", body: o.body, build, onClose: () => { if (S.route.name === "panier" || S.route.name === "remplir") rerender(); } });
   }
 
   /* ---------- baisses de prix ---------- */
@@ -3175,7 +3685,7 @@
   }
   /* copie profonde de champs de S prise avant une action ; renvoie la fonction qui les remet et les sauvegarde */
   function snap(...keys) {
-    const savers = { basket: saveBasket, guide: saveGuide, free: saveFree, lists: saveLists, prefs: savePrefs, hist: () => store.set("hist", S.hist), menu: saveMenu };
+    const savers = { basket: saveBasket, guide: saveGuide, free: saveFree, lists: saveLists, prefs: savePrefs, hist: () => store.set("hist", S.hist), menu: saveMenu, todo: saveTodo };
     const c = keys.map((k) => [k, JSON.parse(JSON.stringify(S[k]))]);
     return () => c.forEach(([k, v]) => { S[k] = v; savers[k](); });
   }
@@ -3234,7 +3744,7 @@
         const undo = snap("basket", "guide", "free");
         S.basket = {}; saveBasket(); S.free = {}; saveFree();
         /* les créneaux des commandes déjà passées restent (« Tes commandes » sur l'accueil) */
-        S.guide = { ck: {}, done: {}, when: S.guide.when || {} }; saveGuide();
+        S.guide = { ck: {}, done: {}, when: S.guide.when || {}, broken: S.guide.broken || {}, snooze: S.guide.snooze || {} }; saveGuide();
         closeSheet(); renderChrome(); rerender();
         undoable("Panier vidé", undo, 8000); break;
       }
@@ -3275,7 +3785,7 @@
         const L = S.lists.find((x) => x.id === id); if (!L) break;
         const undo = snap("basket", "guide", "free");
         addItems(L.items, true); S.free = {}; addFree(L.free);
-        S.guide = { ck: {}, done: {}, when: S.guide.when || {} }; saveGuide();
+        S.guide = { ck: {}, done: {}, when: S.guide.when || {}, broken: S.guide.broken || {}, snooze: S.guide.snooze || {} }; saveGuide();
         renderChrome(); switchTab("panier");
         undoable("Panier remplacé par la liste", undo, 8000); break;
       }
@@ -3284,7 +3794,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": { const undo = snap("lists"); S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); undoable("Liste supprimée", undo, 5000); break; }
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.free = {}; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); store.del("univ"); applyZoom(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); store.del("univ"); applyZoom(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"), f = el._act; el.hidden = true; el._act = null; S.undo = null; if (f) f(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -3355,6 +3865,15 @@
         break;
       }
       case "wlmic": micStart(); break;
+      case "wlpaste": {
+        navigator.clipboard.readText().then((tx) => {
+          tx = String(tx || "").replace(/\r/g, "").trim().slice(0, 4000);
+          if (!norm(tx)) { toast("Rien à coller\u00a0: copie d'abord ta liste"); return; }
+          const cur = (($("#wlIn") || {}).value || "").trim(), text = cur ? cur + "\n" + tx : tx;
+          micStop(); listFrom(text);
+        }, () => toast("Cabas n'a pas pu lire le presse-papiers\u00a0: appuie longuement dans le champ, puis «\u00a0Coller\u00a0»"));
+        break;
+      }
       case "wlgo": {
         micStop();
         const tx = ($("#wlIn") || {}).value || "";
@@ -3434,35 +3953,161 @@
       case "keepdel": { const K = Object.assign({}, S.prefs.keep); delete K[t.dataset.k]; S.prefs.keep = K; savePrefs(); if (usualCount()) refreshSheet(); else closeSheet(); break; }
       case "qty1del": { const Q = Object.assign({}, S.prefs.qty1); delete Q[t.dataset.k]; S.prefs.qty1 = Q; savePrefs(); if (usualCount()) refreshSheet(); else closeSheet(); break; }
       case "usualreset": { const undo = snap("prefs"); S.prefs.usual = {}; S.prefs.keep = {}; S.prefs.qty1 = {}; savePrefs(); closeSheet(); rerender(); undoable("Choix et marques oubliés", undo, 5000); break; }
-      /* commande guidée */
-      case "guide": guideSheet(id); break;
-      case "guideck": { const k = id + "|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); const o = guideOrder(id); if (o && o.items.every((x) => S.guide.ck[id + "|" + x.l.id])) buzz("done"); break; }
-      case "guidecopy": {
-        const o = guideOrder(id);
+      /* remplir mes paniers (les gestes de l'ancienne commande guidée y mènent aussi) */
+      case "fillgo": case "guide": case "fill": {
+        const s = ensureSnap();
+        if (act === "fillgo" && s && s.orders.length > 1) { push("#/remplir"); break; }
+        const rid = id || (s && (fillNext() || s.orders[0]).rid);
+        push(rid ? "#/remplir/" + encodeURIComponent(rid) : "#/remplir");
+        break;
+      }
+      case "fillready": case "fillfirst": {
+        const F = Object.assign({}, S.seen.first), k = offKey(S.allMap.get(id));
+        if (act === "fillready") F[k] = 1; else delete F[k];
+        S.seen.first = F; store.set("seen", S.seen); window.scrollTo(0, 0); rerender(); focusView(); break;
+      }
+      case "firstreset": S.seen.first = {}; store.set("seen", S.seen); rerender(); toast("Les étapes reviendront chez chaque enseigne"); break;
+      /* le lien s'ouvre (nouvel onglet) ; au retour dans l'appli, le produit sera coché */
+      case "fillopen": S.guide.open = { rid: id, id: t.dataset.p, at: Date.now() }; S.guide.opened = Object.assign({}, S.guide.opened, { [id + "|" + t.dataset.p]: 1 }); saveGuide(); break;
+      case "guideck": case "fillck": {
+        const o = fillOrd(id);
         if (!o) break;
-        const tx = o.items.map((x) => { const p = S.prods.get(x.l.id); return `${x.l.q > 1 ? x.l.q + " x " : ""}${p.brand} ${p.name}${p.format ? ", " + p.format : ""}`; }).join("\n");
-        (navigator.clipboard ? navigator.clipboard.writeText(tx) : Promise.reject()).then(() => toast("Liste copiée"), () => toast("Copie impossible sur cet appareil"));
+        const k = id + "|" + t.dataset.p, on = !S.guide.ck[k], main = !t.closest(".gi");
+        if (on) { S.guide.ck[k] = 1; buzz("add"); if (main) fillAdvance(o); } else delete S.guide.ck[k];
+        if (S.guide.open && S.guide.open.rid === id && S.guide.open.id === t.dataset.p) S.guide.open = null;
+        saveGuide(); renderChrome();
+        const st = ordState(o);
+        /* le dernier produit coché : le récapitulatif, en haut de page */
+        if (on && st.k === st.n) { buzz("done"); window.scrollTo(0, 0); rerender(); focusView(); break; }
+        if (main) rerenderKeep(null, "#fpn"); else rerenderKeep(t);
         break;
       }
-      case "guidedone": {
-        /* aucune feuille ne s'ouvre d'elle-même : le rappel de livraison se propose dans le toast */
-        S.guide.done[id] = 1; saveGuide(); closeSheet(); buzz("done");
-        const st = RES.steps[RES.K], bst = st && st.full;
-        toast(bst && bst.orders.every((o) => S.guide.done[o.ch.id]) ? "Toutes tes commandes sont passées" : "Commande " + retName(id) + " notée", { label: "Rappel", run: () => whenSheet(id) }, "check");
+      case "fillstep": case "fillat": {
+        const o = fillOrd(id);
+        if (!o) break;
+        const st = ordState(o), i = act === "fillat" ? +t.dataset.v : curIdx(o, st) + +t.dataset.v;
+        S.guide.cur = Object.assign({}, S.guide.cur, { [id]: Math.max(0, Math.min(st.n - 1, i)) }); saveGuide();
+        if (act === "fillat") { window.scrollTo(0, 0); rerenderKeep(null, "#fpn"); } else rerenderKeep(t, "#fpn");
         break;
       }
+      case "fillmiss": fillMissSheet(id, t.dataset.p); break;
+      /* « Le lien n'ouvre pas le bon produit » : la recherche s'ouvre (lien de la feuille), Cabas s'en souvient */
+      case "fillbroken": {
+        S.guide.broken = Object.assign({}, S.guide.broken, { [id + "|" + t.dataset.p]: isoDay(new Date()) });
+        S.guide.open = { rid: id, id: t.dataset.p, at: Date.now() }; saveGuide();
+        setTimeout(() => { closeSheet(); rerender(); }, 0); break;
+      }
+      case "fillequiv": {
+        const e = S.prods.get(t.dataset.e), rid = id, pid = t.dataset.p;
+        if (!e || !e.offers[rid]) { closeSheet(); break; }
+        fillEdit(rid, pid, (o, x, i) => {
+          const q = x.q, cost = Math.round(e.offers[rid].price * 100) * q, dup = o.items.find((y) => y !== x && y.id === e.id && !y.st);
+          if (dup) { dup.q += q; dup.cost += cost; o.items.splice(i, 1); } else Object.assign(x, { id: e.id, cost, nm: pname(e), f: e.format || "", was: pid });
+          const bq = S.basket[pid] || 0;
+          if (bq > q) S.basket[pid] = bq - q; else delete S.basket[pid];
+          S.basket[e.id] = Math.min(99, (S.basket[e.id] || 0) + q); saveBasket();
+        }, "Remplacé par " + pname(e), ["guide", "basket"]);
+        break;
+      }
+      case "fillmove": {
+        const to = t.dataset.to, o2 = fillOrd(to), p = S.prods.get(t.dataset.p);
+        if (!o2 || !p || !p.offers[to]) { closeSheet(); break; }
+        fillEdit(id, t.dataset.p, (o, x, i) => {
+          o.items.splice(i, 1);
+          const cost = Math.round(p.offers[to].price * 100) * x.q, ex = o2.items.find((y) => y.id === x.id && !y.st);
+          if (ex) { ex.q += x.q; ex.cost += cost; } else o2.items.push(Object.assign({}, x, { cost, from: id }));
+        }, "Déplacé chez " + retName(to));
+        break;
+      }
+      case "fillmag": { const p = S.prods.get(t.dataset.p); fillEdit(id, t.dataset.p, (o, x) => { const m = magFor(p, x.q); if (!m) return false; x.st = "mag"; x.mag = m; return true; }, "À acheter en magasin"); break; }
+      case "fillskip": fillEdit(id, t.dataset.p, (o, x) => { x.st = "skip"; S.todo.push({ id: x.id, q: x.q, from: id, at: isoDay(new Date()) }); saveTodo(); }, "Laissé de côté pour ton prochain panier", ["guide", "todo"]); break;
+      case "guidedone": case "filldone": {
+        const undo = snap("guide", "hist");
+        S.guide.done = Object.assign({}, S.guide.done, { [id]: 1 });
+        if (S.guide.drop) delete S.guide.drop[id];
+        recordFill(); saveGuide(); buzz("done"); closeSheet(); renderChrome(); window.scrollTo(0, 0); rerender(); focusView();
+        const s = snapOf();
+        undoable(s && finished(s) ? "Toutes tes commandes sont passées" : "Commande " + retName(id) + " notée", undo, 6000);
+        break;
+      }
+      case "guideundo": case "fillundone": case "fillundrop": {
+        const k = act === "fillundrop" ? "drop" : "done", D = Object.assign({}, S.guide[k]);
+        delete D[id]; S.guide[k] = D; unrecord(); saveGuide(); renderChrome(); rerender(); break;
+      }
+      case "filldrop": { const undo = snap("guide", "hist"); S.guide.drop = Object.assign({}, S.guide.drop, { [id]: 1 }); recordFill(); saveGuide(); renderChrome(); rerender(); undoable("Commande " + retName(id) + " pas passée", undo, 6000); break; }
+      case "guidecopy": case "fillcopy": copyText(fillText(id || ""), id ? "Liste " + retName(id) + " copiée" : "Listes copiées"); break;
+      case "fillshare": shareText("Mes courses", fillText()); break;
+      case "fillname": { const o = fillOrd(id), x = o && o.items.find((y) => y.id === t.dataset.p); if (x) copyText(x.nm, "Nom copié"); break; }
+      /* sur ordinateur : un onglet par produit qui reste ; le navigateur peut en bloquer, Cabas le dit */
+      case "fillall": {
+        const o = fillOrd(id);
+        if (!o) break;
+        const todo = ordState(o).L.filter((x) => !ckOf(id, x.id));
+        let n = 0;
+        for (const x of todo) {
+          const w = window.open("about:blank", "_blank");
+          if (!w) break;
+          try { w.opener = null; w.location.href = fillLink(id, x).url; } catch (err) { w.close(); break; }
+          n++; S.guide.opened = Object.assign({}, S.guide.opened, { [id + "|" + x.id]: 1 });
+        }
+        S.guide.open = null; saveGuide();
+        toast(n < todo.length ? `${n} sur ${plural(todo.length, "onglet ouvert", "onglets ouverts")}\u00a0: autorise les fenêtres pour Cabas dans ton navigateur, puis réessaie.` : `${plural(n, "onglet ouvert", "onglets ouverts")}\u00a0: ajoute chaque produit, puis coche-le ici.`, null, null, 6000);
+        break;
+      }
+      case "fillresnap": {
+        const s = snapOf(), ns = fillSnap();
+        if (!s || !ns) break;
+        const undo = snap("guide");
+        /* une commande passée le reste si ses produits n'ont pas changé */
+        const items = (o) => JSON.stringify(o.items.filter((x) => !x.st).map((x) => [x.id, x.q]).sort());
+        const D = {};
+        ns.orders.forEach((o) => { const old = s.orders.find((x) => x.rid === o.rid); if (old && S.guide.done[o.rid] && items(old) === items(o)) D[o.rid] = 1; });
+        S.guide = Object.assign({}, S.guide, { snap: ns, done: D, drop: {}, cur: {}, rec: "" }); saveGuide(); renderChrome(); rerender();
+        undoable("Liste mise à jour avec le panier actuel", undo, 6000); break;
+      }
+      case "fillstop": { const undo = snap("guide"), g = S.guide; S.guide = { ck: {}, done: {}, when: g.when || {}, broken: g.broken || {}, snooze: g.snooze || {} }; saveGuide(); renderChrome(); rerender(); undoable("Remplissage arrêté", undo, 6000); break; }
+      case "leads": leadSheet(); break;
+      case "leadset": S.prefs.lead = Object.assign({}, S.prefs.lead, { [id]: +t.dataset.v }); savePrefs(); refreshSheet(); break;
+      case "brokenclear": { const undo = snap("guide"); S.guide.broken = {}; saveGuide(); rerender(); undoable("Liens tous reproposés", undo, 5000); break; }
       case "when": whenSheet(id); break;
       case "whend": S.guide.when = Object.assign({}, S.guide.when, { [id]: Object.assign({}, (S.guide.when || {})[id], { d: t.dataset.d }) }); saveWhen(); refreshSheet(); break;
       case "whens": S.guide.when = Object.assign({}, S.guide.when, { [id]: Object.assign({}, (S.guide.when || {})[id], { s: t.dataset.s }) }); saveWhen(); refreshSheet(); break;
       case "whenno": { const W = Object.assign({}, S.guide.when); delete W[id]; S.guide.when = W; saveWhen(); closeSheet(); break; }
       case "ics": downloadIcs(id, t.dataset.d, t.dataset.s); break;
-      case "reorder": {
-        const h = id === "last" ? (S.hist || []).filter((x) => x.items).slice(-1)[0] : (S.hist || [])[+id];
-        if (!h || !h.items) break;
-        const n = addItems(h.items, false); renderChrome(); bumpBadge();
-        toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier", { label: "Voir", run: () => switchTab("panier") }); break;
+      case "refill": case "reorder": { const H = S.hist || []; refill(id === "last" ? H.filter((x) => x.items).slice(-1)[0] : H[+id]); break; }
+      /* après la commande : tout est arrivé, il manquait quelque chose, total payé, à racheter */
+      case "arrok": { const h = S.hist[+id]; if (!h) break; h.arr = Object.assign({}, h.arr, { [t.dataset.r]: "ok" }); store.set("hist", S.hist); rerender(); toast("C'est noté", { label: "Total payé", run: () => paidSheet(+id) }, "check"); break; }
+      case "arrmiss": arrMissSheet(+id, t.dataset.r); break;
+      case "arrsel": S.arrSel = Object.assign({}, S.arrSel, { [id]: !(S.arrSel || {})[id] }); refreshSheet(); break;
+      case "arrmissok": {
+        const h = S.hist[+id], rid = t.dataset.r, o = h && (h.o || []).find((x) => x && x.rid === rid), ids = Object.keys(S.arrSel || {}).filter((k) => S.arrSel[k]);
+        if (!o || !ids.length) break;
+        const undo = snap("hist", "todo");
+        h.arr = Object.assign({}, h.arr, { [rid]: "manque" }); h.miss = Object.assign({}, h.miss, { [rid]: ids });
+        for (const pid of ids) { const q = (o.items || {})[pid] || 1, e = S.todo.find((x) => x.id === pid); if (e) e.q = Math.min(99, e.q + q); else S.todo.push({ id: pid, q, from: rid, at: isoDay(new Date()) }); }
+        store.set("hist", S.hist); saveTodo(); closeSheet(); rerender();
+        undoable(plural(ids.length, "produit", "produits") + " pour ton prochain panier", undo, 6000); break;
       }
-      case "guideundo": delete S.guide.done[id]; S.guide.rec = ""; saveGuide(); refreshSheet(); break;
+      case "arrlater": { const h = S.hist[+id] || {}; S.guide.snooze = Object.assign({}, S.guide.snooze, { [(h.sid || h.d) + "|" + t.dataset.r]: Date.now() + 864e5 }); saveGuide(); rerender(); toast("Cabas te le redemande demain"); break; }
+      case "paid": paidSheet(+id); break;
+      case "paidok": {
+        const h = S.hist[+id];
+        if (!h) break;
+        const P = {};
+        let bad = null;
+        $$("#sheet input[data-r]").forEach((i) => { const raw = String(i.value || "").trim(); if (!raw) return; const v = numOf(raw); if (!(v > 0 && v <= 2000)) { bad = bad || i.id; return; } P[i.dataset.r] = Math.round(v * 100); });
+        if (bad) { fieldError(bad, "Un montant en euros, par exemple 64,90"); break; }
+        h.paid = P; store.set("hist", S.hist); closeSheet(); rerender();
+        toast(Object.keys(P).length ? "Total payé noté, saisi par toi" : "Total payé effacé", null, "check"); break;
+      }
+      case "todoadd": {
+        const undo = snap("basket", "todo");
+        let n = 0;
+        for (const x of S.todo) if (S.prods.has(x.id)) { S.basket[x.id] = Math.min(99, (S.basket[x.id] || 0) + x.q); n++; }
+        S.todo = []; saveBasket(); saveTodo(); renderChrome(); bumpBadge(); rerender();
+        undoable(plural(n, "produit ajouté", "produits ajoutés") + " au panier", undo, 6000); break;
+      }
+      case "tododel": { const undo = snap("todo"); S.todo = []; saveTodo(); rerender(); undoable("Produits à racheter oubliés", undo, 5000); break; }
       case "histclear": confirmSheet("Effacer l'historique\u00a0?", "Le total de tes économies repart de zéro sur cet appareil.", "Effacer", "histok"); break;
       case "histok": { const undo = snap("hist"); S.hist = []; store.set("hist", []); closeSheet(); rerender(); undoable("Historique effacé", undo, 5000); break; }
       /* partager */
@@ -3517,6 +4162,8 @@
     const t = e.target;
     if (t.dataset && t.dataset.act === "nocomp") { S.prefs.comp = !t.checked; savePrefs(); applyGroups(); freeCheck(true); setTimeout(() => { renderChrome(); rerender(); }, 200); return; }
     if (t.dataset && t.dataset.act === "ret") { const k = offKey(S.allMap.get(t.dataset.id)) || t.dataset.id; if (t.checked) delete S.prefs.off[k]; else S.prefs.off[k] = true; savePrefs(); freeCheck(true); renderChrome(); return; }
+    if (t.dataset && t.dataset.act === "manualck") { S.prefs.manualCk = t.checked; savePrefs(); return; }
+    if (t.dataset && t.dataset.act === "badge") { S.prefs.badge = t.checked; savePrefs(); renderChrome(); return; }
     if (t.id === "extra") { const v = numOf(t.value); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; t.value = frNum(S.prefs.extraCost); savePrefs(); return; }
     if (t.dataset && t.dataset.fee) { const v = numOf(t.value); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; t.value = frNum(o.base); savePrefs(); return; }
     if (t.id === "fmax") { const v = numOf(t.value); F(t.dataset.k).max = v > 0 ? String(v) : ""; refreshSheet(); }
@@ -3575,7 +4222,7 @@
     }
     if (e.key === "Enter") {
       if (e.target.id === "q") { e.preventDefault(); addRecent(e.target.value); e.target.blur(); }
-      else if (e.target.id === "zipIn" || e.target.id === "nameIn" || e.target.id === "budIn" || e.target.id === "eanIn") { e.preventDefault(); const b = $('#sheet .sheet-h [data-act$="ok"]'); if (b) b.click(); }
+      else if (e.target.id === "zipIn" || e.target.id === "nameIn" || e.target.id === "budIn" || e.target.id === "eanIn" || /^paid\d+$/.test(e.target.id)) { e.preventDefault(); const b = $('#sheet .sheet-h [data-act$="ok"]'); if (b) b.click(); }
       else if (e.target.id === "freeT" || e.target.id === "freeP") { e.preventDefault(); const b = $('#sheet [data-act="freeok"]'); if (b) b.click(); }
       else if (e.target.id === "fmax" || e.target.id === "extra" || (e.target.dataset && e.target.dataset.fee)) { e.preventDefault(); e.target.blur(); }
       return;
@@ -3769,7 +4416,21 @@
   /* hors ligne : une bannière sur l'accueil et le panier, posée sur offline et retirée sur online */
   S.offline = navigator.onLine === false;
   for (const ev of ["online", "offline"]) window.addEventListener(ev, () => { S.offline = ev === "offline"; if (S.ready && $("#sheet").hidden && (S.route.name === "home" || S.route.name === "panier")) rerender(); });
+  /* partage vers Cabas (share_target du manifeste, en GET) : le texte reçu devient une liste à lire, un lien de liste
+     Cabas ouvre sa page ; l'adresse est nettoyée tout de suite, rien n'est envoyé nulle part */
+  function sharedIn() {
+    try {
+      const q = new URLSearchParams(location.search);
+      if (!["title", "text", "url"].some((k) => q.has(k))) return null;
+      const url = (q.get("url") || "").trim(), text = (q.get("text") || "").trim(), title = (q.get("title") || "").trim();
+      const m = /#\/partage\/[A-Za-z0-9_-]+/.exec(url + " " + text);
+      const hash = m && (url + " " + text).includes(APP_HOST) ? m[0] : "#/ecrire";
+      history.replaceState(null, "", location.pathname + hash);
+      return hash === "#/ecrire" ? (text || title).split("\n").filter((l) => !/^\s*https?:\/\//i.test(l)).join("\n").trim().slice(0, 4000) : "";
+    } catch (e) { return null; }
+  }
   (async () => {
+    const shared = sharedIn();
     const h0 = location.hash || "#/";
     const t0 = tabOf(h0);
     if (t0) { S.tab = t0; S.stacks[t0] = [h0]; } else { S.tab = "accueil"; S.stacks.accueil = ["#/", h0]; }
@@ -3786,6 +4447,9 @@
     } catch (err) { S.failed = true; }
     if (S.ready) { try { trackDrops(); } catch (e) { /* stockage indisponible */ } }
     render();
+    if (S.ready && shared) listFrom(shared);
+    /* l'appli a été fermée pendant qu'un produit était ouvert sur le site d'une enseigne : il est coché au retour */
+    if (S.ready && S.guide.open) { const age = Date.now() - (S.guide.open.at || 0); if (age > 1500 && age < 6 * 3600e3) fillBack(age); else { S.guide.open = null; saveGuide(); } }
     /* les questions de départ ne bloquent pas le premier écran : elles viennent à la première visite du panier (voir render) */
   })();
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {

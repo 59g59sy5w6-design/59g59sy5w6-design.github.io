@@ -1,0 +1,22 @@
+{
+  "note": "Remplissage en cours inventé pour tools/homecheck.js : deux commandes, un produit déjà coché chez Monoprix. at et key sont posés au chargement. Aucune donnée personnelle.",
+  "basket": { "entremont-emmental-rape-francais-160-g": 2, "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2, "carapelli-huile-d-olive-vierge-extra-classico-75-cl": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 2, "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2 },
+  "snap": {
+    "id": "essai-remplir", "full": true,
+    "orders": [
+      { "rid": "monoprix", "P": { "min": 6000, "fixed": 320, "tiers": [{ "from": 0, "fee": 1200 }, { "from": 12000, "fee": 600 }, { "from": 15000, "fee": 0 }] },
+        "items": [
+          { "id": "entremont-emmental-rape-francais-160-g", "q": 2, "cost": 498, "nm": "Entremont Emmental râpé français", "f": "160 g" },
+          { "id": "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l", "q": 2, "cost": 698, "nm": "Tropicana Jus d'orange pressée sans pulpe", "f": "1 L" },
+          { "id": "carapelli-huile-d-olive-vierge-extra-classico-75-cl", "q": 1, "cost": 999, "nm": "Carapelli Huile d'olive vierge extra Classico", "f": "75 cl" }
+        ] },
+      { "rid": "houra", "P": { "min": 6000, "fixed": 0, "tiers": [{ "from": 0, "fee": 990 }, { "from": 12000, "fee": 790 }, { "from": 15000, "fee": 500 }, { "from": 20000, "fee": 0 }] },
+        "items": [
+          { "id": "parmentier-sardines-a-l-huile-de-tournesol-135-g", "q": 2, "cost": 398, "nm": "Parmentier Sardines à l'huile de tournesol", "f": "135 g" },
+          { "id": "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs", "q": 2, "cost": 458, "nm": "Auchan Œufs de poules élevées en plein air", "f": "6 œufs" }
+        ] }
+    ],
+    "comp": [], "skipped": []
+  },
+  "ck": { "monoprix|entremont-emmental-rape-francais-160-g": 1 }
+}

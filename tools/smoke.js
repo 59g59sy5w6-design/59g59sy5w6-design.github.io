@@ -1,6 +1,6 @@
 // Test rapide de l'appli après une mise à jour : sert le dépôt en local, ouvre les écrans principaux
-// au format iPhone (accueil, Rayons par univers, un rayon par univers, fiche produit avec ses détails, panier, recherche,
-// À propos) et vérifie qu'ils s'affichent sans erreur. Code de sortie 1 en cas de problème.
+// au format iPhone (accueil, Rayons par univers, un rayon par univers, fiche produit avec ses détails, panier, Remplir
+// mes paniers, Recommander, recherche, À propos) et vérifie qu'ils s'affichent sans erreur. Code de sortie 1 en cas de problème.
 // Usage : node tools/smoke.js
 const http = require("http");
 const fs = require("fs");
@@ -80,6 +80,18 @@ const server = http.createServer((req, res) => {
     await page.waitForTimeout(800);
     await check("panier", ".sum .st", 1);
     await check("panier", ".order", 1);
+    /* Remplir mes paniers : la répartition en cours, une carte par commande, puis le mode guidé d'une commande
+       (« Avant de commencer » la première fois) ; Recommander */
+    await page.goto(base + "#/remplir"); await ready();
+    await page.waitForSelector(".fillc", { timeout: 20000 }).catch(() => {});
+    if (await check("remplir", ".fillc", 1)) {
+      await page.click(".dock [data-act=fill]"); await page.waitForTimeout(500); await ready();
+      await check("remplir, mode guidé", "#view .steps li, #fpn", 1);
+      const g = await page.evaluate(() => JSON.parse(localStorage.getItem("cabas.guide") || "{}"));
+      if (!g.snap || !g.snap.orders || !g.snap.orders.length) problems.push("remplir : l'instantané de la répartition (cabas.guide.snap) n'est pas pris");
+    }
+    await page.goto(base + "#/recommander"); await ready();
+    await check("recommander", "#view h1", 1);
     await page.goto(base + "#/recherche"); await ready();
     await page.fill("#q", "lait"); await page.waitForTimeout(500);
     await check("recherche", "#sres .card", 1);

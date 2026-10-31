@@ -867,3 +867,65 @@ details.univ > .cats { padding-bottom: 10px; }
 .offer .os.skl, .gi .gt small.skl { display: block; height: 0.75rem; width: 56%; margin: 5px 0 3px; border-radius: var(--r-pill); }
 .rail .card .tile.sk { display: block; }
 .rail .card .skl { margin-top: 8px; }
+
+/* ---------- remplir mes paniers, après la commande ---------- */
+/* mode guidé : plein écran, sans barre d'onglets ; le gros bouton « Ouvrir sur … » dans le dock, sous le pouce */
+body.solo { --tab: 0px; }
+body.solo .tabbar { display: none; }
+.dock .btn { max-width: none; box-shadow: var(--sh-2); }
+.dock .btn .ic { width: 20px; height: 20px; }
+@media (min-width: 960px) {
+  body.solo .dock, body.dockd .dock { display: block; }
+  body.solo .view.docked, body.dockd .view.docked { padding-bottom: calc(var(--dock-h) + 32px); }
+}
+.fhead { display: flex; align-items: center; gap: 12px; padding: 6px var(--gr) 10px var(--gx); }
+.fhead .rt { flex: 1; min-width: 0; }
+.fhead small { display: block; color: var(--ink-2); font-size: 0.875rem; line-height: 1.1875rem; }
+.fhead .fk { flex: none; font: 600 1.0625rem/1 var(--round); }
+.fillp { display: grid; gap: 14px; margin: 14px var(--gr) 0 var(--gx); padding: 18px 16px; border-radius: var(--r-l); background: var(--card); }
+.fillp .fimg { position: relative; width: min(52vw, 13rem); aspect-ratio: 1 / 1; margin: 0 auto; border-radius: var(--r-m); background: var(--shelf); display: grid; place-items: center; color: var(--ink-2); }
+.fillp .fimg img { position: absolute; inset: 6%; width: 88%; height: 88%; }
+.fillp .fimg > .ic { width: 48px; height: 48px; }
+.fillp .fbody { display: grid; gap: 8px; min-width: 0; }
+.fillp h2 { overflow-wrap: anywhere; hyphens: auto; }
+.fpos { font-size: 0.875rem; line-height: 1.1875rem; color: var(--ink-2); }
+.fqty { justify-self: start; display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 14px; border-radius: var(--r-pill); background: var(--brand-tint); color: var(--brand-ink); font-size: 1.0625rem; font-weight: 600; }
+.fqty b { font: 800 1.625rem/1 var(--round); }
+.ff, .fhint { font-size: 0.9375rem; line-height: 1.33; color: var(--ink-2); }
+.fsite { font-size: 0.9375rem; line-height: 1.33; color: var(--ink-2); overflow-wrap: anywhere; }
+.fsite b { color: var(--ink); font-weight: 600; }
+.fok { display: flex; align-items: center; gap: 6px; color: var(--brand-ink); font-weight: 600; }
+.fok .ic { width: 20px; height: 20px; stroke-width: 2.6; }
+.fillp .act { justify-self: start; margin: 0 0 0 -6px; }
+.fillp .act .ic { width: 18px; height: 18px; margin-right: 4px; }
+.fbtns { padding-top: 14px; }
+.fnav { display: flex; justify-content: space-between; gap: 12px; padding: 12px var(--gr) 0 var(--gx); }
+.fnav .act { margin: 0; }
+.fnav .act:disabled { opacity: 0.45; cursor: default; }
+.gi.cur { box-shadow: inset 3px 0 0 var(--brand); }
+button.gt { width: 100%; text-align: left; padding: 0; }
+.fend { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 18px var(--gr) 6px var(--gx); }
+.fend .art { width: 72px; height: 72px; border-radius: 50%; background: var(--brand-tint); color: var(--brand-ink); display: grid; place-items: center; }
+.fend .art .ic { width: 36px; height: 36px; stroke-width: 2.4; }
+.fend p { color: var(--ink-2); max-width: 34ch; }
+.fend-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; padding: 12px var(--gr) 0 var(--gx); }
+.fend-acts .act { margin: 0; }
+.fend-acts .act .ic { width: 18px; height: 18px; margin-right: 4px; }
+.fillc .of .btn { margin-top: 12px; }
+.fillh { flex-wrap: wrap; }
+.hcard .prog { display: block; margin: 10px 0 2px; }
+.hcard .prog > span { display: block; }
+.hcard.arr { gap: 10px; }
+.hcard .arrh { display: flex; align-items: flex-start; gap: 12px; width: 100%; }
+.hcard .arrh > span { flex: 1; min-width: 0; }
+.hcard .arrh .x { margin: -10px -12px -10px 0; }
+.hcard.col .btns { margin-top: 4px; }
+.row .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: -2px 0 -6px -2px; }
+.row .acts .act { margin: 0; }
+.row.link small { color: var(--ink-2); font-weight: 400; }
+.of .progl { padding: 6px 0 2px; }
+.opt.alt .chev { width: 20px; height: 20px; color: var(--ink-3); stroke-width: 2.4; }
+@media (min-width: 960px) {
+  .fillp { grid-template-columns: 13rem minmax(0, 1fr); align-items: start; gap: 24px; padding: 24px; }
+  .fillp .fimg { width: 100%; }
+}

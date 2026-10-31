@@ -148,9 +148,9 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
       if (!/spaghetti/.test(fixed.text) || /spagheti\b/.test(fixed.text)) fail("« Oui » : le brouillon n'est pas corrigé");
     }
 
-    /* 5. ligne libre : « levure chimique », « Garder quand même », prix et enseigne, panier, texte partagé */
-    lines = await runList("levure chimique\nlait", { prefs: PREFS });
-    if (!lines[0] || lines[0].pick) fail("« levure chimique » trouve un produit : choisir une autre ligne absente du catalogue pour ce test");
+    /* 5. ligne libre : « piles alcalines », « Garder quand même », prix et enseigne, panier, texte partagé */
+    lines = await runList("piles alcalines\nlait", { prefs: PREFS });
+    if (!lines[0] || lines[0].pick) fail("« piles alcalines » trouve un produit : choisir une autre ligne absente du catalogue pour ce test");
     const keep = page.locator('[data-act="wlfree"]');
     if (!(await keep.count())) fail("ligne absente : pas de « Garder quand même »");
     await keep.first().click();
@@ -172,7 +172,7 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     if (fids.length !== 1) fail(`cabas.free devrait avoir une entrée, en a ${fids.length}`);
     else {
       const f = free[fids[0]];
-      if (f.t !== "levure chimique" || f.q !== 2 || f.price !== 1.2 || f.ret !== "carrefour") fail("cabas.free : entrée inattendue " + JSON.stringify(f));
+      if (f.t !== "piles alcalines" || f.q !== 2 || f.price !== 1.2 || f.ret !== "carrefour") fail("cabas.free : entrée inattendue " + JSON.stringify(f));
     }
     const frow = page.locator(".item.wli.free");
     if (!(await frow.count())) fail("Ma liste : la ligne n'est pas devenue une ligne libre");
@@ -190,11 +190,11 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     if (!(await box.count())) fail("panier : section « Tes lignes libres » absente");
     else {
       const bt = await box.textContent();
-      if (!/levure chimique/.test(bt) || !/2,40/.test(bt) || !/prix saisi par toi/.test(bt) || !/non compris dans le total/.test(bt)) fail(`panier : section lignes libres « ${bt.trim().replace(/\s+/g, " ").slice(0, 160)} »`);
+      if (!/piles alcalines/.test(bt) || !/2,40/.test(bt) || !/prix saisi par toi/.test(bt) || !/non compris dans le total/.test(bt)) fail(`panier : section lignes libres « ${bt.trim().replace(/\s+/g, " ").slice(0, 160)} »`);
     }
     if (!/Rien à commander en ligne/.test(await page.locator("#view").textContent())) fail("panier vide avec lignes libres : titre inattendu");
     const ct = await page.evaluate(() => cabasDebug().cartText());
-    if (!/À chercher :/.test(ct) || !/2 x levure chimique/.test(ct) || !/prix saisi par toi/.test(ct)) fail("cartText : pas de section « À chercher »\n" + ct);
+    if (!/À chercher :/.test(ct) || !/2 x piles alcalines/.test(ct) || !/prix saisi par toi/.test(ct)) fail("cartText : pas de section « À chercher »\n" + ct);
     await overflow("panier, lignes libres");
     /* retirer puis « Annuler » */
     await page.click('.freebox [data-act="freedec"]');
@@ -207,16 +207,16 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     await page.waitForTimeout(400);
     if (Object.keys((await stored("free")) || {}).length !== 1) fail("ligne libre : « Annuler » ne la remet pas");
     /* liste partagée avec une ligne libre : affichée, puis ajoutée au panier (la quantité s'ajoute à la ligne déjà là) */
-    const link = "#/partage/" + b64e(JSON.stringify({ n: "Liste test", i: [], f: [["levure chimique", 3], ["<b>x</b>", 1]] }));
+    const link = "#/partage/" + b64e(JSON.stringify({ n: "Liste test", i: [], f: [["piles alcalines", 3], ["<b>x</b>", 1]] }));
     await page.goto(base + link); await ready();
     await page.waitForTimeout(300);
     const pt = await page.locator("#view").textContent();
-    if (!/Lignes libres/.test(pt) || !/levure chimique/.test(pt) || !/2\u00a0lignes libres/.test(pt)) fail("liste partagée : lignes libres absentes");
+    if (!/Lignes libres/.test(pt) || !/piles alcalines/.test(pt) || !/2\u00a0lignes libres/.test(pt)) fail("liste partagée : lignes libres absentes");
     if (await page.locator("#view b").filter({ hasText: /^x$/ }).count()) fail("liste partagée : le texte d'une ligne libre n'est pas échappé");
     await page.click('[data-act="addshared"]');
     await page.waitForTimeout(300);
     const free2 = (await stored("free")) || {};
-    const lev = Object.values(free2).find((f) => f.t === "levure chimique");
+    const lev = Object.values(free2).find((f) => f.t === "piles alcalines");
     if (!lev || lev.q !== 4 || Object.keys(free2).length !== 2) fail("liste partagée : les lignes libres ne rejoignent pas le panier comme attendu : " + JSON.stringify(free2));
     /* une enseigne désactivée après coup : la ligne revient à « peu importe » */
     await page.goto(base + "#/reglages"); await ready();

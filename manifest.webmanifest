@@ -38,21 +38,42 @@
       "name": "Écrire ma liste",
       "short_name": "Ma liste",
       "url": "./#/ecrire",
-      "description": "Écris ou dicte tes courses, Cabas trouve chaque produit au meilleur prix"
+      "description": "Écris, dicte ou colle tes courses, Cabas trouve chaque produit au meilleur prix"
     },
     {
-      "name": "Scanner un code-barres",
-      "short_name": "Scanner",
-      "url": "./#/scan",
-      "description": "En magasin, compare le prix d'un produit"
+      "name": "Remplir mes paniers",
+      "short_name": "Remplir",
+      "url": "./#/remplir",
+      "description": "Ajoute chaque produit au panier de chaque enseigne, sans refaire tout le parcours"
+    },
+    {
+      "name": "Recommander un panier",
+      "short_name": "Recommander",
+      "url": "./#/recommander",
+      "description": "Un panier déjà commandé, remis et réparti aux prix d'aujourd'hui"
     },
     {
       "name": "Mon panier",
       "short_name": "Panier",
       "url": "./#/panier",
       "description": "La répartition la moins chère"
+    },
+    {
+      "name": "Scanner un code-barres",
+      "short_name": "Scanner",
+      "url": "./#/scan",
+      "description": "En magasin, compare le prix d'un produit"
     }
   ],
+  "share_target": {
+    "action": "./",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "screenshots": [
     {
       "src": "icons/ecran-1.png",
@@ -75,5 +96,11 @@
       "form_factor": "narrow",
       "label": "Des repas à petit prix, au coût de la portion"
     }
-  ]
+  ],
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  }
 }

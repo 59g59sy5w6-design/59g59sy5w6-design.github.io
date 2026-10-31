@@ -1,0 +1,30 @@
+{
+  "note": "Historique de commandes inventé pour tools/homecheck.js. dd est l'écart en jours avec le jour du test, remplacé par une date au chargement. Aucune donnée personnelle.",
+  "hist": [
+    {
+      "dd": -20, "t": 6834, "s": 912, "n": 7, "sid": "essai1",
+      "items": { "candia-lait-1-2-ecreme-6-x-1-l": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 2, "gervita-fromage-blanc-mousse-nature-8-x-100-g": 2, "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2 },
+      "o": [{ "rid": "houra", "name": "Houra", "pick": false, "t": 6834, "items": { "candia-lait-1-2-ecreme-6-x-1-l": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 2, "gervita-fromage-blanc-mousse-nature-8-x-100-g": 2, "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2 } }],
+      "when": [], "arr": { "houra": "ok" }
+    },
+    {
+      "dd": -13, "t": 7120, "s": 640, "n": 7, "sid": "essai2",
+      "items": { "candia-lait-1-2-ecreme-6-x-1-l": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 2, "contrex-eau-minerale-naturelle-6-x-1-l": 2, "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2 },
+      "o": [{ "rid": "houra", "name": "Houra", "pick": false, "t": 7120, "items": { "candia-lait-1-2-ecreme-6-x-1-l": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 2, "contrex-eau-minerale-naturelle-6-x-1-l": 2, "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2 } }],
+      "when": [], "arr": { "houra": "ok" }
+    },
+    {
+      "dd": -6, "t": 15230, "s": 1210, "n": 12, "sid": "essai3",
+      "items": { "candia-lait-1-2-ecreme-6-x-1-l": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 2, "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2, "entremont-emmental-rape-francais-160-g": 2, "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2, "barilla-pates-capellini-n-1-500-g": 3 },
+      "o": [
+        { "rid": "houra", "name": "Houra", "pick": false, "t": 6120, "items": { "candia-lait-1-2-ecreme-6-x-1-l": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 2, "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 2 } },
+        { "rid": "monoprix", "name": "Monoprix", "pick": false, "t": 6290, "items": { "entremont-emmental-rape-francais-160-g": 2, "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2 } },
+        { "rid": "carrefour", "name": "Carrefour", "pick": false, "t": 2820, "items": { "barilla-pates-capellini-n-1-500-g": 3 } }
+      ],
+      "when": [
+        { "rid": "houra", "name": "Houra", "pick": false, "dd": -5, "s": "soir", "where": "" },
+        { "rid": "monoprix", "name": "Monoprix", "pick": false, "dd": -4, "s": "matin", "where": "" }
+      ]
+    }
+  ]
+}

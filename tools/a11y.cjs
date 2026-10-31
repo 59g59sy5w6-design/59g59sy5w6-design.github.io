@@ -26,10 +26,25 @@ const iso = (d) => { const z = new Date(d.getTime() - d.getTimezoneOffset() * 60
 const plus = (n) => iso(new Date(Date.now() + n * 864e5));
 const PRODS = { "contrex-eau-minerale-naturelle-6-x-1-l": 2, "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 1, "candia-lait-1-2-ecreme-6-x-1-l": 1, "entremont-emmental-rape-francais-160-g": 2, "president-beurre-gastronomique-doux-82-mg-250-g": 1, "barilla-pates-capellini-n-1-500-g": 3, "carapelli-huile-d-olive-vierge-extra-classico-75-cl": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 2 };
 const LIST_ITEMS = { "candia-lait-1-2-ecreme-6-x-1-l": 1, "barilla-pates-capellini-n-1-500-g": 2, "auchan-oeufs-de-poules-elevees-en-plein-air-6-oeufs": 1, "gervita-fromage-blanc-mousse-nature-8-x-100-g": 1, "coca-cola-boisson-gazeuse-aux-extraits-vegetaux-sans-sucres-1-75-l": 2 };
+/* un remplissage en cours (« Remplir mes paniers ») sur le panier plein : Monoprix en cours, Houra passée, Carrefour pas
+   encore commencé (« Avant de commencer ») ; la clé est celle du panier, pour que l'instantané ne soit pas périmé */
+const P_MONO = { min: 6000, fixed: 320, tiers: [{ from: 0, fee: 1200 }, { from: 12000, fee: 600 }, { from: 15000, fee: 0 }] };
+const P_HOURA = { min: 6000, fixed: 0, tiers: [{ from: 0, fee: 990 }, { from: 12000, fee: 790 }, { from: 15000, fee: 500 }, { from: 20000, fee: 0 }] };
+const P_CARREFOUR = { min: 6000, fixed: 0, tiers: [{ from: 0, fee: 800 }, { from: 10000, fee: 500 }, { from: 15000, fee: 0 }] };
+const item = (id, cost, nm, f) => ({ id, q: PRODS[id], cost: cost * PRODS[id], nm, f });
+const SNAP = {
+  id: "audit", at: new Date().toISOString(), key: JSON.stringify(Object.keys(PRODS).sort().map((id) => [id, PRODS[id]])), full: true,
+  orders: [
+    { rid: "monoprix", P: P_MONO, items: [item("tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l", 349, "Tropicana Jus d'orange pressée sans pulpe", "1 L"), item("entremont-emmental-rape-francais-160-g", 249, "Entremont Emmental râpé français", "160 g"), item("president-beurre-gastronomique-doux-82-mg-250-g", 289, "Président Beurre gastronomique doux", "250 g"), item("carapelli-huile-d-olive-vierge-extra-classico-75-cl", 999, "Carapelli Huile d'olive vierge extra Classico", "75 cl")] },
+    { rid: "houra", P: P_HOURA, items: [item("contrex-eau-minerale-naturelle-6-x-1-l", 459, "Contrex Eau minérale naturelle", "6 x 1 L"), item("candia-lait-1-2-ecreme-6-x-1-l", 699, "Candia Lait demi-écrémé", "6 x 1 L"), item("parmentier-sardines-a-l-huile-de-tournesol-135-g", 199, "Parmentier Sardines à l'huile de tournesol", "135 g")] },
+    { rid: "carrefour", P: P_CARREFOUR, items: [item("barilla-pates-capellini-n-1-500-g", 139, "Barilla Pâtes capellini n°1", "500 g")] },
+  ],
+  comp: [], skipped: [],
+};
 const STATES = {
   vide: {},
   plein: {
-    basket: PRODS, seen: { welcome: 1 },
+    basket: PRODS, seen: { welcome: 1, first: { monoprix: 1, houra: 1 } },
     prefs: { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, maxOrders: 3, extraCost: 0, foyer: 2, budget: 60 },
     lists: [{ id: "l1", name: "Courses de la semaine", items: LIST_ITEMS, at: plus(-3) }, { id: "l2", name: "Petit-déjeuner", items: { "candia-lait-1-2-ecreme-6-x-1-l": 1, "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 1 }, at: plus(-10) }],
     draft: "lait\n2 paquets de pâtes\ncoca zéro x3\npapier toilette\n6 oeufs\nbeurre\nriz\nhuile d'olive",
@@ -37,7 +52,7 @@ const STATES = {
       { d: plus(-21), t: 6834, s: 912, n: 14, o: ["Houra", "Auchan"], items: LIST_ITEMS, when: [] },
       { d: plus(-7), t: 5210, s: 640, n: 11, o: ["Auchan"], items: PRODS, when: [{ rid: "auchan", name: "Auchan", pick: true, d: plus(2), s: "aprem", where: "Fontenay-sous-Bois" }] },
     ],
-    guide: { ck: {}, done: { houra: true }, when: { houra: { d: plus(1), s: "soir" } } },
+    guide: { ck: { "monoprix|entremont-emmental-rape-francais-160-g": 1 }, done: { houra: true }, when: { houra: { d: plus(1), s: "soir" } }, snap: SNAP },
     menu: [{ id: "pates-thon-tomate", portions: 4 }, { id: "omelette-fromage", portions: 2 }],
     recent: ["lait", "pâtes", "café"], seenAt: "", seenp: { "barilla-pates-capellini-n-1-500-g": 9.9, "candia-lait-1-2-ecreme-6-x-1-l": 9.9 }, drops: [],
   },
@@ -49,14 +64,19 @@ const ROUTES = [
   ["reglages", "#/reglages"], ["enseigne-houra", "#/enseigne/houra"], ["enseigne-auchan", "#/enseigne/auchan"], ["enseigne-leclerc", "#/enseigne/leclerc"],
   ["apropos", "#/apropos"], ["comment", "#/comment"], ["ecrire", "#/ecrire"], ["economies", "#/economies"], ["repas", "#/repas"],
   ["recette", "#/repas/pates-thon-tomate"], ["scan", "#/scan"], ["partage", PARTAGE], ["inconnu", "#/nimportequoi"],
+  ["remplir", "#/remplir"], ["remplir-guide", "#/remplir/monoprix"], ["remplir-fin", "#/remplir/houra"], ["remplir-avant", "#/remplir/carrefour"], ["recommander", "#/recommander"],
 ];
 /* écrans mesurés aussi à l'état vide (première visite) */
-const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche"];
+const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander"];
 /* feuilles ouvertes depuis chaque écran : nom, bouton qui l'ouvre ; celles du panier demandent un gros panier
    (14 produits vendus par plusieurs enseignes, en deux exemplaires), qui atteint les minimums de commande */
 const SHEETS = {
-  reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"]],
-  "panier-gros": [["guide", "[data-act=guide]"], ["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"], ["when", "@guidedone"]],
+  reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"]],
+  /* « Remplir mes paniers » est un écran (#/remplir), plus une feuille : ses feuilles sont mesurées depuis le mode guidé */
+  "panier-gros": [["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"]],
+  "remplir-guide": [["pas-trouve", "#view [data-act=fillmiss]"]],
+  "remplir-fin": [["when", "#view [data-act=when]"]],
+  economies: [["total-paye", "[data-act=paid]"]],
   ecrire: [["autre-choix", "[data-act=wlalt]"], ["savelist", "[data-act=wlsave]"]],
   "rayon-pates": [["sort", "[data-act=sort]"], ["filters", "[data-act=filters]"]],
   scan: [["scantype", "[data-act=scantype]"]],
@@ -176,7 +196,7 @@ const MEASURE_JS = `(() => {
 })()`;
 
 /* signature d'un bouton : son action et ses données, stable d'un redessin à l'autre */
-const FOCUS_JS = `(() => { const el = document.activeElement; if (!el || el === document.body) return { tag: "body", inSheet: false }; let s = el.tagName.toLowerCase(); if (typeof el.className === "string" && el.className) s += "." + el.className.trim().split(/\\s+/).slice(0, 2).join("."); if (el.dataset && el.dataset.act) s += "[" + el.dataset.act + "]"; const sig = el.dataset && el.dataset.act ? JSON.stringify(Object.assign({}, el.dataset)) : ""; return { tag: s, inSheet: !!el.closest("#sheet"), sig, isView: el.id === "view" }; })()`;
+const FOCUS_JS = `(() => { const el = document.activeElement; if (!el || el === document.body) return { tag: "body", inSheet: false }; let s = el.tagName.toLowerCase(); if (typeof el.className === "string" && el.className) s += "." + el.className.trim().split(/\\s+/).slice(0, 2).join("."); if (el.dataset && el.dataset.act) s += "[" + el.dataset.act + "]"; const sig = el.dataset && el.dataset.act ? JSON.stringify(Object.assign({}, el.dataset)) : ""; return { tag: s, inSheet: !!el.closest("#sheet"), sig }; })()`;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function ready(page, route) {
@@ -225,20 +245,11 @@ async function ready(page, route) {
           if (st === "plein" && mode.cran === "1" && mode.mobile) {
             for (const [sname, sel] of SHEETS[gros ? "panier-gros" : rname] || []) {
               const sw = `${where} feuille ${sname}`;
-              /* « when » s'atteint par le toast « Rappel » qui suit « J'ai passé cette commande » : son ouvreur disparaît, le focus revient à la vue */
-              const viaToast = sel === "@guidedone";
-              const btn = await page.$(viaToast ? "[data-act=guide]" : sel);
+              const btn = await page.$(sel);
               if (!btn) { add(sw, [{ cat: "feuille", msg: "bouton d'ouverture absent (" + sel + ")" }]); continue; }
               try {
-                let opener = "";
-                if (viaToast) {
-                  await btn.click(); await page.waitForFunction(() => !document.getElementById("sheet").hidden, null, { timeout: 4000 }); await sleep(400);
-                  await page.click("#sheet [data-act=guidedone]"); await sleep(300);
-                  await page.click("#toast [data-act=toastact]");
-                } else {
-                  opener = await page.evaluate((s) => { const b = document.querySelector(s); b.scrollIntoView({ block: "center" }); return JSON.stringify(Object.assign({}, b.dataset)); }, sel);
-                  await btn.focus(); await page.keyboard.press("Enter");
-                }
+                const opener = await page.evaluate((s) => { const b = document.querySelector(s); b.scrollIntoView({ block: "center" }); return JSON.stringify(Object.assign({}, b.dataset)); }, sel);
+                await btn.focus(); await page.keyboard.press("Enter");
                 const opened = await page.waitForFunction(() => !document.getElementById("sheet").hidden, null, { timeout: 4000 }).then(() => true).catch(() => false);
                 if (!opened) { add(sw, [{ cat: "feuille", msg: "ne s'ouvre pas" }]); continue; }
                 await sleep(450);
@@ -255,8 +266,7 @@ async function ready(page, route) {
                 const closed = await page.evaluate(() => document.getElementById("sheet").hidden);
                 if (!closed) { add(sw, [{ cat: "feuille", msg: "Échap ne ferme pas" }]); await page.evaluate(() => { const w = document.getElementById("sheet"); w.hidden = true; }); }
                 const after = await page.evaluate(FOCUS_JS);
-                if (viaToast ? !(after.isView || after.sig) : after.sig !== opener) add(sw, [{ cat: "feuille", msg: "après fermeture, le focus est sur " + after.tag + " et pas sur le bouton d'ouverture" }]);
-                if (viaToast) await page.evaluate(() => { const b = document.querySelector("#sheet"); if (b) b.hidden = true; });
+                if (after.sig !== opener) add(sw, [{ cat: "feuille", msg: "après fermeture, le focus est sur " + after.tag + " et pas sur le bouton d'ouverture" }]);
               } catch (e) { add(sw, [{ cat: "feuille", msg: "erreur : " + String(e).split("\n")[0].slice(0, 120) }]); }
               await page.evaluate(() => { const w = document.getElementById("sheet"); if (!w.hidden) w.hidden = true; document.documentElement.style.overflow = ""; document.body.classList.remove("has-sheet"); ["view", "nav", "dock", "tabbar"].forEach((id) => { const el = document.getElementById(id); if (el) el.removeAttribute("inert"); }); window.scrollTo(0, 0); });
               await sleep(120);
