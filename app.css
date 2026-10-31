@@ -327,6 +327,7 @@ body:not(.grouped) .group { background: var(--group); }
 .dock .wrap { max-width: 720px; }
 .mini { display: flex; align-items: center; gap: 12px; height: 54px; padding: 0 16px 0 10px; border-radius: 16px; background: var(--brand); color: #fff; text-decoration: none; box-shadow: 0 6px 20px rgba(6, 99, 59, 0.28), 0 1px 3px rgba(0, 0, 0, 0.12); }
 .mini:active { background: var(--brand-press); }
+button.mini { width: 100%; text-align: left; }
 .mini .mn { min-width: 34px; height: 34px; padding: 0 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.18); display: grid; place-items: center; font-family: var(--round); font-weight: 700; font-size: 16px; }
 .mini .ml { flex: 1; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
 .mini .mp { font-family: var(--round); font-weight: 700; font-size: 17px; }

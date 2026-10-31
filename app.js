@@ -1170,6 +1170,7 @@
     const dock = $("#dock"), view = $("#view");
     let dh = "";
     if (V.dock === "bar" && V.dockId) dh = `<div class="wrap">${buyCtl(V.dockId, "bar")}</div>`;
+    else if (V.dockHtml) dh = `<div class="wrap">${V.dockHtml}</div>`;
     else if (n && S.route.name !== "panier") dh = `<div class="wrap">${miniHtml()}</div>`;
     dock.innerHTML = dh;
     dock.hidden = !dh;
@@ -1403,6 +1404,8 @@
     return {
       title: "Ma liste", grouped: true,
       right: `<button class="txtbtn" type="button" data-act="wledit">Modifier</button>`,
+      /* le bouton principal reste visible en bas, comme le mini panier : on n'a pas à descendre toute la liste */
+      dockHtml: found.length ? `<button class="mini" type="button" data-act="wladd"><span class="mn">${nArt}</span><span class="ml">Ajouter au panier</span><span class="mp">${eurC(t)}</span></button>` : "",
       html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">${plural(found.length, "produit trouvé", "produits trouvés")} sur ${W.lines.length}${found.length ? ", environ " + eurC(t) + " au meilleur prix" : ""}</p>` +
         `<div class="order" style="margin-top:4px">${W.lines.map(wlRow).join("")}</div>` +
         `<p class="gf">Pour chaque ligne, le produit le moins cher au kilo ou au litre parmi les plus proches de ce que tu as écrit, dans un format courant. Touche «\u00a0Autre choix\u00a0» pour en prendre un autre.</p>` +
