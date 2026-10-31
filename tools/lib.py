@@ -380,7 +380,7 @@ def split_brand_suffix(title):
     # some all-caps tokens belong to the label (e.g. "UHT", "MG")
     lead = []
     btoks = brand.split()
-    while btoks and btoks[0] in ('UHT', 'MG', 'IGP', 'AOP', 'DOP', 'MSC', 'FSC', 'XXL'):
+    while btoks and btoks[0] in ('UHT', 'MG', 'M.G', 'M.G.', 'MG.', '%MG', 'IGP', 'AOP', 'DOP', 'MSC', 'FSC', 'XXL') and len(btoks) > 1:
         lead.append(btoks.pop(0))
     if lead:
         rest = (rest + ' ' + ' '.join(lead)).strip()

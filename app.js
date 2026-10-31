@@ -1287,7 +1287,13 @@
   /* variétés d'un même rayon : huile d'olive ou de tournesol, sucre blanc ou roux, riz complet, pâtes complètes, yaourt au lait de chèvre */
   const VARIETY = new Set("olive tournesol colza arachide noix sesame pepins avocat lin isio friture melange graine chevre brebi soja coco grec grecque complete integrale sarrasin mais pois roux cassonade canne morceau fluide".split(" ").map(stem));
   /* « beurre doux 60 % MG » : un beurre allégé qui ne dit pas son nom (le beurre est à 80 % ou plus) */
-  const lowFat = (p) => p.r === "beurre" && /\b(1[0-9]|[2-6][0-9]|7[0-4]) ?mg\b/.test(norm(p.name));
+  // beurre à moins de 75 % de matière grasse : « 60%MG », « 60% M.G », ou « 60% » seul (le signe tombe à la normalisation)
+  const lowFat = (p) => {
+    if (p.r !== "beurre") return false;
+    const n = norm(p.name);
+    if (/\b(1[0-9]|[2-6][0-9]|7[0-4]) ?(mg|m g)\b/.test(n)) return true;
+    return /%/.test(p.name) && /\b(1[0-9]|[2-6][0-9]|7[0-4])\b(?! ?(g|kg|cl|ml|l|x|portions?|pieces?|unites?|oeufs?|par|min|cm)\b)/.test(n);
+  };
   /* le mot est dans le produit lui-même (marque, nom, format, étiquettes), pas seulement dans le nom de son rayon */
   const ownHas = (p, t) => { if (!p._ow) p._ow = new Set((p._b + " " + norm(p.name).replace(/\b1 2 /g, "demi ") + " " + norm(p.format) + " " + norm((p.tags || []).join(" "))).split(" ").filter(Boolean).map(stem)); return p._ow.has(t); };
   function matchLine(L) {
