@@ -10,9 +10,13 @@ pour que rien ne se perde si l'historique de la session est compacté en cours d
 Les pages à lire sont celles des enseignes que le robot GitHub ne peut pas lire (réglage « robot » à false dans
 tools/sources.json) : le script les affiche à la fin, une par ligne, avec l'url et le prompt à passer à WebFetch.
 
+Les pages sont groupées en lots (champ lot de tools/sources.json, un univers ou deux) : --lot limite la liste affichée
+aux lots demandés, séparés par des virgules (tools/lots/<lot>.md donne le texte prêt pour une tâche planifiée).
+
 Usage :
   python3 tools/dump.py --reset              # début d'un relevé : repartir d'une liste vide
   python3 tools/dump.py                      # après chaque série de lectures WebFetch
+  python3 tools/dump.py --reset --lot frais-1
   python3 tools/dump.py --since 2026-11-03T05:00:00Z --transcript chemin/vers/session.jsonl
 """
 import argparse, glob, json, os, sys
@@ -64,14 +68,19 @@ def main():
     ap.add_argument("--since", default="", help="ne garder que les lectures faites après cette date ISO (UTC)")
     ap.add_argument("--transcript", action="append", help="historique de session à lire (par défaut le plus récent)")
     ap.add_argument("--reset", action="store_true", help="vider tools/work/fetches.json avant d'ajouter")
+    ap.add_argument("--lot", default="", help="lots à afficher (frais-1, epicerie-2...), séparés par des virgules ; tous par défaut")
     a = ap.parse_args()
+    lots = {x.strip() for x in a.lot.split(",") if x.strip()}
+    unknown = lots - set(lib.LOTS)
+    if unknown:
+        sys.exit(f"lot inconnu : {', '.join(sorted(unknown))} (lots : {', '.join(lib.LOTS)})")
     dest = os.path.join(lib.WORK, "fetches.json")
     os.makedirs(lib.WORK, exist_ok=True)
     if a.reset:
         with open(dest, "w", encoding="utf-8") as fh:
             json.dump([], fh)
         print("tools/work/fetches.json vidé")
-        show_todo([])
+        show_todo([], lots)
         return
     paths = a.transcript or transcripts()[-1:]
     if not paths:
@@ -92,18 +101,18 @@ def main():
         json.dump(allrows, fh, ensure_ascii=False, indent=0)
     ok = sum(1 for r in allrows if lib.parse_json(r["text"]) not in (None, [], {}))
     print(f"{len(added)} lectures ajoutées, {len(allrows)} au total ({ok} avec une réponse JSON).")
-    show_todo(allrows)
+    show_todo(allrows, lots)
 
 
-def show_todo(rows):
+def show_todo(rows, lots=()):
     """Pages à lire par Claude qui n'ont pas encore de lecture avec des produits, avec l'url et le prompt exacts."""
     src = lib.load_sources()
     robot = src.get("robot") or {}
     done = {page_key(r["url"]) for r in rows if lib.parse_json(r["text"]) not in (None, [], {})}
     tried = {page_key(r["url"]) for r in rows}
-    mine = [x for x in src["pages"] if robot.get(x["retailer"]) is False]
+    mine = [x for x in src["pages"] if robot.get(x["retailer"]) is False and (not lots or x.get("lot") in lots)]
     todo = [x for x in mine if page_key(x["url"]) not in done]
-    print(f"pages à lire par Claude ({', '.join(sorted({x['retailer'] for x in mine}))}) : {len(mine)}, encore sans lecture : {len(todo)}")
+    print(f"pages à lire par Claude ({', '.join(sorted({x['retailer'] for x in mine}))}{', lots ' + ', '.join(sorted(lots)) if lots else ''}) : {len(mine)}, encore sans lecture : {len(todo)}")
     for x in todo:
         print(json.dumps({"url": x["url"], "prompt": x["prompt"], "deja_essayee": page_key(x["url"]) in tried}, ensure_ascii=False))
 

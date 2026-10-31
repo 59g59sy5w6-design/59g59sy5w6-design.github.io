@@ -2,26 +2,35 @@
 et mêmes mots distinctifs dans la désignation, plus les rapprochements validés à la main (tools/merge.json).
 
 Entrée : tools/work/items.json. Sortie : tools/work/clusters.json.
-Options : --review liste les rapprochements possibles non faits, --multi liste les rapprochements faits.
+Options : --review écrit les rapprochements possibles non faits dans tools/work/review.txt (triés par rayon),
+--multi liste les rapprochements faits.
 """
 import collections, json, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lib  # noqa: E402
-from lib import key, tokens, strong, family, mdd_of, RAYONS  # noqa: E402,F401
+from lib import key, tokens, strong, family  # noqa: E402
 
 items = json.load(open(os.path.join(lib.WORK, 'items.json'), encoding='utf-8'))
 
-# manual decisions after review: pairs of listing ids that are the same product / must stay apart
+# manual decisions after review: pairs of listing ids that are the same product
 MERGE = json.load(open(os.path.join(lib.TOOLS, 'merge.json'), encoding='utf-8')) if os.path.exists(os.path.join(lib.TOOLS, 'merge.json')) else []
-SPLIT = set()
+# produits frais sans marque : « Pommes Golden 1 kg » de deux enseignes sont des produits équivalents (eq), rapprochés
+# pour les fruits, légumes, pains et œufs ; jamais pour la viande et le poisson (origine, label et race diffèrent)
+NO_UNBRANDED = {'viandes-poissons'}
 
 
 def qsig(it):
-    if it['ray'] in ('papier', 'oeufs'):
-        return ('roll', it['rolls'] or 0, 1)
+    unite = lib.RAYON_UNITE.get(it['ray'])
+    if unite in ('rouleau', 'oeuf', 'couche', 'capsule', 'piece') and it.get('rolls'):
+        return ('roll', it['rolls'], 1)
     q = it['qty']
     if not q:
+        if unite in ('rouleau', 'oeuf'):
+            # rouleaux et œufs sans compte lu : comparés entre eux par le nom seul, comme avant
+            return ('roll', 0, 1)
+        if unite == 'lavage' and it.get('lav'):
+            return ('lav', it['lav'], 1)
         return ('none', it['rid'], 0)
     tot = q['n'] * q['v']
     # tolerate rounding of declared sizes (0.771 L vs 750 ml): bucket by 2 %
@@ -29,12 +38,15 @@ def qsig(it):
 
 
 def fam_key(it):
-    return key(family(it['brand']))
+    fam = key(family(it['brand']))
+    if fam == 'sans marque' and lib.RAYON_BY_ID[it['ray']]['univers'] in NO_UNBRANDED:
+        return 'sans marque:' + it['rid']
+    return fam
 
 
 for it in items:
     it['tok'] = tokens(it['label'])
-    it['strong'] = sorted(strong(it['tok']))
+    it['strong'] = sorted(strong(it['tok'], it['ray']))
     it['fam'] = fam_key(it)
     it['q'] = qsig(it)
 
@@ -94,8 +106,6 @@ for g, lst in groups.items():
 for a, b in MERGE:
     if a in parent and b in parent:
         union(a, b)
-    else:
-        pass  # produit absent de ce relevé
 
 clusters = collections.defaultdict(list)
 for it in items:
@@ -107,7 +117,6 @@ print('clusters', len(clusters), 'multi-retailer', len(multi),
 
 if '--review' in sys.argv:
     # near misses: same rayon, family and quantity, different retailers, not clustered together
-    seen = set()
     out = []
     for g, lst in groups.items():
         if g[2][0] == 'none':
@@ -121,13 +130,20 @@ if '--review' in sys.argv:
                 inter = len(sa & sb)
                 uni = len(sa | sb) or 1
                 if inter / uni >= 0.34 or (not sa or not sb):
-                    out.append((g[0], a, b))
-    print('near misses', len(out))
-    for ray, a, b in out:
-        print(f"{ray:9} {a['brand'][:16]:16} | {a['ret'][:4]} {a['label'][:48]:48} {a['price']:>6} | {b['ret'][:4]} {b['label'][:48]:48} {b['price']:>6} | {a['rid']} {b['rid']}")
+                    out.append((lib.RAYON_ORDER[g[0]], g[0], a, b))
+    out.sort(key=lambda t: (t[0], t[2]['brand'], t[2]['label']))
+    path = os.path.join(lib.WORK, 'review.txt')
+    with open(path, 'w', encoding='utf-8') as fh:
+        last = None
+        for _, ray, a, b in out:
+            if ray != last:
+                fh.write(f"\n## {ray} : {lib.RAYON_BY_ID[ray]['nom']}\n")
+                last = ray
+            fh.write(f"{a['brand'][:16]:16} | {a['ret'][:4]} {a['label'][:48]:48} {a['price']:>6} | {b['ret'][:4]} {b['label'][:48]:48} {b['price']:>6} | {a['rid']} {b['rid']}\n")
+    print('near misses', len(out), 'écrits dans', os.path.relpath(path, lib.ROOT))
 
 if '--multi' in sys.argv:
-    for c in sorted(multi, key=lambda c: (c[0]['ray'], c[0]['brand'])):
+    for c in sorted(multi, key=lambda c: (lib.RAYON_ORDER[c[0]['ray']], c[0]['brand'])):
         print(c[0]['ray'], '|', ' || '.join(f"{x['ret'][:4]} {x['brand']} {x['label']} [{x['fmt_raw']}] {x['price']}" for x in c))
 
 json.dump({'items': items, 'cluster_of': {it['rid']: find(it['rid']) for it in items}}, open(os.path.join(lib.WORK, 'clusters.json'), 'w', encoding='utf-8'), ensure_ascii=False)

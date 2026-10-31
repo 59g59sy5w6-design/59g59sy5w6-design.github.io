@@ -3,24 +3,29 @@
 À chaque publication (tools/publish.sh, après make_catalog.py), compare le catalogue déjà publié (HEAD) au nouveau
 catalogue et ajoute à data/history.json chaque prix qui a changé, avec sa date de relevé. Seuls les prix relevés
 comptent, jamais les offres simulées. Un produit dont le prix n'a jamais changé n'y figure pas : son prix est celui
-du catalogue.
+du catalogue. L'historique est plafonné aux MAX_WEEKS dernières semaines et aux MAX_POINTS derniers changements par offre.
 
 Format compact : {"d": ["2026-10-29", ...], "p": {identifiant: {enseigne: [[indice de date, prix], ...]}}}
 Usage : python3 tools/history.py
 """
-import json
-import os
-import subprocess
+import datetime, json, os, subprocess, sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PATH = os.path.join(ROOT, 'data', 'history.json')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lib  # noqa: E402
 
-new = json.load(open(os.path.join(ROOT, 'data', 'catalog.json'), encoding='utf-8'))
-meta = json.load(open(os.path.join(ROOT, 'data', 'meta.json'), encoding='utf-8'))
+PATH = os.path.join(lib.DATA, 'history.json')
+MAX_WEEKS = 26
+MAX_POINTS = 12
+
+new = lib.read_catalog(json.load(open(os.path.join(lib.DATA, 'catalog.json'), encoding='utf-8')))
+meta = json.load(open(os.path.join(lib.DATA, 'meta.json'), encoding='utf-8'))
 try:
-    old = json.loads(subprocess.check_output(['git', 'show', 'HEAD:data/catalog.json'], cwd=ROOT, stderr=subprocess.DEVNULL))
+    old_cat = json.loads(subprocess.check_output(['git', 'show', 'HEAD:data/catalog.json'], cwd=lib.ROOT, stderr=subprocess.DEVNULL))
+    old = lib.read_catalog(old_cat)
+    aliases = json.load(open(os.path.join(lib.DATA, 'catalog.json'), encoding='utf-8')).get('aliases', {})
 except Exception:
     old = None
+    aliases = {}
 
 # en mémoire : {identifiant: {enseigne: [[date, prix], ...]}}
 hist = {}
@@ -41,14 +46,13 @@ def add(pid, ret, day, price):
 
 changed = 0
 if old:
-    aliases = new.get('aliases', {})
     prev = {}
-    for p in old['products']:
+    for p in old:
         pid = aliases.get(p['id'], p['id'])
         for ret, o in p['offers'].items():
             if not o.get('sim'):
                 prev[(pid, ret)] = (o['price'], o.get('at') or meta.get('updatedAt'))
-    for p in new['products']:
+    for p in new:
         for ret, o in p['offers'].items():
             if o.get('sim'):
                 continue
@@ -60,6 +64,18 @@ if old:
                 add(p['id'], ret, was[1], was[0])
             add(p['id'], ret, day, o['price'])
             changed += 1
+
+# plafond : rien de plus vieux que MAX_WEEKS semaines (le dernier point reste, c'est le prix en vigueur), MAX_POINTS points par offre
+limit = (datetime.date.today() - datetime.timedelta(weeks=MAX_WEEKS)).isoformat()
+for pid in list(hist):
+    for ret in list(hist[pid]):
+        pts = hist[pid][ret]
+        pts = [pt for pt in pts if pt[0] >= limit] or pts[-1:]
+        hist[pid][ret] = pts[-MAX_POINTS:]
+        if not hist[pid][ret]:
+            del hist[pid][ret]
+    if not hist[pid]:
+        del hist[pid]
 
 days = sorted({d for offers in hist.values() for pts in offers.values() for d, _ in pts})
 ix = {d: i for i, d in enumerate(days)}
