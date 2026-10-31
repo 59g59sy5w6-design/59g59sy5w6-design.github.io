@@ -605,10 +605,15 @@ a.hcard:active, button.hcard:active { background: var(--fill); }
 .banner.good .ic { color: var(--brand-ink); }
 .banner.warn { background: var(--warn-bg); color: var(--warn); }
 .banner.warn .ic { color: var(--warn); }
-.bud { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 8px; margin-top: 10px; padding: 8px 12px; border-radius: var(--r-s); font-size: 0.9375rem; font-weight: 600; }
+/* budget : ce qu'il reste ou le dépassement, une barre, puis « Tenir le budget » et « Modifier » */
+.bud { display: grid; gap: 6px; margin-top: 10px; padding: 10px 12px 8px; border-radius: var(--r-s); background: var(--fill); color: var(--ink); font-size: 0.9375rem; line-height: 1.33; font-weight: 600; }
 .bud.ok { background: var(--brand-tint); color: var(--brand-ink); }
 .bud.over { background: var(--warn-bg); color: var(--warn); }
-.bud .act { margin: -8px 0 -8px auto; color: inherit; }
+.bud .bt small { display: block; margin-top: 2px; font-size: 0.875rem; line-height: 1.1875rem; font-weight: 400; }
+.bud .prog.thin { margin: 2px 0; background: var(--card); }
+.bud.over .prog span { background: var(--warn); }
+.bacts { display: flex; flex-wrap: wrap; gap: 0 16px; }
+.bud .act { margin: 0 0 0 -6px; color: inherit; }
 
 /* ---------- dock, mini panier, barre d'achat ---------- */
 .dock { position: fixed; z-index: 25; left: var(--side); right: 0; bottom: calc(var(--sb) + var(--tab)); padding: 8px calc(8px + var(--sr)) 8px calc(8px + var(--sl)); pointer-events: none; }
@@ -691,6 +696,55 @@ button.mini { width: 100%; text-align: left; }
 .of .btn { margin-top: 12px; }
 .of .acts { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; }
 .of .btn.tint .ic { width: 18px; height: 18px; }
+/* prix d'une ligne : il ouvre « Où le prendre » (autres enseignes, épingler, exclure, équivalents) */
+.item .ir .lpb { display: inline-flex; align-items: center; gap: 2px; min-height: var(--tap); padding: 0 4px 0 8px; margin-right: -4px; border-radius: var(--r-s); color: var(--ink); }
+.item .ir .lpb .ic { width: 16px; height: 16px; color: var(--ink-2); stroke-width: 2.4; }
+.item .ir .lpb:active { background: var(--fill); }
+@media (min-width: 960px) { .item .ir { gap: 2px; } }
+.item .it small.inote { display: flex; align-items: flex-start; gap: 4px; color: var(--brand-ink); }
+.item .inote .ic { width: 14px; height: 14px; flex: none; margin-top: 2px; stroke-width: 2.4; }
+.order.inset { margin: 0 var(--g); box-shadow: 0 0 0 1px var(--edge); }
+.cview { padding-top: 14px; }
+.cartcols .cview { padding-top: 0; }
+/* tableau du panier : la colonne des produits reste en place, les enseignes défilent de côté */
+.tblh { padding-top: 14px; }
+.ctbl { position: relative; margin: 8px var(--gr) 0 var(--gx); overflow-x: auto; overscroll-behavior-x: contain; border-radius: var(--r-m); background: var(--card); }
+.ctbl:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.ctbl table { border-collapse: separate; border-spacing: 0; min-width: 100%; font-size: 0.9375rem; line-height: 1.25; }
+.ctbl th, .ctbl td { padding: 10px 12px; text-align: right; vertical-align: top; white-space: nowrap; border-top: var(--hair) solid var(--sep); font-variant-numeric: tabular-nums; }
+.ctbl thead th { border-top: 0; font-weight: 600; color: var(--ink); vertical-align: bottom; white-space: normal; min-width: 6rem; max-width: 9rem; }
+.ctbl small { display: block; margin-top: 2px; font-size: 0.875rem; line-height: 1.1875rem; color: var(--ink-2); font-weight: 400; }
+.ctbl th[scope="row"], .ctbl th.pc { position: sticky; left: 0; z-index: 1; min-width: 9.5rem; max-width: 12.5rem; text-align: left; white-space: normal; overflow-wrap: anywhere; font-weight: 600; background: var(--card); box-shadow: 1px 0 0 var(--sep); }
+.ctbl td.on { background: var(--brand-tint); color: var(--brand-ink); font-weight: 700; }
+.ctbl td.on .ic { width: 14px; height: 14px; stroke-width: 3; vertical-align: -1px; margin-right: 3px; }
+.ctbl td.on small { color: var(--brand-ink); }
+.ctbl td.na { color: var(--ink-2); }
+.ctbl tfoot th, .ctbl tfoot td { font-weight: 600; }
+/* Et si : un scénario par ligne, son total exact et « Appliquer » */
+details.wif { margin: 28px var(--gr) 0 var(--gx); background: var(--card); border-radius: var(--r-m); overflow: hidden; }
+details.wif > summary .rt { flex: 1; min-width: 0; font-weight: 600; }
+details.wif > summary .rt small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 0.875rem; line-height: 1.1875rem; font-weight: 400; }
+details.wif > summary:active { background: var(--fill); }
+#wif > .sn { padding: 0 16px 14px; font-size: 0.875rem; color: var(--ink-2); }
+.row.wifr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; align-items: start; }
+.row.wifr .rt { grid-row: 1 / span 2; }
+.row.wifr .val { margin: 0; justify-self: end; font: 600 1.0625rem/1.3 var(--round); color: var(--ink); }
+.row.wifr .btn { justify-self: end; }
+.row.wifr.cur { background: var(--group); }
+.row.wifr.cur .rt { grid-row: auto; }
+/* Compléter malin : le produit, son prix chez l'enseigne, ce que devient le total */
+.tup { position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 8px 12px; align-items: start; padding: 12px 16px; }
+.tup + .tup::before { content: ""; position: absolute; top: 0; left: 76px; right: 0; height: var(--hair); background: var(--sep); }
+.tup .thumb { position: relative; width: 48px; height: 48px; border-radius: var(--r-s); background: var(--shelf); }
+.tup .thumb img { position: absolute; inset: 4%; width: 92%; height: 92%; }
+.tup .tt b { display: block; font-size: 0.9375rem; line-height: 1.33; font-weight: 400; overflow-wrap: anywhere; }
+.tup .tt b strong { font-weight: 600; }
+.tup .tt small { display: block; margin-top: 2px; font-size: 0.875rem; line-height: 1.1875rem; color: var(--ink-2); }
+.tup .tt .eff { color: var(--ink); font-weight: 600; }
+.tup.good .tt .eff { color: var(--brand-ink); }
+.tup .btn { grid-column: 2; justify-self: start; }
+.ihead { padding-top: 4px; }
+.group.eqs { margin-top: 12px; }
 
 /* ---------- état vide ---------- */
 .empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; max-width: 360px; margin: 0 auto; padding: 56px 32px 24px; }

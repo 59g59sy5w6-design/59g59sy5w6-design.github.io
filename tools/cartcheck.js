@@ -1,7 +1,13 @@
 // Vérification de « Annuler partout, gestes et clavier » : un produit retiré du panier revient avec sa quantité par
 // « Annuler » ; « Vider le panier » puis « Annuler » rend le panier et cabas.guide identiques (les créneaux restent) ;
 // un glissement vers la gauche sur une ligne révèle « Retirer », un glissement vertical non ; au clavier, « / » donne
-// le focus à la recherche et « + » sur une carte ajoute un exemplaire. Code de sortie 1 en cas de problème.
+// le focus à la recherche et « + » sur une carte ajoute un exemplaire.
+// Puis le panier intelligent, avec la promesse « le total affiché est celui qu'on obtient, livraison comprise » :
+// tableau du panier (une colonne par enseigne, le prix pris coché, défilement au clavier), épingler et exclure depuis
+// la ligne, Et si (le total d'un scénario est celui du panier une fois appliqué, « Annuler » le défait), panier souple
+// (jamais plus cher, l'équivalent est celui de « Remplir mes paniers »), Compléter malin (le total annoncé est celui
+// du panier après l'ajout), budget du mois (total payé saisi compté à part) et « Tenir le budget ».
+// Code de sortie 1 en cas de problème.
 // Usage : node tools/cartcheck.js
 const http = require("http");
 const fs = require("fs");
@@ -183,8 +189,197 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     fail("parcours ordinateur interrompu : " + e.message.split("\n")[0]);
   }
   await dctx.close();
+
+  /* ---------- panier intelligent ---------- */
+  const PRODS = { "contrex-eau-minerale-naturelle-6-x-1-l": 4, "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2, "candia-lait-1-2-ecreme-6-x-1-l": 2, "entremont-emmental-rape-francais-160-g": 4, "president-beurre-gastronomique-doux-82-mg-250-g": 2, "barilla-pates-capellini-n-1-500-g": 6, "carapelli-huile-d-olive-vierge-extra-classico-75-cl": 2, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 4 };
+  const today = iso(new Date());
+  const hist = [{ d: today, t: 5000, s: 300, n: 6, o: [{ rid: "houra", name: "Houra", pick: false, t: 5000, items: { "candia-lait-1-2-ecreme-6-x-1-l": 2 } }], items: { "candia-lait-1-2-ecreme-6-x-1-l": 2 }, when: [], paid: { houra: 5250 } }, { d: "2026-01-12", t: 9000, s: 0, n: 9, o: [{ rid: "houra", name: "Houra", pick: false, t: 9000, items: {} }], items: {}, when: [] }];
+  const sctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
+  const sp = await sctx.newPage();
+  sp.on("pageerror", (e) => fail("erreur JS (panier intelligent) : " + e.message));
+  sp.on("console", (m) => { if (m.type() === "error") fail("console (panier intelligent) : " + m.text()); });
+  const done = (page) => page.waitForFunction(() => { const D = cabasDebug(), R = D.RES(); return R.done && R.otherDone && !document.querySelector(".sum.loading"); }, null, { timeout: 30000 });
+  const total = (page) => page.evaluate(() => cabasDebug().cartTotal());
+  const shown = (page) => page.evaluate(() => { const el = document.querySelector(".sum .st .sr"); return el ? el.textContent : ""; });
+  const eurC = (c) => (Math.round(c) / 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00a0€";
+  const settle = async (page) => { await page.waitForTimeout(250); await done(page); await page.waitForTimeout(250); };
+  let step = "ouverture";
+  const info = [];
+  /* un bouton de la page est amené au milieu de l'écran avant d'être touché : la barre d'onglets ne le cache pas */
+  const tap = async (page, sel) => { await page.evaluate((sel) => { const el = document.querySelector(sel); if (el) el.scrollIntoView({ block: "center" }); }, sel); await page.waitForTimeout(120); await page.click(sel, { timeout: 8000 }).catch(async (e) => { throw new Error(sel + " : " + (await page.evaluate((sel) => { const el = document.querySelector(sel); if (!el) return "absent"; const r = el.getBoundingClientRect(); const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return JSON.stringify(r) + " sous " + (top ? top.className + "/" + top.tagName : "rien"); }, sel))); }); };
+  try {
+    await sp.goto(base + "#/"); await ready(sp);
+    await sp.evaluate(({ PRODS, hist }) => {
+      localStorage.setItem("cabas.basket", JSON.stringify(PRODS));
+      localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 }));
+      localStorage.setItem("cabas.hist", JSON.stringify(hist));
+      localStorage.setItem("cabas.prefs", JSON.stringify({ zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, usual: {}, qty1: {}, maxOrders: 3, extraCost: 0, offv: 1, budget: 300, budgetMode: "mois" }));
+    }, { PRODS, hist });
+    await sp.goto(base + "#/panier"); await sp.reload(); await ready(sp); await settle(sp);
+    let t0 = await total(sp);
+    if (t0 == null) fail("panier intelligent : pas de total pour le panier d'essai");
+    if ((await shown(sp)) !== eurC(t0)) fail(`le total affiché (${await shown(sp)}) n'est pas celui de la répartition (${eurC(t0)})`);
+
+    step = "budget du mois";
+    /* budget du mois : le total payé saisi (52,50 €) remplace le total relevé (50,00 €) du panier commandé ce mois-ci,
+       le panier de janvier ne compte pas */
+    const ms = await sp.evaluate(() => cabasDebug().monthSpend());
+    if (ms.spent !== 5250 || ms.n !== 1 || ms.typed !== 1) fail("budget du mois : dépenses " + JSON.stringify(ms));
+    const bud = await sp.evaluate(() => (document.querySelector(".sum .bud") || {}).textContent || "");
+    const left = 30000 - 5250 - t0;
+    if (!bud.includes(left >= 0 ? `il te reste ${eurC(left)} ce mois-ci` : `dépassé de ${eurC(-left)}`)) fail(`budget du mois : « ${bud} », attendu ${eurC(left)}`);
+    /* budgetFit : les remplacements les plus rentables au total exact, jusqu'à combler le dépassement */
+    const bf = await sp.evaluate(() => { const D = cabasDebug(), sw = [{ from: { id: "a" }, to: { id: "a2" }, save: 1 }, { from: { id: "b" }, to: { id: "b2" }, save: 1 }, { from: { id: "c" }, to: { id: "c2" }, save: 1 }]; return D.budgetFit(10000, 10500, sw, new Map([["a", 10400], ["b", 10100], ["c", 10600]])); });
+    if (bf.over !== 500 || bf.swaps.map((x) => x.from.id).join() !== "b,a" || bf.save !== 500 || !bf.enough) fail("budgetFit : " + JSON.stringify({ over: bf.over, ids: bf.swaps.map((x) => x.from.id), save: bf.save }));
+
+    step = "tableau";
+    /* tableau du panier : une ligne par produit, une colonne par enseigne, chaque produit pris coché une fois ; le
+       tableau défile de côté au clavier */
+    await tap(sp, '[data-act="cview"][data-v="tab"]'); await sp.waitForTimeout(300);
+    const tb = await sp.evaluate(() => { const D = cabasDebug(), M = D.RES().M, t = document.querySelector(".ctbl table"); if (!t) return null; return { rows: t.tBodies[0].rows.length, cols: t.tHead.rows[0].cells.length, on: t.querySelectorAll("td.on").length, lines: M.lines.length + M.uncovered.length, chans: M.chans.length, region: document.querySelector(".ctbl").getAttribute("role"), tab: document.querySelector(".ctbl").tabIndex }; });
+    if (!tb) fail("tableau : absent");
+    else {
+      if (tb.rows !== tb.lines || tb.cols !== tb.chans + 1) fail("tableau : " + JSON.stringify(tb));
+      if (tb.on < 1 || tb.on > tb.lines) fail(`tableau : ${tb.on} prix cochés pour ${tb.lines} produits`);
+      if (tb.region !== "region" || tb.tab !== 0) fail("tableau : la zone qui défile n'est pas une région atteignable au clavier");
+      await sp.focus(".ctbl"); await sp.keyboard.press("ArrowRight"); await sp.keyboard.press("ArrowRight"); await sp.waitForTimeout(250);
+      const sc = await sp.evaluate(() => { const c = document.querySelector(".ctbl"); return { x: c.scrollLeft, w: c.scrollWidth - c.clientWidth }; });
+      if (sc.w > 0 && sc.x <= 0) fail("tableau : les flèches du clavier ne le font pas défiler");
+    }
+    const over = await sp.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    if (over > 0) fail(`tableau : la page déborde de ${over} px`);
+    await tap(sp, '[data-act="cview"][data-v="cmd"]'); await sp.waitForTimeout(300);
+
+    step = "épingler";
+    /* épingler : le produit va dans l'enseigne choisie, le total affiché est le nouveau total ; exclure : il n'y va plus */
+    const pick = await sp.evaluate((ids) => {
+      const D = cabasDebug(), S = D.S;
+      for (const id of ids) {
+        const pl = D.placeOf(id);
+        if (!pl || pl.mag) continue;
+        const gs = S.rets.filter((r) => { const o = S.prods.get(id).offers[r.id]; return o && o.price > 0 && r.id !== pl.ret; }).map((r) => r.group || r.id);
+        if (gs.length) return { id, from: pl.ret, g: gs[0] };
+      }
+      return null;
+    }, Object.keys(PRODS));
+    if (!pick) fail("épingler : aucun produit vendu par une autre enseigne");
+    else {
+      await tap(sp, `.lpb[data-id="${pick.id}"]`); await sp.waitForTimeout(400);
+      if (await sp.evaluate(() => document.getElementById("sheet").hidden)) fail("le prix d'une ligne n'ouvre pas « Où le prendre »");
+      await tap(sp, `#sheet [data-act="itempin"][data-g="${pick.g}"]`); await settle(sp);
+      const foot = await sp.evaluate(() => document.querySelector("#sheet .sheet-f").textContent);
+      await tap(sp, "#sheet .sheet-h [data-act=close]"); await settle(sp);
+      const pl = await sp.evaluate((id) => { const D = cabasDebug(), p = D.placeOf(id), r = p && D.S.allMap.get(p.ret); return r ? r.group || r.id : null; }, pick.id);
+      if (pl !== pick.g) fail(`épingler : ${pick.id} est chez ${pl}, pas chez ${pick.g}`);
+      const t1 = await total(sp);
+      if ((await shown(sp)) !== eurC(t1)) fail("épingler : le total affiché n'est pas celui de la nouvelle répartition");
+      if (!foot.includes(eurC(t1))) fail(`épingler : la feuille annonçait « ${foot.trim()} », le panier fait ${eurC(t1)}`);
+      if (!(await sp.evaluate((id) => !!document.querySelector(`.item[data-rm="p:${id}"] .inote`), pick.id))) fail("épingler : la ligne ne dit pas « Toujours chez … »");
+      step = "exclure";
+      /* exclure l'enseigne épinglée : l'épingle tombe, le produit n'y est plus pris */
+      await tap(sp, `.lpb[data-id="${pick.id}"]`); await sp.waitForTimeout(400);
+      await tap(sp, `#sheet [data-act="itemban"][data-g="${pick.g}"]`); await settle(sp);
+      await tap(sp, "#sheet .sheet-h [data-act=close]"); await settle(sp);
+      const st = await sp.evaluate((id) => { const D = cabasDebug(), p = D.placeOf(id), r = p && D.S.allMap.get(p.ret); return { at: r ? r.group || r.id : null, pin: D.S.prefs.pin[id] || null, ban: D.S.prefs.ban[id] || null }; }, pick.id);
+      if (st.at === pick.g || st.pin || !st.ban || !st.ban[pick.g]) fail("exclure : " + JSON.stringify(st));
+
+      step = "Et si";
+      /* Et si : « Sans tes choix d'enseigne » et « Sans X » donnent le total qu'on obtient en appliquant */
+      await tap(sp, "details.wif > summary"); await sp.waitForTimeout(300);
+      await sp.waitForFunction(() => document.querySelector("#wif") && !/Calcul/.test(document.querySelector("#wif").textContent), null, { timeout: 20000 });
+      const rows = await sp.evaluate(() => [...document.querySelectorAll("#wif .wifr:not(.cur)")].map((r) => { const b = r.querySelector("[data-act=wifgo]"); return { w: b.dataset.w, g: b.dataset.g || "", ok: !b.disabled, val: r.querySelector(".val").textContent }; }));
+      const free = rows.find((r) => r.w === "free");
+      if (!free) fail("Et si : pas de scénario « Sans tes choix d'enseigne » alors qu'un produit est exclu");
+      const sans = rows.find((r) => r.w === "sans" && r.ok);
+      if (!sans) fail("Et si : aucun scénario « Sans … » applicable : " + JSON.stringify(rows));
+      else {
+        const before = await sp.evaluate(() => JSON.stringify(cabasDebug().S.prefs.off));
+        await tap(sp, `#wif [data-act=wifgo][data-w=sans][data-g="${sans.g}"]`); await settle(sp);
+        const t2 = await total(sp);
+        info.push(`Et si sans ${sans.g} ${sans.val}`);
+        if (eurC(t2) !== sans.val) fail(`Et si : « Sans ${sans.g} » annonçait ${sans.val}, le panier fait ${eurC(t2)}`);
+        if (!(await sp.evaluate((g) => !!cabasDebug().S.prefs.off[g], sans.g))) fail("Et si : l'enseigne n'est pas désactivée");
+        if (!/Annuler/.test(await toastText(sp))) fail("Et si : pas d'« Annuler »");
+        await tap(sp, "#toast button"); await settle(sp);
+        if ((await sp.evaluate(() => JSON.stringify(cabasDebug().S.prefs.off))) !== before) fail("Et si : « Annuler » ne remet pas l'enseigne");
+      }
+      if (free && free.ok) {
+        /* après « Annuler », les scénarios se recalculent : le même total revient */
+        await sp.waitForFunction((v) => { const b = document.querySelector("#wif [data-act=wifgo][data-w=free]"); return b && !b.disabled && b.closest(".wifr").querySelector(".val").textContent === v; }, free.val, { timeout: 20000 }).catch(async () => fail("Et si : après « Annuler », « Sans tes choix d'enseigne » ne revient pas au même total : " + (await sp.evaluate(() => (document.querySelector("#wif") || {}).textContent)) + " / " + free.val));
+        await tap(sp, "#wif [data-act=wifgo][data-w=free]"); await settle(sp);
+        const t3 = await total(sp);
+        if (eurC(t3) !== free.val) fail(`Et si : « Sans tes choix d'enseigne » annonçait ${free.val}, le panier fait ${eurC(t3)}`);
+        if (await sp.evaluate((id) => !!(cabasDebug().S.prefs.ban[id] || cabasDebug().S.prefs.pin[id]), pick.id)) fail("Et si : les choix d'enseigne restent");
+        if (Math.abs(t3 - t0) > 0) fail(`sans épingle ni exclusion, le total (${eurC(t3)}) devrait redevenir ${eurC(t0)}`);
+      }
+    }
+
+    step = "panier souple";
+    /* panier souple : tout cocher ne fait jamais monter le total ; un équivalent pris est le produit que « Remplir mes
+       paniers » ouvre, et l'instantané compte le même total, frais compris */
+    t0 = await total(sp);
+    await tap(sp, "[data-act=flex]"); await sp.waitForTimeout(400);
+    await tap(sp, "#sheet [data-act=flexall]"); await sp.waitForTimeout(200);
+    await tap(sp, "#sheet .sheet-h [data-act=close]"); await settle(sp);
+    const fx = await sp.evaluate(() => {
+      const D = cabasDebug(), snap = D.fillSnap(), alts = [];
+      const R = D.RES(), st = R.steps[R.K], bst = st && st.full;
+      if (bst) bst.orders.forEach((o) => o.items.forEach((x) => { if (x.alt) alts.push({ id: x.l.id, alt: x.alt, ret: o.ch.id }); }));
+      let snapTot = 0;
+      if (snap) { snap.orders.forEach((o) => { const sub = o.items.reduce((a, x) => a + x.cost, 0); snapTot += sub + (sub > 0 ? feeAt(o.P, sub) : 0); }); snapTot += snap.comp.reduce((a, x) => a + x.cost, 0); }
+      const inSnap = alts.every((a) => snap.orders.some((o) => o.rid === a.ret && o.items.some((x) => x.id === a.alt)));
+      return { n: Object.keys(D.S.flex).length, alts, inSnap, snapTot, lines: document.querySelectorAll(".item .inote").length };
+    });
+    const t4 = await total(sp);
+    info.push(`panier souple ${eurC(t0)} puis ${eurC(t4)}, ${fx.alts.length} équivalents pris`);
+    if (!fx.n) fail("panier souple : « Tout cocher » n'a rien coché");
+    if (t4 > t0) fail(`panier souple : le total monte (${eurC(t0)} puis ${eurC(t4)})`);
+    if (fx.snapTot !== t4) fail(`panier souple : « Remplir mes paniers » compterait ${eurC(fx.snapTot)}, le panier affiche ${eurC(t4)}`);
+    if (!fx.inSnap) fail("panier souple : l'équivalent pris n'est pas le produit de « Remplir mes paniers »");
+    if (fx.alts.length && (await sp.evaluate(() => !document.querySelector(".item .inote")))) fail("panier souple : la ligne ne dit pas qu'un équivalent est pris");
+
+    step = "Compléter malin";
+    /* Compléter malin : le total annoncé pour un produit est celui du panier une fois le produit ajouté */
+    const rid = await sp.evaluate(() => { const R = cabasDebug().RES(), st = R.steps[R.K]; return st.full.orders[0].ch.id; });
+    await sp.evaluate((rid) => { const b = document.createElement("button"); b.dataset.act = "topup"; b.dataset.id = rid; b.id = "topt"; b.type = "button"; b.textContent = "Compléter"; document.querySelector("#view .wrap").appendChild(b); }, rid);
+    await sp.evaluate(() => document.getElementById("topt").click()); await sp.waitForTimeout(400);
+    await sp.waitForFunction(() => document.querySelector("#sheet .tup") && ![...document.querySelectorAll("#sheet .tup .eff")].some((e) => /Calcul/.test(e.textContent)), null, { timeout: 30000 }).catch(() => fail("Compléter malin : les totaux ne arrivent pas"));
+    const cand = await sp.evaluate(() => { const b = document.querySelector("#sheet [data-act=topadd]"); return b ? { id: b.dataset.id, eff: b.closest(".tup").querySelector(".eff").textContent } : null; });
+    if (!cand) fail("Compléter malin : aucun produit proposé");
+    else {
+      const g = await sp.evaluate((id) => cabasDebug().topupGain(id), cand.id);
+      const okText = g.after == null || cand.eff.includes(eurC(g.after)) || (g.delta < 0 && cand.eff.includes(eurC(-g.delta))) || (g.delta >= 0 && cand.eff.includes(eurC(g.delta)));
+      if (!okText) fail(`Compléter malin : « ${cand.eff} » ne correspond pas au calcul (${JSON.stringify(g)})`);
+      await tap(sp, `#sheet [data-act=topadd][data-id="${cand.id}"]`); await settle(sp);
+      await tap(sp, "#sheet .sheet-h [data-act=close]"); await settle(sp);
+      const t5 = await total(sp);
+      info.push(`Compléter malin « ${cand.eff} »`);
+      if (t5 !== g.after) fail(`Compléter malin : annoncé ${g.after == null ? "aucun total" : eurC(g.after)}, le panier fait ${t5 == null ? "aucun total" : eurC(t5)}`);
+    }
+
+    step = "tenir le budget";
+    /* tenir le budget : un budget par panier trop bas, les remplacements retenus au total exact, puis appliqués */
+    await sp.evaluate(() => { const D = cabasDebug(); D.S.prefs.budget = 40; D.S.prefs.budgetMode = "panier"; D.S.flex = {}; localStorage.setItem("cabas.prefs", JSON.stringify(D.S.prefs)); localStorage.setItem("cabas.flex", "{}"); });
+    await sp.reload(); await ready(sp); await settle(sp);
+    await tap(sp, "[data-act=budfit]"); await sp.waitForTimeout(400);
+    await sp.waitForFunction(() => { const b = document.querySelector("#sheet .sheet-b"); return b && !/Calcul/.test(b.textContent); }, null, { timeout: 40000 }).catch(() => fail("Tenir le budget : le calcul ne finit pas"));
+    const fit = await sp.evaluate(() => { const p = [...document.querySelectorAll("#sheet .gf")].map((e) => e.textContent).find((x) => /^Avec ce/.test(x)); const m = p && /: ([\d\s\u00a0\u202f.,]+€)/.exec(p); return { txt: p || "", val: m ? m[1] : null, btn: !!document.querySelector("#sheet [data-act=budswap]") }; });
+    if (fit.btn) {
+      await tap(sp, "#sheet [data-act=budswap]"); await settle(sp);
+      await tap(sp, "#sheet .sheet-h [data-act=close]"); await settle(sp);
+      const t6 = await total(sp);
+      info.push(`tenir le budget « ${fit.txt} »`);
+      if (eurC(t6) !== fit.val) fail(`Tenir le budget : annoncé « ${fit.txt} », le panier fait ${eurC(t6)}`);
+    } else if (!/Aucun remplacement/.test(await sp.evaluate(() => document.querySelector("#sheet .sheet-b").textContent))) fail("Tenir le budget : ni remplacement ni explication");
+    const over2 = await sp.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    if (over2 > 0) fail(`panier intelligent : la page déborde de ${over2} px`);
+  } catch (e) {
+    fail(`panier intelligent interrompu (${step}) : ` + e.message.split("\n")[0]);
+  }
+  await sctx.close();
   await browser.close();
   server.close();
+  if (info.length) console.log(info.join("\n"));
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Annuler, glissement et clavier : aucun problème.");
+  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, panier souple, Compléter malin, budget du mois, tenir le budget) : aucun problème.");
 })();

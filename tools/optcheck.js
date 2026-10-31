@@ -1,11 +1,14 @@
 // Vérification de la répartition du panier (optimizer.js) : sur des paniers tirés au hasard, compare le total
 // trouvé par runAll, pour chaque nombre de commandes, au minimum obtenu en essayant toutes les répartitions.
 // Avec et sans achat en magasin, avec et sans coût par commande en plus.
+// Puis le panier intelligent, sur des modèles construits comme l'appli (buildModel) : épingles et exclusions
+// respectées, panier souple (équivalents acceptés, prix relevés seulement) exact et jamais plus cher que le panier
+// exact, gain exact de « Compléter malin » (bestAt avec un produit en plus), scénarios « Et si : sans X ».
 // Usage : node tools/optcheck.js [nombre de paniers]
 const fs = require("fs");
 const path = require("path");
 const src = fs.readFileSync(path.join(__dirname, "..", "optimizer.js"), "utf8");
-const O = new Function(src + "; return { runAll, feeAt };")();
+const O = new Function(src + "; return { runAll, feeAt, buildModel, bestAt };")();
 
 let seed = 12345;
 const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
@@ -85,4 +88,130 @@ for (let t = 0; t < N; t++) {
   }
 }
 console.log(`${tested} cas vérifiés (${multi} meilleures répartitions en plusieurs commandes, ${store} avec achat en magasin), ${bad} écart${bad > 1 ? "s" : ""}${slow ? `, ${slow} calculs de plus d'une seconde` : ""}.`);
-process.exit(bad ? 1 : 0);
+
+/* ---------- panier intelligent ---------- */
+/* Énumération indépendante, sur les données brutes de l'appli : chaque ligne a son produit et ses équivalents (prix par
+   enseigne, simulé ou non) et ses enseignes interdites (no). Une enseigne permise prend le moins cher du produit et des
+   équivalents relevés (un équivalent simulé ne compte jamais) ; en magasin, le prix relevé le plus bas d'une enseigne
+   permise qui a des magasins. Avec des équivalents, le panier exact (sans eux) compte aussi : le meilleur des deux.
+   Renvoie le meilleur score (comme runAll) et le total de cette répartition. */
+function bruteRaw(src, chans, store, compOn, K, lambda) {
+  const a = bruteOne(src, chans, store, compOn, K, lambda);
+  if (!src.some((x) => x.opts.length > 1)) return a;
+  const ex = src.map((x) => Object.assign({}, x, { opts: x.opts.slice(0, 1) }));
+  if (covered(ex, chans.length) !== covered(src, chans.length)) return a;
+  const b = bruteOne(ex, chans, store, compOn, K, lambda);
+  return b.score < a.score ? b : a;
+}
+const covered = (src, m) => src.filter((x) => { for (let c = 0; c < m; c++) if (!x.no.includes(c) && x.opts.some((op, j) => { const v = op.at[c]; return v && v.cost > 0 && (j === 0 || !v.sim); })) return true; return false; }).length;
+function bruteOne(src, chans, store, compOn, K, lambda) {
+  const m = chans.length, at = (x, j, c) => { const a = x.opts[j].at[c]; return a && a.cost > 0 && (j === 0 || !a.sim) ? a.cost : null; };
+  const lines = src.filter((x) => { for (let c = 0; c < m; c++) if (!x.no.includes(c) && x.opts.some((_, j) => at(x, j, c) != null)) return true; return false; });
+  const compMax = compOn ? Math.max(1, Math.floor(lines.length / 4)) : 0;
+  let best = { score: Infinity, total: Infinity };
+  for (let mask = 1; mask < 1 << m; mask++) {
+    const U = []; for (let c = 0; c < m; c++) if (mask & (1 << c)) U.push(c);
+    if (U.length > K) continue;
+    const choices = [], comp = [];
+    let ok = true;
+    for (const x of lines) {
+      const o = [];
+      for (const c of U) { if (x.no.includes(c)) continue; let b = null; x.opts.forEach((_, j) => { const v = at(x, j, c); if (v != null && (b == null || v < b)) b = v; }); if (b != null) o.push({ c, cost: b }); }
+      if (o.length) { choices.push(o); continue; }
+      let cb = null;
+      for (let c = 0; c < m; c++) { if (!store[c] || x.no.includes(c)) continue; x.opts.forEach((op) => { const a = op.at[c]; if (a && a.cost > 0 && !a.sim && (!cb || a.cost < cb.cost)) cb = { cost: a.cost, ret: chans[c].id }; }); }
+      if (cb) comp.push(cb); else { ok = false; break; }
+    }
+    if (!ok || comp.length > compMax) continue;
+    const compCost = comp.reduce((a, x) => a + x.cost, 0), stores = new Set(comp.map((x) => x.ret)).size;
+    const idx = choices.map(() => 0);
+    for (;;) {
+      const sub = new Array(m).fill(0), has = new Array(m).fill(false);
+      choices.forEach((o, i) => { sub[o[idx[i]].c] += o[idx[i]].cost; has[o[idx[i]].c] = true; });
+      let fees = 0, items = 0, used = 0, good = true;
+      for (let c = 0; c < m; c++) if (has[c]) { if (sub[c] < chans[c].P.min) { good = false; break; } used++; items += sub[c]; fees += O.feeAt(chans[c].P, sub[c]); }
+      if (good && used > 0) { const score = items + fees + compCost + lambda * (used - 1 + stores) + stores; if (score < best.score) best = { score, total: items + fees + compCost }; }
+      let s2 = 0;
+      while (s2 < idx.length) { idx[s2]++; if (idx[s2] < choices[s2].length) break; idx[s2] = 0; s2++; }
+      if (s2 >= idx.length) break;
+    }
+  }
+  return best;
+}
+/* toutes les étapes de runAll : score de la répartition de tout le panier en k commandes au plus, et ses commandes */
+function steps(M, lambda) {
+  const got = {};
+  O.runAll(M, M.chans.length, lambda, (msg) => { if (!msg.done) got[msg.k] = msg.full; }, 5000);
+  return got;
+}
+const near = (a, b) => (a === Infinity && b === Infinity) || Math.abs(a - b) <= 0.5;
+let sBad = 0, sTested = 0, flexWins = 0, pinned = 0, topups = 0, sans = 0, alts = 0;
+const sFail = (msg) => { sBad++; if (sBad <= 8) console.log("écart : " + msg); };
+const N2 = Math.max(40, Math.round(N / 2));
+for (let t = 0; t < N2; t++) {
+  const m = pickInt(2, 4), n = pickInt(3, 7);
+  const chans = Array.from({ length: m }, (_, c) => ({ id: "c" + c, store: { retailer: "r" + c }, P: P[pickInt(0, P.length - 1)] }));
+  const store = chans.map((_, c) => c < m - 1 && rnd() < 0.7);
+  const prod = (id) => { const base = pickInt(300, 4000), at = []; for (let c = 0; c < m; c++) at.push(rnd() < 0.6 ? { cost: Math.round(base * (0.8 + rnd() * 0.5)), sim: rnd() < 0.12 } : null); if (!at.some(Boolean)) at[pickInt(0, m - 1)] = { cost: base, sim: false }; return { id, at }; };
+  const src = [];
+  for (let l = 0; l < n; l++) {
+    const opts = [prod("p" + l)];
+    const ne = rnd() < 0.5 ? pickInt(1, 2) : 0;
+    for (let e = 0; e < ne; e++) opts.push(prod("p" + l + "e" + e));
+    const no = [];
+    const r = rnd();
+    if (r < 0.2) { const keep = pickInt(0, m - 1); for (let c = 0; c < m; c++) if (c !== keep) no.push(c); pinned++; }
+    else if (r < 0.4) no.push(pickInt(0, m - 1));
+    src.push({ id: "p" + l, q: 1, opts, no });
+  }
+  const exactSrc = src.map((x) => Object.assign({}, x, { opts: x.opts.slice(0, 1) }));
+  for (const compOn of [false, true]) for (const lambda of [0, 150]) {
+    const MF = O.buildModel(src, chans, store, compOn), ME = O.buildModel(exactSrc, chans, store, compOn);
+    const gf = steps(MF, lambda), ge = steps(ME, lambda);
+    for (let K = 1; K <= m; K++) {
+      sTested++;
+      const wf = bruteRaw(src, chans, store, compOn, K, lambda), we = bruteRaw(exactSrc, chans, store, compOn, K, lambda);
+      const sf = gf[K] ? gf[K].score : Infinity, se = ge[K] ? ge[K].score : Infinity;
+      if (!near(sf, wf.score)) sFail(`souple, panier ${t}, ${K} commandes : trouvé ${sf}, minimum ${wf.score}`);
+      if (!near(se, we.score)) sFail(`exact, panier ${t}, ${K} commandes : trouvé ${se}, minimum ${we.score}`);
+      /* le panier souple ne coûte jamais plus que le panier exact, pour les mêmes produits */
+      if (MF.lines.length === ME.lines.length && sf > se + 0.5) sFail(`souple plus cher que l'exact, panier ${t}, ${K} commandes : ${sf} contre ${se}`);
+      if (MF.lines.length === ME.lines.length && sf < se - 0.5) flexWins++;
+      /* épingles et exclusions : aucune ligne dans une enseigne interdite, ni en magasin chez elle ; un équivalent
+         seulement à son prix relevé */
+      const r = gf[K];
+      if (r) {
+        for (const o of r.orders) for (const x of o.items) {
+          const L = src.find((y) => y.id === x.l.id), c = chans.indexOf(o.ch);
+          if (L.no.includes(c)) sFail(`ligne ${x.l.id} dans une enseigne interdite (${o.ch.id}), panier ${t}`);
+          if (x.alt) { alts++; const op = L.opts.find((y) => y.id === x.alt), a = op && op.at[c]; if (!a || a.sim || a.cost !== x.cost) sFail(`équivalent ${x.alt} mal compté chez ${o.ch.id}, panier ${t}`); }
+        }
+        for (const x of r.completed) { const L = src.find((y) => y.id === x.l.id), c = chans.findIndex((ch) => ch.id === x.ret); if (L.no.includes(c) || !store[c]) sFail(`ligne ${x.l.id} en magasin chez une enseigne interdite (${x.ret}), panier ${t}`); }
+        /* bestAt (Et si, Compléter malin) donne le même total que runAll */
+        const b = O.bestAt(MF, K, lambda, 5000);
+        if (!b.full || !near(b.full.score, r.score) || b.full.total !== r.itemsTotal + r.feesTotal + (r.compTotal || 0)) sFail(`bestAt diffère de runAll, panier ${t}, ${K} commandes`);
+      }
+    }
+    /* Compléter malin : le total avec un produit en plus, tel que bestAt le donne, est le vrai minimum, et le gain
+       affiché (nouveau total moins ancien) est l'écart exact entre les deux minimums */
+    const K = pickInt(1, m), cand = { id: "neuf", q: 1, opts: [prod("neuf")], no: [] };
+    const b0 = O.bestAt(MF, K, lambda, 5000), b1 = O.bestAt(O.buildModel(src.concat([cand]), chans, store, compOn), K, lambda, 5000);
+    const w0 = bruteRaw(src, chans, store, compOn, K, lambda), w1 = bruteRaw(src.concat([cand]), chans, store, compOn, K, lambda);
+    topups++;
+    const s0 = b0.full ? b0.full.score : Infinity, s1 = b1.full ? b1.full.score : Infinity;
+    if (!near(s0, w0.score) || !near(s1, w1.score)) sFail(`Compléter malin, panier ${t} : ${s0} puis ${s1}, minimums ${w0.score} puis ${w1.score}`);
+    else if (b0.full && b1.full && lambda === 0 && Math.abs((b1.full.total - b0.full.total) - (w1.total - w0.total)) > 1) sFail(`Compléter malin, panier ${t} : gain ${b1.full.total - b0.full.total}, attendu ${w1.total - w0.total}`);
+    /* Et si : sans telle enseigne, le modèle reconstruit sans elle (indices des interdictions décalés) */
+    for (let x = 0; x < m; x++) {
+      const keep = chans.map((_, c) => c).filter((c) => c !== x), ch2 = keep.map((c) => chans[c]), st2 = keep.map((c) => store[c]);
+      const src2 = src.map((y) => ({ id: y.id, q: y.q, opts: y.opts.map((op) => ({ id: op.id, at: keep.map((c) => op.at[c]) })), no: y.no.filter((c) => c !== x).map((c) => keep.indexOf(c)) }));
+      const M2 = O.buildModel(src2, ch2, st2, compOn), K2 = Math.min(K, ch2.length), b2 = O.bestAt(M2, K2, lambda, 5000), w2 = bruteRaw(src2, ch2, st2, compOn, K2, lambda);
+      sans++;
+      const s2 = b2.full ? b2.full.score : Infinity;
+      if (!near(s2, w2.score)) sFail(`sans c${x}, panier ${t} : trouvé ${s2}, minimum ${w2.score}`);
+      if (M2.lines.length === MF.lines.length && s2 < s0 - 0.5) sFail(`sans c${x} moins cher qu'avec, panier ${t}`);
+    }
+  }
+}
+console.log(`Panier intelligent : ${sTested} cas (${pinned} épingles tirées, ${alts} équivalents pris, ${flexWins} fois le panier souple moins cher), ${topups} « Compléter malin », ${sans} « Et si : sans », ${sBad} écart${sBad > 1 ? "s" : ""}.`);
+process.exit(bad || sBad ? 1 : 0);

@@ -201,7 +201,7 @@ function solveSubset(sub, M, lambda, budget, deadline, bestScore) {
         if (!best || score < best.score) {
           used.forEach((o) => o.items.sort((a, b) => (a.l.n ?? 0) - (b.l.n ?? 0)));
           used.sort((a, b) => b.sub - a.sub);
-          const completed = compLines.map((l) => ({ l: M.lines[l], cost: M.comp[l].cost, ret: M.comp[l].ret }));
+          const completed = compLines.map((l) => (M.comp[l].alt ? { l: M.lines[l], cost: M.comp[l].cost, ret: M.comp[l].ret, alt: M.comp[l].alt } : { l: M.lines[l], cost: M.comp[l].cost, ret: M.comp[l].ret }));
           best = { orders: used, skipped, completed, total, score, itemsTotal: items, feesTotal: fees, compTotal: compCost, compStores: [...stores], extra };
         }
       }
@@ -277,12 +277,73 @@ function* subsetsOfSize(chans, k) {
   if (k > 0) yield* rec(0);
 }
 
+/* Modèle du panier, en centimes, à partir de ses lignes { id, q, opts, no } :
+   - opts[0] est le produit, les suivants les équivalents que la personne accepte (panier souple) ; opts[j].at[ci] vaut
+     { cost, sim } quand l'enseigne ci le vend (cost : prix de la quantité de la ligne), sinon null ;
+   - no : les enseignes (indices) écartées pour cette ligne, par une épingle ailleurs ou une exclusion.
+   Pour chaque enseigne permise, la ligne prend le moins cher du produit et de ses équivalents (alt : l'équivalent pris) ;
+   un équivalent ne compte qu'à un prix relevé, jamais simulé, et le produit lui-même passe d'abord à prix égal.
+   L'achat en magasin (comp) : le prix relevé le plus bas d'une enseigne permise qui a des magasins (store[ci]), au plus
+   un quart des lignes quand il est permis (compOn). Une ligne sans enseigne permise est « uncovered ». */
+function buildModel(src, chans, store, compOn) {
+  const lines = [], offers = [], comp = [], uncovered = [];
+  for (const x of src) {
+    const no = new Set(x.no || []), o = [];
+    let c = null;
+    for (let ci = 0; ci < chans.length; ci++) {
+      if (no.has(ci)) continue;
+      let b = null;
+      x.opts.forEach((op, j) => {
+        const a = op.at[ci];
+        if (!a || !(a.cost > 0) || (j > 0 && a.sim)) return;
+        if (!b || a.cost < b.cost) b = { cost: a.cost, alt: j ? op.id : null };
+        if (store[ci] && !a.sim && (!c || a.cost < c.cost)) c = { cost: a.cost, ret: chans[ci].id, alt: j ? op.id : null };
+      });
+      if (b) o.push(b.alt ? { c: ci, cost: b.cost, alt: b.alt } : { c: ci, cost: b.cost });
+    }
+    if (o.length) { lines.push({ id: x.id, q: x.q, n: lines.length }); offers.push(o); comp.push(c && !c.alt ? { cost: c.cost, ret: c.ret } : c); }
+    else uncovered.push(x.id);
+  }
+  const M = { lines, offers, comp, compMax: compOn ? Math.max(1, Math.floor(lines.length / 4)) : 0, chans, uncovered };
+  /* Avec des équivalents, le panier exact (les produits eux-mêmes) est gardé à côté : prendre à chaque enseigne le moins
+     cher n'est pas toujours le mieux (un produit plus cher peut faire atteindre un minimum d'achat), et le panier souple
+     ne doit jamais coûter plus que le panier exact. runAll garde, pour chaque nombre de commandes, le meilleur des deux. */
+  if (src.some((x) => x.opts.length > 1)) M.exact = buildModel(src.map((x) => Object.assign({}, x, { opts: x.opts.slice(0, 1) })), chans, store, compOn);
+  return M;
+}
+/* La meilleure répartition de tout le panier en K commandes au plus, résumée (Et si, Compléter malin) : son total
+   (articles, frais, achats en magasin), ses commandes ; sinon celle qui laisse le moins de produits de côté. */
+function bestAt(M, K, lambda, ms) {
+  let last = null;
+  if (M.lines.length && M.chans.length) runAll(M, Math.max(1, Math.min(K, M.chans.length)), lambda, (m) => { if (!m.done) last = m; }, ms);
+  const brief = (r) => r && { total: r.itemsTotal + r.feesTotal + (r.compTotal || 0), score: r.score, fees: r.feesTotal, orders: r.orders.map((o) => ({ id: o.ch.id, sub: o.sub, fee: o.fee, n: o.items.length })), comp: (r.completed || []).length, skipped: (r.skipped || []).length, alts: r.orders.reduce((a, o) => a + o.items.filter((x) => x.alt).length, 0) + (r.completed || []).filter((x) => x.alt).length };
+  return { full: last ? brief(last.full) : null, partial: last ? brief(last.partial) : null, truncated: !!(last && last.truncated), lines: M.lines.length, uncovered: M.uncovered.length };
+}
+
 /* Toutes les tailles de commande, de 1 à Kmax, dans l'ordre. Pour chaque k, report() reçoit :
    - full : la répartition de TOUT le panier la moins chère en k commandes au plus (null s'il n'y en a pas) ;
    - partial : sinon, la répartition qui laisse le moins de produits de côté, puis la moins chère.
    « full » est cumulé d'une taille à l'autre : pour le même panier, plus de commandes autorisées ne donne jamais un
    total plus élevé. Les petites tailles passent d'abord : si le temps manque, seules les grandes sont écourtées. */
 function runAll(M, Kmax, lambda, report, budgetMs) {
+  if (M.exact && M.exact.lines.length === M.lines.length) return runBoth(M, Kmax, lambda, report, budgetMs);
+  return runOne(M, Kmax, lambda, report, budgetMs);
+}
+/* panier souple : le modèle avec équivalents et le panier exact, chacun calculé en entier ; pour chaque nombre de
+   commandes, la répartition de tout le panier la moins chère des deux (sinon celle qui laisse le moins de côté) */
+function runBoth(M, Kmax, lambda, report, budgetMs) {
+  const ms = budgetMs || 9000, a = {}, b = {};
+  runOne(M.exact, Kmax, lambda, (m) => { if (!m.done) a[m.k] = m; }, ms * 0.4);
+  runOne(M, Kmax, lambda, (m) => { if (!m.done) b[m.k] = m; }, ms * 0.6);
+  for (let k = 1; k <= Kmax; k++) {
+    const x = a[k] || {}, y = b[k] || {};
+    const full = !x.full ? y.full || null : !y.full ? x.full : y.full.score <= x.full.score ? y.full : x.full;
+    const partial = full ? null : !x.partial ? y.partial || null : !y.partial ? x.partial : y.partial.score <= x.partial.score ? y.partial : x.partial;
+    report({ k, full, partial, truncated: !!(x.truncated || y.truncated) });
+  }
+  report({ done: true });
+}
+function runOne(M, Kmax, lambda, report, budgetMs) {
   const deadline = performance.now() + (budgetMs || 9000);
   const MS = withSkip(M), SK = M.chans.length;
   let full = null, partial = null, truncated = false;

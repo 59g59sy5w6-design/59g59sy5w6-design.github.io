@@ -1,8 +1,18 @@
 importScripts("optimizer.js");
 /* modes : les réglages « Sans achat en magasin » à calculer, dans l'ordre, chacun avec son modèle ({ mode, M }).
-   Les anciennes versions de l'appli envoyaient un seul modèle (M) et, pour chaque réglage, sa limite (compMax). */
+   Les anciennes versions de l'appli envoyaient un seul modèle (M) et, pour chaque réglage, sa limite (compMax).
+   kind « jobs » : calculs d'appoint (Et si, Compléter malin, budget), chacun { key, M, K } ; la réponse donne, sous
+   la même clé, la meilleure répartition de tout le panier en K commandes au plus (bestAt). */
 onmessage = (e) => {
   const { seq, lambda } = e.data;
+  if (e.data.kind === "jobs") {
+    for (const j of e.data.jobs) {
+      try { postMessage({ seq, kind: "job", key: j.key, r: bestAt(j.M, j.K, lambda, 4000) }); }
+      catch (err) { postMessage({ seq, kind: "job", key: j.key, r: null, error: String(err) }); }
+    }
+    postMessage({ seq, kind: "jobs", idle: true });
+    return;
+  }
   const modes = e.data.modes || [{ compMax: e.data.M.compMax }];
   for (const x of modes) {
     const M = x.M || Object.assign({}, e.data.M, { compMax: x.compMax });

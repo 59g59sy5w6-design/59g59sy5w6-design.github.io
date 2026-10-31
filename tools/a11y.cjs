@@ -73,7 +73,7 @@ const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas"
 const SHEETS = {
   reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"]],
   /* « Remplir mes paniers » est un écran (#/remplir), plus une feuille : ses feuilles sont mesurées depuis le mode guidé */
-  "panier-gros": [["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"]],
+  "panier-gros": [["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"], ["ou-le-prendre", "[data-act=itemopt]"], ["panier-souple", "[data-act=flex]"]],
   "remplir-guide": [["pas-trouve", "#view [data-act=fillmiss]"]],
   "remplir-fin": [["when", "#view [data-act=when]"]],
   economies: [["total-paye", "[data-act=paid]"]],
