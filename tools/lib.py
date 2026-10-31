@@ -25,13 +25,13 @@ HORS_COURSES = re.compile(r'(^|\s)(radiateur|robinet d arrosage|robinet arrosage
 # poudre ou en morceaux, pas un bonbon). Le texte comparé est le nom sans accents (key).
 RAYON_FILTRE = {
     'oeufs': (r'\boeufs?\b', r'pate|chocolat|lasagne|nouille|tagliatel|coquillet|spaetzle|brioche|mayonnaise|caille|surprise|kinder|paques|blanc d|jaune d|liquide'),
-    'beurre': (r'\bbeurre\b', r'cacahu|biscuit|sable|cookie|galette|croissant|brioche|madeleine|pain|gateau|sauce|escargot|crepe|palet|caramel|karite|cacao|amande|noisette|pomme de terre|ail|fines herbes|persil'),
-    'riz': (r'\briz\b', r'galette|souffle|dessert|au lait|gateau|boisson|vinaigre|feuille|nouille|cake|creme|pudding|semoule|salade|vermicelle|papier|farine|cuisine|plat|poelee|cantonais|paella|risotto prepare|biscuit|chips|crackers|tortilla'),
+    'beurre': (r'\bbeurre\b', r'chocolat|pepite|cacahu|biscuit|sable|cookie|galette|croissant|brioche|madeleine|pain|gateau|sauce|escargot|crepe|palet|caramel|karite|cacao|amande|noisette|pomme de terre|ail|fines herbes|persil'),
+    'riz': (r'\briz\b', r'micro ond|risotto aux|risotto champignon|risotto saveur|galette|souffle|dessert|au lait|gateau|boisson|vinaigre|feuille|nouille|cake|creme|pudding|semoule|salade|vermicelle|papier|farine|cuisine|plat|poelee|cantonais|paella|risotto prepare|biscuit|chips|crackers|tortilla'),
     'huile': (r'\bhuile\b', r'essentielle|massage|solaire|corps|cheveux|bebe|moteur|thon|sardine|maquereau|anchois|olives |aux olives|piment|spray|vaporisateur|lampe|parfum|seche|tomates sechees|artichaut|poivron|champignon'),
     'tomates': (r'\btomates?\b', r'ketchup|sauce|soupe|sechee|cerise|chips|thon|sardine|maquereau|jus de tomate|ravioli|pizza|farcie|gaspacho|mozzarella|tartin|plat|riz|pates|lasagne|graine|plant|semence|grappe|ronde|vrac|barquette|fraiche|coeur de boeuf|roma|cocktail|allongee|ancienne|olivette|cornue'),
-    'thon': (r'\bthon\b', r'rillette|salade|pate |pates|tartin|sauce|pizza|sandwich|croquette|chat|chien|terrine|mousse|tomate|crudites|paella|wrap|bouchee|quiche|pain'),
+    'thon': (r'\bthon\b', r'catalane|mayonnaise|rillette|salade|pate |pates|tartin|sauce|pizza|sandwich|croquette|chat|chien|terrine|mousse|tomate|crudites|paella|wrap|bouchee|quiche|pain'),
     'farine': (r'\bfarine\b', r'bebe|lait|pain d epice|prete|gateau|biscuit|preparation|cereale|bouillie|croquette|chien|chat'),
-    'sucre': (r'\bsucres?\b', r'sans sucre|bonbon|confiserie|sucre d orge|sucette|chewing|biscuit|gateau|madeleine|crepe|gaufre|chocolat|confiture|sirop|dragee|barbe|caramel|soda|boisson|the |cafe|compote|cereale|yaourt|chantilly|perles de sucre|decor|vermicelle'),
+    'sucre': (r'\bsucres?\b', r'vanill|cannelle|fleur d orange|chouquette|sans sucre|bonbon|confiserie|sucre d orge|sucette|chewing|biscuit|gateau|madeleine|crepe|gaufre|chocolat|confiture|sirop|dragee|barbe|caramel|soda|boisson|the |cafe|compote|cereale|yaourt|chantilly|perles de sucre|decor|vermicelle'),
 }
 _RF = {k: (re.compile(a), re.compile(b)) for k, (a, b) in RAYON_FILTRE.items()}
 
@@ -46,7 +46,7 @@ def hors_rayon(ray, label):
 
 def parse_oeufs(text):
     t = ' ' + key(text) + ' '
-    m = re.search(r'(\d+)\s*(?:gros |moyens |extra |frais )?oeufs', t) or re.search(r'(?:boite|plateau|lot|etui) de\s*(\d+)', t) or re.search(r'(\d+)\s*(?:pieces?|pcs|unites?)\b', t) or re.search(r'\bx\s*(\d+)\b', t)
+    m = re.search(r'(\d+)\s*(?:gros |moyens |extra |frais )?oeufs', t) or re.search(r'(?:boite|plateau|lot|etui) de\s*(\d+)', t) or re.search(r'(\d+)\s*(?:pieces?|pcs|unites?)\b', t) or re.search(r'(\d+)(?: x 1)? par pack', t) or re.search(r'\bx\s*(\d+)\b', t)
     n = int(m.group(1)) if m else None
     return n if n and 2 <= n <= 60 else None
 
@@ -123,6 +123,10 @@ def route(url):
     for p in _SOURCES:
         if p["url"] == url:
             return p["retailer"], p["rayon"]
+    # pages écartées (réglage « ignore » de tools/sources.json : une page lue sans les noms des produits)
+    base = url.split("?")[0].split("#")[0].rstrip("/")
+    if base in {x.split("?")[0].split("#")[0].rstrip("/") for x in load_sources().get("ignore") or []}:
+        return None
     # sinon la page de la liste dont le repère (« match ») est le plus long : les pages des différents points de
     # retrait Auchan ne diffèrent que par leur fragment (#alesia...)
     best = None
@@ -239,6 +243,14 @@ Bonne Maman|St Michel|Maison Colibri|Colibri|La Madeleine|Lu|Milka|Kinder|Saint 
 Lotus - Moltonel|Lotus|Kleenex®|Kleenex|Moltonel|Le Trèfle|Fess'nett|Ecodoo|Foxy|Lucart|RENOVA|Renova
 Sun|L'Arbre Vert|L'arbre Vert|Paic|PAIC|LIQUIDE VAISSELLE PAIC|Jacques Briochin|Briochin|Rainett|Mir|Palmolive|Finish|Maison Verte|Ecover Essential|Ecover|Les Secrets de Léontine|L'artisan savonnier|Bulle Verte|Comme Avant|Kerzon|Maison Net|Pimpant|Spring|Super Flacon
 Ariel|Le Chat|Persil|Dash|Sanytol|Skip|X-TRA|X-Tra|X Tra|Maia|Chanteclair|Bonux|Omo
+Loué|Les Fermiers de Loué|Matines|Le Gaulois|Coquen'Or|Cocorette|Poulehouse|Baby Coque|Miels Villeneuve|Nous Anti Gaspi|Nous anti-gaspi|D'Erwan|Oeuf frais D'Erwan|La Nouvelle Agriculture|Douce France
+St Hubert|Saint Hubert|Planta Fin|Grand Fermage|Elle & Vire|Beurrerie Echiré|Echiré|Isigny Sainte Mère|Isigny Ste Mère|Primevère|Bridel|Bridélice|Bridelice|Lescure|Montaigu|Bordier|Fruitières Chabert|Etrez|Alain Ledanec|Allgau|Le Vieux Moulin
+Ben's Original|Ben'S Original|Uncle Ben's|Taureau Ailé|Taureau Aile|Florelli|Tilda|Riz du monde|Riz du Monde|Alter Eco|Jardin Bio|Markal|Mas du Bio|Grand Badon|Ofal|Vracbio
+Terra Delyssa|Bio Organic Terra Delyssa|Terra d'Elyssa|Carapelli|Puget|Lesieur|Isio 4|La Tourangelle|Monini|Château Montfrin|Petit Château Montfrin|Château Virant|Alexis Munoz pour Monoprix|Alexis Munoz|Fruit d'Or|Costa d'Oro|Tramier|Bertolli|Oliviers & Co|Borges|Emile Noël|Émile Noël|Bio Planète|Vigean|Huilerie Vigean|Soléou|Soleou
+Mutti|Rochefontaine|Cirio|D'Aucy|d'aucy|Cassegrain|Bonduelle|Carmelina|Pomì|Pomi|De Rica|Elvea|Ciro|Gino|Garden Gourmet
+Petit Navire|Un Pêcheur Sachant Pêcher|Un pécheur sachant pécher|Un Pécheur sachant Pécher|Rio Mare|Ortiz|Le Savoureux|Nautilus|Samia|Phare d'Eckmühl|Phare D'Eckmühl|La Belle-Iloise|La Belle Iloise|Capitaine Nat|Pêche Océan|Peche Ocean|Hénaff|Henaff|Conserverie Gonidec
+Francine|Maizena|Tipiak|Moulins De Versailles|Moulins de Versailles|Treblec|La Compagnie des Farines|Floraline|Mon Fournil|J.B Japon|Cœur de Blé|Coeur de Blé|Terre du pays d'Othe|Terre du pays d’Othe|Gruau d'Or|Les Grands Moulins de Paris|Celnat|Vahiné|Vahine|Alsa|Ancel|Dr. Oetker|Dr Oetker
+Saint Louis|St Louis|Canderel|Pure Via|Daddy|Beghin Say|Béghin Say|La Perruche|Sunny Via|Ginko|Blonvilliers|Route du Sucre|Hermesetas|Stevia Sweet|Sucaryl|Erstein|Tereos
 """
 BRAND_LIST = sorted({b.strip() for line in BRANDS.strip().split('\n') for b in line.split('|') if b.strip()}, key=lambda b: -len(b))
 
@@ -262,6 +274,17 @@ CANON = {
     'le chariot a fromages artisan fromager': 'Le Chariot à fromages', 'lu': 'LU', 'hipro': 'HiPRO',
     'dr pepper ': 'Dr Pepper', 'les 300 laitiers bio': 'Les 300 Laitiers Bio', 'les 300 bio': 'Les 300 Laitiers Bio',
     'la laitiere': 'La Laitière', 'nestle': 'Nestlé', 'gerble': 'Gerblé', 'president': 'Président',
+    'beghin say': 'Béghin Say', 'st louis': 'Saint Louis', 'taureau aile': 'Taureau Ailé', 'ben s original': "Ben's Original",
+    'uncle ben s': "Ben's Original", 'riz du monde': 'Riz du Monde', 'terra d elyssa': 'Terra Delyssa', 'bio organic terra delyssa': 'Terra Delyssa',
+    'isigny sainte mere': 'Isigny Sainte-Mère', 'isigny ste mere': 'Isigny Sainte-Mère', 'beurrerie echire': 'Echiré', 'echire': 'Echiré',
+    'd aucy': "d'aucy", 'vahine': 'Vahiné', 'moulins de versailles': 'Moulins de Versailles', 'alexis munoz pour monoprix': 'Alexis Munoz',
+    'petit chateau montfrin': 'Château Montfrin', 'chateau montfrin': 'Château Montfrin', 'chateau virant': 'Château Virant', 'primevere': 'Primevère',
+    'phare d eckmuhl': "Phare d'Eckmühl", 'un pecheur sachant pecher': 'Un Pêcheur Sachant Pêcher', 'saint hubert': 'St Hubert',
+    'les fermiers de loue': 'Loué', 'loue': 'Loué', 'coquen or': "Coquen'Or", 'nous anti gaspi': 'Nous anti-gaspi', 'oeuf frais d erwan': "D'Erwan",
+    'emile noel': 'Émile Noël', 'bio planete': 'Bio Planète', 'huilerie vigean': 'Vigean', 'soleou': 'Soléou', 'pomi': 'Pomì',
+    'la belle iloise': 'La Belle-Iloise', 'peche ocean': 'Pêche Océan', 'henaff': 'Hénaff', 'coeur de ble': 'Cœur de Blé',
+    'terre du pays d othe': "Terre du pays d'Othe", 'dr oetker': 'Dr. Oetker', 'bridelice': 'Bridélice', 'fruitieres chabert': 'Fruitières Chabert',
+    'oliviers co': 'Oliviers & Co', 'elle vire': 'Elle & Vire',
     'albert menes': 'Albert Ménès', 'primeal': 'Priméal', 'schar': 'Schär', 'violife': 'Violife',
     'la madeleine': 'Maison Colibri', 'montagnes d arree': "Montagnes d'Arrée", 'laiterie bio d ariege': "Laiterie Bio d'Ariège",
     'biopyrenees': 'Biopyrénées', 'ste alix': 'Sainte-Alix', 'plancoet': 'Plancoët', 'les 2 vaches': 'Les 2 Vaches',

@@ -1650,6 +1650,198 @@
    "match": "text=coulis%20de%20tomates#livraison-paris14",
    "url": "https://www.auchan.fr/recherche?text=coulis%20de%20tomates#livraison-paris14",
    "prompt": ""
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "oeufs",
+   "host": "courses.monoprix.fr",
+   "match": "0f13a02c-f337",
+   "url": "https://courses.monoprix.fr/categories/produits-laitiers-œufs-et-fromages/œufs/0f13a02c-f337-4bc1-a822-7e1bfe552e1e?source=navigation",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "beurre",
+   "host": "courses.monoprix.fr",
+   "match": "80a1ac41-9266",
+   "url": "https://courses.monoprix.fr/categories/produits-laitiers-œufs-et-fromages/beurres-et-margarines/80a1ac41-9266-45e5-b736-ce3b2ba85973?source=navigation",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "riz",
+   "host": "courses.monoprix.fr",
+   "match": "3e25066e-d441",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/p%C3%A2te-riz-c%C3%A9r%C3%A9ale-et-pur%C3%A9e/riz/3e25066e-d441-4c83-82cc-052e2e661c59?sortBy=favorite",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "huile",
+   "host": "courses.monoprix.fr",
+   "match": "a2ffcabb-a82d",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/assaisonnement-et-condiment/huile/a2ffcabb-a82d-4007-81bd-cadee90c8bea?sortBy=favorite",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "tomates",
+   "host": "courses.monoprix.fr",
+   "match": "c69c9691-7132",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/conserve/conserve-de-l%C3%A9gume/tomate-en-conserve/c69c9691-7132-43bf-8b2a-0c722d0a77d0?sortBy=favorite",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "thon",
+   "host": "courses.monoprix.fr",
+   "match": "11eeacd2-e429",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/conserve/conserve-de-poisson/thon-au-naturel-en-conserve/11eeacd2-e429-411e-a0b5-ad46eb822874?sortBy=favorite",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "thon",
+   "host": "courses.monoprix.fr",
+   "match": "98f098f3-80ea",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/conserve/conserve-de-poisson/thon-aromatis%C3%A9-en-conserve/98f098f3-80ea-4b76-950b-978cd2ce2242?sortBy=favorite",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "farine",
+   "host": "courses.monoprix.fr",
+   "match": "1cdb1ee5-1140",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sucr%C3%A9e/sucre-farine-et-aide-%C3%A0-la-p%C3%A2tisserie/farine/1cdb1ee5-1140-4a29-afc0-94397b3df92f?sortBy=favorite",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "sucre",
+   "host": "courses.monoprix.fr",
+   "match": "0c81e3b7-0d81",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sucr%C3%A9e/sucre-farine-et-aide-%C3%A0-la-p%C3%A2tisserie/sucre/0c81e3b7-0d81-4dd4-8750-07e60fa0c314?sortBy=favorite",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "oeufs",
+   "host": "www.carrefour.fr",
+   "match": "cremerie/oeufs",
+   "url": "https://www.carrefour.fr/r/cremerie/oeufs",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la boîte de 12 œufs\", \"12 œufs\"), \"price\": price as number in euros, \"unit\": price per unit text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "beurre",
+   "host": "www.carrefour.fr",
+   "match": "beurres/beurres-doux",
+   "url": "https://www.carrefour.fr/r/cremerie/beurres-cremes/beurres/beurres-doux",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la plaquette de 250g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "beurre",
+   "host": "www.carrefour.fr",
+   "match": "beurres/beurres-demi-sel",
+   "url": "https://www.carrefour.fr/r/cremerie/beurres-cremes/beurres/beurres-demi-sel",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la plaquette de 250g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "beurre",
+   "host": "www.carrefour.fr",
+   "match": "beurres/beurres-plaquettes",
+   "url": "https://www.carrefour.fr/r/cremerie/beurres-cremes/beurres/beurres-plaquettes",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la plaquette de 250g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "beurre",
+   "host": "www.carrefour.fr",
+   "match": "beurres/beurres-moules",
+   "url": "https://www.carrefour.fr/r/cremerie/beurres-cremes/beurres/beurres-moules",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la plaquette de 250g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "riz",
+   "host": "www.carrefour.fr",
+   "match": "pates-riz-feculents/riz",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/pates-riz-feculents/riz",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le paquet de 1kg\", \"les 4 sachets de 125g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "riz",
+   "host": "www.carrefour.fr",
+   "match": "riz/riz-long-grain",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/pates-riz-feculents/riz/riz-long-grain",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le paquet de 1kg\", \"les 4 sachets de 125g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "riz",
+   "host": "www.carrefour.fr",
+   "match": "riz/basmati-et-thai",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/pates-riz-feculents/riz/basmati-et-thai",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le paquet de 1kg\", \"les 4 sachets de 125g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "riz",
+   "host": "www.carrefour.fr",
+   "match": "riz/riz-complet",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/pates-riz-feculents/riz/riz-complet",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le paquet de 1kg\", \"les 4 sachets de 125g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "huile",
+   "host": "www.carrefour.fr",
+   "match": "huiles-vinaigres-et-vinaigrettes/huiles",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/huiles-vinaigres-et-vinaigrettes/huiles",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la bouteille de 1L\"), \"price\": price as number in euros, \"unit\": price per litre text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "tomates",
+   "host": "www.carrefour.fr",
+   "match": "conserves-legumes/tomates-poivrons",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/conserves-et-bocaux/conserves-legumes/tomates-poivrons",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la boîte de 400g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "tomates",
+   "host": "www.carrefour.fr",
+   "match": "pulpes-coulis-concentres-tomates",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/sauces-chaudes/pulpes-coulis-concentres-tomates",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la boîte de 400g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "thon",
+   "host": "www.carrefour.fr",
+   "match": "conserves-poissons/thon",
+   "url": "https://www.carrefour.fr/r/epicerie-salee/conserves-et-bocaux/conserves-poissons/thon",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la boîte de 140g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "farine",
+   "host": "www.carrefour.fr",
+   "match": "preparation-gateaux/farines",
+   "url": "https://www.carrefour.fr/r/epicerie-sucree/sucres-farines-coulis-et-preparation-gateaux/farines",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le paquet de 1kg\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
+  },
+  {
+   "retailer": "carrefour",
+   "rayon": "sucre",
+   "host": "www.carrefour.fr",
+   "match": "sucres-et-edulcorants",
+   "url": "https://www.carrefour.fr/r/epicerie-sucree/sucres-farines-coulis-et-preparation-gateaux/sucres-et-edulcorants",
+   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"le paquet de 1kg\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
   }
  ],
  "robot": {
@@ -1705,5 +1897,8 @@
    }
   }
  },
- "magasins_note": "Enseignes dont les prix dépendent du magasin ou de la zone de livraison. Points de retrait : le robot choisit la carte du point. Livraison à domicile : il choisit la zone et, si Auchan demande une adresse, donne l'adresse publique de la mairie de la zone, jamais celle d'un utilisateur."
+ "magasins_note": "Enseignes dont les prix dépendent du magasin ou de la zone de livraison. Points de retrait : le robot choisit la carte du point. Livraison à domicile : il choisit la zone et, si Auchan demande une adresse, donne l'adresse publique de la mairie de la zone, jamais celle d'un utilisateur.",
+ "ignore": [
+  "https://www.carrefour.fr/r/epicerie-salee/huiles-vinaigres-et-vinaigrettes/huiles-dolive"
+ ]
 }

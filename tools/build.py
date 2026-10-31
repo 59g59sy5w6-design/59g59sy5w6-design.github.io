@@ -116,11 +116,17 @@ for r in raw:
             continue
         fmt = r.get('format') or ''
         brand, rest = split_brand_suffix(title.split(' 6x')[0] if False else title)
-        url = ('https://www.carrefour.fr' + r['href']) if r.get('href') else None
-        ean = None
-        if r.get('href'):
-            m = re.search(r'(\d{8,14})$', r['href'])
-            ean = m.group(1) if m else None
+        # lien : chemin « /p/... » (href) ou adresse complète (url) ; le code EAN termine le chemin
+        href = r.get('href') or ''
+        if not href and str(r.get('url') or '').startswith('https://www.carrefour.fr/'):
+            href = str(r['url'])[len('https://www.carrefour.fr'):]
+        path = href.split('?')[0].split('#')[0]
+        # « ?s=1234 » : article d'un vendeur partenaire de la place de marché, pas une commande Carrefour
+        if re.search(r'[?&]s=\d', href):
+            continue
+        url = ('https://www.carrefour.fr' + path) if path else None
+        m = re.search(r'(\d{8,14})$', path)
+        ean = m.group(1) if m else None
         qty_text = fmt or title
         name_for_qty = title
         label = rest
@@ -131,7 +137,17 @@ for r in raw:
                 fmt = m.group(1)
                 t2 = title[:m.start()]
                 brand, label = split_brand_suffix(t2)
+        if not fmt:
+            # lecture sans champ « format » : la ligne de conditionnement termine le nom
+            # (« … CARREFOUR CLASSIC' la plaquette de 250g », « … CARREFOUR EXTRA - 1 kg e »)
+            m = re.search(r"\s+(?:-\s+)?((?:le|la|les)\s\S.*\d.*|l[’']\S.*\d.*|\d+(?:[.,]\d+)?\s?(?:x\s?\d+(?:[.,]\d+)?\s?)?(?:kg|g|l|cl|ml|œufs?|oeufs?|rouleaux)\b.*)$", title, re.I)
+            if m:
+                fmt = m.group(1).strip()
+                brand, label = split_brand_suffix(title[:m.start()].strip())
         rid = ean or key(title + ' ' + fmt)
+        if not brand:
+            unbranded.append((ret, r['ray'], title))
+            brand = 'Sans marque'
     else:
         name = (r.get('name') or '').strip()
         if not name:
@@ -170,6 +186,7 @@ for r in raw:
     ray = r['ray']
     qty = None
     rolls = lav = None
+    qty_alt = None   # l'autre contenance écrite (poids égoutté d'une conserve, « 0,456 L » d'une bouteille de 50 cl)
     if ray == 'papier':
         rolls = parse_rolls(fmt) or parse_rolls(r.get('name') or r.get('title'))
     elif ray == 'oeufs':
@@ -177,18 +194,20 @@ for r in raw:
         rolls = parse_oeufs(fmt) or parse_oeufs(r.get('name') or r.get('title'))
     else:
         if ret == 'monoprix':
-            qty = parse_qty(r.get('name')) or parse_qty(fmt)
+            qty, qty_alt = parse_qty(r.get('name')) or parse_qty(fmt), parse_qty(fmt)
         else:
-            qty = parse_qty(fmt) or parse_qty(r.get('name') or r.get('title'))
+            qty, qty_alt = parse_qty(fmt) or parse_qty(r.get('name') or r.get('title')), parse_qty(r.get('name') or r.get('title'))
         if ray == 'lessive':
             lav = parse_lavages(qtext)
     doubt = None
     if ret in CHECKED and ray not in NO_UNIT_CHECK:
-        exp = unit_expected(r.get('unit'), qty)
-        if exp:
+        # le prix doit concorder avec le prix au kilo ou au litre pour l'une des contenances écrites
+        exps = [e for e in (unit_expected(r.get('unit'), q) for q in (qty, qty_alt) if q) if e]
+        if exps:
             checked[r['src']] += 1
-            if abs(float(r['price']) - exp) > UNIT_TOL * max(float(r['price']), exp) and not explained(float(r['price']) / exp, qty, qtext):
-                doubt = round(exp, 2)
+            price = float(r['price'])
+            if not any(abs(price - e) <= UNIT_TOL * max(price, e) or explained(price / e, qty, qtext) for e in exps):
+                doubt = round(exps[0], 2)
                 doubtful.append((ret, ray, r['src'], r.get('name') or r.get('title'), r['price'], r.get('unit'), doubt))
     promo = r.get('promo')
     if promo and re.fullmatch(r'\s*cagnott[ée]s\s*', promo, re.I):
@@ -250,7 +269,8 @@ json.dump(items, open(os.path.join(lib.WORK, "items.json"), "w", encoding="utf-8
 json.dump(report, open(os.path.join(lib.WORK, "report.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 fails = [p for p in report["pages"] if not p["products"]]
 print("produits normalisés", len(items), dict(collections.Counter(i["ret"] for i in items)), "dont repris du relevé précédent", len(carried))
-print("sans marque reconnue", len(unbranded))
+print("sans marque reconnue", len(unbranded), "(liste complète dans tools/work/unbranded.json)")
+json.dump(unbranded, open(os.path.join(lib.WORK, "unbranded.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 for u in unbranded[:30]:
     print("   ", u)
 for ret, ray, url, n, n0, l, l0 in rejected:
