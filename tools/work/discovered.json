@@ -1,0 +1,66 @@
+[
+ {
+  "retailer": "houra",
+  "rayon": "oeufs",
+  "host": "houra.fr",
+  "match": "B1556946",
+  "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/oeufs-B1556946-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+ },
+ {
+  "retailer": "houra",
+  "rayon": "beurre",
+  "host": "houra.fr",
+  "match": "B1556973",
+  "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/beurre-et-margarine-B1556973-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+ },
+ {
+  "retailer": "houra",
+  "rayon": "riz",
+  "host": "houra.fr",
+  "match": "B1557058",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-riz-cereales-et-purees-B1557058-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+ },
+ {
+  "retailer": "houra",
+  "rayon": "huile",
+  "host": "houra.fr",
+  "match": "B1558081",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/huile-herbes-aide-culinaire-B1558081-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+ },
+ {
+  "retailer": "houra",
+  "rayon": "tomates",
+  "host": "houra.fr",
+  "match": "B1557112",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/tomates-poivrons-autres-legumes-chauds-B1557112-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+ },
+ {
+  "retailer": "houra",
+  "rayon": "thon",
+  "host": "houra.fr",
+  "match": "B1557090",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/thon-a-l-huile-prepare-en-sauce-B1557090-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+ },
+ {
+  "retailer": "houra",
+  "rayon": "farine",
+  "host": "houra.fr",
+  "match": "B1557657",
+  "url": "https://www.houra.fr/catalogue/epicerie-sucree/sucres-farines-et-aides-a-la-patisserie-B1557657-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+ },
+ {
+  "retailer": "houra",
+  "rayon": "sucre",
+  "host": "houra.fr",
+  "match": "B1557657",
+  "url": "https://www.houra.fr/catalogue/epicerie-sucree/sucres-farines-et-aides-a-la-patisserie-B1557657-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"count_text\": any text giving the total number of products, \"next_page\": URL of the next page of results or null}."
+ }
+]
