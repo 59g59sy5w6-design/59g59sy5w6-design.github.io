@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-joh3fuKwNQC87yS+sgIUimcf8saYuNfmwGvEOkcrrUA='; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' https://world.openfoodfacts.org; media-src 'self' blob: mediastream:; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-QH8zL2d2tEAlR+JaygsXneLMycTR2Lg72ZHpEgLEnL0='; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' https://world.openfoodfacts.org; media-src 'self' blob: mediastream:; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Cabas, tes courses au prix le plus bas</title>
 <meta name="description" content="Compare les prix de tes courses chez Monoprix, Carrefour, Houra et Auchan, et trouve où commander pour payer le moins cher, livraison comprise. Gratuit, sans compte.">
@@ -36,7 +36,9 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="stylesheet" href="app.css">
 <script>/* premier passage, sans service worker : les prix se téléchargent pendant que l'appli se charge */
-if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) { const l = document.createElement("link"); l.rel = "preload"; l.as = "fetch"; l.href = "data/catalog.json"; l.crossOrigin = "anonymous"; document.head.appendChild(l); }</script>
+if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) { const l = document.createElement("link"); l.rel = "preload"; l.as = "fetch"; l.href = "data/catalog.json"; l.crossOrigin = "anonymous"; document.head.appendChild(l); }
+/* taille du texte choisie : posée avant le premier rendu pour que le squelette ne saute pas */
+try { const z = String((JSON.parse(localStorage.getItem("cabas.prefs") || "{}") || {}).zoom || "1"), v = { "0.8": "0.82", "0.88": "0.9" }[z] || z; if (["0.82", "0.9", "1.12", "1.25"].includes(v)) document.documentElement.dataset.text = v; } catch (e) { /* sans réglage */ }</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -68,6 +70,8 @@ if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) { co
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.6 7V4.8h4.8V7M6.6 7l.9 12.3a1.6 1.6 0 0 0 1.6 1.5h5.8a1.6 1.6 0 0 0 1.6-1.5L17.4 7"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.2s-6.6-6.1-6.6-11.3a6.6 6.6 0 0 1 13.2 0c0 5.2-6.6 11.3-6.6 11.3Z"/><circle cx="12" cy="9.8" r="2.4"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m4.8 12.6 4.6 4.6 9.8-10.2"/></symbol>
+    <symbol id="i-check-sm" viewBox="0 0 16 16"><path d="m3.2 8.4 3.1 3.1 6.5-6.9"/></symbol>
+    <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M5 9.5a12 12 0 0 1 3.6-2.3M12 5.2a12 12 0 0 1 7 2.6M8.2 13a7 7 0 0 1 2-1.3M12 9.9a7 7 0 0 1 4.3 1.7M11 16.3a2.6 2.6 0 0 1 3 .6"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 10.8v6M12 7.4v.2"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3 2"/></symbol>
     <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2.8 6.4h11v10.4h-11zM13.8 9.6h4l3.4 3.6v3.6h-7.4"/><circle cx="7" cy="17.6" r="1.9" fill="#fff"/><circle cx="17.4" cy="17.6" r="1.9" fill="#fff"/></symbol>
@@ -76,12 +80,15 @@ if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) { co
   </defs>
 </svg>
 
+<a class="skip" href="#view">Aller au contenu</a>
 <aside class="side" id="side" aria-label="Navigation"></aside>
 <header class="nav" id="nav"><div class="nav-in"><div class="nav-l" id="navL"></div><div class="nav-t" id="navT"></div><div class="nav-r" id="navR"></div></div></header>
-<main class="view" id="view">
-  <div class="wrap">
-    <div class="lt wordmark"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</div>
-    <div class="grid" style="margin-top:12px" aria-hidden="true"><div><div class="sk"></div><div class="skl"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl"></div><div class="skl s"></div></div></div>
+<main class="view" id="view" tabindex="-1">
+  <div class="wrap" aria-busy="true">
+    <p class="sr" role="status">Chargement des prix</p>
+    <div class="pad" style="padding-top:10px" aria-hidden="true"><div class="sk bar"></div></div>
+    <div class="sk card" aria-hidden="true"></div>
+    <div class="cats" style="margin-top:28px" aria-hidden="true"><div><div class="sk"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl s"></div></div><div><div class="sk"></div><div class="skl s"></div></div></div>
   </div>
 </main>
 <div class="dock" id="dock" hidden></div>

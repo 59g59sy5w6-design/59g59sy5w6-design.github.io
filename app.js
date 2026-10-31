@@ -47,6 +47,32 @@
   }
   const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const standalone = () => (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  const reducedMotion = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* durée d'un jeton de mouvement (« 320ms »), lue dans la feuille de style ; 0 quand le mouvement réduit est demandé */
+  const tokenMs = (name, d) => { const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)); return isNaN(v) ? d : v; };
+  /* retour haptique : Android seulement, jamais une condition, jamais sous mouvement réduit, seulement après un geste */
+  function buzz(kind) {
+    try {
+      if (!("vibrate" in navigator) || reducedMotion()) return;
+      navigator.vibrate({ add: 10, remove: [10, 40, 10], done: [15, 60, 30], error: [40, 60, 40] }[kind] || 10);
+    } catch (e) { /* pas de vibreur */ }
+  }
+  /* nombre au format français pour un champ (« 9,90 »), lu avec une virgule ou un point */
+  const frNum = (v) => (v == null || v === "" ? "" : Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 }));
+  const numOf = (s) => parseFloat(String(s == null ? "" : s).replace(/\s/g, "").replace(",", "."));
+  /* champ de feuille : étiquette visible, boîte de 48 px, suffixe collé, aide ou erreur dessous */
+  function field(id, label, attrs, hint, suffix) {
+    return `<div class="field" data-field="${esc(id)}"><label for="${esc(id)}">${label}</label><span class="in"><input id="${esc(id)}" ${attrs} aria-describedby="${esc(id)}H">${suffix ? `<span class="suf">${suffix}</span>` : ""}</span><small id="${esc(id)}H">${hint || ""}</small></div>`;
+  }
+  /* erreur de champ : bordure orange, message avec l'icône, focus ramené sur le champ (jamais la couleur seule) */
+  function fieldError(id, msg) {
+    const f = $(`[data-field="${CSS.escape(id)}"]`), i = $("#" + CSS.escape(id));
+    if (!f) { toast(msg); return; }
+    f.classList.add("err");
+    const h = $("small", f); if (h) { h.dataset.hint = h.dataset.hint || h.innerHTML; h.innerHTML = ic("info") + `<span>${esc(msg)}</span>`; }
+    if (i) i.focus();
+    buzz("error");
+  }
 
   /* ---------- état ---------- */
   const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, liv: {}, keep: {}, maxOrders: 3, extraCost: 0 };
@@ -446,22 +472,31 @@
   function buyCtl(id, v) {
     const q = S.basket[id] || 0, p = S.prods.get(id);
     const nm = p ? esc(p.brand + " " + p.name) : "";
+    /* à 1, le moins devient une corbeille « Retirer » */
+    const dec = `<button type="button" data-act="dec" data-id="${esc(id)}" aria-label="${q > 1 ? "Retirer un" : "Retirer"}">${ic(q > 1 ? "minus" : "trash", q > 1 ? "" : "trash")}</button>`;
+    const inc = `<button type="button" data-act="inc" data-id="${esc(id)}" aria-label="Ajouter un">${ic("plus")}</button>`;
     if (v === "bar") {
       const b = p && best(p);
-      if (q > 0) return `<div class="buybar" data-buy="${esc(id)}" data-v="bar"><div class="stepper" role="group" aria-label="Quantité"><button type="button" data-act="dec" data-id="${esc(id)}" aria-label="Retirer un">${ic(q > 1 ? "minus" : "trash")}</button><span aria-live="polite">${q}</span><button type="button" data-act="inc" data-id="${esc(id)}" aria-label="Ajouter un">${ic("plus")}</button></div><a class="btn" href="#/panier" data-tab="panier">Voir le panier</a></div>`;
+      if (q > 0) return `<div class="buybar" data-buy="${esc(id)}" data-v="bar"><div class="stepper" role="group" aria-label="Quantité">${dec}<span aria-live="polite">${q}</span>${inc}</div><a class="btn" href="#/panier" data-tab="panier">Voir le panier</a></div>`;
       return `<div class="buybar" data-buy="${esc(id)}" data-v="bar"><button type="button" class="btn" data-act="inc" data-id="${esc(id)}"${b ? "" : " disabled"}>Ajouter au panier${b ? ` <span class="sub">${eur(b.price)}</span>` : ""}</button></div>`;
     }
-    if (q > 0 || v === "item") return `<div class="stepper${v === "flat" ? " flat" : ""}${v === "item" ? " soft" : ""}" data-buy="${esc(id)}" data-v="${v}" role="group" aria-label="Quantité de ${nm}"><button type="button" data-act="dec" data-id="${esc(id)}" aria-label="Retirer un">${ic(q > 1 ? "minus" : "trash")}</button><span aria-live="polite">${q}</span><button type="button" data-act="inc" data-id="${esc(id)}" aria-label="Ajouter un">${ic("plus")}</button></div>`;
+    if (q > 0 || v === "item") return `<div class="stepper${v === "flat" ? " flat" : ""}${v === "item" ? " soft" : ""}" data-buy="${esc(id)}" data-v="${v}" role="group" aria-label="Quantité de ${nm}">${dec}<span aria-live="polite">${q}</span>${inc}</div>`;
     return `<button type="button" class="add${v === "flat" ? " flat" : ""}" data-buy="${esc(id)}" data-v="${v}" data-act="inc" data-id="${esc(id)}" aria-label="Ajouter ${nm} au panier">${ic("plus")}</button>`;
   }
-  function card(p) {
-    const b = best(p), n = offers(p, false).filter((o) => !o.sim).length;
-    const badge = b && b.promo ? '<span class="badge promo">Offre</span>' : n > 1 ? `<span class="badge">${n} enseignes</span>` : "";
+  /* carte produit : une pastille au plus (« Offre »), prix et prix au kilo, l'enseigne, marque et nom ; le format suit
+     le nom quand il est court. La carte entière est un lien nommé en entier (nom, format, prix, enseigne) ; le texte
+     dessous est un second lien hors tabulation. extra : { was } pour un ancien prix barré et la baisse en pastille */
+  function card(p, extra) {
+    const b = best(p);
+    const badge = b && b.promo ? '<span class="badge promo">Offre</span>' : "";
     const u = b ? unitPrice(p, b.price) : "";
-    return `<article class="card"><div class="tile"><a class="cover" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name + ", " + p.format)}">${img(p)}</a>${badge}${b ? buyCtl(p.id, "tile") : ""}</div>` +
-      `<a class="meta" href="${hp(p.id)}" tabindex="-1" aria-hidden="true"><div class="prow">${b ? px(b.price) + (u ? `<span class="unit">${u}</span>` : "") : '<span class="na">Pas dans tes enseignes</span>'}</div>` +
+    const shortFmt = (p.format || "").length <= 8;
+    const label = p.brand + " " + p.name + (p.format ? ", " + p.format : "") + (b ? ", " + eur(b.price) + " chez " + retName(b.ret) + (b.sim ? ", prix simulé" : "") : ", pas dans tes enseignes");
+    const was = extra && extra.was > 0 && b && b.price < extra.was ? `<s class="was"><span class="sr">au lieu de </span>${eur(extra.was)}</s><span class="drop">-${Math.round((100 * (extra.was - b.price)) / extra.was)}${NB}%</span>` : "";
+    return `<article class="card"><div class="tile"><a class="cover" href="${hp(p.id)}" aria-label="${esc(label)}">${img(p)}</a>${badge}${b ? buyCtl(p.id, "tile") : ""}</div>` +
+      `<a class="meta" href="${hp(p.id)}" tabindex="-1"><div class="prow">${b ? px(b.price) + was + (u ? `<span class="unit">${u}</span>` : "") : '<span class="na">Pas dans tes enseignes</span>'}</div>` +
       (b ? `<div class="where">chez ${esc(retName(b.ret))}${b.sim ? ", prix simulé" : ""}</div>` : "") +
-      `<div class="pname"><b>${esc(p.brand)}</b> ${esc(p.name)}</div><div class="pfmt">${esc(p.format)}</div></a></article>`;
+      `<div class="pname"><b>${esc(p.brand)}</b> ${esc(p.name)}${shortFmt && p.format ? ", " + esc(p.format) : ""}</div>${shortFmt ? "" : `<div class="pfmt">${esc(p.format)}</div>`}</a></article>`;
   }
   function deals(n) {
     const out = [];
@@ -484,9 +519,11 @@
     return `<article class="deal"><div class="dh"><a class="di" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p)}</a><div class="dtx"><a class="dt" href="${hp(p.id)}"><b>${esc(p.brand)}</b> ${esc(p.name)}</a><div class="pfmt">${esc(p.format)}</div></div></div>` +
       `<ul class="ladder">${rows}</ul><div class="df"><span class="gap"><span>${eur(d.gap)}</span> d'écart</span><button class="icbtn dsh" type="button" data-act="sharegap" data-id="${esc(p.id)}" aria-label="Partager cet écart de prix">${ic("share")}</button>${buyCtl(p.id, "flat")}</div></article>`;
   }
+  /* libellés courts des tuiles de rayon (deux lignes au plus, sans césure) ; le nom complet reste le titre du rayon */
+  const SHORT = { jus: "Jus", sodas: "Colas", lait: "Lait", yaourts: "Yaourts", fromages: "Fromage râpé", tomates: "Tomates", conserves: "Sardines", thon: "Thon", cafe: "Café", gateaux: "Gâteaux", papier: "Papier toilette", vaisselle: "Vaisselle", lessive: "Lessive" };
   function catTile(r) {
     const rep = S.list.find((p) => p.r === r.id && offers(p, false).length > 1) || S.list.find((p) => p.r === r.id);
-    return `<a class="cat" href="${hr(r.id)}"><span class="ct">${rep ? img(rep, 160) : ""}</span><span>${esc(r.name)}</span></a>`;
+    return `<a class="cat" href="${hr(r.id)}" aria-label="${esc(r.name)}"><span class="ct">${rep ? img(rep, 160) : ""}</span><span>${esc(SHORT[r.id] || r.name)}</span></a>`;
   }
   function suggestion() {
     if (S._sug) return S._sug;
@@ -507,7 +544,7 @@
   function suggestCard(sg) {
     const ids = Object.keys(sg.items).filter((id) => S.prods.has(id));
     const e = estimate(sg.items);
-    return `<div class="suggest"><div class="stack">${ids.slice(0, 6).map((id) => `<span>${img(S.prods.get(id), 52)}</span>`).join("")}</div><div><h3>${esc(sg.name)}</h3><p>${plural(e.n, "produit", "produits")} du quotidien vendus dans plusieurs enseignes, environ ${eur(e.t)} au meilleur prix.</p></div><div class="btns"><button class="btn" type="button" data-act="addlist" data-id="${esc(sg.id)}">${ic("plus")}Tout ajouter au panier</button><a class="btn tint" href="#/suggestion">Voir les produits</a></div></div>`;
+    return `<section class="hcard col" aria-label="${esc(sg.name)}"><div class="stack">${ids.slice(0, 6).map((id) => `<span>${img(S.prods.get(id), 48)}</span>`).join("")}</div><span><b>${esc(sg.name)}</b><small>${plural(e.n, "produit", "produits")} du quotidien vendus dans plusieurs enseignes, environ ${eur(e.t)} au meilleur prix.</small></span><div class="btns two"><button class="btn sm tint" type="button" data-act="addlist" data-id="${esc(sg.id)}">${ic("plus")}Tout ajouter</button><a class="btn sm ghost" href="#/suggestion">Voir les produits</a></div></section>`;
   }
   /* Android (Chrome, Samsung Internet) : le navigateur propose l'installation en un geste ; on garde l'invitation pour la
      montrer au bon moment (carte de l'accueil, réglages) */
@@ -522,19 +559,21 @@
   }
   function installCard() {
     if (standalone() || S.seen.install || (!isIOS && !installEvt)) return "";
-    if (installEvt) return `<div class="install"><svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><div><b>Installe Cabas sur ton téléphone</b>Une icône sur l'écran d'accueil, l'appli en plein écran, et les prix même sans réseau.<button class="btn sm" type="button" data-act="installnow" style="margin-top:8px">Installer</button></div><button class="x" type="button" data-act="hideinstall" aria-label="Masquer">${ic("x")}</button></div>`;
-    return `<div class="install"><svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><div><b>Installe Cabas sur ton iPhone</b>Touche ${ic("share")} en bas de Safari, puis «\u00a0Sur l'écran d'accueil\u00a0».</div><button class="x" type="button" data-act="hideinstall" aria-label="Masquer">${ic("x")}</button></div>`;
+    if (installEvt) return `<div class="hcard tint" role="status"><svg class="si" aria-hidden="true"><use href="#i-logo"/></svg><span><b>Installe Cabas sur ton téléphone</b><small>Une icône sur l'écran d'accueil, l'appli en plein écran, et les prix même sans réseau.</small><button class="btn sm" type="button" data-act="installnow">Installer</button></span><button class="x" type="button" data-act="hideinstall" aria-label="Masquer">${ic("x")}</button></div>`;
+    return `<div class="hcard tint" role="status"><svg class="si" aria-hidden="true"><use href="#i-logo"/></svg><span><b>Installe Cabas sur ton iPhone</b><small>Touche ${ic("share")} en bas de Safari, puis «\u00a0Sur l'écran d'accueil\u00a0».</small></span><button class="x" type="button" data-act="hideinstall" aria-label="Masquer">${ic("x")}</button></div>`;
   }
   function footNote() {
-    return `<p class="foot">${plural(S.list.length, "produit", "produits")} de ${esc(joinEt(S.rets.map((r) => r.service)))}. ${esc(freshText())}.<br><a href="#/apropos">À propos des prix</a></p>`;
+    return `<p class="foot">${plural(S.list.length, "produit", "produits")} de ${esc(joinEt(S.rets.map((r) => r.service)))}. ${esc(freshText())}.<br><a class="act" href="#/apropos">À propos des prix${ic("chev")}</a></p>`;
   }
+  /* hors ligne : les prix affichés sont ceux du dernier relevé */
+  const netBanner = () => (S.offline ? `<div class="banner" role="status">${ic("wifi-off")}<span><b>Hors ligne</b>Les prix affichés sont ceux du dernier relevé.</span></div>` : "");
   function chipsHtml(key, base) {
     const f = F(key), n = nActive(f);
     const has = (fn) => base.some(fn);
     const sortL = (SORTS.find((s) => s[0] === f.sort) || SORTS[0])[1];
-    let s = `<div class="chips" role="toolbar" aria-label="Trier et filtrer"><button class="chip" type="button" data-act="sort" data-k="${esc(key)}" aria-pressed="${f.sort !== "pertinence"}">${ic("sort")}${f.sort === "pertinence" ? "Trier" : esc(sortL)}</button>`;
+    let s = `<div class="chips" role="group" aria-label="Trier et filtrer"><button class="chip" type="button" data-act="sort" data-k="${esc(key)}" aria-pressed="${f.sort !== "pertinence"}">${ic("sort")}${f.sort === "pertinence" ? "Trier" : esc(sortL)}</button>`;
     s += `<button class="chip" type="button" data-act="filters" data-k="${esc(key)}" aria-pressed="false">${ic("filter")}Filtres${n ? `<span class="n">${n}</span>` : ""}</button>`;
-    if (has((p) => Object.keys(p.offers).length > 1)) s += `<button class="chip" type="button" data-act="quick" data-q="cmp" data-k="${esc(key)}" aria-pressed="${f.cmp}">Comparés</button>`;
+    if (has((p) => Object.keys(p.offers).length > 1)) s += `<button class="chip" type="button" data-act="quick" data-q="cmp" data-k="${esc(key)}" aria-pressed="${f.cmp}">Comparables</button>`;
     if (has((p) => Object.values(p.offers).some((o) => o.promo))) s += `<button class="chip" type="button" data-act="quick" data-q="promo" data-k="${esc(key)}" aria-pressed="${f.promo}">Offres</button>`;
     if (has((p) => (p.tags || []).includes("Bio"))) s += `<button class="chip" type="button" data-act="quick" data-q="bio" data-k="${esc(key)}" aria-pressed="${!!f.tags.Bio}">Bio</button>`;
     if (has((p) => p.type === "mdd")) s += `<button class="chip" type="button" data-act="quick" data-q="mdd" data-k="${esc(key)}" aria-pressed="${f.type === "mdd"}">Marques distributeur</button>`;
@@ -551,6 +590,7 @@
   }
   let lazyObs = null;
   function mountLazy() {
+    markEnds();
     if (lazyObs) lazyObs.disconnect();
     const sentinels = $$("[data-more]");
     if (!sentinels.length || !("IntersectionObserver" in window)) return;
@@ -567,8 +607,21 @@
     }, { rootMargin: "600px 0px" });
     sentinels.forEach((s) => lazyObs.observe(s));
   }
-  const emptyArt = (n) => `<div class="art">${ic(n)}</div>`;
-  const notFound = () => ({ title: "Introuvable", html: `<div class="empty">${emptyArt("search")}<h2>Produit introuvable</h2><p>Ce produit n'est plus dans le catalogue. Les prix sont mis à jour à chaque relevé.</p><a class="btn" href="#/">Revenir à l'accueil</a></div>` });
+  /* illustration d'un état vide : des emballages dessinés (packs.js) quand un produit existe, une icône sinon */
+  function emptyArt(n) {
+    if (n === "bag" && S.list.length) {
+      const fan = ["eaux", "pates", "lait"].map((r) => S.list.find((p) => p.r === r)).filter(Boolean);
+      if (fan.length === 3) return `<div class="art"><div class="fan">${fan.map((p) => img(p, 80)).join("")}</div></div>`;
+    }
+    if (n === "list" && S.list.length) { const p = S.list.find((x) => x.r === "cafe") || S.list[0]; return `<div class="art">${img(p, 96)}</div>`; }
+    return `<div class="art">${ic(n)}</div>`;
+  }
+  /* page absente : le titre nomme l'objet (produit, enseigne, liste, recette), le bouton ramène à l'accueil */
+  function notFound(what) {
+    const T = { enseigne: ["Cette enseigne n'existe pas", "Les enseignes de Cabas sont dans les réglages."], liste: ["Cette liste n'existe plus", "Elle a été supprimée de cet appareil."], recette: ["Cette recette n'existe pas", "Les repas à petit prix sont dans « Repas »."], rayon: ["Ce rayon n'existe pas", "Les rayons couverts sont dans « Rayons »."] };
+    const [h, p] = T[what] || ["Ce produit n'est plus dans le catalogue", "Les prix sont mis à jour à chaque relevé."];
+    return { title: "Introuvable", html: `<div class="empty" role="alert">${emptyArt("search")}<h1 class="t1">${h}</h1><p>${p}</p><a class="btn" href="#/">Revenir à l'accueil</a></div>` };
+  }
 
   /* ---------- écrans ---------- */
   const VIEWS = {};
@@ -584,7 +637,7 @@
   const newcomer = () => !S.seen.welcome && !count() && !S.hist.length && !S.lists.length;
   function heroHtml() {
     const ex = EXAMPLES.map(([k, l]) => `<button class="chip" type="button" data-act="wlex" data-k="${k}">${esc(l)}</button>`).join("");
-    return `<div class="hero"><p class="tagline">Tes courses au prix le plus bas, livraison comprise.</p>` +
+    return `<div class="hero"><h1>Tes courses au prix le plus bas, livraison comprise.</h1>` +
       `<p class="lede">Les mêmes produits chez Monoprix, Carrefour, Houra et Auchan, aux prix relevés sur leurs sites. Écris ta liste\u00a0: Cabas trouve chaque produit au meilleur prix et répartit tes commandes, frais compris.</p>` +
       `<a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><p class="try">Ou essaie avec une liste toute faite</p><div class="exrow">${ex}</div>` +
       `<p class="trust">Gratuit, sans compte, sans publicité. En Île-de-France pour l'instant. <a href="#/comment">Comment ça marche</a></p></div>`;
@@ -596,22 +649,22 @@
     const first = newcomer();
     return {
       title: "",
-      left: `<button class="loc" type="button" data-act="zip">${ic("pin")}<span>${S.prefs.zip ? "Livraison à " + esc(S.prefs.zip) : "Où te livrer\u00a0?"}</span>${ic("down", "chev")}</button>`,
+      /* le wordmark compact tient lieu de titre dans la barre ; le titre de contenu est la promesse, ou « Accueil » pour les lecteurs d'écran */
+      left: `<a class="wordmark" href="#/" data-tab="accueil" aria-label="Cabas, accueil"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</a>`,
       right: `<a class="icbtn" href="#/reglages" aria-label="Réglages">${ic("gear")}</a>`,
-      html: `<h1 class="lt wordmark"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</h1>` +
-        (first ? heroHtml() : "") +
-        `<div class="srow"><button class="search" type="button" data-act="gosearch">${ic("search")}<span>Produits, marques</span></button><a class="icbtn" href="#/scan" aria-label="Scanner un code-barres">${ic("scan")}</a></div>` +
+      html: (first ? heroHtml() : `<h1 class="sr">Accueil</h1>`) + netBanner() +
+        `<div class="srow"><button class="search" type="button" data-act="gosearch">${ic("search")}<span>Un produit, une marque, un rayon</span></button><a class="icbtn" href="#/scan" aria-label="Scanner un code-barres">${ic("scan")}</a></div>` +
         `<p class="fresh${isStale() ? " old" : ""}">${ic("clock")}<span>${esc(freshText())}${isStale() ? ", ils ont pu changer depuis" : ""}</span></p>` +
-        (first ? "" : `<a class="wlcta" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>`) +
-        (!first && !S.seen.welcome ? `<button class="wlcta" type="button" data-act="welcome">${ic("gear", "si")}<span><b>Dis-nous où tu fais tes courses</b><small>Enseignes, déplacement ou tout livré, nombre de personnes</small></span>${ic("chev", "chev")}</button>` : "") +
+        (first ? "" : `<a class="hcard" href="#/ecrire">${ic("pen", "si")}<span><b>Écris ou dicte ta liste</b><small>Cabas trouve chaque produit au meilleur prix</small></span>${ic("chev", "chev")}</a>`) +
+        (!first && !S.seen.welcome ? `<button class="hcard" type="button" data-act="welcome">${ic("gear", "si")}<span><b>Dis-nous où tu fais tes courses</b><small>Enseignes, déplacement ou tout livré, nombre de personnes</small></span>${ic("chev", "chev")}</button>` : "") +
         ordersCard() +
         savingsCard() +
         installCard() +
         dropsRail() +
         dueRail() +
         habitsRail() +
-        (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals">${ds.map(dealCard).join("")}</div>` : "") +
-        `<div class="sh"><h2>Rayons</h2><a href="#/rayons">Tout voir</a></div><div class="cats">${tiles}</div>` +
+        (ds.length ? `<div class="sh"><h2>Même produit, pas le même prix</h2></div><div class="rail deals" role="region" aria-label="Même produit, pas le même prix">${ds.map(dealCard).join("")}</div>` : "") +
+        `<div class="sh"><h2>Rayons</h2><a class="act" href="#/rayons">Tout voir${ic("chev")}</a></div><div class="cats">${tiles}</div>` +
         recRail() +
         promosRail() +
         (Object.keys(sg.items).length ? `<div class="sh"><h2>Panier tout prêt</h2></div>${suggestCard(sg)}` : "") +
@@ -632,7 +685,7 @@
 
   VIEWS.rayon = (r) => {
     const ray = rayon(r.id);
-    if (!ray) return notFound();
+    if (!ray) return notFound("rayon");
     const key = "r:" + ray.id, f = F(key);
     const base = S.list.filter((p) => p.r === ray.id);
     const list = applyFilters(base, f);
@@ -655,7 +708,7 @@
     const u = b ? unitPrice(p, b.price) : "";
     const rows = all.map((o, i) => {
       const off = !retOn(o.ret), low = b && o.ret === b.ret && on.length > 1 && !o.sim;
-      return `<a class="row offer${off ? " off" : ""}" href="${esc(o.url)}" target="_blank" rel="noopener"><span class="av">${esc(retName(o.ret).slice(0, 1))}</span><span class="rt"><span class="on">${esc(retName(o.ret))}${low ? '<span class="tag-low">Le moins cher</span>' : ""}${o.sim ? '<span class="tag-sim">Simulé</span>' : ""}</span>` +
+      return `<a class="row offer${off ? " off" : ""}" href="${esc(o.url)}" target="_blank" rel="noopener"><span class="mono" aria-hidden="true">${esc(retName(o.ret).slice(0, 1))}</span><span class="rt"><span class="on">${esc(retName(o.ret))}${low ? '<span class="tag low">Le moins cher</span>' : ""}${o.sim ? '<span class="tag sim" aria-label="prix simulé">Simulé</span>' : ""}</span>` +
         `<span class="os">${esc(o.name || "")}</span><span class="os">${esc(offerWhen(o))}${o.cat ? ", page du rayon" : ""}${off ? ", enseigne désactivée" : ""}</span>${o.promo ? `<span class="os promo">Offre\u00a0: ${esc(o.promo)}</span>` : ""}</span>` +
         `<span class="op">${px(o.price)}${unitPrice(p, o.price) ? `<span class="unit">${unitPrice(p, o.price)}</span>` : ""}</span></a>`;
     }).join("");
@@ -670,11 +723,11 @@
       right: `<button class="icbtn" type="button" data-act="share" data-id="${esc(p.id)}" aria-label="Partager">${ic("share")}</button>`,
       html: `<div class="pdp"><div class="pimg">${img(p, 480)}${promo ? '<span class="badge promo">Offre</span>' : ""}</div>` +
         `<div class="pmain"><div class="ph"><p class="pb">${esc(p.brand)}</p><h1>${esc(p.name)}</h1><p class="pf">${esc(p.format)}${u ? ", " + esc(u) : ""}</p>` +
-        (b ? `<div class="pprice">${px(b.price)}${b.sim ? '<span class="tag-sim lg">Prix simulé</span>' : on.length > 1 ? '<span class="sticker lg">Meilleur prix</span>' : ""}<p class="pw">chez <b>${esc(retName(b.ret))}</b>${b.sim ? " (prix simulé)" : ""}${hi && hi.price - b.price >= 0.01 ? `, ${eur(hi.price - b.price)} de moins que chez ${esc(retName(hi.ret))}` : ""}</p></div>` : `<p class="pw" style="margin-top:14px">Ce produit n'est vendu par aucune de tes enseignes activées.</p>`) +
+        (b ? `<div class="pprice">${px(b.price)}${b.sim ? '<span class="tag sim lg">Prix simulé</span>' : on.length > 1 ? '<span class="sticker lg">Prix le plus bas</span>' : ""}<p class="pw">chez <b>${esc(retName(b.ret))}</b>${b.sim ? " (prix simulé)" : ""}${hi && hi.price - b.price >= 0.01 ? `, ${eur(hi.price - b.price)} de moins que chez ${esc(retName(hi.ret))}` : ""}</p></div>` : `<p class="pw" style="margin-top:14px">Ce produit n'est vendu par aucune de tes enseignes activées.</p>`) +
         `<div class="pinline">${buyCtl(p.id, "bar")}</div></div></div>` +
         `<div class="pmore"><h2 class="gh">Prix dans ${all.length > 1 ? "les enseignes" : "l'enseigne"}</h2><div class="group">${rows}</div><p class="gf">Touche une enseigne pour ouvrir le produit sur son site. Les offres (2e à moitié prix, cagnotte) ne sont pas déduites des totaux.</p><div id="phist">${histHtml(p)}</div>` +
         `<h2 class="gh">Caractéristiques</h2><div class="group"><dl class="spec">${spec.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div></div>` +
-        (sim.length ? `<div class="pfull"><div class="sh"><h2>Dans le même rayon</h2>${ray ? `<a href="${hr(ray.id)}">Tout voir</a>` : ""}</div><div class="rail">${sim.map(card).join("")}</div></div>` : "") + `</div>`,
+        (sim.length ? `<div class="pfull"><div class="sh"><h2>Dans le même rayon</h2>${ray ? `<a class="act" href="${hr(ray.id)}">Tout voir${ic("chev")}</a>` : ""}</div><div class="rail" role="region" aria-label="Dans le même rayon">${sim.map((x) => card(x)).join("")}</div></div>` : "") + `</div>`,
     };
   };
 
@@ -685,7 +738,7 @@
       S.list.forEach((p) => { if (Object.keys(p.offers).length > 1) brands.set(p.brand, (brands.get(p.brand) || 0) + 1); });
       const top = [...brands.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map((x) => x[0]);
       return `<div class="group" style="margin-top:4px"><a class="row" href="#/ecrire">${ic("pen", "ext")}<span class="rt">Chercher toute une liste<small>Colle ou dicte ta liste, Cabas trouve chaque produit</small></span>${ic("chev", "chev")}</a></div>` +
-        (S.recent.length ? `<div class="sh"><h2>Recherches récentes</h2><button type="button" data-act="clearrecent">Effacer</button></div><div class="group">${S.recent.map((x) => `<button class="row" type="button" data-act="setq" data-q="${esc(x)}">${ic("clock", "ext")}<span class="rt">${esc(x)}</span></button>`).join("")}</div>` : "") +
+        (S.recent.length ? `<div class="sh"><h2>Recherches récentes</h2><button class="act" type="button" data-act="clearrecent">Effacer</button></div><div class="group">${S.recent.map((x) => `<button class="row" type="button" data-act="setq" data-q="${esc(x)}">${ic("clock", "ext")}<span class="rt">${esc(x)}</span></button>`).join("")}</div>` : "") +
         `<div class="sh"><h2>Marques comparées</h2></div><div class="tagset">${top.map((x) => `<button class="chip" type="button" data-act="setq" data-q="${esc(x)}">${esc(x)}</button>`).join("")}</div>` +
         `<div class="sh"><h2>Rayons</h2></div><div class="cats">${S.rayons.map(catTile).join("")}</div>`;
     }
@@ -697,7 +750,7 @@
   VIEWS.recherche = () => ({
     title: "Recherche",
     right: `<a class="icbtn" href="#/scan" aria-label="Scanner un code-barres">${ic("scan")}</a>`,
-    html: `<h1 class="lt">Recherche</h1><div class="srow"><label class="search">${ic("search")}<input id="q" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Produits, marques" value="${esc(S.q)}" aria-label="Rechercher un produit ou une marque"><button type="button" class="clr" data-act="clearq"${S.q ? "" : " hidden"} aria-label="Effacer la recherche">${ic("xc")}</button></label></div><div id="sres">${searchBody()}</div>`,
+    html: `<h1 class="lt">Recherche</h1><div class="srow"><label class="search">${ic("search")}<input id="q" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Un produit, une marque, un rayon" value="${esc(S.q)}" aria-label="Rechercher un produit, une marque ou un rayon"><button type="button" class="clr" data-act="clearq"${S.q ? "" : " hidden"} aria-label="Effacer la recherche">${ic("xc")}</button></label></div><div id="sres" aria-label="Résultats">${searchBody()}</div>`,
     mount: () => { mountLazy(); if (S.focusSearch) { S.focusSearch = false; const i = $("#q"); if (i) { i.focus(); } } },
   });
 
@@ -725,7 +778,7 @@
   }
   VIEWS.liste = (r) => {
     const L = S.lists.find((x) => x.id === r.id);
-    if (!L) return notFound();
+    if (!L) return notFound("liste");
     const e = estimate(L.items);
     return {
       title: L.name, grouped: true,
@@ -750,7 +803,7 @@
   function itemRow(id, cost, q, note) {
     const p = S.prods.get(id);
     const unit = cost / q / 100;
-    return `<div class="item"><a class="thumb" href="${hp(id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 52)}</a><a class="it" href="${hp(id)}"><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${q > 1 ? ", " + eur(unit) + " l'unité" : ""}${note ? ", " + esc(note) : ""}</small></a><div class="ir"><span class="lp">${cost ? eurC(cost) : "–"}</span>${buyCtl(id, "item")}</div></div>`;
+    return `<div class="item"><a class="thumb" href="${hp(id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 56)}</a><a class="it" href="${hp(id)}"><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${q > 1 ? ", " + eur(unit) + " l'unité" : ""}${note ? ", " + esc(note) : ""}</small></a><div class="ir"><span class="lp">${cost ? eurC(cost) : "–"}</span>${buyCtl(id, "item")}</div></div>`;
   }
   function plainItems(ids) {
     return ids.map((id) => { const p = S.prods.get(id), b = best(p), q = S.basket[id]; return itemRow(id, b ? Math.round(b.price * 100) * q : 0, q); }).join("");
@@ -760,14 +813,21 @@
     const fee = o.fee - P.fixed;
     const nt = nextTier(o.ch, o.sub);
     const nItems = o.items.reduce((a, x) => a + x.l.q, 0);
-    return `<section class="order" aria-label="Commande ${esc(r.name)}"><div class="oh"><span class="av">${esc(r.name.slice(0, 1))}</span><div class="rt"><h3>${esc(r.name)}</h3><small>${plural(nItems, "article", "articles")}${r.group && (r.channel || {}).where ? ", " + esc((pickup(r) ? "retrait à " : "livraison ") + r.channel.where) : ""}</small></div>${px((o.sub + o.fee) / 100)}</div>` +
+    /* barre vers le palier suivant : le seuil est un repère sur la barre, qui va un peu au-delà ; à la livraison offerte, vert plein et coche */
+    const freeT = !pickup(r) && P.tiers.find((t) => t.fee === 0 && t.from > 0);
+    const goal = nt ? o.sub + nt.need : 0, span = Math.round(goal * 1.15);
+    const bar = nt ? `<p class="hint">Encore ${eurC(nt.need)} chez ${esc(r.name)} et la livraison ${nt.fee > 0 ? "passe à " + eurC(nt.fee) : "devient offerte"}.</p><div class="prog thin" role="progressbar" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${o.sub}" aria-valuetext="${esc(eurC(o.sub) + " sur " + eurC(goal))}"><span style="width:${Math.round((100 * o.sub) / span)}%"></span><i style="left:${Math.round((100 * goal) / span)}%"></i></div>`
+      : freeT && o.sub >= freeT.from ? `<div class="prog thin" role="progressbar" aria-valuemin="0" aria-valuemax="${freeT.from}" aria-valuenow="${freeT.from}" aria-valuetext="Livraison offerte"><span style="width:100%"></span></div><p class="progl done">${ic("check")}Livraison offerte</p>` : "";
+    const W = (S.guide.when || {})[r.id];
+    const when = W && W.d ? `<p class="hint">${pickup(r) ? "Retrait" : "Livraison"} ${esc(whenText(W))}.</p><div class="acts"><button class="act" type="button" data-act="when" data-id="${esc(r.id)}">Modifier${ic("chev")}</button><button class="act" type="button" data-act="ics" data-id="${esc(r.id)}" data-d="${esc(W.d)}" data-s="${esc(W.s || "")}">${ic("cal")}Calendrier</button></div>`
+      : `<div class="acts"><button class="act" type="button" data-act="when" data-id="${esc(r.id)}">${pickup(r) ? "Quand vas-tu le retirer\u00a0?" : "Quand est-ce livré\u00a0?"}${ic("chev")}</button></div>`;
+    return `<section class="order" aria-label="Commande ${esc(r.name)}"><div class="oh"><span class="mono" aria-hidden="true">${esc(r.name.slice(0, 1))}</span><div class="rt"><h3>${esc(r.name)}</h3><small>${plural(nItems, "article", "articles")}${r.group && (r.channel || {}).where ? ", " + esc((pickup(r) ? "retrait à " : "livraison ") + r.channel.where) : ""}</small></div>${px((o.sub + o.fee) / 100)}</div>` +
       o.items.map((x) => itemRow(x.l.id, x.cost, x.l.q)).join("") +
       `<div class="of"><div class="ln"><span>Articles</span><span>${eurC(o.sub)}</span></div><div class="ln"><span>${pickup(r) ? "Retrait" : "Livraison"}</span><span>${fee > 0 ? eurC(fee) : pickup(r) ? "Gratuit" : "Offerte"}</span></div>` +
       (P.fixed ? `<div class="ln"><span>Frais de service</span><span>${eurC(P.fixed)}</span></div>` : "") +
-      `<div class="ln tot"><span>Total ${esc(r.name)}</span><span>${eurC(o.sub + o.fee)}</span></div>` +
-      (nt ? `<p class="hint">Encore ${eurC(nt.need)} chez ${esc(r.name)} et la livraison ${nt.fee > 0 ? "passe à " + eurC(nt.fee) : "devient offerte"}.</p><div class="prog thin" aria-hidden="true"><span style="width:${Math.round((100 * o.sub) / (o.sub + nt.need))}%"></span></div>` : "") +
+      `<div class="ln tot"><span>Total ${esc(r.name)}</span><span>${eurC(o.sub + o.fee)}</span></div>` + bar +
       (r.simulated ? `<p class="hint">Prix simulés, pas relevés : le vrai total s'affiche sur ${esc(r.service)}.</p>` : "") +
-      (S.guide.done[r.id] ? `<button class="btn tint" type="button" data-act="guide" data-id="${esc(r.id)}">${ic("check")}Commande passée</button>` + ((S.guide.when || {})[r.id] && S.guide.when[r.id].d ? `<p class="hint">${pickup(r) ? "Retrait" : "Livraison"} ${esc(whenText(S.guide.when[r.id]))}. <button class="lnk" type="button" data-act="when" data-id="${esc(r.id)}">Modifier</button> <button class="lnk" type="button" data-act="ics" data-id="${esc(r.id)}" data-d="${esc(S.guide.when[r.id].d)}" data-s="${esc(S.guide.when[r.id].s || "")}">Calendrier</button></p>` : `<p class="hint"><button class="lnk" type="button" data-act="when" data-id="${esc(r.id)}">${pickup(r) ? "Quand vas-tu le retirer\u00a0?" : "Quand est-ce livré\u00a0?"}</button></p>`) : `<button class="btn" type="button" data-act="guide" data-id="${esc(r.id)}">Passer la commande sur ${esc(r.service)}</button>`) +
+      (S.guide.done[r.id] ? `<button class="btn tint" type="button" data-act="guide" data-id="${esc(r.id)}">${ic("check")}Commande passée</button>` + when : `<button class="btn" type="button" data-act="guide" data-id="${esc(r.id)}">Passer la commande sur ${esc(r.service)}</button>`) +
       `</div></section>`;
   }
   function compHtml(r) {
@@ -775,9 +835,9 @@
     if (!c.length) return "";
     const shops = joinEt([...new Set(c.map((x) => x.ret))].map(retName));
     const n = c.reduce((a, x) => a + x.l.q, 0);
-    return `<section class="order" aria-label="À acheter en magasin"><div class="oh"><span class="av">${ic("store", "avi")}</span><div class="rt"><h3>À acheter en magasin</h3><small>${plural(n, "article", "articles")}, chez ${esc(shops)}</small></div>${px(r.compTotal / 100)}</div>` +
+    return `<section class="order" aria-label="À acheter en magasin"><div class="oh"><span class="mono" aria-hidden="true">${ic("store")}</span><div class="rt"><h3>À acheter en magasin</h3><small>${plural(n, "article", "articles")}, chez ${esc(shops)}</small></div>${px(r.compTotal / 100)}</div>` +
       c.map((x) => itemRow(x.l.id, x.cost, x.l.q, "chez " + retName(x.ret))).join("") +
-      `<div class="of"><p class="hint" style="color:var(--ink-2)">Tes commandes ne prennent pas ces produits\u00a0: achète-les en magasin, au plus près de chez toi. Ce sont les prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p><button class="btn tint" type="button" data-act="shop">${ic("list")}Liste pour le magasin</button></div></section>`;
+      `<div class="of"><p class="hint muted">Tes commandes ne prennent pas ces produits\u00a0: achète-les en magasin, au plus près de chez toi. Ce sont les prix relevés en ligne\u00a0; en magasin, ils peuvent être un peu différents.</p><button class="btn tint" type="button" data-act="shop">${ic("list")}Liste pour le magasin</button></div></section>`;
   }
   /* interrupteur « Sans achat en magasin » du panier (le même que dans les réglages) */
   const isDrive = (r) => /drive/i.test(((r && r.channel) || {}).label || "");
@@ -794,7 +854,7 @@
   const noCompRow = () => {
     const noComp = S.prefs.comp === false;
     const sw = swappedPickups().map(({ from, to }) => `${esc(to.name)} est livré chez toi${to.channel.where ? ", zone " + esc(to.channel.where) : ""}, au lieu du ${isDrive(from) ? "drive" : "retrait" + (from.channel.where ? " à " + esc(from.channel.where) : "")}.`);
-    return `<div class="optrow"><span class="ot">Sans achat en magasin<small>${noComp ? "Tout est livré chez toi, sans achat en magasin ni retrait." : "À cocher pour tout recevoir chez toi, sans te déplacer."}</small></span><label class="sw"><input type="checkbox" data-act="nocomp" aria-label="Sans achat en magasin"${noComp ? " checked" : ""}><span></span></label></div>` +
+    return `<div class="optrow"><span class="ot" id="nocompL">Tout me faire livrer<small>${noComp ? "Tout est livré chez toi, sans achat en magasin ni retrait." : "À cocher pour tout recevoir chez toi, sans te déplacer."}</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="nocomp" aria-labelledby="nocompL"${noComp ? " checked" : ""}><span></span></label></div>` +
       (sw.length ? `<p class="sn">${sw.join(" ")} <a href="#/reglages">Changer de zone</a></p>` : "");
   };
   /* tout le panier dans une seule enseigne ; les produits qu'elle ne vend pas, complétés en magasin quand c'est permis */
@@ -810,16 +870,16 @@
   const compPhrase = (r) => (r.completed && r.completed.length ? `, et ${plural(r.completed.length, "produit", "produits")} en magasin` : "");
   VIEWS.panier = () => {
     const ids = Object.keys(S.basket).filter((id) => S.basket[id] > 0 && S.prods.has(id));
-    if (!ids.length) return { title: "Panier", grouped: true, html: `<h1 class="lt">Panier</h1><div class="empty">${emptyArt("bag")}<h2>Ton panier est vide</h2><p>Ajoute des produits\u00a0: Cabas cherche où les commander pour payer le moins cher, livraison comprise.</p><a class="btn" href="#/ecrire">${ic("pen")}Écrire ou dicter ma liste</a><a class="btn tint" href="#/rayons" style="margin-top:0">Parcourir les rayons</a></div>` };
+    if (!ids.length) return { title: "Panier", grouped: true, html: `<h1 class="lt">Panier</h1><div class="empty">${emptyArt("bag")}<h2>Ton panier est vide</h2><p>Écris ta liste ou parcours les rayons\u00a0: Cabas cherche où commander pour payer le moins cher, livraison comprise.</p><a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><a class="btn tint" href="#/rayons">Parcourir les rayons</a></div>` };
     const res = cartResult(), M = res.M, K = res.K;
     const nRet = M.chans.length;
     const nameOf = (o) => S.retMap.get(o.ch.id).name;
     const isSim = (r) => r.orders.some((o) => (S.retMap.get(o.ch.id) || {}).simulated);
-    const seg = nRet > 1 ? `<p class="segl">Nombre de commandes au plus</p><div class="seg tall" role="group" aria-label="Nombre de commandes au plus">${Array.from({ length: nRet }, (_, i) => i + 1).map((k) => `<button type="button" data-act="maxk" data-k="${k}" aria-pressed="${k === K}">${k}<small data-segk="${k}">${segLabel(k)}</small></button>`).join("")}</div>` : "";
+    const seg = nRet > 1 ? `<p class="segl" id="maxkL">Commandes au plus</p><div class="seg tall" role="radiogroup" aria-labelledby="maxkL">${Array.from({ length: nRet }, (_, i) => i + 1).map((k) => `<button type="button" role="radio" data-act="maxk" data-k="${k}" aria-checked="${k === K}">${k}<small data-segk="${k}">${segLabel(k)}</small></button>`).join("")}</div>` : "";
     let side = "", main = "";
-    const zipNote = !S.prefs.zip ? `<div class="note">Indique ton code postal pour vérifier que les enseignes te livrent.<button class="btn sm tint" type="button" data-act="zip" style="margin-top:10px">Indiquer mon code postal</button></div>` :
-      !inZone() ? `<div class="note">Les enseignes de Cabas livrent en Île-de-France. La livraison à ${esc(S.prefs.zip)} n'est pas couverte pour l'instant\u00a0: les totaux sont indicatifs.</div>` : "";
-    const uncovered = M.uncovered.length ? `<h2 class="gh">Pas dans tes enseignes</h2><div class="order" style="margin-top:0">${plainItems(M.uncovered)}<div class="of"><p class="hint" style="color:var(--ink-2)">Vendus seulement par une enseigne désactivée. Active-la dans les réglages pour les inclure.</p></div></div>` : "";
+    const zipNote = !S.prefs.zip ? `<div class="banner" role="status">${ic("truck")}<span>Indique ton code postal pour vérifier que les enseignes te livrent.</span><button class="btn sm tint" type="button" data-act="zip">Indiquer mon code postal</button></div>` :
+      !inZone() ? `<div class="banner" role="status">${ic("info")}<span>Les enseignes de Cabas livrent en Île-de-France. La livraison à ${esc(S.prefs.zip)} n'est pas couverte pour l'instant\u00a0: les totaux sont indicatifs.</span></div>` : "";
+    const uncovered = M.uncovered.length ? `<h2 class="gh">Pas dans tes enseignes</h2><div class="order" style="margin-top:0">${plainItems(M.uncovered)}<div class="of"><p class="hint muted">Vendus seulement par une enseigne désactivée. Active-la dans les réglages pour les inclure.</p></div></div>` : "";
     const st = res.steps[K];
     const bst = st ? st.full || st.partial : null;
     if (!st && !res.done) {
@@ -896,21 +956,21 @@
       if (allDone) recordDone();
       const doneBox = allDone ? `<div class="alt"><p><b>Toutes tes commandes sont passées.</b>${S.guide.saved ? ` Tu as économisé ${eurC(S.guide.saved)}, meilleurs prix et remplacements compris.` : ""}</p><div class="btns two"><button class="btn sm tint" type="button" data-act="savelist">Garder en liste</button><button class="btn sm" type="button" data-act="clearok">Vider le panier</button></div></div>` : "";
       const sw = swaps(), swTot = sw.reduce((a, x) => a + x.save, 0);
-      const swapCard = sw.length && !allDone ? `<button class="savecard" type="button" data-act="swaps">${ic("swap", "si")}<span><b>Économiser encore, environ ${eur(swTot)}</b><small>${plural(sw.length, "produit a", "produits ont")} un équivalent moins cher, d'une autre marque</small></span>${ic("chev", "chev")}</button>` : "";
+      const swapCard = sw.length && !allDone ? `<button class="hcard" type="button" data-act="swaps">${ic("swap", "si")}<span><b>Économiser encore, environ ${eur(swTot)}</b><small>${plural(sw.length, "produit a", "produits ont")} un équivalent moins cher, d'une autre marque</small></span>${ic("chev", "chev")}</button>` : "";
       side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${budgetLine(money, complete)}${doneBox}${altBox}` +
         (save ? `<p class="sv">${save}</p>` : "") + (why ? `<p class="sn">${why}</p>` : "") + (more ? `<p class="sn">${more}</p>` : "") +
         (notCheapest ? `<p class="sn">Certains produits ne sont pas pris là où ils sont le moins chers\u00a0: avec les minimums d'achat et la livraison, ce regroupement revient moins cher.</p>` : "") +
         (st.truncated ? `<p class="sn">Gros panier\u00a0: le calcul a été écourté, le vrai minimum peut être un peu plus bas.</p>` : "") +
-        (bst.extra ? `<p class="sn">Avec ${eurC(res.lambda)} comptés pour chaque commande en plus (réglages).</p>` : "") + seg + compRow + `</div>` + (swapCard ? `<div class="savewrap">${swapCard}</div>` : "");
+        (bst.extra ? `<p class="sn">Avec ${eurC(res.lambda)} comptés pour chaque commande en plus (réglages).</p>` : "") + seg + compRow + `</div>` + swapCard;
       const opts = singles.map((x) => {
         const s2 = x.s;
         const sub = !s2.ok ? `Minimum de ${eurC(s2.ch.P.min).replace(",00", "")} non atteint, il manque ${eurC(s2.ch.P.min - s2.sub)}` : x.compN ? `Et ${plural(x.compN, "produit", "produits")} en magasin` : s2.missing ? `${plural(s2.missing, "produit manque", "produits manquent")}` : "";
-        return `<div class="row"><span class="av sm">${esc(x.name.slice(0, 1))}</span><span class="rt">Tout chez ${esc(x.name)}${sub ? `<small>${sub}</small>` : ""}</span><span class="val num">${x.tot != null ? eurC(x.tot) : "–"}</span></div>`;
+        return `<div class="row"><span class="mono sm" aria-hidden="true">${esc(x.name.slice(0, 1))}</span><span class="rt">Tout chez ${esc(x.name)}${sub ? `<small>${sub}</small>` : ""}</span><span class="val num">${x.tot != null ? eurC(x.tot) : "–"}</span></div>`;
       }).join("");
       const skipWhy = altK ? `${k === 1 ? esc(names[0]) + " ne vend pas ces produits" : "Les enseignes de ces commandes ne vendent pas ces produits"}\u00a0: en ${K === 1 ? "une seule commande" : K + " commandes au plus"}, ils ne peuvent pas être pris. Passe à ${altK} commandes pour avoir tout le panier, ou retire-les.`
         : "Ces produits ne rentrent dans aucune commande qui atteint le minimum d'achat de leur enseigne. Ajoute d'autres produits de ces enseignes, ou choisis un équivalent vendu ailleurs.";
-      main = bst.orders.map(orderHtml).join("") + compHtml(bst) +
-        (skipped.length ? `<h2 class="gh">Hors commande</h2><div class="order" style="margin-top:0">${skipped.map((x) => { const p = S.prods.get(x.l.id), b = best(p); return itemRow(x.l.id, b ? Math.round(b.price * 100) * x.l.q : 0, x.l.q); }).join("")}<div class="of"><p class="hint" style="color:var(--ink-2)">${skipWhy}</p></div></div>` : "") +
+      main = `<h2 class="sr">${k === 1 ? "Ta commande" : "Tes commandes"}</h2>` + bst.orders.map(orderHtml).join("") + compHtml(bst) +
+        (skipped.length ? `<h2 class="gh">Hors commande</h2><div class="order" style="margin-top:0">${skipped.map((x) => { const p = S.prods.get(x.l.id), b = best(p); return itemRow(x.l.id, b ? Math.round(b.price * 100) * x.l.q : 0, x.l.q); }).join("")}<div class="of"><p class="hint muted">${skipWhy}</p></div></div>` : "") +
         uncovered + (nRet > 1 ? `<h2 class="gh">Comparer</h2><div class="group">${opts}</div>` : "");
     } else {
       const singles = M.chans.map((c, i) => singleBasket(M, i)).filter((x) => x.have > 0);
@@ -936,8 +996,8 @@
     return {
       title: "Panier", grouped: true,
       right: `<button class="icbtn" type="button" data-act="sharecart" aria-label="Partager la répartition">${ic("share")}</button><button class="txtbtn" type="button" data-act="clear">Vider</button>`,
-      html: `<h1 class="lt">Panier</h1><div class="cartcols"><div class="cside">${side}${zipNote}</div><div class="cmain">${main}</div></div>` +
-        `<p class="foot">${esc(freshText())}. Le total exact s'affiche sur le site de chaque enseigne au moment de commander.<br><a href="#/reglages">Livraison et frais</a></p>`,
+      html: `<h1 class="lt">Panier</h1>` + netBanner() + `<div class="cartcols"><div class="cside">${side}${zipNote}</div><div class="cmain">${main}</div></div>` +
+        `<p class="foot">${esc(freshText())}. Le total exact s'affiche sur le site de chaque enseigne au moment de commander.<br><a class="act" href="#/reglages">Livraison et frais${ic("chev")}</a></p>`,
     };
   };
 
@@ -960,31 +1020,35 @@
   }
   VIEWS.reglages = () => {
     const K = Math.max(1, Math.min(S.rets.length, S.prefs.maxOrders || 3));
+    const seg = (id, label, opts, act, key, cur, hint) => `<div class="row stack"><span class="rt" id="${id}">${label}${hint ? `<small>${hint}</small>` : ""}</span><div class="seg" role="radiogroup" aria-labelledby="${id}">${opts.map((v) => `<button type="button" role="radio" data-act="${act}" data-${key}="${v}" aria-checked="${v === cur}">${v}</button>`).join("")}</div></div>`;
     return {
       title: "Réglages", grouped: true,
       html: `<h1 class="lt">Réglages</h1>` +
-        `<h2 class="gh">Affichage</h2><div class="group"><div class="row stack"><span class="rt">Taille du texte</span><div class="seg" role="group" aria-label="Taille du texte">${ZOOMS.map(([v, l]) => `<button type="button" data-act="zoom" data-v="${v}" aria-pressed="${String(S.prefs.zoom || 1) === v}">${l}</button>`).join("")}</div></div><button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
+        `<h2 class="gh">Affichage</h2><div class="group"><div class="row stack"><span class="rt" id="tsizeL">Taille du texte</span>${tsizeHtml("tsizeL")}</div><button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
         `<h2 class="gh">Livraison</h2><div class="group"><button class="row" type="button" data-act="zip"><span class="rt">Code postal</span><span class="val">${S.prefs.zip ? esc(S.prefs.zip) : "À indiquer"}</span>${ic("chev", "chev")}</button></div>` +
         `<p class="gf">${S.prefs.zip && !inZone() ? "Les enseignes de Cabas livrent en Île-de-France : ton code postal n'est pas encore couvert." : "Les enseignes de Cabas livrent en Île-de-France. Chacune confirme ses créneaux au moment de commander."}</p>` +
-        `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}" style="text-decoration:none">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
+        `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw hit"><input type="checkbox" role="switch" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
         `<p class="gf">Le panier n'utilise que les enseignes activées. Touche une enseigne pour voir ses frais et leurs sources.</p>` +
         Object.entries(groupsOf()).map(([g, ms]) => {
           const noComp = S.prefs.comp === false, cur = pickFor(g, !noComp), back = noComp && cur !== pickOf(g, ms);
-          return `<h2 class="gh">${esc(ms[0].name)} : livraison ou retrait</h2><div class="group">${ms.map((m) => { const dis = noComp && pickup(m); return `<button class="row" type="button" data-act="pick" data-g="${esc(g)}" data-id="${esc(m.id)}" aria-pressed="${m.id === cur}"${dis ? " disabled" : ""}><span class="rt">${esc(optionLabel(m))}<small>${esc(pickup(m) ? (tiersOf(m)[0].fee > 0 ? eur(tiersOf(m)[0].fee) + " par retrait" : "Retrait gratuit") : feeShort(m))}</small></span>${m.id === cur ? ic("check", "chk") : ""}</button>`; }).join("")}</div>` +
-            `<p class="gf">${noComp ? `« Sans achat en magasin » est coché\u00a0: tout est livré chez toi, pas de retrait. ${[ms.filter((m) => !pickup(m)).length > 1 ? "choisis ta zone de livraison" : "", back ? "en décochant, tu retrouves ton " + (isDrive(S.allMap.get(pickOf(g, ms))) ? "drive" : "point de retrait") : ""].filter(Boolean).join("\u00a0; ").replace(/^./, (c) => c.toUpperCase()).replace(/.$/, (c) => c + ".")}` : `Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.`}</p>`;
+          return `<h2 class="gh" id="pick-${esc(g)}">${esc(ms[0].name)} : livraison ou retrait</h2><div class="group" role="radiogroup" aria-labelledby="pick-${esc(g)}">${ms.map((m) => { const dis = noComp && pickup(m); return `<button class="row" type="button" role="radio" data-act="pick" data-g="${esc(g)}" data-id="${esc(m.id)}" aria-checked="${m.id === cur}"${dis ? " disabled" : ""}><span class="rt">${esc(optionLabel(m))}<small>${esc(pickup(m) ? (tiersOf(m)[0].fee > 0 ? eur(tiersOf(m)[0].fee) + " par retrait" : "Retrait gratuit") : feeShort(m))}</small></span>${m.id === cur ? ic("check", "chk") : ""}</button>`; }).join("")}</div>` +
+            `<p class="gf">${noComp ? `« Tout me faire livrer » est coché\u00a0: tout est livré chez toi, pas de retrait. ${[ms.filter((m) => !pickup(m)).length > 1 ? "choisis ta zone de livraison" : "", back ? "en décochant, tu retrouves ton " + (isDrive(S.allMap.get(pickOf(g, ms))) ? "drive" : "point de retrait") : ""].filter(Boolean).join("\u00a0; ").replace(/^./, (c) => c.toUpperCase()).replace(/.$/, (c) => c + ".")}` : `Les prix ${esc(ms[0].name)} dépendent du magasin et de la zone de livraison : choisis ta zone ou ton point de retrait.`}</p>`;
         }).join("") +
-        `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt">Sans achat en magasin<small>Tout passe par les commandes en ligne. Décoché, un produit que tes commandes ne prennent pas peut s'acheter en magasin, au prix relevé le plus bas (au plus un quart du panier).</small></span><label class="sw"><input type="checkbox" data-act="nocomp"${S.prefs.comp === false ? " checked" : ""} aria-label="Sans achat en magasin"><span></span></label></div><div class="row"><span class="rt">Commandes au plus</span><div class="seg" style="width:${S.rets.length * 46}px" role="group" aria-label="Nombre de commandes au plus">${S.rets.map((_, i) => `<button type="button" data-act="maxk" data-k="${i + 1}" aria-pressed="${i + 1 === K}">${i + 1}</button>`).join("")}</div></div>` +
-        `<div class="row"><span class="rt">Personnes à la maison<small>Pour les portions des repas.</small></span><div class="seg" style="width:${6 * 38}px" role="group" aria-label="Personnes à la maison">${[1, 2, 3, 4, 5, 6].map((n) => `<button type="button" data-act="wfoyer" data-v="${n}" aria-pressed="${(S.prefs.foyer || 0) === n}">${n}</button>`).join("")}</div></div>` +
+        `<h2 class="gh">Répartition du panier</h2><div class="group"><div class="row"><span class="rt" id="nocompRL">Tout me faire livrer<small>Tout passe par les commandes en ligne. Décoché, un produit que tes commandes ne prennent pas peut s'acheter en magasin, au prix relevé le plus bas (au plus un quart du panier).</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="nocomp"${S.prefs.comp === false ? " checked" : ""} aria-labelledby="nocompRL"><span></span></label></div>` +
+        seg("maxkL", "Commandes au plus", S.rets.map((_, i) => i + 1), "maxk", "k", K) +
+        seg("foyerL", "Personnes à la maison", [1, 2, 3, 4, 5, 6], "wfoyer", "v", S.prefs.foyer || 0, "Pour les portions des repas.") +
         `<button class="row" type="button" data-act="budget"><span class="rt">Budget par panier<small>Le panier dit ce qu'il reste ou de combien tu dépasses.</small></span><span class="val">${parseFloat(S.prefs.budget) > 0 ? eurR(parseFloat(S.prefs.budget)) : "Aucun"}</span>${ic("chev", "chev")}</button>` +
         (Object.keys(S.prefs.keep || {}).length ? `<div class="row"><span class="rt">Marques gardées<small>${plural(Object.keys(S.prefs.keep).length, "produit n'est", "produits ne sont")} plus proposés au remplacement par un équivalent moins cher.</small></span><button class="btn sm plain" type="button" data-act="keepreset">Tout reproposer</button></div>` : "") +
-        `<label class="row" for="extra"><span class="rt">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><input class="inl num" id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(S.prefs.extraCost || 0)}"><span class="val">€</span></label></div>` +
+        `<div class="row stack"><span class="rt" id="extraL">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><div class="field" data-field="extra"><span class="in"><input id="extra" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="${esc(frNum(S.prefs.extraCost || 0))}" aria-labelledby="extraL"><span class="suf">€</span></span><small></small></div></div></div>` +
         `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/comment"><span class="rt">Comment ça marche</span>${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="${installEvt ? "installnow" : "install"}"><span class="rt">${isIOS ? "Installer Cabas sur l'iPhone" : "Installer Cabas sur le téléphone"}</span>${ic("chev", "chev")}</button>`}<button class="row" type="button" data-act="shareapp"><span class="rt">Faire connaître Cabas<small>Une image et un lien à envoyer à qui fait ses courses</small></span>${ic("share", "chev")}</button><div class="row"><span class="rt">Version</span><span class="val">1.2</span></div></div>` +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
     };
   };
   VIEWS.enseigne = (r) => {
-    const R0 = S.retMap.get(r.id);
-    if (!R0) return notFound();
+    /* #/enseigne/<groupe> (auchan, leclerc) ouvre l'option retenue du groupe ; une option précise s'ouvre telle quelle */
+    const G = groupsOf()[r.id];
+    const R0 = S.retMap.get(r.id) || S.allMap.get(r.id) || (G && S.allMap.get(pickFor(r.id, S.prefs.comp !== false)));
+    if (!R0) return notFound("enseigne");
     const ch = R0.channel || {}, T = tiersOf(R0);
     const rows = T.map((t, i) => {
       const lo = Math.max(t.from, ch.minOrder || 0), hi = T[i + 1] ? T[i + 1].from : null;
@@ -997,10 +1061,10 @@
     return {
       title: R0.name, grouped: true,
       html: `<h1 class="lt">${esc(R0.name)}</h1><p class="lt-sub">${esc(R0.service)}</p>` +
-        `<div class="group"><div class="row"><span class="rt">Utiliser ${esc(R0.name)}</span><label class="sw"><input type="checkbox" data-act="ret" data-id="${esc(R0.id)}"${retOn(R0.id) ? " checked" : ""} aria-label="Utiliser ${esc(R0.name)}"><span></span></label></div></div>` +
+        `<div class="group"><div class="row"><span class="rt" id="useL">Utiliser ${esc(R0.name)}</span><label class="sw hit"><input type="checkbox" role="switch" data-act="ret" data-id="${esc(R0.id)}"${retOn(R0.id) ? " checked" : ""} aria-labelledby="useL"><span></span></label></div></div>` +
         `<h2 class="gh">${pickup(R0) ? "Retrait" + (ch.where ? " à " + esc(ch.where) : "") : "Livraison à domicile"}</h2><div class="group"><div class="row"><span class="rt">Commande minimum</span><span class="val num">${eurR(ch.minOrder || 0)}</span></div>${rows}${ch.fixedFee ? `<div class="row"><span class="rt">Frais de service</span><span class="val num">${eur(ch.fixedFee)}</span></div>` : ""}</div>` +
-        (ch.editable ? `<h2 class="gh">Ton créneau</h2><div class="group"><label class="row" for="fee-${esc(R0.id)}"><span class="rt">${pickup(R0) ? "Frais de retrait" : "Frais de livraison"}${firstTo ? " sous " + eurR(firstTo) : ""}<small>${pickup(R0) ? "À vérifier sur le site au moment de commander." : "Selon le créneau choisi. Par défaut, le prix le plus haut."}</small></span><input class="inl num" id="fee-${esc(R0.id)}" type="number" inputmode="decimal" min="0" step="0.1" data-fee="${esc(R0.id)}" value="${esc(ov.base != null ? ov.base : ch.tiers[0].fee)}"><span class="val">€</span></label></div>` : "") +
-        (ch.feeNote ? `<h2 class="gh">D'où viennent ces frais</h2><div class="group"><p class="prose" style="padding:12px 16px"><span>${esc(ch.feeNote)}</span></p>${(ch.sources || []).map((s) => `<a class="row link" href="${esc(s.url)}" target="_blank" rel="noopener"><span class="rt">${esc(s.label)}</span>${ic("ext", "ext")}</a>`).join("")}</div>` : "") +
+        (ch.editable ? `<h2 class="gh">Ton créneau</h2><div class="group"><div class="row stack">${field("fee-" + esc(R0.id), (pickup(R0) ? "Frais de retrait" : "Frais de livraison") + (firstTo ? " sous " + eurR(firstTo) : ""), `type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" data-fee="${esc(R0.id)}" value="${esc(frNum(ov.base != null ? ov.base : ch.tiers[0].fee))}"`, pickup(R0) ? "À vérifier sur le site au moment de commander." : "Selon le créneau choisi. Par défaut, le prix le plus haut.", "€")}</div></div>` : "") +
+        (ch.feeNote ? `<h2 class="gh">D'où viennent ces frais</h2><div class="group"><p class="prose"><span>${esc(ch.feeNote)}</span></p>${(ch.sources || []).map((s) => `<a class="row link" href="${esc(s.url)}" target="_blank" rel="noopener"><span class="rt">${esc(s.label)}</span>${ic("ext", "ext")}</a>`).join("")}</div>` : "") +
         `<div class="group" style="margin-top:28px"><a class="row link" href="${esc(R0.home)}" target="_blank" rel="noopener"><span class="rt">Ouvrir ${esc(R0.service)}</span>${ic("ext", "ext")}</a></div>`,
     };
   };
@@ -1019,9 +1083,9 @@
         step(3, "Ton panier est réparti entre les enseignes", "Une ou plusieurs commandes, en tenant compte des minimums d'achat et des frais de livraison de chacune : le total affiché est celui que tu paieras, frais compris. Si une seule commande revient moins cher, Cabas le dit.") +
         step(4, "Tu commandes sur les sites des enseignes", "Cabas te donne la liste de chaque commande avec les liens. Il ne vend rien, ne prend aucune commission et n'est lié à aucune enseigne.") +
         `</div>` +
-        `<h2 class="gh">D'où viennent les prix</h2><div class="group"><div class="prose" style="padding:12px 16px"><p>Les prix sont relevés sur les sites des enseignes, page de rayon par page de rayon, et chaque prix garde la date de son relevé${m.updatedAt ? " (dernier relevé le " + esc(dateFr(m.updatedAt)) + ")" : ""}. Rien n'est estimé${S.allRets.some((r) => r.simulated) ? ", sauf E.Leclerc, dont les prix sont simulés et signalés comme tels partout" : ""}. Les offres en cours sont signalées mais pas déduites.</p><p>Les prix Auchan dépendent du magasin : Cabas relève plusieurs points de retrait et zones de livraison, et tu choisis le tien.</p></div></div>` +
-        `<h2 class="gh">Où ça marche</h2><div class="group"><div class="prose" style="padding:12px 16px"><p>Pour l'instant en Île-de-France, là où ${esc(names)} livrent ou proposent un retrait. Les rayons couverts\u00a0: ${esc(joinEt(S.rayons.map((r) => r.name.toLowerCase())))}. D'autres suivent.</p></div></div>` +
-        `<h2 class="gh">Ce que ça coûte</h2><div class="group"><div class="prose" style="padding:12px 16px"><p>Rien. Pas de compte, pas de publicité, pas de suivi. Tes listes, ton panier et tes commandes restent dans ton téléphone. Cabas s'installe sur l'écran d'accueil et marche sans réseau avec le dernier relevé.</p></div></div>` +
+        `<h2 class="gh">D'où viennent les prix</h2><div class="group"><div class="prose"><p>Les prix sont relevés sur les sites des enseignes, page de rayon par page de rayon, et chaque prix garde la date de son relevé${m.updatedAt ? " (dernier relevé le " + esc(dateFr(m.updatedAt)) + ")" : ""}. Rien n'est estimé${S.allRets.some((r) => r.simulated) ? ", sauf E.Leclerc, dont les prix sont simulés et signalés comme tels partout" : ""}. Les offres en cours sont signalées mais pas déduites.</p><p>Les prix Auchan dépendent du magasin : Cabas relève plusieurs points de retrait et zones de livraison, et tu choisis le tien.</p></div></div>` +
+        `<h2 class="gh">Où ça marche</h2><div class="group"><div class="prose"><p>Pour l'instant en Île-de-France, là où ${esc(names)} livrent ou proposent un retrait. Les rayons couverts\u00a0: ${esc(joinEt(S.rayons.map((r) => r.name.toLowerCase())))}. D'autres suivent.</p></div></div>` +
+        `<h2 class="gh">Ce que ça coûte</h2><div class="group"><div class="prose"><p>Rien. Pas de compte, pas de publicité, pas de suivi. Tes listes, ton panier et tes commandes restent dans ton téléphone. Cabas s'installe sur l'écran d'accueil et marche sans réseau avec le dernier relevé.</p></div></div>` +
         `<div class="pad btns" style="padding-top:18px"><a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><button class="btn tint" type="button" data-act="shareapp">${ic("share")}Faire connaître Cabas</button></div>` +
         `<p class="gf"><a href="#/apropos">À propos des prix</a>, enseigne par enseigne.</p>`,
     };
@@ -1033,7 +1097,7 @@
       title: "À propos des prix", grouped: true,
       html: `<h1 class="lt">À propos des prix</h1>` +
         `<h2 class="gh">Dernière vérification</h2><div class="group">${S.rets.map((r) => { const st = ((S.status || {}).retailers || {})[r.id] || {}; return `<div class="row"><span class="rt">${esc(r.name)}<small>${r.simulated ? "Prix simulés, pas relevés" : st.checkedAt ? "Vérifié " + esc(whenFr(st.checkedAt)) + (st.pages ? ", " + st.read + " page" + (st.read > 1 ? "s" : "") + " lue" + (st.read > 1 ? "s" : "") + " sur " + st.pages : "") : "Relevé du " + esc(dateFr(m.updatedAt))}</small></span><span class="val num">${plural(cov[r.id] || 0, "prix", "prix")}</span></div>`; }).join("")}<div class="row"><span class="rt">Produits vendus par plusieurs enseignes</span><span class="val num">${esc(m.multi || 0)}</span></div></div>` +
-        `<h2 class="gh">Comment lire les prix</h2><div class="group"><div class="prose" style="padding:12px 16px">${(m.notes || []).map((n) => `<p>${esc(n)}</p>`).join("")}</div></div>` +
+        `<h2 class="gh">Comment lire les prix</h2><div class="group"><div class="prose">${(m.notes || []).map((n) => `<p>${esc(n)}</p>`).join("")}</div></div>` +
         `<p class="gf">Les prix viennent des pages rayon des enseignes, relues à chaque relevé. Une page qui n'a pas pu être lue garde ses prix précédents, avec leur date. Cabas n'est lié à aucune enseigne. Les noms des enseignes et des marques appartiennent à leurs propriétaires.</p>`,
     };
   };
@@ -1122,6 +1186,8 @@
   window.addEventListener("hashchange", () => {
     const h = location.hash || "#/";
     if (h === S.cur) return;
+    /* retour du navigateur ou adresse tapée : la feuille de la page quittée se ferme */
+    if (!$("#sheet").hidden) closeSheet();
     S.scroll[S.cur] = window.scrollY;
     const st = S.stacks[S.tab];
     if (st[st.length - 1] !== h) {
@@ -1153,13 +1219,16 @@
     $("#navR").innerHTML = V.right || "";
     const view = $("#view");
     view.innerHTML = `<div class="wrap">${V.html}</div>`;
-    view.classList.remove("enter-push", "enter-pop");
-    if (S.dir === "push" || S.dir === "pop") { void view.offsetWidth; view.classList.add(S.dir === "push" ? "enter-push" : "enter-pop"); }
+    view.classList.remove("enter-push", "enter-pop", "enter-tab");
+    if (S.dir === "push" || S.dir === "pop" || S.dir === "tab") { void view.offsetWidth; view.classList.add({ push: "enter-push", pop: "enter-pop", tab: "enter-tab" }[S.dir]); }
     renderChrome(V);
-    document.title = V.title && V.title !== "Cabas" ? V.title + " – Cabas" : "Cabas";
+    document.title = V.title && V.title !== "Cabas" ? V.title + ", Cabas" : "Cabas";
     window.scrollTo(0, S.dir === "push" ? 0 : S.scroll[h] || 0);
+    /* après une navigation, le focus part de la vue : le lecteur d'écran lit le nouveau titre, Tab va au contenu */
+    if (S.dir === "push" || S.dir === "tab") { try { view.focus({ preventScroll: true }); } catch (e) { /* focus refusé */ } }
     S.dir = "none";
     if (V.mount) V.mount();
+    markEnds();
     /* questions de départ (enseignes, déplacement, foyer, secteur) : à la première visite du panier avec des produits,
        quand elles changent le total, et jamais avant d'avoir vu ce que fait Cabas */
     if (S.ready && !S.seen.welcome && r.name === "panier" && count() > 0 && !location.hash.startsWith("#/partage")) setTimeout(() => { if ($("#sheet").hidden && S.route.name === "panier") welcomeSheet(); }, 450);
@@ -1175,17 +1244,22 @@
     V = V || lastV || {};
     const n = count();
     const tabs = [["accueil", "Accueil", "home"], ["rayons", "Rayons", "grid"], ["recherche", "Recherche", "search"], ["listes", "Listes", "list"], ["panier", "Panier", "bag"]];
-    $("#tabbar").innerHTML = tabs.map(([t, l, i]) => `<a class="tab" href="${ROOTS[t]}" data-tab="${t}"${S.tab === t ? ' aria-current="page"' : ""}>${ic(i, "off")}${ic(i + "-f", "on")}<span>${l}</span>${t === "panier" && n ? `<span class="bdg">${n > 99 ? "99+" : n}</span>` : ""}</a>`).join("");
-    $("#side").innerHTML = `<a class="wordmark" href="#/" data-tab="accueil" style="text-decoration:none"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</a>` +
-      tabs.map(([t, l, i]) => `<a class="sitem" href="${ROOTS[t]}" data-tab="${t}"${S.tab === t ? ' aria-current="page"' : ""}>${ic(i, "off")}${ic(i + "-f", "on")}<span>${l}</span>${t === "panier" && n ? `<span class="bdg">${n > 99 ? "99+" : n}</span>` : ""}</a>`).join("") +
+    const bdg = (t) => (t === "panier" && n ? `<span class="bdg" aria-hidden="true">${n > 99 ? "99+" : n}</span>` : "");
+    const lab = (t) => (t === "panier" && n ? ` aria-label="Panier, ${plural(n, "article", "articles")}"` : "");
+    $("#tabbar").innerHTML = tabs.map(([t, l, i]) => `<a class="tab" href="${ROOTS[t]}" data-tab="${t}"${S.tab === t ? ' aria-current="page"' : ""}${lab(t)}>${ic(i, "off")}${ic(i + "-f", "on")}<span>${l}</span>${bdg(t)}</a>`).join("");
+    $("#side").innerHTML = `<a class="wordmark" href="#/" data-tab="accueil" aria-label="Cabas, accueil"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</a>` +
+      tabs.map(([t, l, i]) => `<a class="sitem" href="${ROOTS[t]}" data-tab="${t}"${S.tab === t ? ' aria-current="page"' : ""}${lab(t)}>${ic(i, "off")}${ic(i + "-f", "on")}<span>${l}</span>${bdg(t)}</a>`).join("") +
       `<a class="sitem" href="#/reglages"${S.route.name === "reglages" ? ' aria-current="page"' : ""}>${ic("gear")}<span>Réglages</span></a><div class="smini">${S.route.name === "panier" ? "" : miniHtml()}</div>`;
     const dock = $("#dock"), view = $("#view");
     let dh = "";
     if (V.dock === "bar" && V.dockId) dh = `<div class="wrap">${buyCtl(V.dockId, "bar")}</div>`;
     else if (V.dockHtml) dh = `<div class="wrap">${V.dockHtml}</div>`;
     else if (n && S.route.name !== "panier") dh = `<div class="wrap">${miniHtml()}</div>`;
+    const was = !dock.hidden;
     dock.innerHTML = dh;
     dock.hidden = !dh;
+    /* le dock entre par une montée quand il apparaît (premier produit au panier) */
+    dock.classList.toggle("in", !!dh && !was);
     view.classList.toggle("docked", !!dh);
   }
   function bumpBadge() { $$(".tab .bdg, .sitem .bdg").forEach((b) => { b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }); }
@@ -1206,6 +1280,11 @@
     nav.classList.toggle("flat", stuck);
   }
   window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  /* rangées qui défilent (chips, rails) : un fondu à droite tant qu'il reste du contenu, retiré au bout (classe .end) */
+  const markEnd = (el) => el.classList.toggle("end", el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
+  function markEnds() { $$(".chips, .rail").forEach(markEnd); }
+  document.addEventListener("scroll", (e) => { const el = e.target; if (el && el.nodeType === 1 && (el.classList.contains("chips") || el.classList.contains("rail"))) markEnd(el); else if (el && el.classList && el.classList.contains("sheet-b")) sheetEdges(el); }, { capture: true, passive: true });
+  window.addEventListener("resize", () => { markEnds(); const b = $("#sheet .sheet-b"); if (b && !$("#sheet").hidden) sheetEdges(b); });
 
   /* ---------- panier : actions ---------- */
   function setQty(id, q, how) {
@@ -1213,6 +1292,9 @@
     const before = S.basket[id] || 0;
     if (q) S.basket[id] = q; else delete S.basket[id];
     saveBasket();
+    if (how) buzz(q > before ? "add" : q ? "" : "remove");
+    /* un produit retiré se remet en un geste, le temps du toast */
+    if (before && !q && how === "dec") { const p = S.prods.get(id); toast(p ? "Produit retiré" : "Retiré", { label: "Annuler", run: () => setQty(id, before) }); }
     if (S.route.name === "panier") { rerender(); return; }
     $$(`[data-buy="${CSS.escape(id)}"]`).forEach((el) => {
       const t = document.createElement("div");
@@ -1220,6 +1302,7 @@
       const nw = t.firstElementChild;
       const hadFocus = el.contains(document.activeElement);
       if (!before && q && nw.classList.contains("stepper")) nw.classList.add("pop");
+      else if (before && q) { const sp = nw.querySelector("span[aria-live]"); if (sp) sp.classList.add("tick"); }
       el.replaceWith(nw);
       if (hadFocus) { const f = nw.querySelector(`[data-act="${how === "dec" && q ? "dec" : "inc"}"]`) || nw; if (f.focus) f.focus({ preventScroll: true }); }
     });
@@ -1471,7 +1554,7 @@
       return `<div class="item wli miss"><span class="thumb q">${ic("search")}</span><div class="it"><span class="wq">${esc(x.raw)}</span><b>${off ? "Pas vendu par tes enseignes" : "Pas encore dans Cabas"}</b><small>${off ? "Vendu par une enseigne ou dans une zone que tu n'utilises pas." : "Cabas ne couvre que quelques rayons pour l'instant."}</small></div><div class="ir"><button class="btn sm plain" type="button" data-act="wlsearch" data-i="${i}">Chercher</button></div></div>`;
     }
     const p = S.prods.get(x.pick), b = best(p), u = b ? unitPrice(p, b.price) : "";
-    return `<div class="item wli"><a class="thumb" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 52)}</a><div class="it"><span class="wq">${esc(x.raw)}</span><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${u ? ", " + esc(u) : ""}${b ? ", chez " + esc(retName(b.ret)) + (b.sim ? " (simulé)" : "") : ""}</small><button class="lnk" type="button" data-act="wlalt" data-i="${i}">Autre choix</button></div><div class="ir"><span class="lp">${b ? eurC(Math.round(b.price * 100) * x.n) : "–"}</span>${wlStep(x, i)}</div></div>`;
+    return `<div class="item wli"><a class="thumb" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 56)}</a><div class="it"><span class="wq">${esc(x.raw)}</span><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${u ? ", " + esc(u) : ""}${b ? ", chez " + esc(retName(b.ret)) + (b.sim ? " (simulé)" : "") : ""}</small><button class="act" type="button" data-act="wlalt" data-i="${i}" aria-label="Autre choix pour ${esc(x.raw)}">Autre choix${ic("chev")}</button></div><div class="ir"><span class="lp">${b ? eurC(Math.round(b.price * 100) * x.n) : "–"}</span>${wlStep(x, i)}</div></div>`;
   }
   VIEWS.ecrire = () => {
     const W = S.wl || (S.wl = { text: store.get("draft", ""), lines: null });
@@ -1504,14 +1587,14 @@
     let planHtml = "";
     if (plan && plan.short) {
       const s = plan.short;
-      planHtml = `<div class="plan">${ic("coin", "si")}<span><b>Encore ${eurC(s.gap)} pour une livraison</b><small>Chez ${esc(retName(s.ch).split(" ")[0])}, ${s.covered < plan.n ? s.covered + " produits sur " + plan.n + " font" : "ces produits font"} ${eurC(s.sub)} au mieux\u00a0: le minimum de commande est de ${eurC(s.sub + s.gap).replace(",00", "")}. Ajoute des produits, ou achète ce petit panier en magasin.</small></span></div>`;
+      planHtml = `<div class="banner" role="status">${ic("coin")}<span><b>Encore ${eurC(s.gap)} pour une livraison</b>Chez ${esc(retName(s.ch).split(" ")[0])}, ${s.covered < plan.n ? s.covered + " produits sur " + plan.n + " font" : "ces produits font"} ${eurC(s.sub)} au mieux\u00a0: le minimum de commande est de ${eurC(s.sub + s.gap).replace(",00", "")}. Ajoute des produits, ou achète ce petit panier en magasin.</span></div>`;
     } else if (plan) {
       const same = plan.picks.every((pk) => !pk.id || (pk.id === pk.line.pick && pk.n === pk.line.n));
       const where = joinEt(plan.orders.map((o) => retName(o.ch).split(" ")[0]));
       const fees = plan.orders.reduce((a, o) => a + o.fee, 0);
       const head = plan.covered < plan.n ? `${plan.covered} produits sur ${plan.n}, ${eurC(plan.total)} livraison comprise` : `${eurC(plan.total)} livraison comprise`;
       const sub = `${plan.orders.length === 1 ? "Une commande" : plan.orders.length + " commandes"} chez ${esc(where)}${fees ? ", " + eurC(fees) + " de frais" : ", livraison offerte"}${plan.covered < plan.n ? ". Les autres produits ne sont vendus que par une enseigne dont la commande n'atteindrait pas le minimum d'achat." : "."}`;
-      planHtml = `<div class="plan">${ic("coin", "si")}<span><b>${same ? "Le moins cher, livraison comprise\u00a0: " + head.replace(" livraison comprise", "") : "Encore moins cher\u00a0: " + head}</b><small>${sub}${same ? " Chaque produit est pris là où l'ensemble revient le moins cher\u00a0; «\u00a0Autre choix\u00a0» pour en changer un." : " Les produits ci-dessous changent pour y arriver."}</small>${same ? "" : `<button class="btn sm" type="button" data-act="wlplan" style="margin-top:10px">Prendre ces produits</button>`}</span></div>`;
+      planHtml = `<div class="banner good" role="status">${ic("coin")}<span><b>${same ? "Le moins cher, livraison comprise\u00a0: " + head.replace(" livraison comprise", "") : "Encore moins cher\u00a0: " + head}</b>${sub}${same ? " Chaque produit est pris là où l'ensemble revient le moins cher\u00a0; «\u00a0Autre choix\u00a0» pour en changer un." : " Les produits ci-dessous changent pour y arriver."}</span>${same ? "" : `<button class="btn sm ghost" type="button" data-act="wlplan">Prendre ces produits</button>`}</div>`;
       W.plan = plan;
     }
     return {
@@ -1520,10 +1603,11 @@
       /* le bouton principal reste visible en bas, comme le mini panier : on n'a pas à descendre toute la liste */
       /* le montant du bouton est celui que le panier affichera : le plan livraison comprise quand il prend toute la liste */
       dockHtml: found.length ? `<button class="mini" type="button" data-act="wladd"><span class="mn">${nArt}</span><span class="ml">Ajouter au panier</span><span class="mp">${eurC(plan && !plan.short && plan.covered === plan.n && plan.picks.every((pk) => pk.id === pk.line.pick && pk.n === pk.line.n) ? plan.total : t)}</span></button>` : "",
+      /* un seul appel à l'action plein : le dock ; en bas de page, seulement « Enregistrer en liste » */
       html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">${plural(found.length, "produit trouvé", "produits trouvés")} sur ${W.lines.length}${found.length && !(plan && !plan.short) ? ", environ " + eurC(t) + " au meilleur prix de chaque produit" : ""}</p>` + planHtml +
-        `<div class="order" style="margin-top:4px">${W.lines.map(wlRow).join("")}</div>` +
-        `<p class="gf">Pour chaque ligne, le produit le moins cher au kilo ou au litre parmi les plus proches de ce que tu as écrit, dans un format courant. Touche «\u00a0Autre choix\u00a0» pour en prendre un autre.</p>` +
-        (found.length ? `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="wladd">${ic("plus")}Ajouter ${plural(nArt, "article", "articles")} au panier</button><button class="btn tint" type="button" data-act="wlsave">Enregistrer en liste</button></div>` : ""),
+        `<div class="order wlist" style="margin-top:12px">${W.lines.map(wlRow).join("")}</div>` +
+        `<p class="gf">Pour chaque ligne, le produit le moins cher au kilo ou au litre parmi les plus proches de ce que tu as écrit, dans un format courant. «\u00a0Autre choix\u00a0» pour en prendre un autre.</p>` +
+        (found.length ? `<div class="pad btns" style="padding-top:16px"><button class="btn tint" type="button" data-act="wlsave">Enregistrer en liste</button></div>` : ""),
     };
   };
   /* ---------- dictée (Web Speech API, quand le navigateur la propose) ---------- */
@@ -1563,7 +1647,7 @@
     const list = x.cands.map((id) => S.prods.get(id)).filter((p) => p && best(p)).sort((a, b) => valOf(a) - valOf(b)).slice(0, 40);
     openSheet({
       title: x.raw,
-      body: `<p>Du moins cher au plus cher, au kilo ou au litre.</p><div class="group">${list.map((p) => { const b = best(p); return `<button class="opt alt" type="button" data-act="wlpick" data-i="${i}" data-id="${esc(p.id)}"><span class="thumb">${img(p, 40)}</span><span class="at"><b>${esc(p.brand)}</b> ${esc(p.name)}<small>${esc(p.format)}${unitPrice(p, b.price) ? ", " + esc(unitPrice(p, b.price)) : ""}, chez ${esc(retName(b.ret))}</small></span><span class="ap">${eur(b.price)}</span>${p.id === x.pick ? ic("check", "ck") : `<span class="ck"></span>`}</button>`; }).join("")}</div>`,
+      body: `<p>Du moins cher au plus cher, au kilo ou au litre.</p><div class="group" role="radiogroup" aria-label="Produits proposés">${list.map((p) => { const b = best(p); return `<button class="opt alt" type="button" role="radio" aria-checked="${p.id === x.pick}" data-act="wlpick" data-i="${i}" data-id="${esc(p.id)}"><span class="thumb">${img(p, 40)}</span><span class="at"><b>${esc(p.brand)}</b> ${esc(p.name)}<small>${esc(p.format)}${unitPrice(p, b.price) ? ", " + esc(unitPrice(p, b.price)) : ""}, chez ${esc(retName(b.ret))}</small></span><span class="ap">${eur(b.price)}</span><span class="box">${ic("check")}</span></button>`; }).join("")}</div>`,
     });
   }
   function wlItems() {
@@ -1670,13 +1754,13 @@
       const where = r.channel && r.channel.where ? (pickup(r) ? ", choisis le retrait à " + r.channel.where : ", choisis la livraison à domicile (" + r.channel.where + ")") : "";
       const row = (x) => {
         const p = S.prods.get(x.l.id), of = p.offers[rid] || {}, on = !!G.ck[rid + "|" + p.id];
-        return `<div class="gi${on ? " on" : ""}"><button class="box" type="button" data-act="guideck" data-id="${esc(rid)}" data-p="${esc(p.id)}" role="checkbox" aria-checked="${on}" aria-label="Ajouté au panier ${esc(r.service)}">${ic("check")}</button>` +
+        return `<div class="gi${on ? " on" : ""}"><button class="box hit" type="button" data-act="guideck" data-id="${esc(rid)}" data-p="${esc(p.id)}" role="checkbox" aria-checked="${on}" aria-label="Ajouté au panier ${esc(r.service)}, ${esc(p.brand + " " + p.name)}">${ic("check")}</button>` +
           `<a class="gt" href="${esc(of.url || r.home)}" target="_blank" rel="noopener"><b>${x.l.q > 1 ? `<span class="gq">${x.l.q} ×</span> ` : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}, ${eurC(x.cost)}${of.cat ? ", sur la page du rayon" : ""}</small>${of.name ? `<small>Sur le site\u00a0: ${esc(of.name)}</small>` : ""}</a>${ic("ext", "ext")}</div>`;
       };
       return {
         body: `<p>Ouvre ${esc(r.service)}${esc(where)}, puis ajoute chaque produit et coche-le ici. Touche un produit pour l'ouvrir sur le site.</p>` +
           `<div class="pad gbtn"><a class="btn sm tint" href="${esc(r.home)}" target="_blank" rel="noopener">Ouvrir le site${ic("ext")}</a><button class="btn sm plain" type="button" data-act="guidecopy" data-id="${esc(rid)}">${ic("copy")}Copier la liste</button></div>` +
-          `<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${k}"><span style="width:${n ? Math.round((100 * k) / n) : 0}%"></span></div><p class="progl">${k} sur ${plural(n, "produit ajouté", "produits ajoutés")}</p>` +
+          `<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${k}" aria-valuetext="${k} sur ${plural(n, "produit ajouté", "produits ajoutés")}"><span style="width:${n ? Math.round((100 * k) / n) : 0}%"></span></div><p class="progl${n && k === n ? " done" : ""}" aria-live="polite">${n && k === n ? ic("check") : ""}${k} sur ${plural(n, "produit ajouté", "produits ajoutés")}</p>` +
           `<div class="group">${o.items.map(row).join("")}</div>` +
           (r.simulated ? `<p class="gf">Prix simulés, pas relevés\u00a0: le vrai total s'affiche sur ${esc(r.service)}.</p>` : ""),
         foot: done ? `<button class="btn plain" type="button" data-act="guideundo" data-id="${esc(rid)}">Commande pas encore passée</button>` : `<button class="btn" type="button" data-act="guidedone" data-id="${esc(rid)}">J'ai passé cette commande, ${eurC(o.sub + o.fee)}</button>`,
@@ -1709,7 +1793,7 @@
     const H = S.hist || [];
     if (!H.length) return "";
     const s = H.reduce((a, x) => a + (x.s || 0), 0);
-    return `<div class="savings"><a class="sv-main" href="#/economies">${ic("coin", "si")}<span><b>${eurC(s)} économisés avec Cabas</b><small>Sur ${plural(H.length, "panier", "paniers")} depuis le ${esc(dateFr(H[0].d).replace(/ \d{4}$/, ""))}, grâce aux meilleurs prix et aux remplacements.</small></span></a><button class="icbtn" type="button" data-act="sharesave" aria-label="Partager mes économies">${ic("share")}</button></div>`;
+    return `<div class="hcard tint">${ic("coin", "si")}<a class="hl" href="#/economies"><b>${eurC(s)} économisés avec Cabas</b><small>Sur ${plural(H.length, "panier", "paniers")} depuis le ${esc(dateFr(H[0].d).replace(/ \d{4}$/, ""))}, grâce aux meilleurs prix et aux remplacements.</small></a><button class="icbtn" type="button" data-act="sharesave" aria-label="Partager mes économies">${ic("share")}</button></div>`;
   }
   VIEWS.economies = () => {
     const H = (S.hist || []).slice().reverse(), s = H.reduce((a, x) => a + (x.s || 0), 0);
@@ -1752,13 +1836,13 @@
       const days = Array.from({ length: 8 }, (_, i) => isoDay(new Date(Date.now() + i * 864e5)));
       return {
         body: `<p>${pickup(r) ? "Quand vas-tu le retirer\u00a0?" : "Quand est-ce livré\u00a0?"} Cabas te le rappelle sur l'accueil.</p>` +
-          `<h3 class="gh">Jour</h3><div class="tagset">${days.map((d) => `<button class="chip" type="button" data-act="whend" data-id="${esc(rid)}" data-d="${d}" aria-pressed="${cur.d === d}">${esc(dayLabel(d, true).replace(/^./, (c) => c.toUpperCase()))}</button>`).join("")}</div>` +
-          `<h3 class="gh">Créneau</h3><div class="tagset">${SLOTS.map(([k, l, a, b]) => `<button class="chip" type="button" data-act="whens" data-id="${esc(rid)}" data-s="${k}" aria-pressed="${cur.s === k}">${l}, ${a}h à ${b}h</button>`).join("")}</div>`,
-        foot: `<button class="btn plain" type="button" data-act="whenno" data-id="${esc(rid)}" style="flex:1">Plus tard</button><button class="btn" type="button" data-act="close" style="flex:1"${cur.d ? "" : " disabled"}>OK</button>`,
+          `<h3 class="gh" id="whenD">Jour</h3><div class="tagset" role="radiogroup" aria-labelledby="whenD">${days.map((d) => `<button class="chip" type="button" role="radio" data-act="whend" data-id="${esc(rid)}" data-d="${d}" aria-checked="${cur.d === d}">${esc(dayLabel(d, true).replace(/^./, (c) => c.toUpperCase()))}</button>`).join("")}</div>` +
+          `<h3 class="gh" id="whenS">Créneau</h3><div class="tagset" role="radiogroup" aria-labelledby="whenS">${SLOTS.map(([k, l, a, b]) => `<button class="chip" type="button" role="radio" data-act="whens" data-id="${esc(rid)}" data-s="${k}" aria-checked="${cur.s === k}">${l}, ${a}h à ${b}h</button>`).join("")}</div>`,
+        foot: `<button class="btn plain" type="button" data-act="whenno" data-id="${esc(rid)}">Plus tard</button><button class="btn" type="button" data-act="close"${cur.d ? "" : " disabled"}>OK</button>`,
       };
     };
     const o = build();
-    openSheet({ title: `${pickup(r) ? "Retrait" : "Livraison"} ${r.name}`, left: `<span></span>`, right: `<span></span>`, body: o.body, foot: o.foot, build, onClose: () => { if (S.route.name === "panier" || S.route.name === "home") rerender(); } });
+    openSheet({ title: `Rappel de ${pickup(r) ? "retrait" : "livraison"}, ${r.name}`, right: `<span></span>`, body: o.body, foot: o.foot, build, onClose: () => { if (S.route.name === "panier" || S.route.name === "home") rerender(); } });
     return w;
   }
   /* créneaux des commandes du panier, tels que notés */
@@ -1780,7 +1864,7 @@
   function ordersCard() {
     const up = upcoming();
     if (!up.length) return "";
-    return `<div class="orders"><div class="sh" style="padding-left:0;padding-right:0"><h2>Tes commandes</h2></div>${up.map((x) => `<div class="orow"><span class="av sm">${esc(x.name.slice(0, 1))}</span><span class="rt">${esc(x.name)}<small>${x.pick ? "Retrait" : "Livraison"} ${esc(whenText(x.w))}${x.where ? ", " + esc(x.where) : ""}</small></span><button class="btn sm plain" type="button" data-act="ics" data-id="${esc(x.rid)}" data-d="${esc(x.w.d)}" data-s="${esc(x.w.s || "")}" aria-label="Ajouter au calendrier">${ic("cal")}</button></div>`).join("")}</div>`;
+    return `<section class="hcard list" aria-label="Tes commandes"><h2>Tes commandes</h2>${up.map((x) => `<div class="orow"><span class="mono sm" aria-hidden="true">${esc(x.name.slice(0, 1))}</span><span class="rt">${esc(x.name)}<small>${x.pick ? "Retrait" : "Livraison"} ${esc(whenText(x.w))}${x.where ? ", " + esc(x.where) : ""}</small></span><button class="btn sm plain" type="button" data-act="ics" data-id="${esc(x.rid)}" data-d="${esc(x.w.d)}" data-s="${esc(x.w.s || "")}" aria-label="Ajouter au calendrier, ${esc(x.name)}">${ic("cal")}</button></div>`).join("")}</section>`;
   }
   function icsFor(name, pick, d, s, where) {
     const sl = SLOTS.find((x) => x[0] === s) || [null, null, 9, 18];
@@ -1807,7 +1891,7 @@
   }
   function promosRail() {
     const ps = S.list.filter((p) => { const b = best(p); return b && b.promo && !b.sim; }).map((p) => { const os = offers(p, true); return { p, gap: os.length > 1 ? os[os.length - 1].price - os[0].price : 0 }; }).sort((a, b) => b.gap - a.gap).slice(0, 12).map((x) => x.p);
-    return ps.length ? `<div class="sh"><h2>Offres en cours</h2></div><div class="rail">${ps.map(card).join("")}</div>` : "";
+    return ps.length ? `<div class="sh"><h2>Offres en cours</h2></div><div class="rail" role="region" aria-label="Offres en cours">${ps.map((p) => card(p)).join("")}</div>` : "";
   }
   /* produits achetés à intervalle régulier dont le prochain achat approche (au moins deux paniers, écart médian) */
   function dueSoon(n) {
@@ -1827,12 +1911,12 @@
   }
   function dueRail() {
     const ds = dueSoon(10);
-    return ds.length ? `<div class="sh"><h2>À racheter bientôt</h2></div><div class="rail">${ds.map((d) => card(d.p)).join("")}</div>` : "";
+    return ds.length ? `<div class="sh"><h2>À racheter bientôt</h2></div><div class="rail" role="region" aria-label="À racheter bientôt">${ds.map((d) => card(d.p)).join("")}</div>` : "";
   }
   function habitsRail() {
     const ps = habits(10);
     if (!ps.length) return "";
-    return `<div class="sh"><h2>Tes habitudes</h2>${S.hist.length ? `<button type="button" data-act="reorder" data-id="last">Recommander le dernier panier</button>` : ""}</div><div class="rail">${ps.map(card).join("")}</div>`;
+    return `<div class="sh"><h2>Tes habitudes</h2>${S.hist.length ? `<button class="act" type="button" data-act="reorder" data-id="last" aria-label="Recommander le dernier panier">Recommander${ic("chev")}</button>` : ""}</div><div class="rail" role="region" aria-label="Tes habitudes">${ps.map((p) => card(p)).join("")}</div>`;
   }
 
   /* ---------- partager ---------- */
@@ -1869,7 +1953,7 @@
   VIEWS.partage = (r) => {
     let L = null;
     try { const o = JSON.parse(b64d(r.id)); L = { name: String(o.n || "Liste partagée").slice(0, 40), items: {} }; for (const [id0, q] of o.i || []) { const id = S.prods.has(id0) ? id0 : (S.alias || {})[id0]; if (id && S.prods.has(id) && q > 0) L.items[id] = Math.min(99, (L.items[id] || 0) + (q | 0)); } } catch (err) { L = null; }
-    if (!L || !Object.keys(L.items).length) return { title: "Liste partagée", html: `<div class="empty">${emptyArt("list")}<h2>Lien illisible</h2><p>Ce lien de liste est incomplet ou ses produits ne sont plus au catalogue.</p><a class="btn" href="#/listes">Voir mes listes</a></div>` };
+    if (!L || !Object.keys(L.items).length) return { title: "Liste partagée", html: `<div class="empty" role="alert">${emptyArt("list")}<h1 class="t1">Ce lien de liste est illisible</h1><p>Il est incomplet, ou ses produits ne sont plus au catalogue.</p><a class="btn" href="#/listes">Voir mes listes</a></div>` };
     S.shared = L;
     const e = estimate(L.items);
     return {
@@ -1881,9 +1965,40 @@
   };
 
   /* ---------- taille du texte ---------- */
-  /* « Grande » et « Très grande » agrandissent toute l'appli, textes et boutons, comme le zoom du navigateur. */
-  const ZOOMS = [["1", "Normale"], ["1.12", "Grande"], ["1.25", "Très grande"]];
-  function applyZoom() { try { document.documentElement.style.zoom = String(S.prefs.zoom || 1) === "1" ? "" : String(S.prefs.zoom); } catch (e) { /* zoom indisponible */ } }
+  /* Cinq crans par la taille de police racine (html[data-text]) : les textes en rem suivent, le chrome, les gouttières
+     et les cibles en px ne suivent pas. Les valeurs déjà enregistrées (« 1.12 », « 1.25 ») restent valables. */
+  const ZOOMS = [["0.82", "Très petite"], ["0.9", "Petite"], ["1", "Normale"], ["1.12", "Grande"], ["1.25", "Très grande"]];
+  const ZOOM_OLD = { "0.8": "0.82", "0.88": "0.9" };
+  const zoomIndex = () => { let v = String(S.prefs.zoom || "1"); v = ZOOM_OLD[v] || v; const i = ZOOMS.findIndex(([k]) => k === v); return i < 0 ? 2 : i; };
+  function applyZoom() {
+    try {
+      document.documentElement.style.zoom = "";
+      const v = ZOOMS[zoomIndex()][0];
+      if (v === "1") delete document.documentElement.dataset.text; else document.documentElement.dataset.text = v;
+    } catch (e) { /* sans effet */ }
+  }
+  /* « A moins / A plus » : une phrase d'exemple qui change de taille en direct, le nom du cran, cinq points */
+  function tsizeHtml(labelId) {
+    const i = zoomIndex();
+    return `<div class="tsize" role="group" aria-labelledby="${labelId}"><p class="sample">Les prix de tes courses, livraison comprise.</p>` +
+      `<button type="button" data-act="zoomdec" aria-label="Texte plus petit"${i === 0 ? ' aria-disabled="true"' : ""}>A</button>` +
+      `<div><div class="cur" aria-live="polite">${ZOOMS[i][1]}</div><div class="dots" aria-hidden="true">${ZOOMS.map((_, k) => `<i${k === i ? ' class="on"' : ""}></i>`).join("")}</div></div>` +
+      `<button type="button" data-act="zoominc" aria-label="Texte plus grand"${i === ZOOMS.length - 1 ? ' aria-disabled="true"' : ""}>A</button></div>`;
+  }
+  function tsizeSync() {
+    const i = zoomIndex();
+    $$(".tsize").forEach((el) => {
+      $(".cur", el).textContent = ZOOMS[i][1];
+      $$(".dots i", el).forEach((d, k) => d.classList.toggle("on", k === i));
+      const [dec, inc] = $$("button", el);
+      if (i === 0) dec.setAttribute("aria-disabled", "true"); else dec.removeAttribute("aria-disabled");
+      if (i === ZOOMS.length - 1) inc.setAttribute("aria-disabled", "true"); else inc.removeAttribute("aria-disabled");
+    });
+  }
+  function setZoom(step) {
+    const i = Math.max(0, Math.min(ZOOMS.length - 1, zoomIndex() + step));
+    S.prefs.zoom = ZOOMS[i][0]; savePrefs(); applyZoom(); tsizeSync();
+  }
 
   /* ---------- premier lancement ---------- */
   /* Trois questions pour que les totaux ressemblent aux courses de chacun ; tout se change ensuite dans les réglages. */
@@ -1896,16 +2011,17 @@
       const noComp = S.prefs.comp === false, pk = (groupsOf().auchan || []).length ? pickOf("auchan", groupsOf().auchan) : "";
       return {
         body: `<p>Quelques questions pour que les totaux et les repas ressemblent à ta maison. Tout se change ensuite dans les réglages.</p>` +
-          `<h3 class="gh">Où fais-tu tes courses\u00a0?</h3><div class="tagset">${chips}</div>` +
-          `<h3 class="gh">Peux-tu te déplacer\u00a0?</h3><div class="group">${opt("wmove", "Oui, en magasin ou en point de retrait", !noComp, 'data-v="1"')}${opt("wmove", "Non, je veux tout recevoir chez moi", noComp, 'data-v="0"')}</div>` +
-          `<h3 class="gh">Vous êtes combien à la maison\u00a0?</h3><div class="tagset">${[1, 2, 3, 4, 5, 6].map((n) => `<button class="chip" type="button" data-act="wfoyer" data-v="${n}" aria-pressed="${(S.prefs.foyer || 0) === n}">${n}${n === 6 ? " et plus" : ""}</button>`).join("")}</div>` +
-          `<h3 class="gh">Ton secteur, pour les prix Auchan</h3><div class="group">${SECTEURS.map(([id, l]) => opt("wsect", esc(l), pk === id || (S.allMap.get(id) || {}).livraison === pk, `data-id="${id}"`)).join("")}</div>` +
+          `<h3 class="gh" id="tsizeW">Tu vois bien ce texte\u00a0?</h3><div class="pad">${tsizeHtml("tsizeW")}</div>` +
+          `<h3 class="gh" id="wretL">Où fais-tu tes courses\u00a0?</h3><div class="tagset" role="group" aria-labelledby="wretL">${chips}</div>` +
+          `<h3 class="gh" id="wmoveL">Peux-tu te déplacer\u00a0?</h3><div class="group" role="radiogroup" aria-labelledby="wmoveL">${opt("wmove", "Oui, en magasin ou en point de retrait", !noComp, 'data-v="1"', null, true)}${opt("wmove", "Non, je veux tout recevoir chez moi", noComp, 'data-v="0"', null, true)}</div>` +
+          `<h3 class="gh" id="wfoyerL">Vous êtes combien à la maison\u00a0?</h3><div class="tagset" role="radiogroup" aria-labelledby="wfoyerL">${[1, 2, 3, 4, 5, 6].map((n) => `<button class="chip" type="button" role="radio" data-act="wfoyer" data-v="${n}" aria-checked="${(S.prefs.foyer || 0) === n}">${n}${n === 6 ? " et plus" : ""}</button>`).join("")}</div>` +
+          `<h3 class="gh" id="wsectL">Ton secteur, pour les prix Auchan</h3><div class="group" role="radiogroup" aria-labelledby="wsectL">${SECTEURS.map(([id, l]) => opt("wsect", esc(l), pk === id || (S.allMap.get(id) || {}).livraison === pk, `data-id="${id}"`, null, true)).join("")}</div>` +
           `<p class="gf">Les prix Auchan dépendent du magasin. Sans déplacement, Cabas prend la livraison à domicile du même secteur.</p>`,
         foot: `<button class="btn" type="button" data-act="wok">C'est parti</button>`,
       };
     };
     const o = build();
-    openSheet({ title: "Bienvenue sur Cabas", left: `<button class="txtbtn" type="button" data-act="wskip">Passer</button>`, right: `<span></span>`, body: o.body, foot: o.foot, build, onClose: () => { S.seen.welcome = 1; store.set("seen", S.seen); } });
+    openSheet({ title: "Bienvenue sur Cabas", right: `<button class="txtbtn" type="button" data-act="wskip">Passer</button>`, body: o.body, foot: o.foot, build, onClose: () => { S.seen.welcome = 1; store.set("seen", S.seen); } });
   }
 
   /* ---------- budget ---------- */
@@ -1913,15 +2029,15 @@
     const bud = Math.round((parseFloat(S.prefs.budget) || 0) * 100);
     if (!bud || !complete) return "";
     const d = bud - money;
-    return d >= 0 ? `<p class="bud ok">Budget de ${eurC(bud).replace(",00", "")}\u00a0: il te reste ${eurC(d)}. <button class="lnk" type="button" data-act="budget">Modifier</button></p>`
-      : `<p class="bud over">${eurC(-d)} au-dessus de ton budget de ${eurC(bud).replace(",00", "")}. <button class="lnk" type="button" data-act="budget">Modifier</button></p>`;
+    const edit = `<button class="act" type="button" data-act="budget">Modifier${ic("chev")}</button>`;
+    return d >= 0 ? `<div class="bud ok"><span>Budget ${eurC(bud).replace(",00", "")}\u00a0: il reste ${eurC(d)}</span>${edit}</div>`
+      : `<div class="bud over" role="status"><span>Budget ${eurC(bud).replace(",00", "")}\u00a0: dépassé de ${eurC(-d)}</span>${edit}</div>`;
   }
   function budgetSheet() {
     openSheet({
       title: "Budget", focus: "#budIn",
-      left: `<button class="txtbtn" type="button" data-act="close">Annuler</button>`,
-      right: `<button class="txtbtn" type="button" data-act="budok">OK</button>`,
-      body: `<p>Le panier te dit ce qu'il reste, ou de combien tu dépasses, frais compris. Laisse vide pour ne pas en avoir.</p><label class="field"><input id="budIn" type="number" inputmode="decimal" min="0" step="5" placeholder="Par exemple 120" value="${esc(S.prefs.budget || "")}" aria-label="Budget en euros"><small>En euros, pour un panier.</small></label>`,
+      right: `<button class="txtbtn primary" type="button" data-act="budok">OK</button>`,
+      body: `<p>Le panier te dit ce qu'il reste, ou de combien tu dépasses, frais compris. Laisse vide pour ne pas en avoir.</p>${field("budIn", "Budget, en euros", `type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="Par exemple 120" value="${esc(frNum(S.prefs.budget))}"`, "Pour un panier, livraison comprise.", "€")}`,
     });
   }
 
@@ -1935,10 +2051,10 @@
       const order = (x) => { const p = S.prods.get(x.l.id); return (S.rayons.findIndex((r) => r.id === p.r) + 1) * 1000 + (x.l.n || 0); };
       const k = c.filter((x) => S.guide.ck["mag|" + x.l.id]).length;
       return {
-        body: `<p>Coche chaque produit une fois dans ton panier. Les produits sont rangés par rayon.</p><div class="prog"><span style="width:${Math.round((100 * k) / c.length)}%"></span></div><p class="progl">${k} sur ${plural(c.length, "produit", "produits")}</p>` +
+        body: `<p>Coche chaque produit une fois dans ton panier. Les produits sont rangés par rayon.</p><div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${c.length}" aria-valuenow="${k}" aria-valuetext="${k} sur ${plural(c.length, "produit", "produits")}"><span style="width:${Math.round((100 * k) / c.length)}%"></span></div><p class="progl${k === c.length ? " done" : ""}" aria-live="polite">${k === c.length ? ic("check") : ""}${k} sur ${plural(c.length, "produit", "produits")}</p>` +
           [...by.entries()].map(([ret, xs]) => `<h3 class="gh">Chez ${esc(retName(ret))}</h3><div class="group">${xs.sort((a, b) => order(a) - order(b)).map((x) => {
             const p = S.prods.get(x.l.id), on = !!S.guide.ck["mag|" + p.id], ray = rayon(p.r);
-            return `<div class="gi${on ? " on" : ""}"><button class="box" type="button" data-act="shopck" data-p="${esc(p.id)}" role="checkbox" aria-checked="${on}" aria-label="Dans mon panier">${ic("check")}</button><span class="gt"><b>${x.l.q > 1 ? `<span class="gq">${x.l.q} ×</span> ` : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}, environ ${eurC(x.cost)}${ray ? ", rayon " + esc(ray.name.toLowerCase()) : ""}</small></span><span></span></div>`;
+            return `<div class="gi${on ? " on" : ""}"><button class="box hit" type="button" data-act="shopck" data-p="${esc(p.id)}" role="checkbox" aria-checked="${on}" aria-label="Dans mon panier, ${esc(p.brand + " " + p.name)}">${ic("check")}</button><span class="gt"><b>${x.l.q > 1 ? `<span class="gq">${x.l.q} ×</span> ` : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}, environ ${eurC(x.cost)}${ray ? ", rayon " + esc(ray.name.toLowerCase()) : ""}</small></span><span></span></div>`;
           }).join("")}</div>`).join("") +
           `<p class="gf">Prix relevés en ligne\u00a0: en magasin, ils peuvent être un peu différents.</p>`,
         foot: "",
@@ -1970,7 +2086,7 @@
     const today = new Date().toISOString().slice(0, 10);
     const ds = store.get("drops", []).filter((d) => d.until >= today && S.prods.has(d.id)).map((d) => { const p = S.prods.get(d.id), b = bestReal(p); return b && b.price < d.old ? { p, old: d.old, b } : null; }).filter(Boolean);
     if (!ds.length) return "";
-    return `<div class="sh"><h2>Moins cher sur tes produits</h2></div><div class="rail">${ds.map((d) => card(d.p).replace('<div class="prow">', `<div class="prow"><s class="was">${eur(d.old)}</s>`)).join("")}</div>`;
+    return `<div class="sh"><h2>Moins cher sur tes produits</h2></div><div class="rail" role="region" aria-label="Moins cher sur tes produits">${ds.map((d) => card(d.p, { was: d.old })).join("")}</div>`;
   }
 
   /* ---------- repas à petit prix ---------- */
@@ -2020,17 +2136,17 @@
   const recsReady = () => !!(S._recs && S._recs.key === recKey());
   function recRailHtml() {
     const rs = recs().filter((rc) => !rc.c.miss.length).slice(0, 8);
-    return rs.length ? `<div class="sh"><h2>Repas à petit prix</h2><a href="#/repas">Tout voir</a></div><div class="rail rails">${rs.map(recCard).join("")}</div>` : "";
+    return rs.length ? `<div class="sh"><h2>Repas à petit prix</h2><a class="act" href="#/repas">Tout voir${ic("chev")}</a></div><div class="rail rails" role="region" aria-label="Repas à petit prix">${rs.map(recCard).join("")}</div>` : "";
   }
   /* sur l'accueil, le coût des repas (chaque ingrédient cherché dans le catalogue) se calcule juste après le premier
      affichage, pour ne pas le retarder ; la rangée prend sa place dès que c'est prêt */
   let recTimer = 0;
   function recRail() {
     if (recsReady() || !(S.recs || []).length) return recRailHtml();
-    if (!recTimer) recTimer = setTimeout(() => { recTimer = 0; recs(); const el = $("#recrail"); if (el) el.outerHTML = recRailHtml(); }, 0);
+    if (!recTimer) recTimer = setTimeout(() => { recTimer = 0; recs(); const el = $("#recrail"); if (el) { el.outerHTML = recRailHtml(); markEnds(); } }, 0);
     /* en attendant, une rangée de la même hauteur : rien ne saute quand les prix arrivent */
     const sk = `<a class="rcard" aria-hidden="true"><div class="stack"><span></span><span></span><span></span></div><b class="skl"></b><span class="rp skl s"></span><small class="skl s"></small></a>`;
-    return `<div id="recrail"><div class="sh"><h2>Repas à petit prix</h2><a href="#/repas">Tout voir</a></div><div class="rail rails">${sk.repeat(4)}</div></div>`;
+    return `<div id="recrail"><div class="sh"><h2>Repas à petit prix</h2><a class="act" href="#/repas">Tout voir${ic("chev")}</a></div><div class="rail rails" aria-busy="true">${sk.repeat(4)}</div></div>`;
   }
   VIEWS.repas = () => {
     const all = recs(), row = (rc) => {
@@ -2047,7 +2163,7 @@
   };
   VIEWS.recette = (r) => {
     const rc = (S.recs || []).find((x) => x.id === r.id);
-    if (!rc) return notFound();
+    if (!rc) return notFound("recette");
     /* portions : le dernier choix, sinon la taille du foyer (arrondie aux choix proposés), sinon celles de la recette */
     const foyer = S.prefs.foyer ? [2, 4, 6, 8].reduce((a, v) => (Math.abs(v - S.prefs.foyer) < Math.abs(a - S.prefs.foyer) ? v : a), 2) : 0;
     const P = (S.recP && S.recP[rc.id]) || foyer || rc.portions, c = recCost(rc, P), k = P / rc.portions;
@@ -2061,7 +2177,7 @@
       html: `<h1 class="lt">${esc(rc.name)}</h1><p class="lt-sub">${rc.kind === "plat" ? "Plat" : "Dessert"}, ${rc.minutes}${NB}min</p>` +
         `<div class="sum rsum"><p class="sl">${c.miss.length ? "Coût des ingrédients comparés" : "Par portion"}</p><div class="st">${px(c.miss.length ? c.used : c.per)}</div>` +
         `<p class="sn">${c.miss.length ? `Pour ${plural(P, "portion", "portions")}, sans ${esc(joinEt(c.miss.map((x) => x.g.q)))}, pas encore dans Cabas.` : `${eur(c.used)} pour ${plural(P, "portion", "portions")}. Les courses, en paquets entiers, font ${eur(c.buy)}\u00a0: il en restera pour une autre fois.`}</p>` +
-        `<p class="segl">Portions</p><div class="seg" role="group" aria-label="Nombre de portions">${[2, 4, 6, 8].map((v) => `<button type="button" data-act="recp" data-id="${esc(rc.id)}" data-v="${v}" aria-pressed="${v === P}">${v}</button>`).join("")}</div>` +
+        `<p class="segl" id="portL">Portions</p><div class="seg" role="radiogroup" aria-labelledby="portL">${[2, 4, 6, 8].map((v) => `<button type="button" role="radio" data-act="recp" data-id="${esc(rc.id)}" data-v="${v}" aria-checked="${v === P}">${v}</button>`).join("")}</div>` +
         `<div class="btns two" style="margin-top:14px"><button class="btn" type="button" data-act="recadd" data-id="${esc(rc.id)}">${ic("plus")}Au panier</button><button class="btn tint" type="button" data-act="menuput" data-id="${esc(rc.id)}">${S.menu.some((m) => m.id === rc.id) ? "Dans ma semaine" : "Ajouter à ma semaine"}</button></div></div>` +
         `<h2 class="gh">Ingrédients</h2><div class="group">${c.lines.map(line).join("")}${rc.placard ? `<div class="row"><span class="rt">Du placard<small>${esc(rc.placard)}, pas comptés</small></span></div>` : ""}</div>` +
         `<p class="gf">Chaque produit est le moins cher au kilo, au litre ou à la pièce dans tes enseignes, selon les prix relevés. Touche-le pour en voir d'autres.</p>` +
@@ -2094,7 +2210,7 @@
     return `<h2 class="gh">Ma semaine</h2><div class="sum rsum"><p class="sl">${plural(rs.length, "repas", "repas")}, ${plural(c.portions, "portion", "portions")}</p><div class="st">${px(c.used)}</div>` +
       `<p class="sn">${c.miss.length ? `Sans ${esc(joinEt(c.miss.map((x) => x.g.q)))}, pas encore dans Cabas. ` : ""}Les courses, en paquets entiers, font ${eur(c.buy)}\u00a0: les ingrédients communs ne sont achetés qu'une fois.</p>` +
       `<div class="btns" style="margin-top:14px"><button class="btn" type="button" data-act="menuadd">${ic("plus")}Ajouter les courses de la semaine au panier</button></div></div>` +
-      `<div class="group" style="margin-top:12px">${rs.map(({ rc, portions }) => `<div class="row"><a class="rt" href="#/repas/${esc(rc.id)}" style="text-decoration:none">${esc(rc.name)}<small>${plural(portions, "portion", "portions")}</small></a><button class="icbtn" type="button" data-act="menudel" data-id="${esc(rc.id)}" aria-label="Retirer ${esc(rc.name)}">${ic("x")}</button></div>`).join("")}</div>`;
+      `<div class="group" style="margin-top:12px">${rs.map(({ rc, portions }) => `<div class="row"><a class="rt" href="#/repas/${esc(rc.id)}">${esc(rc.name)}<small>${plural(portions, "portion", "portions")}</small></a><button class="icbtn" type="button" data-act="menudel" data-id="${esc(rc.id)}" aria-label="Retirer ${esc(rc.name)}">${ic("x")}</button></div>`).join("")}</div>`;
   }
   function recItems(id) {
     const rc = (S.recs || []).find((x) => x.id === id);
@@ -2122,7 +2238,7 @@
     const t0 = Date.parse(all.map((x) => x[0]).sort()[0]), t1 = Math.max(Date.parse(last), t0 + 864e5);
     const vs = all.map((x) => x[1]), lo = Math.min(...vs), hi = Math.max(...vs), pad = (hi - lo) * 0.2 || 0.1;
     const W = 320, Hh = 110, X = (d) => 6 + ((Date.parse(d) - t0) / (t1 - t0)) * (W - 12), Y = (v) => 8 + (1 - (v - lo + pad) / (hi - lo + 2 * pad)) * (Hh - 16);
-    const cols = ["var(--brand)", "#3a3a3c", "#8e8e93", "#c7c7cc"];
+    const cols = ["var(--brand)", "var(--ink)", "var(--ink-2)", "var(--ink-3)"];
     const paths = series.map((x, k) => {
       let d = "";
       x.pts.forEach(([day, v], i) => { d += i ? `H${X(day).toFixed(1)}V${Y(v).toFixed(1)}` : `M${X(day).toFixed(1)},${Y(v).toFixed(1)}`; });
@@ -2163,7 +2279,7 @@
     const now = Date.now();
     if (code === SC.last && now - SC.lastAt < 4000) return;
     SC.last = code; SC.lastAt = now;
-    if (navigator.vibrate) navigator.vibrate(50);
+    buzz("add");
     const id = eanIndex().get(code.replace(/^0+/, ""));
     const it = { code, at: now, pid: id || null, off: null, near: null, loading: !id };
     SC.items = [it].concat(SC.items.filter((x) => x.code !== code)).slice(0, 12);
@@ -2195,10 +2311,10 @@
       return `<article class="deal scanr"><p class="scn">${title}<small>Pas dans Cabas tel quel. L'équivalent le moins cher dans tes enseignes\u00a0:</small></p>` +
         `<div class="dh"><a class="di" href="${hp(p.id)}">${img(p)}</a><div class="dtx"><a class="dt" href="${hp(p.id)}"><b>${esc(p.brand)}</b> ${esc(p.name)}</a><div class="pfmt">${esc(p.format)}${b ? `, ${eur(b.price)} chez ${esc(retName(b.ret))}${unitPrice(p, b.price) ? ", " + esc(unitPrice(p, b.price)) : ""}` : ""}</div></div></div>` +
         `<label class="shelf"><span>Prix vu en rayon</span><input type="number" inputmode="decimal" step="0.01" min="0" data-shelf="${esc(x.code)}" value="${esc(x.shelf || "")}" placeholder="0,00"><span>€</span></label>${shelf(x.shelf, b, x.code)}` +
-        `<div class="df"><button class="lnk" type="button" data-act="scansearch" data-q="${esc([off.brand, off.name].filter(Boolean).join(" "))}">Chercher d'autres équivalents</button>${buyCtl(p.id, "flat")}</div></article>`;
+        `<div class="df"><button class="act" type="button" data-act="scansearch" data-q="${esc([off.brand, off.name].filter(Boolean).join(" "))}">Chercher d'autres équivalents${ic("chev")}</button>${buyCtl(p.id, "flat")}</div></article>`;
     }
     return `<article class="deal scanr"><p class="scn">${title}<small>${off ? "Pas dans Cabas, et aucun équivalent trouvé dans ses rayons." : "Produit inconnu\u00a0: Cabas ne couvre que quelques rayons, et le nom n'a pas pu être demandé à Open Food Facts (réseau)."}</small></p>` +
-      (off && (off.name || off.brand) ? `<div class="df"><button class="lnk" type="button" data-act="scansearch" data-q="${esc([off.brand, off.name].filter(Boolean).join(" "))}">Chercher dans Cabas</button><span></span></div>` : "") + `</article>`;
+      (off && (off.name || off.brand) ? `<div class="df"><button class="act" type="button" data-act="scansearch" data-q="${esc([off.brand, off.name].filter(Boolean).join(" "))}">Chercher dans Cabas${ic("chev")}</button><span></span></div>` : "") + `</article>`;
   };
   function shelfNote(v, b) {
     const p = parseFloat(String(v || "").replace(",", "."));
@@ -2209,7 +2325,7 @@
   function scanRender() {
     const el = $("#scres");
     if (!el) return;
-    el.innerHTML = SC.items.length ? `<div class="sh"><h2>Derniers scans</h2><button type="button" data-act="scanclear">Effacer</button></div>` + SC.items.map(scanOne).join("") : "";
+    el.innerHTML = SC.items.length ? `<div class="sh"><h2>Derniers scans</h2><button class="act" type="button" data-act="scanclear">Effacer</button></div>` + SC.items.map(scanOne).join("") : "";
     const st = $("#scst");
     if (st) st.textContent = SC.note;
   }
@@ -2280,41 +2396,73 @@
   function scanTypeSheet() {
     openSheet({
       title: "Code-barres", focus: "#eanIn",
-      left: `<button class="txtbtn" type="button" data-act="close">Annuler</button>`,
-      right: `<button class="txtbtn" type="button" data-act="scantypeok">OK</button>`,
-      body: `<p>Les 13 chiffres (ou 8) écrits sous le code-barres.</p><label class="field"><input id="eanIn" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="14" placeholder="3017620422003" aria-label="Code-barres" enterkeyhint="done"></label>`,
+      right: `<button class="txtbtn primary" type="button" data-act="scantypeok">OK</button>`,
+      body: `<p>Les chiffres écrits sous le code-barres.</p>${field("eanIn", "Code à 13 chiffres, ou 8", `type="text" inputmode="numeric" pattern="[0-9]*" maxlength="14" autocomplete="off" placeholder="3017620422003" enterkeyhint="done"`, "")}`,
     });
   }
 
   /* ---------- feuilles ---------- */
+  /* La feuille est le seul dialogue : le reste de la page devient inerte, le focus entre sur le titre (ou le champ
+     demandé) et revient à l'élément qui l'a ouverte à la fermeture ; une croix « Fermer » de 44 px à gauche, l'action
+     principale en texte à droite ; le corps défilant a un fondu de bord tant qu'il reste du contenu. */
   let sheetCtx = null;
+  const INERT = ["view", "nav", "dock", "tabbar", "side"];
+  function sheetEdges(b) {
+    b.classList.toggle("more-top", b.scrollTop > 8);
+    b.classList.toggle("more-bot", b.scrollTop + b.clientHeight < b.scrollHeight - 8);
+  }
   function openSheet(o) {
-    sheetCtx = o;
     const w = $("#sheet"), sh = w.querySelector(".sheet");
-    sh.innerHTML = `<div class="grab" aria-hidden="true"></div><div class="sheet-h">${o.left || `<span></span>`}<h2 id="sheetT">${esc(o.title)}</h2>${o.right || `<button class="txtbtn" type="button" data-act="close">OK</button>`}</div><div class="sheet-b">${o.body}</div>${o.foot ? `<div class="sheet-f">${o.foot}</div>` : ""}`;
+    o.opener = w.hidden ? document.activeElement : (sheetCtx && sheetCtx.opener) || document.activeElement;
+    sheetCtx = o;
+    sh.innerHTML = `<div class="grabz" aria-hidden="true"><div class="grab"></div></div><div class="sheet-h"><button class="icbtn" type="button" data-act="close" aria-label="Fermer">${ic("x")}</button><h2 id="sheetT" tabindex="-1">${esc(o.title)}</h2>${o.right || `<button class="txtbtn primary" type="button" data-act="close">OK</button>`}</div><div class="sheet-b">${o.body}</div>${o.foot ? `<div class="sheet-f">${o.foot}</div>` : ""}`;
     sh.style.transform = "";
     sh.classList.remove("closing");
     w.hidden = false;
     document.documentElement.style.overflow = "hidden";
-    if (o.focus) setTimeout(() => { const i = $(o.focus, sh); if (i) i.focus(); }, 60);
+    document.body.classList.add("has-sheet");
+    INERT.forEach((id) => { const el = $("#" + id); if (el) el.setAttribute("inert", ""); });
+    sheetEdges($(".sheet-b", sh));
+    const delay = o.focus ? 60 : tokenMs("--t-3", 320);
+    setTimeout(() => { if (sheetCtx !== o) return; const i = (o.focus && $(o.focus, sh)) || $("#sheetT"); if (i) i.focus({ preventScroll: !o.focus }); }, delay);
   }
   function refreshSheet() {
     if (!sheetCtx || !sheetCtx.build) return;
     const b = $("#sheet .sheet-b"), y = b ? b.scrollTop : 0;
+    /* l'élément qui avait le focus (une option, une pastille) est retrouvé par son action et ses données */
+    const ae = document.activeElement, keep = ae && ae.closest("#sheet") ? sameAs(ae) : "";
     const o = sheetCtx.build();
-    $("#sheet .sheet-b").innerHTML = o.body;
+    b.innerHTML = o.body;
     const f = $("#sheet .sheet-f");
     if (o.foot != null && f) f.innerHTML = o.foot;
-    $("#sheet .sheet-b").scrollTop = y;
+    b.scrollTop = y;
+    sheetEdges(b);
+    if (keep) { const n = $(keep, $("#sheet")); if (n) n.focus({ preventScroll: true }); }
   }
   function closeSheet() {
     const w = $("#sheet");
     if (w.hidden) return;
     w.hidden = true;
     document.documentElement.style.overflow = "";
-    const cb = sheetCtx && sheetCtx.onClose;
+    document.body.classList.remove("has-sheet");
+    INERT.forEach((id) => { const el = $("#" + id); if (el) el.removeAttribute("inert"); });
+    const cb = sheetCtx && sheetCtx.onClose, op = sheetCtx && sheetCtx.opener, key = op && !op.closest("#sheet") ? sameAs(op) : "";
     sheetCtx = null;
     if (cb) cb();
+    /* l'ouvreur s'il est encore visible (pas un bouton de toast disparu), sinon son équivalent redessiné, sinon la vue */
+    const back = (op && document.contains(op) && op.getClientRects().length && !op.closest("#sheet") ? op : key && $(key, $("#view"))) || $("#view");
+    try { back.focus({ preventScroll: true }); } catch (e) { /* focus refusé */ }
+  }
+  /* sélecteur qui retrouve un bouton après un redessin : son action et ses données */
+  const sameAs = (el) => (el && el.dataset && el.dataset.act ? `[data-act="${CSS.escape(el.dataset.act)}"]` + Object.keys(el.dataset).filter((k) => k !== "act").map((k) => `[data-${k.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase())}="${CSS.escape(el.dataset[k])}"]`).join("") : "");
+  /* piège de Tab de secours, pour les navigateurs sans inert */
+  function trapTab(e) {
+    const sh = $("#sheet .sheet");
+    const f = $$("button:not([disabled]), a[href], input:not([disabled]), textarea, select, [tabindex]:not([tabindex='-1'])", sh).filter((el) => el.offsetParent !== null);
+    if (!f.length) { e.preventDefault(); $("#sheetT").focus(); return; }
+    const first = f[0], last = f[f.length - 1], ae = document.activeElement;
+    if (e.shiftKey && (ae === first || !sh.contains(ae))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && (ae === last || !sh.contains(ae))) { e.preventDefault(); first.focus(); }
   }
   if (window.visualViewport) {
     const vv = window.visualViewport;
@@ -2340,10 +2488,11 @@
     document.addEventListener("pointerup", end);
     document.addEventListener("pointercancel", end);
   })();
-  const opt = (act, label, checked, extra, count) => `<button class="opt" type="button" role="menuitemcheckbox" aria-checked="${!!checked}" data-act="${act}" ${extra || ""}><span>${label}</span>${count != null ? `<span class="c">${count}</span>` : ""}<span class="box">${ic("check")}</span></button>`;
+  /* option cochable : case ronde, coche pour un choix multiple (checkbox), disque pour un choix unique (radio, dans un radiogroup) */
+  const opt = (act, label, checked, extra, count, single) => `<button class="opt" type="button" role="${single ? "radio" : "checkbox"}" aria-checked="${!!checked}" data-act="${act}" ${extra || ""}><span>${label}</span>${count != null ? `<span class="c">${count}</span>` : ""}<span class="box">${ic("check")}</span></button>`;
   function sortSheet(key) {
     const f = F(key);
-    openSheet({ title: "Trier par", body: `<div class="group">${SORTS.map(([v, l]) => `<button class="opt" type="button" data-act="setsort" data-k="${esc(key)}" data-v="${v}">${esc(l)}${f.sort === v ? ic("check", "ck") : ""}</button>`).join("")}</div>` });
+    openSheet({ title: "Trier par", body: `<div class="group" role="radiogroup" aria-label="Trier par">${SORTS.map(([v, l]) => opt("setsort", esc(l), f.sort === v, `data-k="${esc(key)}" data-v="${v}"`, null, true)).join("")}</div>` });
   }
   function baseFor(key) { return key === "s" ? search(S.q) : S.list.filter((p) => "r:" + p.r === key); }
   function filterSheet(key) {
@@ -2354,13 +2503,13 @@
       const brands = new Map(); base.forEach((p) => brands.set(p.brand, (brands.get(p.brand) || 0) + 1));
       const bq = norm(f.bq);
       const bl = [...brands.entries()].filter(([b]) => !bq || norm(b).includes(bq)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "fr")).slice(0, 60);
-      const body = `<h3 class="gh">Enseignes</h3><div class="group">${S.rets.map((r) => opt("fret", esc(r.name), f.ret[r.id], `data-id="${esc(r.id)}" data-k="${esc(key)}"`, rc(r.id))).join("")}</div>` +
-        `<h3 class="gh">Disponibilité</h3><div class="group">${opt("fcmp", "Vendus dans plusieurs enseignes", f.cmp, `data-k="${esc(key)}"`)}${opt("fpromo", "Avec une offre en cours", f.promo, `data-k="${esc(key)}"`)}</div>` +
-        `<h3 class="gh">Type de marque</h3><div class="pad"><div class="seg" role="group" aria-label="Type de marque">${[["all", "Toutes"], ["nb", "Grandes marques"], ["mdd", "Distributeur"]].map(([v, l]) => `<button type="button" data-act="ftype" data-k="${esc(key)}" data-v="${v}" aria-pressed="${f.type === v}">${l}</button>`).join("")}</div></div>` +
-        (tagc.size ? `<h3 class="gh">Labels et mentions</h3><div class="tagset">${[...tagc.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([t]) => `<button class="chip" type="button" data-act="ftag" data-k="${esc(key)}" data-t="${esc(t)}" aria-pressed="${!!f.tags[t]}">${esc(t)}</button>`).join("")}</div>` : "") +
-        `<h3 class="gh">Prix maximum</h3><label class="field"><input id="fmax" data-k="${esc(key)}" type="number" inputmode="decimal" min="0" step="0.5" placeholder="Sans limite, en euros" value="${esc(f.max)}"></label>` +
-        `<h3 class="gh">Marques</h3><label class="field" style="margin-bottom:10px"><input id="fbq" data-k="${esc(key)}" type="search" placeholder="Chercher une marque" value="${esc(f.bq)}" autocomplete="off"></label><div class="group">${bl.map(([b, n]) => opt("fbrand", esc(b), f.brand[b], `data-b="${esc(b)}" data-k="${esc(key)}"`, n)).join("") || `<div class="opt" style="color:var(--ink-2)">Aucune marque</div>`}</div>`;
-      const foot = `<button class="btn plain" type="button" data-act="freset" data-k="${esc(key)}" style="flex:0 0 auto;width:auto">Effacer</button><button class="btn" type="button" data-act="close">Voir ${plural(res.length, "produit", "produits")}</button>`;
+      const body = `<h3 class="gh" id="fretL">Enseignes</h3><div class="group" role="group" aria-labelledby="fretL">${S.rets.map((r) => opt("fret", esc(r.name), f.ret[r.id], `data-id="${esc(r.id)}" data-k="${esc(key)}"`, rc(r.id))).join("")}</div>` +
+        `<h3 class="gh" id="fdispL">Disponibilité</h3><div class="group" role="group" aria-labelledby="fdispL">${opt("fcmp", "Vendus dans plusieurs enseignes", f.cmp, `data-k="${esc(key)}"`)}${opt("fpromo", "Avec une offre en cours", f.promo, `data-k="${esc(key)}"`)}</div>` +
+        `<h3 class="gh" id="ftypeL">Type de marque</h3><div class="pad"><div class="seg" role="radiogroup" aria-labelledby="ftypeL">${[["all", "Toutes"], ["nb", "Grandes marques"], ["mdd", "Distributeur"]].map(([v, l]) => `<button type="button" role="radio" data-act="ftype" data-k="${esc(key)}" data-v="${v}" aria-checked="${f.type === v}">${l}</button>`).join("")}</div></div>` +
+        (tagc.size ? `<h3 class="gh" id="ftagL">Labels et mentions</h3><div class="tagset" role="group" aria-labelledby="ftagL">${[...tagc.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([t]) => `<button class="chip" type="button" data-act="ftag" data-k="${esc(key)}" data-t="${esc(t)}" aria-pressed="${!!f.tags[t]}">${esc(t)}</button>`).join("")}</div>` : "") +
+        `<div style="padding-top:22px">${field("fmax", "Prix maximum, en euros", `data-k="${esc(key)}" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="Sans limite" value="${esc(f.max)}"`, "", "€")}</div>` +
+        `<div style="padding-top:10px">${field("fbq", "Marques", `data-k="${esc(key)}" type="search" autocomplete="off" placeholder="Chercher une marque" value="${esc(f.bq)}"`, "")}</div><div class="group" role="group" aria-label="Marques">${bl.map(([b, n]) => opt("fbrand", esc(b), f.brand[b], `data-b="${esc(b)}" data-k="${esc(key)}"`, n)).join("") || `<div class="opt"><span>Aucune marque</span></div>`}</div>`;
+      const foot = `<button class="btn sm ghost" type="button" data-act="freset" data-k="${esc(key)}">Effacer</button><button class="btn" type="button" data-act="close">Voir ${plural(res.length, "produit", "produits")}</button>`;
       return { body, foot };
     };
     const o = build();
@@ -2378,24 +2527,22 @@
   function zipSheet() {
     openSheet({
       title: "Livraison", focus: "#zipIn",
-      left: `<button class="txtbtn" type="button" data-act="close">Annuler</button>`,
-      right: `<button class="txtbtn" type="button" data-act="zipok">OK</button>`,
-      body: `<p>Ton code postal sert à vérifier que les enseignes te livrent. Il reste sur cet appareil.</p><label class="field"><input id="zipIn" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" autocomplete="postal-code" placeholder="Code postal, par exemple 75011" value="${esc(S.prefs.zip)}" aria-label="Code postal"><small>${esc(zipHint())}</small></label>`,
+      right: `<button class="txtbtn primary" type="button" data-act="zipok">OK</button>`,
+      body: `<p>Ton code postal sert à vérifier que les enseignes te livrent. Il reste sur cet appareil.</p>${field("zipIn", "Code postal", `type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" autocomplete="postal-code" enterkeyhint="done" placeholder="Par exemple 75011" value="${esc(S.prefs.zip)}"`, esc(zipHint()))}`,
     });
   }
   function nameSheet(title, value, act, id) {
     openSheet({
       title, focus: "#nameIn",
-      left: `<button class="txtbtn" type="button" data-act="close">Annuler</button>`,
-      right: `<button class="txtbtn" type="button" data-act="${act}" data-id="${esc(id || "")}">OK</button>`,
-      body: `<label class="field" style="padding-top:8px"><input id="nameIn" type="text" maxlength="40" value="${esc(value)}" aria-label="Nom de la liste" enterkeyhint="done"></label>`,
+      right: `<button class="txtbtn primary" type="button" data-act="${act}" data-id="${esc(id || "")}">OK</button>`,
+      body: `<div style="padding-top:8px">${field("nameIn", "Nom de la liste", `type="text" maxlength="40" autocomplete="off" enterkeyhint="done" value="${esc(value)}"`, "")}</div>`,
     });
   }
   function confirmSheet(title, text, label, act, id) {
     openSheet({
-      title, left: `<span></span>`, right: `<span></span>`,
+      title, right: `<span></span>`,
       body: `<p>${esc(text)}</p>`,
-      foot: `<button class="btn plain" type="button" data-act="close" style="flex:1">Annuler</button><button class="btn" type="button" data-act="${act}" data-id="${esc(id || "")}" style="flex:1;background:var(--promo)">${esc(label)}</button>`,
+      foot: `<button class="btn plain" type="button" data-act="close">Annuler</button><button class="btn danger" type="button" data-act="${act}" data-id="${esc(id || "")}">${esc(label)}</button>`,
     });
   }
   function installSheet() {
@@ -2407,14 +2554,15 @@
   }
 
   /* ---------- toast ---------- */
+  /* un seul toast à la fois, 2,5 s, 5 s avec une action (« Voir », « Annuler ») ; icône de réussite en option */
   let toastT = null;
-  function toast(msg, action) {
+  function toast(msg, action, icon) {
     const el = $("#toast");
-    el.innerHTML = esc(msg) + (action ? ` <button type="button" data-act="toastact">${esc(action.label)}</button>` : "");
+    el.innerHTML = (icon ? ic(icon) : "") + `<span>${esc(msg)}</span>` + (action ? `<button type="button" data-act="toastact">${esc(action.label)}</button>` : "");
     el._act = action ? action.run : null;
     el.hidden = false;
     clearTimeout(toastT);
-    toastT = setTimeout(() => { el.hidden = true; }, action ? 4000 : 1800);
+    toastT = setTimeout(() => { el.hidden = true; }, action ? 5000 : 2500);
   }
 
   /* ---------- événements ---------- */
@@ -2462,7 +2610,7 @@
       case "fbrand": { const f = F(k); f.brand[t.dataset.b] = !f.brand[t.dataset.b]; refreshSheet(); break; }
       case "freset": { const f = F(k); Object.assign(f, { ret: {}, brand: {}, tags: {}, type: "all", cmp: false, promo: false, max: "", bq: "" }); if (sheetCtx) refreshSheet(); else rerenderList(); break; }
       case "zip": zipSheet(); break;
-      case "zipok": { const v = ($("#zipIn").value || "").replace(/\D/g, "").slice(0, 5); if (v && v.length !== 5) { toast("Un code postal a 5 chiffres"); break; } S.prefs.zip = v; savePrefs(); closeSheet(); rerender(); if (v && !inZone()) toast("Livraison hors Île-de-France pas encore couverte"); break; }
+      case "zipok": { const v = ($("#zipIn").value || "").replace(/\D/g, "").slice(0, 5); if (v && v.length !== 5) { fieldError("zipIn", "Un code postal a 5 chiffres"); break; } S.prefs.zip = v; savePrefs(); closeSheet(); rerender(); if (v && !inZone()) toast("Livraison hors Île-de-France pas encore couverte"); break; }
       case "maxk": S.prefs.maxOrders = +t.dataset.k; savePrefs(); rerender(); break;
       case "clear": confirmSheet("Vider le panier\u00a0?", "Tous les produits du panier seront retirés.", "Vider le panier", "clearok"); break;
       case "clearok": S.basket = {}; saveBasket(); S.guide = { ck: {}, done: {} }; saveGuide(); closeSheet(); renderChrome(); rerender(); break;
@@ -2477,7 +2625,8 @@
       case "shareapp": shareApp(); break;
       case "sharesave": shareSavings(); break;
       case "sharegap": shareGap(id); break;
-      case "hideinstall": S.seen.install = true; store.set("seen", S.seen); t.closest(".install").remove(); break;
+      case "hideinstall": S.seen.install = true; store.set("seen", S.seen); t.closest(".hcard").remove(); break;
+      case "reload": location.reload(); break;
       case "install": installSheet(); break;
       case "installnow": installNow(); break;
       case "savelist": nameSheet("Nouvelle liste", "Courses du " + new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" }), "savelistok"); break;
@@ -2502,11 +2651,11 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); break;
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, liv: {}, keep: {}, offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.wl = null; S.seen = {}; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" ? [] : {})); store.set("draft", ""); ["seenp", "drops"].forEach((x) => store.set(x, x === "drops" ? [] : {})); store.set("seenAt", ""); applyZoom(); savePrefs(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"); el.hidden = true; if (el._act) el._act(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
-      case "scantypeok": { const v = (($("#eanIn") || {}).value || "").replace(/\D/g, ""); ensureScan().then(() => { if (!Scan.valid(v)) { toast("Un code-barres a 13 chiffres, ou 8"); return; } closeSheet(); if (S.route.name !== "scan") push("#/scan"); onCode(v); }, () => toast("Le lecteur de codes-barres n'a pas pu se charger")); break; }
+      case "scantypeok": { const v = (($("#eanIn") || {}).value || "").replace(/\D/g, ""); ensureScan().then(() => { if (!Scan.valid(v)) { fieldError("eanIn", "Un code-barres a 13 chiffres, ou 8"); return; } closeSheet(); if (S.route.name !== "scan") push("#/scan"); onCode(v); }, () => toast("Le lecteur de codes-barres n'a pas pu se charger")); break; }
       case "scanclear": SC.items = []; SC.last = ""; scanRender(); break;
       case "scansearch": { S.q = t.dataset.q || ""; addRecent(S.q); S.shown.s = 0; switchTab("recherche"); break; }
       /* repas */
@@ -2539,9 +2688,10 @@
       }
       case "wok": applyGroups(); closeSheet(); renderChrome(); rerender(); toast("C'est noté"); break;
       /* affichage, budget, magasin */
-      case "zoom": S.prefs.zoom = t.dataset.v; savePrefs(); applyZoom(); rerender(); break;
+      case "zoomdec": if (t.getAttribute("aria-disabled") !== "true") setZoom(-1); break;
+      case "zoominc": if (t.getAttribute("aria-disabled") !== "true") setZoom(1); break;
       case "budget": budgetSheet(); break;
-      case "budok": { const v = parseFloat(String(($("#budIn") || {}).value || "").replace(",", ".")); S.prefs.budget = v > 0 ? Math.min(v, 5000) : ""; savePrefs(); closeSheet(); rerender(); break; }
+      case "budok": { const raw = String(($("#budIn") || {}).value || "").trim(), v = numOf(raw); if (raw && !(v > 0)) { fieldError("budIn", "Un montant en euros, par exemple 120"); break; } S.prefs.budget = v > 0 ? Math.min(v, 5000) : ""; savePrefs(); closeSheet(); rerender(); break; }
       case "shop": shopSheet(); break;
       case "shopck": { const k = "mag|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); break; }
       /* liste écrite ou dictée */
@@ -2590,6 +2740,7 @@
       case "swaps": swapSheet(); break;
       case "swaptg": S.swSel[id] = !S.swSel[id]; refreshSheet(); break;
       case "swapok": {
+        buzz("done");
         const sw = swaps(), st = RES.steps[RES.K], prev = st && st.full ? fullTotal(st.full) : null;
         let n = 0;
         for (const x of sw) {
@@ -2604,7 +2755,7 @@
       case "keepreset": S.prefs.keep = {}; savePrefs(); rerender(); toast("Remplacements reproposés"); break;
       /* commande guidée */
       case "guide": guideSheet(id); break;
-      case "guideck": { const k = id + "|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); break; }
+      case "guideck": { const k = id + "|" + t.dataset.p; if (S.guide.ck[k]) delete S.guide.ck[k]; else S.guide.ck[k] = 1; saveGuide(); refreshSheet(); const o = guideOrder(id); if (o && o.items.every((x) => S.guide.ck[id + "|" + x.l.id])) buzz("done"); break; }
       case "guidecopy": {
         const o = guideOrder(id);
         if (!o) break;
@@ -2613,10 +2764,11 @@
         break;
       }
       case "guidedone": {
-        S.guide.done[id] = 1; saveGuide(); closeSheet();
+        /* aucune feuille ne s'ouvre d'elle-même : le rappel de livraison se propose dans le toast */
+        S.guide.done[id] = 1; saveGuide(); closeSheet(); buzz("done");
         const st = RES.steps[RES.K], bst = st && st.full;
-        toast(bst && bst.orders.every((o) => S.guide.done[o.ch.id]) ? "Toutes tes commandes sont passées" : "Commande " + retName(id) + " notée");
-        setTimeout(() => whenSheet(id), 350); break;
+        toast(bst && bst.orders.every((o) => S.guide.done[o.ch.id]) ? "Toutes tes commandes sont passées" : "Commande " + retName(id) + " notée", { label: "Rappel", run: () => whenSheet(id) }, "check");
+        break;
       }
       case "when": whenSheet(id); break;
       case "whend": S.guide.when = Object.assign({}, S.guide.when, { [id]: Object.assign({}, (S.guide.when || {})[id], { d: t.dataset.d }) }); saveWhen(); refreshSheet(); break;
@@ -2644,9 +2796,9 @@
     const t = e.target;
     if (t.dataset && t.dataset.act === "nocomp") { S.prefs.comp = !t.checked; savePrefs(); applyGroups(); setTimeout(() => { renderChrome(); rerender(); }, 200); return; }
     if (t.dataset && t.dataset.act === "ret") { const k = offKey(S.allMap.get(t.dataset.id)) || t.dataset.id; if (t.checked) delete S.prefs.off[k]; else S.prefs.off[k] = true; savePrefs(); renderChrome(); return; }
-    if (t.id === "extra") { const v = parseFloat(String(t.value).replace(",", ".")); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; savePrefs(); return; }
-    if (t.dataset && t.dataset.fee) { const v = parseFloat(String(t.value).replace(",", ".")); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; savePrefs(); return; }
-    if (t.id === "fmax") { F(t.dataset.k).max = t.value; refreshSheet(); }
+    if (t.id === "extra") { const v = numOf(t.value); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; t.value = frNum(S.prefs.extraCost); savePrefs(); return; }
+    if (t.dataset && t.dataset.fee) { const v = numOf(t.value); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; t.value = frNum(o.base); savePrefs(); return; }
+    if (t.id === "fmax") { const v = numOf(t.value); F(t.dataset.k).max = v > 0 ? String(v) : ""; refreshSheet(); }
 
   });
   let qT = null;
@@ -2676,14 +2828,25 @@
     }
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !$("#sheet").hidden) { closeSheet(); return; }
+    if (e.key === "Escape") {
+      if (!$("#sheet").hidden) { closeSheet(); return; }
+      if (!$("#toast").hidden && $("#toast button")) { $("#toast").hidden = true; return; }
+    }
+    if (e.key === "Tab" && !$("#sheet").hidden) { trapTab(e); return; }
+    /* flèches dans un groupe de choix unique : le choix suit */
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") && e.target.getAttribute && e.target.getAttribute("role") === "radio") {
+      const g = e.target.closest("[role=radiogroup]"); if (!g) return;
+      const rs = $$("[role=radio]:not([disabled])", g), i = rs.indexOf(e.target); if (i < 0) return;
+      const n = rs[(i + (e.key === "ArrowLeft" || e.key === "ArrowUp" ? rs.length - 1 : 1)) % rs.length];
+      e.preventDefault(); n.focus(); n.click(); return;
+    }
     if (e.key === "Enter") {
       if (e.target.id === "q") { e.preventDefault(); addRecent(e.target.value); e.target.blur(); }
-      else if (e.target.id === "zipIn") { e.preventDefault(); const b = $('#sheet [data-act="zipok"]'); if (b) b.click(); }
-      else if (e.target.id === "nameIn") { e.preventDefault(); const b = $('#sheet .sheet-h [data-act$="ok"]'); if (b) b.click(); }
-      else if (e.target.id === "fmax") { e.preventDefault(); e.target.blur(); }
+      else if (e.target.id === "zipIn" || e.target.id === "nameIn" || e.target.id === "budIn" || e.target.id === "eanIn") { e.preventDefault(); const b = $('#sheet .sheet-h [data-act$="ok"]'); if (b) b.click(); }
+      else if (e.target.id === "fmax" || e.target.id === "extra" || (e.target.dataset && e.target.dataset.fee)) { e.preventDefault(); e.target.blur(); }
     }
   });
+  document.addEventListener("input", (e) => { const f = e.target.closest && e.target.closest(".field.err"); if (f) { f.classList.remove("err"); const h = $("small", f); if (h && h.dataset.hint != null) h.innerHTML = h.dataset.hint; } });
   const APP_URL = "https://59g59sy5w6-design.github.io/";
   const APP_HOST = "59g59sy5w6-design.github.io";
   /* ---------- images à partager (réseaux sociaux, messageries) ----------
@@ -2797,8 +2960,11 @@
 
   /* ---------- démarrage ---------- */
   function renderFail() {
-    $("#view").innerHTML = `<div class="wrap"><div class="empty">${emptyArt("info")}<h2>Catalogue indisponible</h2><p>Le catalogue n'a pas pu être chargé. Vérifie ta connexion, puis réessaie.</p><button class="btn" type="button" onclick="location.reload()">Réessayer</button></div></div>`;
+    $("#view").innerHTML = `<div class="wrap"><div class="empty" role="alert">${emptyArt("info")}<h1 class="t1">Catalogue indisponible</h1><p>Le catalogue n'a pas pu être chargé. Vérifie ta connexion, puis réessaie.</p><button class="btn" type="button" data-act="reload">Réessayer</button></div></div>`;
   }
+  /* hors ligne : une bannière sur l'accueil et le panier, posée sur offline et retirée sur online */
+  S.offline = navigator.onLine === false;
+  for (const ev of ["online", "offline"]) window.addEventListener(ev, () => { S.offline = ev === "offline"; if (S.ready && $("#sheet").hidden && (S.route.name === "home" || S.route.name === "panier")) rerender(); });
   (async () => {
     const h0 = location.hash || "#/";
     const t0 = tabOf(h0);
