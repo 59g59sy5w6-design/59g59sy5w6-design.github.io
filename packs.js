@@ -1,6 +1,7 @@
 /* Cabas, visuels produits.
-   Chaque produit est dessiné selon son emballage (bouteille, pack, brique, pot, sachet, boîte, conserve, rouleaux, flacon, bidon),
-   avec des couleurs tirées de ce qu'il contient (eau, cola, emmental, citron…) et une couleur d'étiquette choisie par marque.
+   Chaque produit est dessiné selon son emballage (bouteille, pack, brique, pot, sachet, boîte, conserve, rouleaux, flacon, bidon,
+   barquette, filet, part de fromage, tube, vaporisateur), avec des couleurs tirées de ce qu'il contient (eau, cola, emmental,
+   citron, viande, confiture…) et une couleur d'étiquette choisie par marque, dans la palette de l'univers du rayon.
    Aucun logo ni visuel de marque : ce sont des illustrations génériques. */
 (function (G) {
   "use strict";
@@ -279,7 +280,7 @@
 
   /* rouleaux de papier toilette sous film */
   function rolls(by, cols, rows, o) {
-    const rw = Math.min(56, 178 / cols), rh = Math.min(rw * 1.05, 150 / rows), gap = 1.5;
+    const rw = Math.min(56, 178 / cols), rh = o.tall ? Math.min(rw * 1.9, 150) : Math.min(rw * 1.05, 150 / rows), gap = 1.5;
     const W = cols * rw + (cols - 1) * gap, L = 120 - W / 2, Ttop = by - rows * rh - (rows - 1) * gap;
     const roll = o.body, ry = rw * 0.2;
     let s = "";
@@ -376,10 +377,12 @@
     const d = 46;
     const fish = `<path d="M-30,0C-19,-12 8,-12 19,0C8,12 -19,12 -30,0Z" fill="#fff" opacity=".94"/><path d="M19,0L32,-9L29,0L32,9Z" fill="#fff" opacity=".94"/><circle cx="-20" cy="-2" r="2.2" fill="${o.sleeve}"/><path d="M-8,-6Q-4,0 -8,6" stroke="${o.sleeve}" stroke-width="1.4" fill="none" opacity=".6"/>`;
     const tomato = `<circle r="15" fill="#fff" opacity=".95"/><circle r="11.5" fill="#e74c3c"/><path d="M0,-11l3,-5M0,-11l-4,-3M0,-11l5,-1M0,-11l-5,1" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round"/>`;
+    /* conserve sans poisson ni tomate (légumes, plats, pâtée) : un médaillon de la couleur du contenu */
+    const plain = `<circle r="15" fill="#fff" opacity=".95"/><circle r="11" fill="${o.c2 || lt(o.sleeve, 0.5)}"/><path d="M-6,1Q0,-6 6,1" stroke="#fff" stroke-opacity=".7" stroke-width="2" fill="none" stroke-linecap="round"/>`;
     return box(x - d / 2, by, w, d, h, {
       body: o.sleeve, metalSide: true, face: (L, T, ww, hh) =>
         `<rect x="${f(L)}" y="${f(T + hh * 0.72)}" width="${f(ww)}" height="${f(hh * 0.12)}" fill="#fff" opacity=".85"/>` +
-        `<g transform="translate(${f(L + ww * 0.5)},${f(T + hh * 0.42)})">${o.tomato ? tomato : fish}</g>` +
+        `<g transform="translate(${f(L + ww * 0.5)},${f(T + hh * 0.42)})">${o.plain ? plain : o.tomato ? tomato : fish}</g>` +
         `<rect x="${f(L)}" y="${f(T)}" width="${f(ww)}" height="${f(hh * 0.1)}" fill="${dk(o.sleeve, 0.18)}"/>`
     });
   }
@@ -387,6 +390,93 @@
   /* capsule de café */
   function capsule(cx, cy, s, col) {
     return `<g transform="translate(${f(cx)},${f(cy)})"><path d="M${f(-s * 0.5)},${f(-s * 0.3)}L${f(-s * 0.34)},${f(s * 0.32)}Q0,${f(s * 0.42)} ${f(s * 0.34)},${f(s * 0.32)}L${f(s * 0.5)},${f(-s * 0.3)}Z" fill="${col}"/><path d="M${f(-s * 0.5)},${f(-s * 0.3)}L${f(-s * 0.34)},${f(s * 0.32)}Q0,${f(s * 0.42)} ${f(s * 0.34)},${f(s * 0.32)}L${f(s * 0.5)},${f(-s * 0.3)}Z" fill="url(#cy)"/><ellipse cy="${f(-s * 0.3)}" rx="${f(s * 0.6)}" ry="${f(s * 0.14)}" fill="url(#mt)"/></g>`;
+  }
+
+  /* barquette (viande, poisson, charcuterie, traiteur) : plateau peu profond vu de trois quarts, contenu, film, étiquette */
+  function tray(x, by, w, d, h, o, seed) {
+    const L = x - w / 2, R = x + w / 2, T = by - h, dy = d * 0.55, R2 = rng(seed);
+    const P = (u, v) => `${f(L + u * w + v * d)},${f(T - v * dy)}`;
+    let s = `<path d="M${f(R)},${f(T)}L${f(R + d)},${f(T - dy)}L${f(R + d)},${f(by - dy)}L${f(R)},${f(by)}Z" fill="${dk(o.body, 0.2)}"/>`;
+    s += `<path d="M${P(0, 0)}L${P(1, 0)}L${P(1, 1)}L${P(0, 1)}Z" fill="${dk(o.body, 0.06)}"/>`;
+    s += `<rect x="${f(L)}" y="${f(T)}" width="${f(w)}" height="${f(h)}" fill="${o.body}"/>`;
+    const m = 0.07, n = 0.14;
+    s += `<path d="M${P(m, n)}L${P(1 - m, n)}L${P(1 - m, 1 - n)}L${P(m, 1 - n)}Z" fill="${dk(o.c2, 0.12)}"/>`;
+    s += `<path d="M${P(m + 0.03, n + 0.1)}L${P(1 - m - 0.03, n + 0.1)}L${P(1 - m - 0.03, 1 - n - 0.06)}L${P(m + 0.03, 1 - n - 0.06)}Z" fill="${o.c2}"/>`;
+    if (o.lumps) for (let i = 0; i < 9; i++) { const u = m + 0.08 + R2() * (1 - 2 * m - 0.16), v = n + 0.15 + R2() * (1 - 2 * n - 0.3); const [cx, cy] = P(u, v).split(","); s += `<ellipse cx="${cx}" cy="${cy}" rx="${f(5 + R2() * 4)}" ry="${f(3 + R2() * 2)}" fill="${R2() < 0.5 ? lt(o.c2, 0.18) : dk(o.c2, 0.1)}"/>`; }
+    else for (let i = 0; i < 3; i++) { const v = n + 0.2 + i * 0.22; s += `<path d="M${P(m + 0.08, v)}L${P(1 - m - 0.1, v)}" stroke="${lt(o.c2, 0.3)}" stroke-opacity=".7" stroke-width="${f(w * 0.045)}" stroke-linecap="round"/>`; }
+    s += `<path d="M${P(0, 0)}L${P(1, 0)}L${P(1, 1)}L${P(0, 1)}Z" fill="url(#fm)"/>`;
+    s += `<path d="M${P(0.05, 0.85)}L${P(0.4, 0.85)}" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>`;
+    s += `<rect x="${f(L)}" y="${f(T + h * 0.28)}" width="${f(w)}" height="${f(h * 0.44)}" fill="${o.accent}"/>`;
+    s += `<rect x="${f(L + w * 0.3)}" y="${f(T + h * 0.44)}" width="${f(w * 0.4)}" height="${f(h * 0.12)}" rx="2" fill="#fff" opacity=".9"/>`;
+    s += `<rect x="${f(L)}" y="${f(T)}" width="${f(w)}" height="${f(h)}" fill="url(#vt)"/>`;
+    return s;
+  }
+
+  /* filet de fruits ou de légumes : des pièces rondes sous un maillage, une étiquette */
+  function net(x, by, w, h, o, seed) {
+    const T = by - h, R2 = rng(seed);
+    const d = `M${f(x - w * 0.12)},${f(T + 6)}L${f(x + w * 0.12)},${f(T + 6)}C${f(x + w * 0.62)},${f(T + h * 0.22)} ${f(x + w * 0.54)},${f(by - 22)} ${f(x + w * 0.1)},${f(by)}L${f(x - w * 0.1)},${f(by)}C${f(x - w * 0.54)},${f(by - 22)} ${f(x - w * 0.62)},${f(T + h * 0.22)} ${f(x - w * 0.12)},${f(T + 6)}Z`;
+    let s = `<clipPath id="nt"><path d="${d}"/></clipPath><path d="${d}" fill="${lt(o.c2, 0.55)}"/><g clip-path="url(#nt)">`;
+    const r = w * 0.13;
+    for (let row = 0; row < 4; row++) for (let col = 0; col < 4; col++) {
+      const cx = x - w * 0.45 + col * w * 0.3 + (row % 2 ? w * 0.15 : 0) + (R2() - 0.5) * 6, cy = T + h * 0.3 + row * h * 0.19 + (R2() - 0.5) * 6;
+      const col2 = R2() < 0.3 ? dk(o.c2, 0.12) : R2() < 0.5 ? lt(o.c2, 0.12) : o.c2;
+      s += `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="${col2}"/><circle cx="${f(cx - r * 0.3)}" cy="${f(cy - r * 0.35)}" r="${f(r * 0.3)}" fill="#fff" opacity=".35"/>`;
+    }
+    for (let i = -8; i < 12; i++) { const k = x - w + i * 14; s += `<path d="M${f(k)},${f(T)}L${f(k + h * 0.6)},${f(by)}M${f(k + h * 0.6)},${f(T)}L${f(k)},${f(by)}" stroke="${dk(o.accent, 0.1)}" stroke-opacity=".55" stroke-width="1.2"/>`; }
+    s += `<path d="${d}" fill="url(#cs)"/></g><path d="${d}" fill="none" stroke="${dk(o.accent, 0.1)}" stroke-opacity=".6" stroke-width="1.5"/>`;
+    s += `<rect x="${f(x - w * 0.16)}" y="${f(T)}" width="${f(w * 0.32)}" height="12" rx="4" fill="${o.accent}"/>`;
+    s += `<rect x="${f(x - w * 0.3)}" y="${f(by - h * 0.42)}" width="${f(w * 0.6)}" height="${f(h * 0.17)}" rx="5" fill="#fff" opacity=".93"/><rect x="${f(x - w * 0.2)}" y="${f(by - h * 0.36)}" width="${f(w * 0.4)}" height="${f(h * 0.05)}" rx="2" fill="${o.accent}"/>`;
+    return s;
+  }
+
+  /* part de fromage : pointe à gauche, face coupée devant, croûte sur le côté, trous pour les pâtes pressées */
+  function wedge(x, by, w, h, o) {
+    const T = by - h, tip = [x - w * 0.5, by - h * 0.42], tr = [x + w * 0.5, by - h * 0.78], br = [x + w * 0.5, by], bk = [x + w * 0.12, T], bb = [x + w * 0.12, by - h * 0.22];
+    const pt = (p) => `${f(p[0])},${f(p[1])}`;
+    let s = `<path d="M${pt(tr)}L${pt(bk)}L${pt(bb)}L${pt(br)}Z" fill="${o.rind}"/>`;
+    s += `<path d="M${pt(tr)}L${pt(bk)}L${pt(bb)}L${pt(br)}Z" fill="url(#cs)"/>`;
+    s += `<path d="M${pt(tip)}L${pt(tr)}L${pt(bk)}Z" fill="${lt(o.body, 0.12)}"/>`;
+    s += `<path d="M${pt(tip)}L${pt(tr)}L${pt(br)}Z" fill="${o.body}"/>`;
+    if (o.holes) for (const [u, v, r] of [[0.55, 0.55, 7], [0.78, 0.4, 5], [0.72, 0.78, 6], [0.38, 0.7, 4], [0.88, 0.62, 3.5]]) { const px = tip[0] + (br[0] - tip[0]) * u, py = tip[1] + (br[1] - tip[1]) * v * (u > 0.3 ? 1 : 0.4); s += `<ellipse cx="${f(px)}" cy="${f(py)}" rx="${f(r)}" ry="${f(r * 0.8)}" fill="${dk(o.body, 0.16)}"/><ellipse cx="${f(px - r * 0.2)}" cy="${f(py - r * 0.25)}" rx="${f(r * 0.5)}" ry="${f(r * 0.4)}" fill="${dk(o.body, 0.08)}"/>`; }
+    if (o.soft) s += `<path d="M${pt(tip)}L${pt(tr)}L${pt(br)}Z" fill="none" stroke="${o.rind}" stroke-width="5"/><path d="M${f(x - w * 0.3)},${f(by - h * 0.3)}Q${f(x)},${f(by - h * 0.5)} ${f(x + w * 0.3)},${f(by - h * 0.45)}" stroke="${lt(o.body, 0.4)}" stroke-width="3" fill="none" opacity=".8"/>`;
+    s += `<path d="M${pt(tip)}L${pt(tr)}L${pt(br)}Z" fill="url(#vt)"/>`;
+    s += `<path d="M${f(x - w * 0.05)},${f(by - h * 0.36)}L${f(x + w * 0.5)},${f(by - h * 0.58)}L${f(x + w * 0.5)},${f(by - h * 0.38)}L${f(x - w * 0.05)},${f(by - h * 0.16)}Z" fill="${o.accent}" opacity=".92"/>`;
+    s += `<path d="M${f(x + w * 0.1)},${f(by - h * 0.36)}L${f(x + w * 0.38)},${f(by - h * 0.47)}" stroke="#fff" stroke-opacity=".9" stroke-width="2.4" stroke-linecap="round"/>`;
+    return s;
+  }
+
+  /* tube (dentifrice, crème) debout sur son bouchon */
+  function tubep(x, by, w, h, o) {
+    const T = by - h, capH = h * 0.11, hw = w / 2;
+    const d = `M${f(x - hw * 0.92)},${f(T + 4)}L${f(x + hw * 0.92)},${f(T + 4)}C${f(x + hw)},${f(T + h * 0.3)} ${f(x + hw)},${f(T + h * 0.55)} ${f(x + hw)},${f(by - capH - 10)}Q${f(x + hw)},${f(by - capH)} ${f(x + hw - 10)},${f(by - capH)}L${f(x - hw + 10)},${f(by - capH)}Q${f(x - hw)},${f(by - capH)} ${f(x - hw)},${f(by - capH - 10)}C${f(x - hw)},${f(T + h * 0.55)} ${f(x - hw)},${f(T + h * 0.3)} ${f(x - hw * 0.92)},${f(T + 4)}Z`;
+    let s = `<path d="${d}" fill="${o.body}"/>`;
+    s += `<rect x="${f(x - hw)}" y="${f(T + h * 0.3)}" width="${f(w)}" height="${f(h * 0.3)}" fill="${o.accent}"/>`;
+    s += `<rect x="${f(x - hw * 0.6)}" y="${f(T + h * 0.41)}" width="${f(hw * 1.2)}" height="${f(h * 0.07)}" rx="3" fill="#fff" opacity=".92"/>`;
+    s += `<rect x="${f(x - hw * 0.4)}" y="${f(T + h * 0.68)}" width="${f(hw * 0.8)}" height="${f(h * 0.05)}" rx="2" fill="${o.c2 || o.accent}" opacity=".8"/>`;
+    s += `<path d="${d}" fill="url(#cy)"/>`;
+    s += crimp(x - hw * 0.92, x + hw * 0.92, T, 9, dk(o.body, 0.05));
+    s += `<path d="M${f(x - hw * 0.62)},${f(T + 14)}L${f(x - hw * 0.62)},${f(by - capH - 14)}" stroke="#fff" stroke-opacity=".55" stroke-width="${f(w * 0.06)}" stroke-linecap="round"/>`;
+    s += `<rect x="${f(x - hw * 0.5)}" y="${f(by - capH)}" width="${f(w * 0.5)}" height="${f(capH)}" rx="3" fill="${o.cap}"/><rect x="${f(x - hw * 0.5)}" y="${f(by - capH)}" width="${f(w * 0.5)}" height="${f(capH)}" rx="3" fill="url(#cs)"/>`;
+    return s;
+  }
+
+  /* vaporisateur (nettoyants, déodorant) : corps droit, col et gâchette */
+  function spray(x, by, w, h, o) {
+    const T = by - h, hw = w / 2, bodyT = T + h * 0.36;
+    const d = `M${f(x - hw)},${f(by - 12)}Q${f(x - hw)},${f(by)} ${f(x - hw + 12)},${f(by)}L${f(x + hw - 12)},${f(by)}Q${f(x + hw)},${f(by)} ${f(x + hw)},${f(by - 12)}L${f(x + hw)},${f(bodyT + 8)}Q${f(x + hw)},${f(bodyT)} ${f(x + hw - 8)},${f(bodyT)}L${f(x - hw + 8)},${f(bodyT)}Q${f(x - hw)},${f(bodyT)} ${f(x - hw)},${f(bodyT + 8)}Z`;
+    let s = `<path d="${d}" fill="${o.body}"/>`;
+    s += `<rect x="${f(x - hw * 0.8)}" y="${f(bodyT + h * 0.12)}" width="${f(hw * 1.6)}" height="${f(h * 0.3)}" rx="8" fill="${o.label || "#fff"}" opacity=".94"/>`;
+    s += `<circle cx="${f(x)}" cy="${f(bodyT + h * 0.24)}" r="${f(hw * 0.3)}" fill="${o.accent}"/>`;
+    s += `<rect x="${f(x - hw * 0.45)}" y="${f(bodyT + h * 0.36)}" width="${f(hw * 0.9)}" height="${f(h * 0.03)}" rx="2" fill="${o.accent}" opacity=".6"/>`;
+    s += `<path d="${d}" fill="url(#cy)"/>`;
+    s += `<path d="M${f(x - hw * 0.66)},${f(bodyT + 12)}L${f(x - hw * 0.66)},${f(by - 16)}" stroke="#fff" stroke-opacity=".5" stroke-width="${f(w * 0.06)}" stroke-linecap="round"/>`;
+    /* col, tête et gâchette */
+    s += `<rect x="${f(x - hw * 0.26)}" y="${f(T + h * 0.24)}" width="${f(hw * 0.52)}" height="${f(h * 0.13)}" fill="${dk(o.cap, 0.1)}"/>`;
+    s += `<path d="M${f(x - hw * 0.4)},${f(T + h * 0.24)}L${f(x - hw * 0.4)},${f(T + h * 0.08)}Q${f(x - hw * 0.4)},${f(T)} ${f(x - hw * 0.3)},${f(T)}L${f(x + hw * 0.55)},${f(T)}Q${f(x + hw * 0.72)},${f(T)} ${f(x + hw * 0.72)},${f(T + h * 0.08)}L${f(x + hw * 0.72)},${f(T + h * 0.15)}L${f(x + hw * 0.3)},${f(T + h * 0.2)}L${f(x + hw * 0.3)},${f(T + h * 0.24)}Z" fill="${o.cap}"/>`;
+    s += `<path d="M${f(x + hw * 0.72)},${f(T + h * 0.09)}L${f(x + hw * 0.95)},${f(T + h * 0.08)}L${f(x + hw * 0.95)},${f(T + h * 0.14)}L${f(x + hw * 0.72)},${f(T + h * 0.15)}Z" fill="${dk(o.cap, 0.2)}"/>`;
+    s += `<path d="M${f(x - hw * 0.1)},${f(T + h * 0.2)}Q${f(x - hw * 0.05)},${f(T + h * 0.34)} ${f(x + hw * 0.12)},${f(T + h * 0.36)}L${f(x + hw * 0.22)},${f(T + h * 0.32)}Q${f(x + hw * 0.1)},${f(T + h * 0.26)} ${f(x + hw * 0.1)},${f(T + h * 0.2)}Z" fill="${dk(o.cap, 0.3)}"/>`;
+    return s;
   }
 
   /* ---------- palettes ---------- */
@@ -403,6 +493,28 @@
     papier: ["#2e86c1", "#45b39d", "#af7ac5", "#f5b041", "#5dade2", "#ec7063"],
     vaisselle: ["#2e86c1", "#c0392b", "#27ae60", "#8e44ad", "#f39c12"],
     lessive: ["#1f5fbf", "#2f9e44", "#7b2cbf", "#e85d04", "#0096c7", "#d6336c"],
+  };
+  /* couleur d'étiquette par univers, pour les rayons qui n'ont pas de dessin particulier (155 rayons, 18 univers) */
+  const PALU = {
+    "fruits-legumes": ["#2e7d32", "#e67e22", "#c0392b", "#7a9e3b", "#d4a017"],
+    "viandes-poissons": ["#8e2c2c", "#1f4e79", "#264653", "#b5651d", "#2e6db4"],
+    cremerie: ["#2b6cb0", "#1f9d8b", "#4c6ef5", "#2f9e44", "#5f6fd6"],
+    "charcuterie-traiteur": ["#8e2c2c", "#b5651d", "#264653", "#6a1b9a", "#2e7d32"],
+    "pain-patisserie": ["#b5651d", "#8d5a2b", "#c0392b", "#2e7d32", "#d4a017"],
+    surgeles: ["#1f6fb2", "#2fa5d6", "#4d69d6", "#1d9b86", "#5f6fd6"],
+    "epicerie-salee": ["#c0392b", "#1f4e79", "#2e7d32", "#b5651d", "#7d3c98"],
+    "petit-dejeuner": ["#b5651d", "#c0392b", "#2e7d32", "#1f4e79", "#d4a017"],
+    "epicerie-sucree": ["#c0392b", "#2e86c1", "#af601a", "#7d3c98", "#d4ac0d"],
+    boissons: ["#2a7bc0", "#e0525f", "#1d9b86", "#4d69d6", "#ef9d10"],
+    cave: ["#6b1430", "#2f5f3f", "#b5651d", "#1f3a5f", "#7a1f2b"],
+    bebe: ["#5aa9d6", "#e88ca8", "#f4b860", "#7ccba2", "#9b8bd6"],
+    "hygiene-beaute": ["#1d9b86", "#2e86c1", "#d6336c", "#8e44ad", "#5aa86f"],
+    parapharmacie: ["#2e7d32", "#2e86c1", "#1d9b86", "#5f6fd6"],
+    entretien: ["#1f5fbf", "#2f9e44", "#0096c7", "#e85d04", "#7b2cbf"],
+    animaux: ["#e67e22", "#8d5a2b", "#2e7d32", "#1f4e79", "#c0392b"],
+    "regimes-bio": ["#2e7d32", "#58b368", "#7cb342", "#2a9d8f"],
+    monde: ["#c0392b", "#d4a017", "#2e7d32", "#1f4e79", "#8e44ad"],
+    autre: ["#2e6db4", "#c0392b", "#2e8b57", "#8e44ad", "#d35400"],
   };
 
   /* format "2 x (6 x 1,5 L)", "6 x 1 L", "500 g", "12 rouleaux" */
@@ -523,10 +635,109 @@
       L.sleeve = pick(["#c0392b", "#a93226", "#d35400"]); L.tomato = true; L.k = "tin"; L.n = q.n;
     } else if (r === "thon") {
       L.sleeve = pick(["#1f4e79", "#2e86c1", "#2e7d32", "#b9770e", "#264653"]); L.k = "tin"; L.n = q.n;
-    } else {
-      L.k = "generic"; L.a = "#8a8f98";
-    }
+    } else generic(L, p, t, q, pick);
     return L;
+  }
+
+  /* Tout autre rayon : le dessin suit l'icône du catalogue (k : tray, net, wedge, tub, brick, bottle, can, pack, tin, jar, bag,
+     box, tube, flacon, spray, sack, rolls, eggs, cup, carton, cake, jug) et la couleur son univers ; le contenu prend la
+     couleur de ce que le rayon vend (viande, poisson, fromage, fruits, croquettes, confiture…). */
+  function generic(L, p, t, q, pick) {
+    const k = p.icon || "box", r = L.r || "", u = p.u || "";
+    L.a = pick(PALU[u] || PALU.autre);
+    L.u = u;
+    const cs = (pairs, d) => { for (const [re, c] of pairs) if (re.test(r + " " + t)) return c; return d; };
+    switch (k) {
+      case "tray":
+        L.k = "tray";
+        L.c2 = cs([[/volaille|poulet|dinde/, "#f0cfae"], [/poisson|cabillaud|colin|truite|bar\b|dorade/, "#dde3e8"], [/crustace|crevette|gambas/, "#f2a07b"], [/traiteur-mer|saumon|surimi/, "#f08a6e"], [/jambon-blanc|jambon blanc|dinde/, "#f3b7bd"], [/jambon-cru|saucisson|chorizo/, "#a63d47"], [/lardon|poitrine/, "#e59aa0"], [/saucisses-boudins|boudin|knack/, "#c9868a"], [/vegetal|vegan|tofu/, "#9bbf7c"], [/pates-fraiches|ravioli|gnocchi/, "#f3dfa8"], [/salades-sandwichs|salade/, "#b7d58a"], [/aperitif|plats-cuisines|traiteur/, "#e8c98f"], [/hache|boeuf|veau|agneau|porc|merguez|saucisse|halal/, "#d9646a"]], "#d9646a");
+        L.lumps = /hache|merguez|crevette|boulette/.test(r + " " + t);
+        break;
+      case "net":
+        L.k = "net";
+        L.c2 = cs([[/pommes-de-terre|pomme de terre|oignon|ail\b/, "#c9a26b"], [/carotte/, "#f28c28"], [/banane|citron/, "#f1d34b"], [/orange|clementine|mandarine/, "#f39c2a"], [/tomate|fraise|cerise|framboise/, "#d9434b"], [/pomme|poire|raisin|kiwi|avocat|salade|courgette|concombre|haricot|epinard|brocoli|chou/, "#7cb342"], [/fruits-secs|noix|amande|noisette/, "#c99a5b"], [/legumes|salades-herbes/, "#7cb342"]], "#e9a23b");
+        break;
+      case "wedge":
+        L.k = "wedge";
+        L.soft = /pate-molle|camembert|brie|coulommiers|chevre-brebis|chevre|bleu|roquefort/.test(r + " " + t);
+        L.body = /bleu|roquefort|fourme|gorgonzola/.test(t) ? "#eef0e6" : L.soft ? "#f7f1e2" : /comte|beaufort|cheddar|mimolette/.test(t) ? "#f1c75f" : "#f5d78a";
+        L.rind = /bleu|roquefort|fourme|gorgonzola/.test(t) ? "#8fa3b8" : L.soft ? "#f3eee2" : /mimolette|cheddar/.test(t) ? "#e0861f" : "#c58b3a";
+        L.holes = !L.soft && /emmental|gruyere|leerdammer|maasdam|trou|pate-pressee/.test(r + " " + t);
+        break;
+      case "tub":
+        L.k = "tub";
+        L.body = /glace|sorbet/.test(r + " " + t) ? "#f3e7d3" : /creme/.test(r) ? "#fbfbfa" : "#fbfbfa";
+        L.lid = /glace/.test(r) ? L.a : lt(L.a, 0.15);
+        break;
+      case "brick": case "carton":
+        L.k = "brick"; L.cap = L.a; L.small = !!(q.v && q.v <= 500);
+        if (q.n > 1) L.k = "packk";
+        break;
+      case "bottle": {
+        const cave = u === "cave";
+        L.liq = cs([[/vin-rouge/, "#5a1028"], [/vin-blanc/, "#e9d98a"], [/vin-rose/, "#f2a7b3"], [/champagne|cremant|mousseux/, "#efd98a"], [/biere|bieres/, "#e2a93b"], [/cidre|poire/, "#e8c266"], [/aperitif|pastis|porto|martini/, "#c0392b"], [/whisky|rhum|cognac/, "#b5651d"], [/vodka|gin/, "#e8f1f5"], [/eaux-gazeuses|gazeuse/, "#d8edf8"], [/jus-autres|pomme/, "#e7be55"], [/sirops|sirop|grenadine/, "#c0392b"], [/boissons-plates|the glace|the/, "#c47a2c"], [/vinaigre|vinaigrette/, "#b5651d"], [/sauces-monde|soja|barbecue/, "#5a2a1a"], [/laits-autres|lait/, "#fbfbfa"]], "#d8edf8");
+        L.dark = L.liq !== "#fbfbfa";
+        L.glass = cave || /verre/.test(t);
+        L.size = q.v >= 1250 ? "big" : q.v >= 900 ? "l1" : q.v >= 450 ? "s50" : q.v >= 300 ? "s33" : "s25";
+        L.k = q.n > 1 && !cave ? "packb" : "bottle";
+        break;
+      }
+      case "can":
+        L.k = q.n > 1 ? "packc" : "can"; L.liq = L.a; L.dark = true;
+        break;
+      case "pack":
+        if (u === "boissons" || u === "cave") { L.k = q.n > 1 ? "packb" : "bottle"; L.liq = "#d8edf8"; L.size = q.v >= 1250 ? "big" : q.v >= 900 ? "l1" : "s50"; }
+        else { L.k = "genbag"; L.c2 = /culotte|pants/.test(t) ? "#cfe6f5" : /serviette|tampon|protege/.test(t) ? "#f7d9e4" : "#e3eef7"; }
+        break;
+      case "tin":
+        L.k = "tin"; L.sleeve = L.a; L.plain = true; L.n = q.n;
+        L.c2 = cs([[/patee-chat|patee-chien|patee/, "#b86a4b"], [/haricot|pois|lentille|mais/, "#8fbc5a"], [/plats-conserve|cassoulet|raviolis|ravioli/, "#d8903f"], [/oriental|couscous|pois chiche/, "#e3c35a"], [/champignon/, "#d7c9b3"]], "#8fbc5a");
+        break;
+      case "jar":
+        L.k = "jar"; L.glass = true; L.lid = L.a; L.n = 1;
+        L.body = cs([[/miel/, "#e9a53b"], [/pate-a-tartiner|noisette|cacao/, "#5a3a24"], [/confiture|fraise|framboise|cerise|fruits rouges/, "#b23a48"], [/abricot|orange|peche/, "#e8893a"], [/sauces-chaudes|tomate|bolognaise|arrabiata/, "#c0392b"], [/pesto|basilic/, "#5f8f3a"], [/cornichon|olive|antipasti/, "#6f8f3a"], [/epices|curry|paprika/, "#c9742e"], [/sel|poivre/, "#e8e4da"], [/pates-rillettes|rillette|terrine|foie/, "#c98f72"], [/repas-bebe|petit pot|legumes/, "#e9b36a"], [/asie|soja|curry/, "#8b4a2a"], [/mayonnaise|moutarde|ketchup/, "#f0c35a"]], "#c98f72");
+        break;
+      case "bag":
+        L.k = "genbag";
+        L.c2 = cs([[/chips/, "#f1c75f"], [/croquettes|chat|chien|animaux/, "#8d5a2b"], [/legumes-secs|lentille|pois/, "#b98b54"], [/fruits-secs|noix|amande/, "#c99a5b"], [/pain-de-mie|mie|burger|wrap/, "#efd9a8"], [/pain|baguette/, "#e0b36d"], [/viennoiserie|brioche|croissant/, "#e8b55a"], [/bonbons|bonbon|chewing/, "#e36ba2"], [/legumes-surgeles|surgel|poelee/, "#5aa05a"], [/frites|pommes de terre/, "#f1c75f"], [/viandes-surgelees|viande|volaille/, "#d9646a"], [/fromages-cuisiner|mozzarella|feta|raclette/, "#f6f0e0"], [/crepes-gaufres|crepe|gaufre|brownie/, "#e3a24b"], [/semoule|boulgour|quinoa|polenta/, "#efd59a"], [/the|infusion/, "#7a9e3b"], [/autres-animaux|graines|oiseau/, "#d4b483"]], "#efd59a");
+        L.shape = /chips/.test(r) ? "disc" : /croquette|legumes-secs|fruits-secs|bonbon|graine|quinoa|semoule/.test(r + " " + t) ? "lentil" : /frites/.test(r) ? "long" : "";
+        break;
+      case "tube":
+        L.k = "tubep"; L.body = "#fbfbfa"; L.cap = "#f2f2f0";
+        L.c2 = cs([[/dentifrice|menthe|blancheur/, "#3fb6a8"], [/solaire|soleil/, "#f5a623"], [/visage|creme|hydrat/, "#f2c6c9"]], "#4fa3d8");
+        break;
+      case "flacon":
+        L.k = "flacon";
+        L.liq = cs([[/gel-douche|douche|bain|savon/, "#4fa3d8"], [/shampoing|shampooing/, "#e8b4c8"], [/soins-cheveux|apres-shampoing|masque/, "#f3cfa2"], [/toilette-bebe|bebe/, "#f7d9e4"], [/wc|deboucheur|javel/, "#2f6fb5"], [/soins-corps|lait|creme/, "#f3dcc2"], [/vinaigre/, "#e3c35a"], [/lave-vaisselle/, "#5aa0d8"]], "#4caf50");
+        L.k = /recharge/.test(t) ? "doy" : "flacon";
+        break;
+      case "spray":
+        L.k = "spray"; L.cap = "#f2f2f0";
+        L.body = cs([[/deodorant|deo/, "#dfe6ee"], [/vitre|cuisine|salle de bain|multi/, "#4fa3d8"], [/desodorisant|parfum|ambiance/, "#e8b4c8"], [/insecticide|moustique|mouche/, "#8fbc5a"], [/javel|sol/, "#2f6fb5"]], "#4fa3d8");
+        break;
+      case "sack":
+        L.k = "sack"; L.body = /litiere/.test(r) ? "#d9cdb8" : "#f3ede1"; L.cube = false;
+        break;
+      case "rolls":
+        L.k = "rolls"; L.body = /recycl|naturel|non blanchi/.test(t) ? "#efe5d4" : "#fbfbf8"; L.n = q.rolls ? q.n : 2; L.tall = /essuie/.test(r + " " + t);
+        break;
+      case "eggs":
+        L.k = "eggs"; L.n = q.n > 1 ? q.n : 6;
+        break;
+      case "cup":
+        L.k = "cups"; L.body = /compote|dessert/.test(r) ? "#fbf6ee" : "#fbfbfa"; L.lid = lt(L.a, 0.15); L.n = q.n;
+        break;
+      case "cake":
+        L.k = "cakebag"; L.piece = /brownie|moelleux/.test(t) ? "moelleux" : "cake"; L.cc = /chocolat|cacao/.test(t) ? "#7a4a2c" : "#e3a24b";
+        break;
+      case "jug":
+        L.k = "jugl"; L.body = /adoucissant|linge/.test(r + " " + t) ? "#c9d7f2" : lt(L.a, 0.1);
+        break;
+      default:
+        L.k = "genbox";
+        L.c2 = cs([[/cereales|muesli|flocon/, "#e3b86a"], [/capsules|cafe|dosette/, "#5a3a24"], [/the|infusion|tisane/, "#7a9e3b"], [/chocolat-poudre|cacao|chocolat/, "#6b3b22"], [/biscuits|sable|petit beurre|gateau|galette|biscotte/, "#e3a24b"], [/pizzas|quiche|tarte/, "#e5b05a"], [/plats-surgeles|poissons-surgeles|pane|aperitifs-surgeles|desserts-surgeles/, "#f1c75f"], [/lait-infantile|infantile|croissance/, "#cfe6f5"], [/lave-vaisselle|lessive|capsule|tablette/, "#5aa0d8"], [/sacs-poubelle|sac|eponge|gant/, "#8e9aa8"], [/conservation|film|aluminium|congelation|cuisson/, "#cfd6de"], [/premiers-soins|pansement|complement|vitamine/, "#5fb36f"], [/rasage|rasoir|lame/, "#9fb3c8"], [/mouchoirs|coton/, "#f2f2ef"], [/bouillon|fond|aide/, "#d8a24a"], [/aide-patisserie|levure|arome/, "#f0c35a"], [/mexique|tortilla|tacos|chili/, "#d8903f"], [/casher|sans-gluten/, "#9bbf7c"]], "#e3b86a");
+        break;
+    }
   }
 
   /* ---------- rendu ---------- */
@@ -696,8 +907,8 @@
       }
       case "tin": {
         const two = L.n > 1, h = two ? 58 : 76;
-        s += tin(120, B, 168, h, { sleeve: L.sleeve, tomato: L.tomato });
-        if (two) s += tin(120, B - h - 1, 168, h, { sleeve: dk(L.sleeve, 0.06), tomato: L.tomato });
+        s += tin(120, B, 168, h, { sleeve: L.sleeve, tomato: L.tomato, plain: L.plain, c2: L.c2 });
+        if (two) s += tin(120, B - h - 1, 168, h, { sleeve: dk(L.sleeve, 0.06), tomato: L.tomato, plain: L.plain, c2: L.c2 });
         gr = ground(126, B + 1, 100, 9);
         break;
       }
@@ -743,8 +954,8 @@
       }
       case "rolls": {
         const n = L.n || 6;
-        const cols = n <= 4 ? 2 : n <= 9 ? 3 : 4, rows = n <= 6 ? 2 : 3;
-        s = rolls(B, cols, rows, { body: L.body, accent: L.a, coreless: L.coreless });
+        const cols = L.tall ? Math.min(3, Math.max(2, n)) : n <= 4 ? 2 : n <= 9 ? 3 : 4, rows = L.tall ? 1 : n <= 6 ? 2 : 3;
+        s = rolls(B, cols, rows, { body: L.body, accent: L.a, coreless: L.coreless, tall: L.tall });
         gr = ground(120, B + 1, 96, 9);
         break;
       }
@@ -781,24 +992,75 @@
         gr = ground(120, B + 1, 76, 8);
         break;
       }
+      case "tray": {
+        s = tray(100, B, 158, 74, 54, { body: "#f5f4f0", c2: L.c2, accent: a, lumps: L.lumps }, seed);
+        gr = ground(126, B + 1, 106, 10);
+        break;
+      }
+      case "net": {
+        s = net(120, B, 150, 180, { c2: L.c2, accent: a }, seed);
+        gr = ground(120, B + 1, 64, 8);
+        break;
+      }
+      case "wedge": {
+        s = wedge(120, B, 164, 120, { body: L.body, rind: L.rind, accent: a, holes: L.holes, soft: L.soft });
+        gr = ground(126, B + 1, 90, 9);
+        break;
+      }
+      case "tub": {
+        s = jar(120, B, 150, 100, { body: L.body, accent: a, lid: L.lid });
+        gr = ground(120, B + 1, 86, 8);
+        break;
+      }
+      case "genbag": {
+        const long = L.shape === "long";
+        s = pillow(120, B, 136, 176, { accent: a, inner: lt(L.c2, 0.45), bandH: 0.24, fill: L.shape ? (x, y, w, h) => pasta(long ? "long" : L.shape, L.c2, x, y, w, h, seed) : null });
+        gr = ground(120, B + 1, 76, 8);
+        break;
+      }
+      case "genbox": {
+        s = box(112, B, 112, 32, 150, {
+          body: a, face: (Lx, T, w, h) => `<rect x="${f(Lx)}" y="${f(T + h * 0.08)}" width="${f(w)}" height="${f(h * 0.16)}" fill="#fff" opacity=".92"/><rect x="${f(Lx + w * 0.2)}" y="${f(T + h * 0.13)}" width="${f(w * 0.6)}" height="${f(h * 0.06)}" rx="2" fill="${a}" opacity=".85"/>` +
+            `<circle cx="${f(Lx + w / 2)}" cy="${f(T + h * 0.56)}" r="${f(w * 0.26)}" fill="#fff" opacity=".93"/><circle cx="${f(Lx + w / 2)}" cy="${f(T + h * 0.56)}" r="${f(w * 0.19)}" fill="${L.c2}"/><circle cx="${f(Lx + w * 0.44)}" cy="${f(T + h * 0.5)}" r="${f(w * 0.06)}" fill="#fff" opacity=".4"/>` +
+            `<rect x="${f(Lx + w * 0.15)}" y="${f(T + h * 0.84)}" width="${f(w * 0.7)}" height="${f(h * 0.05)}" rx="2" fill="#fff" opacity=".75"/>`,
+        });
+        gr = ground(122, B + 1, 80, 8);
+        break;
+      }
+      case "tubep": {
+        s = tubep(120, B, 84, 176, { body: L.body, accent: a, cap: L.cap, c2: L.c2 });
+        gr = ground(120, B + 1, 54, 7);
+        break;
+      }
+      case "spray": {
+        s = spray(118, B, 84, 196, { body: L.body, cap: L.cap, accent: a, label: "#fff" });
+        gr = ground(120, B + 1, 56, 7);
+        break;
+      }
       default:
         s = box(112, B, 100, 30, 120, { body: "#e9ebee" });
     }
     return gr + s;
   }
 
-  function svg(p) {
-    const L = look(p);
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><defs>${DEFS}</defs>${draw(L, hash(p.id) % 100000)}</svg>`;
-  }
+  /* dessins dont le détail (contenu semé) dépend de la marque : même graine pour une même marque, un dessin par marque */
+  const SEEDED = new Set(["pastabag", "pastabox", "cheese", "genbag", "tray", "net"]);
+  const seedOf = (p, L) => (SEEDED.has(L.k) ? hash(p.brand) % 7 : hash(p.id) % 100000);
+  const svgOf = (p, L) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><defs>${DEFS}</defs>${draw(L, seedOf(p, L))}</svg>`;
+  function svg(p) { return svgOf(p, look(p)); }
 
   const cache = new Map();
-  function keyOf(p) { const L = look(p); return JSON.stringify([L.k, L.a, L.size, L.liq, L.cap, L.body, L.lid, L.n, L.shape, L.pc, L.cheese, L.flakes, L.sleeve, L.piece, L.cc, L.glass, L.small, L.coreless, L.k === "pastabag" || L.k === "pastabox" || L.k === "cheese" ? hash(p.brand) % 7 : 0]); }
+  /* clé du cache : tout ce qui change le dessin (chaque champ posé par look, hors le texte et le format analysés), plus la graine */
+  function keyOf(p) {
+    const L = look(p), o = {};
+    for (const k of Object.keys(L).sort()) if (k !== "t" && k !== "q") o[k] = L[k];
+    return JSON.stringify(o) + "|" + seedOf(p, L);
+  }
   function url(p) {
     const k = keyOf(p);
     let u = cache.get(k);
     if (u) return u;
-    const s = svg({ ...p, id: p.id && (look(p).k === "pastabag" || look(p).k === "pastabox" || look(p).k === "cheese") ? String(hash(p.brand) % 7) : p.id });
+    const s = svgOf(p, look(p));
     try { u = URL.createObjectURL(new Blob([s], { type: "image/svg+xml" })); } catch (e) { u = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s); }
     cache.set(k, u);
     return u;

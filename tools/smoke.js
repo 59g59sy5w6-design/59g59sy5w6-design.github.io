@@ -1,5 +1,6 @@
 // Test rapide de l'appli après une mise à jour : sert le dépôt en local, ouvre les écrans principaux
-// au format iPhone et vérifie qu'ils s'affichent sans erreur. Code de sortie 1 en cas de problème.
+// au format iPhone (accueil, Rayons par univers, un rayon par univers, fiche produit avec ses détails, panier, recherche,
+// À propos) et vérifie qu'ils s'affichent sans erreur. Code de sortie 1 en cas de problème.
 // Usage : node tools/smoke.js
 const http = require("http");
 const fs = require("fs");
@@ -44,17 +45,36 @@ const server = http.createServer((req, res) => {
     await page.goto(base + "#/"); await ready();
     await check("accueil", ".deal", 1);
     await check("accueil", ".cat", 4);
+    /* catalogue v2 : clés courtes (i identifiant, r rayon, o offres), rayons avec univers (u) et compteur (n) */
     const cat = await page.evaluate(() => fetch("data/catalog.json").then((r) => r.json()));
     const meta = await page.evaluate(() => fetch("data/meta.json").then((r) => r.json()));
-    for (const r of cat.rayons) {
+    if (cat.v !== 2) problems.push("catalogue : format v2 attendu");
+    /* page Rayons : un bloc repliable par univers, montée rapide, filtre local */
+    await page.goto(base + "#/rayons"); await ready();
+    const nUniv = await check("rayons", "details.univ", 1);
+    const univ = cat.univers.filter((u) => cat.rayons.some((r) => r.u === u.id && (r.n || r.virtuel))).length;
+    if (nUniv !== univ) problems.push(`rayons : ${nUniv} univers affichés, ${univ} attendus`);
+    const ms = await page.evaluate(() => { const t0 = performance.now(); location.hash = "#/"; location.hash = "#/rayons"; return performance.now() - t0; });
+    if (ms > 200) problems.push(`rayons : rendu en ${Math.round(ms)} ms, 200 attendus au plus`);
+    await page.fill("#rq", "eau"); await page.waitForTimeout(400);
+    const tiles = await page.$$eval("#rlist .cat b", (els) => els.map((e) => e.textContent));
+    if (!tiles.length || tiles.some((t) => !/eau/i.test(t))) problems.push("rayons : le filtre « eau » laisse " + JSON.stringify(tiles));
+    /* un rayon par univers, le premier qui a des produits, plus les rayons de parcours (virtuels) */
+    const seen = new Set();
+    const sample = cat.rayons.filter((r) => (r.n && !seen.has(r.u) && seen.add(r.u)) || (r.virtuel && r.virtuel.length));
+    for (const r of sample) {
       await page.goto(base + "#/rayon/" + r.id); await ready();
-      await check("rayon " + r.id, ".card", 1);
+      if (r.n || r.virtuel) await check("rayon " + r.id, ".card", r.n ? 1 : 0);
     }
-    const multi = cat.products.filter((p) => Object.keys(p.offers).length > 1);
-    await page.goto(base + "#/produit/" + encodeURIComponent(multi[0].id)); await ready();
+    const multi = cat.products.filter((p) => (p.o || []).length > 1);
+    await page.goto(base + "#/produit/" + encodeURIComponent(multi[0].i)); await ready();
     await check("fiche produit", ".offer", 2);
+    /* les détails de l'univers arrivent après la fiche : nom affiché par l'enseigne et lien de la fiche */
+    await page.waitForFunction(() => !document.querySelector("#poffers .skl"), null, { timeout: 8000 }).catch(() => problems.push("fiche produit : les détails ne remplacent pas le squelette"));
+    const links = await page.$$eval("#poffers a.offer", (els) => els.map((e) => e.getAttribute("href")));
+    if (!links.some((h) => /https?:\/\/.+\/.+/.test(h))) problems.push("fiche produit : aucun lien de fiche chez une enseigne (" + links.join(", ") + ")");
     const basket = {};
-    multi.slice(0, 14).forEach((p) => { basket[p.id] = 2; });
+    multi.slice(0, 14).forEach((p) => { basket[p.i] = 2; });
     await page.evaluate((b) => localStorage.setItem("cabas.basket", JSON.stringify(b)), basket);
     await page.goto(base + "#/panier"); await page.reload(); await ready();
     await page.waitForTimeout(800);
@@ -63,7 +83,10 @@ const server = http.createServer((req, res) => {
     await page.goto(base + "#/recherche"); await ready();
     await page.fill("#q", "lait"); await page.waitForTimeout(500);
     await check("recherche", "#sres .card", 1);
-    console.log(`Appli vérifiée : ${cat.products.length} produits, relevé du ${meta.updatedAt}, ${cat.rayons.length} rayons ouverts.`);
+    await check("recherche", "#sres .hcard", 1);
+    await page.goto(base + "#/apropos"); await ready();
+    await check("à propos", "details.adv", 1);
+    console.log(`Appli vérifiée : ${cat.products.length} produits, relevé du ${meta.updatedAt}, ${cat.rayons.length} rayons dans ${univ} univers, ${sample.length} rayons ouverts.`);
   } catch (e) {
     problems.push("parcours interrompu : " + e.message.split("\n")[0]);
   }

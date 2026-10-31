@@ -1,7 +1,10 @@
 // Vérification de Ma liste : choix habituel mémorisé (repris d'office, ou signalé quand il est plus de 15 % plus cher,
 // « Garder le mien »), quantité habituelle d'après les paniers commandés (« × 2, comme d'habitude », « Toujours 1 »),
 // usualQty sur un historique fixe, orthographe (« spagetti x2 » trouve un spaghetti, « zzzz » reste sans suggestion,
-// « Tu voulais dire… ? Oui »), et lignes libres (« Garder quand même », panier, texte partagé, liste partagée).
+// « Tu voulais dire… ? Oui »), lignes libres (« Garder quand même », panier, texte partagé, liste partagée), puis, avec le
+// jeu d'essai tools/fixtures/catalog-extra.json ajouté au catalogue, les mots des nouvelles catégories (jambon, camembert,
+// lessive capsules, couches, croquettes chat, vin rouge…) et « Mon régime » (rayon filtré, chip, Ma liste, réglages,
+// dietOk sur 30 libellés, repas).
 // Code de sortie 1 en cas de problème. Usage : node tools/listcheck.js
 const http = require("http");
 const fs = require("fs");
@@ -236,11 +239,77 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     const pr = await stored("prefs");
     if (Object.keys(pr.usual || {}).length || Object.keys(pr.keep || {}).length) fail("« Tout oublier » ne vide pas usual et keep");
     if (!/Annuler/.test(await toastText())) fail("« Tout oublier » : pas d'« Annuler »");
+
+    /* ---- catalogue étendu : jeu d'essai (tools/fixtures/catalog-extra.json, rayons et produits inventés) ajouté au
+       catalogue chargé, pour les mots des nouvelles catégories et le régime ---- */
+    const extra = JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "fixtures", "catalog-extra.json"), "utf8"));
+    const withExtra = async (prefs) => {
+      await page.evaluate((st) => { localStorage.setItem("cabas.prefs", JSON.stringify(st)); localStorage.setItem("cabas.hist", "[]"); localStorage.setItem("cabas.basket", "{}"); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); }, prefs);
+      await page.goto(base + "#/"); await page.reload(); await ready();
+      await page.evaluate((x) => cabasDebug().merge(x), extra);
+    };
+    await withExtra(PREFS);
+    const WORDS = [["jambon", "jambon-blanc", /jambon blanc/i], ["camembert", "fromages-pate-molle", /^Camembert$/], ["lessive capsules", "lessive-capsules-poudre", /capsules/i], ["couches", "couches", /^Couches taille 4$/], ["croquettes chat", "croquettes-chat", /adulte/i], ["vin rouge", "vin-rouge", /rouge/i], ["bière blonde x6", "bieres", /^Bière blonde$/], ["chips", "chips", /nature/i], ["saucisson", "saucisson", /saucisson/i], ["dentifrice", "dentifrice", /dentifrice/i], ["pain", "pain", /baguette/i], ["camenbert", "fromages-pate-molle", /^Camembert$/]];
+    const got = await page.evaluate((qs) => { const D = cabasDebug(); return D.readList(qs.join("\n")).map((x) => { const p = x.pick && D.S.prods.get(x.pick); return { raw: x.raw, r: p ? p.r : null, name: p ? p.name : null, n: x.n }; }); }, WORDS.map((w) => w[0]));
+    WORDS.forEach(([q, r, re], i) => { const g = got[i]; if (!g || g.r !== r || !re.test(g.name || "")) fail(`Ma liste « ${q} » : attendu rayon ${r} et ${re}, obtenu ${g ? g.r + " / " + g.name : "rien"}`); });
+    if (got[6] && got[6].n !== 1) fail("« bière blonde x6 » : un pack de 6 attendu en quantité 1, obtenu " + got[6].n);
+    const top = await page.evaluate(() => { const D = cabasDebug(); return ["vin rouge", "croquettes chat", "jambon"].map((q) => { const r = D.searchScored(q)[0]; return r ? r[1].r : null; }); });
+    if (top[0] !== "vin-rouge" || top[1] !== "croquettes-chat" || !/jambon/.test(top[2] || "")) fail("recherche : premiers résultats " + JSON.stringify(top));
+    /* « Mon régime » halal : le rayon jambon ne montre que les produits étiquetés, la chip se décoche, Ma liste suit */
+    await withExtra(Object.assign({}, PREFS, { diet: { halal: true } }));
+    await page.evaluate(() => { location.hash = "#/rayon/jambon-blanc"; });
+    await page.waitForTimeout(400);
+    let cards = await page.locator("#view .card").count();
+    if (cards !== 1) fail(`régime halal : ${cards} cartes dans le rayon jambon, 1 attendue`);
+    if (!/correspond.*ton régime/.test(await page.locator("#view .count").textContent().catch(() => ""))) fail("régime halal : le nombre de produits conformes n'est pas dit");
+    const dchip = page.locator('[data-act="quick"][data-q="diet"]');
+    if ((await dchip.getAttribute("aria-pressed")) !== "true") fail("régime : la chip « Mon régime » n'est pas pressée par défaut");
+    await dchip.click(); await page.waitForTimeout(300);
+    cards = await page.locator("#view .card").count();
+    if (cards !== 4) fail(`régime halal décoché : ${cards} cartes, 4 attendues`);
+    const dl = await page.evaluate(() => { const D = cabasDebug(); return D.readList("jambon\ncamembert").map((x) => ({ pick: x.pick, miss: !!x.dietMiss })); });
+    if (!dl[0] || !/halal/.test(dl[0].pick) || dl[0].miss) fail("régime halal, Ma liste « jambon » : " + JSON.stringify(dl[0]));
+    if (!dl[1] || !dl[1].pick || !dl[1].miss) fail("régime halal, Ma liste « camembert » : le repli sans filtre n'est pas signalé : " + JSON.stringify(dl[1]));
+    await page.evaluate(() => { location.hash = "#/reglages"; }); await page.waitForTimeout(400);
+    const rv = await page.locator('[data-act="diet"] .val').textContent();
+    if (!/halal/.test(rv)) fail("réglages : « Mon régime » n'affiche pas « halal » (" + rv + ")");
+    await page.click('[data-act="diet"]'); await page.waitForTimeout(450);
+    const dchips = await page.locator("#sheet .dietchip").count(), pressed = await page.locator('#sheet .dietchip[aria-pressed="true"]').textContent();
+    if (dchips !== 10) fail(`feuille « Mon régime » : ${dchips} choix, 10 attendus`);
+    if (!/Halal/.test(pressed) || !/produit/.test(pressed)) fail("feuille « Mon régime » : la chip cochée ne compte pas ses produits (" + pressed + ")");
+    await page.click('#sheet .dietchip[data-k="gluten"]'); await page.waitForTimeout(300);
+    const pd = (await stored("prefs")).diet || {};
+    if (!pd.gluten || !pd.halal) fail("feuille « Mon régime » : le choix n'est pas mémorisé : " + JSON.stringify(pd));
+    await page.click('#sheet .sheet-h [data-act="close"]'); await page.waitForTimeout(300);
+    /* dietOk sur des libellés fixes : exclusions sur les mots, étiquettes exigées pour les régimes positifs */
+    const DK = await page.evaluate(() => {
+      const D = cabasDebug(), P = (name, r, regimes, tags, u) => ({ name, r, regimes: regimes || [], tags: tags || [], u: u || "" });
+      const T = [
+        [P("Jambon blanc", "jambon-blanc"), { pork: true }, false], [P("Jambon de dinde", "jambon-blanc"), { pork: true }, true], [P("Rillettes de porc", "pates-rillettes"), { pork: true }, false], [P("Saucisses de volaille", "saucisses-boudins"), { pork: true }, true], [P("Lardons fumés", "lardons"), { pork: true }, false], [P("Pizza sans porc", "pizzas-surgelees"), { pork: true }, true],
+        [P("Steak haché", "viande-hachee"), { veg: true }, false], [P("Thon au naturel", "thon"), { veg: true }, false], [P("Riz basmati", "riz"), { veg: true }, true], [P("Galettes de soja", "traiteur-vegetal", ["vegetarien"]), { veg: true }, true], [P("Nuggets de poulet", "volaille"), { veg: true }, false], [P("Yaourt nature", "yaourts"), { veg: true }, true],
+        [P("Bordeaux rouge", "vin-rouge", [], [], "cave"), { alcohol: true }, false], [P("Bière blonde", "bieres", [], [], "cave"), { alcohol: true }, false], [P("Bière sans alcool", "cidres-sans-alcool", [], [], "cave"), { alcohol: true }, false], [P("Vinaigre de vin", "vinaigre-vinaigrette"), { alcohol: true }, true], [P("Jus de pomme", "jus-autres"), { alcohol: true }, true], [P("Sauce au vin blanc", "sauces-chaudes"), { alcohol: true }, false],
+        [P("Pâtes", "pates"), { gluten: true }, false], [P("Pâtes de riz", "pates", ["sans-gluten"]), { gluten: true }, true], [P("Lait demi-écrémé", "lait"), { lactose: true }, false], [P("Lait sans lactose", "lait", ["sans-lactose"]), { lactose: true }, true],
+        [P("Jambon de volaille halal", "jambon-blanc", ["halal"]), { halal: true }, true], [P("Jambon blanc", "jambon-blanc"), { halal: true }, false], [P("Poulet casher", "volaille", ["casher"]), { kosher: true }, true], [P("Poulet", "volaille"), { kosher: true }, false],
+        [P("Boisson à l'amande", "boissons-vegetales", ["vegan", "vegetarien"]), { vegan: true }, true], [P("Yaourt nature", "yaourts"), { vegan: true }, false], [P("Jus d'orange sans sucres ajoutés", "jus", [], ["Sans sucres ajoutés"]), { sugar: true }, true], [P("Jus d'orange", "jus"), { sugar: true }, false],
+      ];
+      return T.map(([p, d, want]) => [p.name, JSON.stringify(d), D.dietOk(p, d), want]).filter((x) => x[2] !== x[3]);
+    });
+    if (DK.length) fail("dietOk : " + DK.map((x) => `${x[0]} ${x[1]} donne ${x[2]}`).join(" ; "));
+    /* repas : avec un régime végétarien, une recette au thon est « pas pour ton régime », toujours ouvrable */
+    await withExtra(Object.assign({}, PREFS, { diet: { veg: true } }));
+    await page.evaluate(() => { location.hash = "#/repas"; }); await page.waitForTimeout(600);
+    const bad = await page.evaluate(() => { const D = cabasDebug(), rc = D.S.recs.find((x) => x.id === "pates-thon-tomate"); return rc ? D.recCost(rc).bad.map((x) => x.g.q) : null; });
+    if (!bad || !bad.includes("thon")) fail("régime végétarien : le thon de la recette n'est pas signalé : " + JSON.stringify(bad));
+    const rt = await page.locator("#view").textContent();
+    if (!/Pas pour ton régime/.test(rt)) fail("régime végétarien : la liste des repas ne dit pas « Pas pour ton régime »");
+    await page.evaluate(() => { location.hash = "#/repas/pates-thon-tomate"; }); await page.waitForTimeout(500);
+    if (!/Pas pour ton régime/.test(await page.locator("#view").textContent())) fail("régime végétarien : la recette n'avertit pas sur le thon");
+    await overflow("recette, régime");
   } catch (e) {
     fail("parcours interrompu : " + e.message.split("\n")[0]);
   }
   await browser.close();
   server.close();
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Ma liste (choix habituels, quantités, orthographe, lignes libres) : aucun problème.");
+  console.log("Ma liste (choix habituels, quantités, orthographe, lignes libres, nouvelles catégories, régime) : aucun problème.");
 })();

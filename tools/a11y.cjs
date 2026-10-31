@@ -61,7 +61,7 @@ const SHEETS = {
   "rayon-pates": [["sort", "[data-act=sort]"], ["filters", "[data-act=filters]"]],
   scan: [["scantype", "[data-act=scantype]"]],
 };
-const GROS_JS = `fetch("data/catalog.json").then((r) => r.json()).then((c) => { const b = {}; c.products.filter((p) => Object.keys(p.offers).length > 1).slice(0, 14).forEach((p) => { b[p.id] = 2; }); sessionStorage.setItem("a11yGros", JSON.stringify(b)); })`;
+const GROS_JS = `fetch("data/catalog.json").then((r) => r.json()).then((c) => { const b = {}; c.products.filter((p) => (p.o || []).length > 1).slice(0, 14).forEach((p) => { b[p.i] = 2; }); sessionStorage.setItem("a11yGros", JSON.stringify(b)); })`;
 const CRANS = ["0.82", "0.9", "1", "1.12", "1.25"];
 const WIDTHS = { m: { width: 390, height: 844 }, d: { width: 1280, height: 800 } };
 function modeOf(id) {

@@ -40,8 +40,11 @@ async function measure(page, url, label, throttle) {
   await page.goto(url, { waitUntil: "commit" });
   await page.waitForFunction(RENDERED, null, { timeout: 60000 });
   const first = Date.now() - t0;
+  /* l'accueil se dessine avant le catalogue (promesse, squelettes) ; puis le catalogue v2 arrive et le remplit */
+  await page.waitForFunction(() => window.cabasDebug && cabasDebug().S.ready, null, { timeout: 60000 });
+  const full = Date.now() - t0;
   const res = await page.evaluate(() => performance.getEntriesByType("resource").map((r) => ({ n: r.name.split("/").slice(-2).join("/").replace(/^[^/]*:\d+\//, ""), ms: Math.round(r.responseEnd - r.startTime), kb: Math.round((r.transferSize || 0) / 1024) })));
-  console.log(`\n${label} : premier affichage en ${first} ms`);
+  console.log(`\n${label} : premier affichage en ${first} ms, catalogue prêt en ${full} ms`);
   for (const r of res.filter((r) => r.kb > 20 || r.ms > 300)) console.log(`   ${r.n.padEnd(24)} ${String(r.ms).padStart(5)} ms  ${String(r.kb).padStart(4)} ko transférés`);
   if (throttle) { await client.send("Emulation.setCPUThrottlingRate", { rate: 1 }); await client.send("Network.emulateNetworkConditions", { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 }); }
   await client.detach();
@@ -66,7 +69,7 @@ async function measure(page, url, label, throttle) {
   const client = await ctx.newCDPSession(page);
   await client.send("Emulation.setCPUThrottlingRate", { rate: 4 });
   console.log("\nVues, processeur x4 :");
-  for (const h of ["#/rayons", "#/rayon/eaux", "#/recherche", "#/repas", "#/panier", "#/listes", "#/reglages"]) {
+  for (const h of ["#/rayons", "#/rayon/eaux", "#/rayon/bio", "#/recherche", "#/repas", "#/panier", "#/listes", "#/reglages"]) {
     const ms = await page.evaluate(async (h) => { const t0 = performance.now(); location.hash = h; await new Promise((r) => setTimeout(r, 0)); await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))); return Math.round(performance.now() - t0); }, h);
     console.log(`   ${h.padEnd(14)} ${String(ms).padStart(5)} ms`);
   }

@@ -1,0 +1,1103 @@
+{
+ "v": 2,
+ "updatedAt": "2026-10-31",
+ "epoch": "2026-01-01",
+ "rets": [
+  "monoprix",
+  "carrefour",
+  "houra",
+  "auchan",
+  "auchan-alesia",
+  "auchan-bellesfeuilles",
+  "auchan-livraison-perreux",
+  "auchan-livraison-paris16",
+  "auchan-livraison-paris14",
+  "leclerc-livraison",
+  "leclerc-drive"
+ ],
+ "note": "Jeu d'essai pour les tests (tools/listcheck.js) : rayons et produits inventés, prix fictifs, aucune donnée réelle.",
+ "univers": [],
+ "rayons": [
+  {
+   "id": "jambon-blanc",
+   "name": "Jambon blanc et blanc de volaille",
+   "u": "charcuterie-traiteur",
+   "order": 30,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 4
+  },
+  {
+   "id": "jambon-cru",
+   "name": "Jambon cru et charcuterie tranchée",
+   "u": "charcuterie-traiteur",
+   "order": 31,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 1
+  },
+  {
+   "id": "fromages-pate-molle",
+   "name": "Camembert, brie, bleus et fromages de caractère",
+   "u": "cremerie",
+   "order": 24,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 3
+  },
+  {
+   "id": "fromages-pate-pressee",
+   "name": "Emmental, comté, gouda et pâtes pressées",
+   "u": "cremerie",
+   "order": 25,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 1
+  },
+  {
+   "id": "lessive-capsules-poudre",
+   "name": "Lessive en capsules, poudre et feuilles",
+   "u": "entretien",
+   "order": 132,
+   "regimes": [],
+   "frais": false,
+   "unite": "lavage",
+   "virtuel": null,
+   "n": 2
+  },
+  {
+   "id": "couches",
+   "name": "Couches et lingettes bébé",
+   "u": "bebe",
+   "order": 116,
+   "regimes": [],
+   "frais": false,
+   "unite": "couche",
+   "virtuel": null,
+   "n": 2
+  },
+  {
+   "id": "croquettes-chat",
+   "name": "Croquettes pour chat",
+   "u": "animaux",
+   "order": 142,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 2
+  },
+  {
+   "id": "patee-chat",
+   "name": "Pâtées, sachets fraîcheur et friandises pour chat",
+   "u": "animaux",
+   "order": 143,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 1
+  },
+  {
+   "id": "vin-rouge",
+   "name": "Vins rouges",
+   "u": "cave",
+   "order": 107,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 2
+  },
+  {
+   "id": "vin-blanc",
+   "name": "Vins blancs",
+   "u": "cave",
+   "order": 108,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 1
+  },
+  {
+   "id": "bieres",
+   "name": "Bières",
+   "u": "cave",
+   "order": 105,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 2
+  },
+  {
+   "id": "chips",
+   "name": "Chips",
+   "u": "epicerie-salee",
+   "order": 73,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 2
+  },
+  {
+   "id": "saucisson",
+   "name": "Saucisson sec et chorizo",
+   "u": "charcuterie-traiteur",
+   "order": 32,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 1
+  },
+  {
+   "id": "pain",
+   "name": "Pain, baguettes et pains précuits",
+   "u": "pain-patisserie",
+   "order": 42,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 2
+  },
+  {
+   "id": "dentifrice",
+   "name": "Dentifrices, brosses à dents et bains de bouche",
+   "u": "hygiene-beaute",
+   "order": 122,
+   "regimes": [],
+   "frais": false,
+   "unite": "piece",
+   "virtuel": null,
+   "n": 1
+  },
+  {
+   "id": "gel-douche",
+   "name": "Gels douche, bains et savons",
+   "u": "hygiene-beaute",
+   "order": 118,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 1
+  },
+  {
+   "id": "boissons-vegetales",
+   "name": "Boissons végétales",
+   "u": "boissons",
+   "order": 104,
+   "regimes": [
+    "vegan"
+   ],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 1
+  },
+  {
+   "id": "cereales",
+   "name": "Céréales du petit-déjeuner et muesli",
+   "u": "petit-dejeuner",
+   "order": 80,
+   "regimes": [],
+   "frais": false,
+   "unite": null,
+   "virtuel": null,
+   "n": 2
+  }
+ ],
+ "aliases": {},
+ "products": [
+  {
+   "i": "fx-jambon-blanc-superieur-4-tranches",
+   "b": "Fleury Michon",
+   "n": "Jambon blanc supérieur 4 tranches",
+   "f": "160 g",
+   "r": "jambon-blanc",
+   "k": "tray",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     329,
+     303,
+     0
+    ],
+    [
+     2,
+     299,
+     303,
+     0
+    ],
+    [
+     3,
+     309,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    160,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-jambon-blanc-degraisse-6-tranches",
+   "b": "Herta",
+   "n": "Jambon blanc dégraissé 6 tranches",
+   "f": "240 g",
+   "r": "jambon-blanc",
+   "k": "tray",
+   "t": "nb",
+   "o": [
+    [
+     1,
+     399,
+     303,
+     0
+    ],
+    [
+     3,
+     379,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    240,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-jambon-de-dinde-4-tranches",
+   "b": "Le Gaulois",
+   "n": "Jambon de dinde 4 tranches",
+   "f": "160 g",
+   "r": "jambon-blanc",
+   "k": "tray",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     249,
+     303,
+     0
+    ],
+    [
+     3,
+     259,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    160,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-jambon-de-volaille-halal-4-tranches",
+   "b": "Isla Délice",
+   "n": "Jambon de volaille halal 4 tranches",
+   "f": "160 g",
+   "r": "jambon-blanc",
+   "k": "tray",
+   "t": "nb",
+   "o": [
+    [
+     1,
+     269,
+     303,
+     0
+    ],
+    [
+     3,
+     279,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    160,
+    "g"
+   ],
+   "g": [
+    "Halal"
+   ],
+   "d": [
+    "halal"
+   ]
+  },
+  {
+   "i": "fx-jambon-cru-8-tranches",
+   "b": "Aoste",
+   "n": "Jambon cru 8 tranches",
+   "f": "120 g",
+   "r": "jambon-cru",
+   "k": "tray",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     449,
+     303,
+     0
+    ],
+    [
+     2,
+     419,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    120,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-camembert-250-g",
+   "b": "Président",
+   "n": "Camembert",
+   "f": "250 g",
+   "r": "fromages-pate-molle",
+   "k": "wedge",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     249,
+     303,
+     0
+    ],
+    [
+     2,
+     229,
+     303,
+     0
+    ],
+    [
+     3,
+     239,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    250,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-camembert-au-lait-cru-250-g",
+   "b": "Le Rustique",
+   "n": "Camembert au lait cru",
+   "f": "250 g",
+   "r": "fromages-pate-molle",
+   "k": "wedge",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     319,
+     303,
+     0
+    ],
+    [
+     3,
+     329,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    250,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-brie-200-g",
+   "b": "Carrefour",
+   "n": "Brie",
+   "f": "200 g",
+   "r": "fromages-pate-molle",
+   "k": "wedge",
+   "t": "mdd",
+   "o": [
+    [
+     1,
+     199,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    200,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-emmental-portion-250-g",
+   "b": "Entremont",
+   "n": "Emmental portion",
+   "f": "250 g",
+   "r": "fromages-pate-pressee",
+   "k": "wedge",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     299,
+     303,
+     0
+    ],
+    [
+     2,
+     279,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    250,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-lessive-capsules-30-lavages",
+   "b": "Ariel",
+   "n": "Lessive en capsules",
+   "f": "30 capsules",
+   "r": "lessive-capsules-poudre",
+   "k": "box",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     1199,
+     303,
+     0
+    ],
+    [
+     2,
+     1099,
+     303,
+     0
+    ],
+    [
+     3,
+     1149,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    30,
+    "pc"
+   ],
+   "ql": "lavage"
+  },
+  {
+   "i": "fx-lessive-poudre-40-lavages",
+   "b": "Skip",
+   "n": "Lessive en poudre",
+   "f": "2,2 kg",
+   "r": "lessive-capsules-poudre",
+   "k": "box",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     999,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    40,
+    "pc"
+   ],
+   "ql": "lavage"
+  },
+  {
+   "i": "fx-couches-taille-4-44-couches",
+   "b": "Pampers",
+   "n": "Couches taille 4",
+   "f": "44 couches",
+   "r": "couches",
+   "k": "pack",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     1499,
+     303,
+     0
+    ],
+    [
+     2,
+     1399,
+     303,
+     0
+    ],
+    [
+     3,
+     1449,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    44,
+    "pc"
+   ],
+   "ql": "couche"
+  },
+  {
+   "i": "fx-couches-culottes-taille-4-40",
+   "b": "Pampers",
+   "n": "Couches culottes taille 4",
+   "f": "40 couches",
+   "r": "couches",
+   "k": "pack",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     1599,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    40,
+    "pc"
+   ],
+   "ql": "couche"
+  },
+  {
+   "i": "fx-croquettes-chat-adulte-poulet-1-9-kg",
+   "b": "Whiskas",
+   "n": "Croquettes chat adulte au poulet",
+   "f": "1,9 kg",
+   "r": "croquettes-chat",
+   "k": "bag",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     699,
+     303,
+     0
+    ],
+    [
+     2,
+     649,
+     303,
+     0
+    ],
+    [
+     3,
+     659,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    1900,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-croquettes-chaton-poulet-1-5-kg",
+   "b": "Purina",
+   "n": "Croquettes chaton au poulet",
+   "f": "1,5 kg",
+   "r": "croquettes-chat",
+   "k": "bag",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     899,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    1500,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-patee-chat-poulet-12-x-85-g",
+   "b": "Whiskas",
+   "n": "Pâtée chat au poulet",
+   "f": "12 x 85 g",
+   "r": "patee-chat",
+   "k": "tin",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     599,
+     303,
+     0
+    ],
+    [
+     3,
+     579,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    1020,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-bordeaux-rouge-75-cl",
+   "b": "Château Fictif",
+   "n": "Bordeaux rouge",
+   "f": "75 cl",
+   "r": "vin-rouge",
+   "k": "bottle",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     599,
+     303,
+     0
+    ],
+    [
+     2,
+     549,
+     303,
+     0
+    ],
+    [
+     3,
+     569,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    750,
+    "ml"
+   ]
+  },
+  {
+   "i": "fx-cotes-du-rhone-rouge-75-cl",
+   "b": "Cellier Fictif",
+   "n": "Côtes du Rhône rouge",
+   "f": "75 cl",
+   "r": "vin-rouge",
+   "k": "bottle",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     499,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    750,
+    "ml"
+   ]
+  },
+  {
+   "i": "fx-bourgogne-blanc-75-cl",
+   "b": "Domaine Fictif",
+   "n": "Bourgogne blanc",
+   "f": "75 cl",
+   "r": "vin-blanc",
+   "k": "bottle",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     799,
+     303,
+     0
+    ],
+    [
+     3,
+     789,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    750,
+    "ml"
+   ]
+  },
+  {
+   "i": "fx-biere-blonde-6-x-25-cl",
+   "b": "Brasserie Fictive",
+   "n": "Bière blonde",
+   "f": "6 x 25 cl",
+   "r": "bieres",
+   "k": "bottle",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     499,
+     303,
+     0
+    ],
+    [
+     2,
+     459,
+     303,
+     0
+    ],
+    [
+     3,
+     469,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    1500,
+    "ml"
+   ]
+  },
+  {
+   "i": "fx-biere-sans-alcool-6-x-25-cl",
+   "b": "Brasserie Fictive",
+   "n": "Bière blonde sans alcool",
+   "f": "6 x 25 cl",
+   "r": "bieres",
+   "k": "bottle",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     429,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    1500,
+    "ml"
+   ],
+   "g": [
+    "Sans alcool"
+   ]
+  },
+  {
+   "i": "fx-chips-nature-135-g",
+   "b": "Lay's",
+   "n": "Chips nature",
+   "f": "135 g",
+   "r": "chips",
+   "k": "bag",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     159,
+     303,
+     0
+    ],
+    [
+     2,
+     149,
+     303,
+     0
+    ],
+    [
+     3,
+     155,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    135,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-chips-paprika-135-g",
+   "b": "Lay's",
+   "n": "Chips saveur paprika",
+   "f": "135 g",
+   "r": "chips",
+   "k": "bag",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     149,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    135,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-saucisson-sec-250-g",
+   "b": "Justin Bridou",
+   "n": "Saucisson sec",
+   "f": "250 g",
+   "r": "saucisson",
+   "k": "tray",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     399,
+     303,
+     0
+    ],
+    [
+     2,
+     379,
+     303,
+     0
+    ],
+    [
+     3,
+     389,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    250,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-baguette-tradition-250-g",
+   "b": "Carrefour",
+   "n": "Baguette tradition",
+   "f": "250 g",
+   "r": "pain",
+   "k": "bag",
+   "t": "mdd",
+   "o": [
+    [
+     1,
+     109,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    250,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-pain-complet-tranche-500-g",
+   "b": "Harrys",
+   "n": "Pain complet tranché",
+   "f": "500 g",
+   "r": "pain",
+   "k": "bag",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     219,
+     303,
+     0
+    ],
+    [
+     2,
+     209,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    500,
+    "g"
+   ]
+  },
+  {
+   "i": "fx-dentifrice-menthe-75-ml",
+   "b": "Signal",
+   "n": "Dentifrice menthe",
+   "f": "75 ml",
+   "r": "dentifrice",
+   "k": "tube",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     199,
+     303,
+     0
+    ],
+    [
+     2,
+     189,
+     303,
+     0
+    ],
+    [
+     3,
+     185,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    75,
+    "ml"
+   ]
+  },
+  {
+   "i": "fx-gel-douche-amande-250-ml",
+   "b": "Le Petit Marseillais",
+   "n": "Gel douche amande",
+   "f": "250 ml",
+   "r": "gel-douche",
+   "k": "flacon",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     249,
+     303,
+     0
+    ],
+    [
+     2,
+     229,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    250,
+    "ml"
+   ]
+  },
+  {
+   "i": "fx-boisson-amande-1-l",
+   "b": "Alpro",
+   "n": "Boisson à l'amande",
+   "f": "1 L",
+   "r": "boissons-vegetales",
+   "k": "brick",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     229,
+     303,
+     0
+    ],
+    [
+     2,
+     209,
+     303,
+     0
+    ],
+    [
+     3,
+     219,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    1000,
+    "ml"
+   ],
+   "d": [
+    "vegan",
+    "vegetarien"
+   ]
+  },
+  {
+   "i": "fx-cereales-chocolat-sans-gluten-375-g",
+   "b": "Schär",
+   "n": "Céréales au chocolat sans gluten",
+   "f": "375 g",
+   "r": "cereales",
+   "k": "box",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     349,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    375,
+    "g"
+   ],
+   "g": [
+    "Sans gluten"
+   ],
+   "d": [
+    "sans-gluten"
+   ]
+  },
+  {
+   "i": "fx-cereales-chocolat-375-g",
+   "b": "Nesquik",
+   "n": "Céréales au chocolat",
+   "f": "375 g",
+   "r": "cereales",
+   "k": "box",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     299,
+     303,
+     0
+    ],
+    [
+     2,
+     279,
+     303,
+     0
+    ],
+    [
+     3,
+     289,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    375,
+    "g"
+   ]
+  }
+ ]
+}

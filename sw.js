@@ -1,6 +1,6 @@
 /* Cabas hors ligne : l'appli et le dernier relevé de prix restent disponibles sans réseau.
    Changer VERSION à chaque mise en ligne pour que les téléphones récupèrent les nouveaux fichiers. */
-const VERSION = "cabas-2026-10-31-15";
+const VERSION = "cabas-2026-10-31-16";
 /* l'appli : toujours rechargée du réseau à l'installation d'une version */
 const SHELL = [
   "./", "index.html", "app.css", "app.js", "packs.js", "scan.js", "optimizer.js", "worker.js", "manifest.webmanifest",
@@ -9,6 +9,9 @@ const SHELL = [
 /* les prix : repris du cache de la version précédente à l'installation, puis servis tout de suite depuis le cache à
    chaque ouverture et revérifiés derrière ; l'appli est prévenue quand une version plus récente est arrivée */
 const DATA = ["data/catalog.json", "data/retailers.json", "data/meta.json", "data/status.json", "data/recettes.json", "data/history.json"];
+/* les détails par univers (data/details/<univers>.json : noms chez l'enseigne, liens, offres) sont chargés à la demande,
+   servis comme les autres données (cache d'abord) et repris du cache précédent à l'installation d'une version */
+const DETAILS = /\/data\/details\/[^/]+\.json$/;
 
 self.addEventListener("install", (e) => {
   e.waitUntil((async () => {
@@ -20,6 +23,10 @@ self.addEventListener("install", (e) => {
       for (const k of old) { hit = await (await caches.open(k)).match(f); if (hit) break; }
       if (hit) await c.put(f, hit);
       else await c.add(new Request(f)).catch(() => { /* mis en cache à la première lecture */ });
+    }
+    for (const k of old) {
+      const oc = await caches.open(k);
+      for (const req of await oc.keys()) if (DETAILS.test(new URL(req.url).pathname) && !(await c.match(req))) { const hit = await oc.match(req); if (hit) await c.put(req, hit); }
     }
     await self.skipWaiting();
   })());

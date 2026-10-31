@@ -34,10 +34,11 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
   const fail = (m) => problems.push(m);
   const browser = await chromium.launch();
   const cat = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "catalog.json"), "utf8"));
-  const multi = cat.products.filter((p) => Object.keys(p.offers).length > 1);
+  /* catalogue v2 : i = identifiant, o = offres [enseigne, centimes, jour, drapeaux] */
+  const multi = cat.products.filter((p) => (p.o || []).length > 1);
   const basket = {};
-  multi.slice(0, 8).forEach((p, i) => { basket[p.id] = i ? 2 : 1; });
-  const one = multi[0].id;
+  multi.slice(0, 8).forEach((p, i) => { basket[p.i] = i ? 2 : 1; });
+  const one = multi[0].i;
   const guide = { ck: {}, done: { houra: true }, when: { houra: { d: plus(1), s: "soir" } } };
   const toastText = (page) => page.evaluate(() => { const t = document.getElementById("toast"); return t.hidden ? "" : t.textContent; });
   const stored = (page, k) => page.evaluate((k) => JSON.parse(localStorage.getItem("cabas." + k) || "null"), k);
@@ -93,7 +94,9 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     if ((await page.locator(".item[data-rm]").count()) < 8) fail("Annuler après vider : les lignes ne sont pas toutes redessinées");
 
     /* 3. glisser une ligne vers la gauche : « Retirer » ; un tap ailleurs referme ; un glissement vertical ne révèle rien */
+    /* la ligne est amenée dans la fenêtre d'abord : avec le catalogue v2, la première ligne du panier peut être sous la barre d'onglets */
     const first = page.locator(".item[data-rm]").first();
+    await first.scrollIntoViewIfNeeded(); await page.waitForTimeout(200);
     const bb = await first.boundingBox();
     const cy = bb.y + bb.height / 2;
     await page.mouse.move(bb.x + 220, cy);
@@ -112,6 +115,7 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     await page.mouse.click(200, 90);
     await page.waitForTimeout(350);
     if (await page.locator(".item.swipe").count()) fail("un tap ailleurs ne referme pas la ligne glissée");
+    await page.locator(".item[data-rm]").nth(1).scrollIntoViewIfNeeded(); await page.waitForTimeout(200);
     const bb2 = await page.locator(".item[data-rm]").nth(1).boundingBox();
     await page.mouse.move(bb2.x + 220, bb2.y + 10);
     await page.mouse.down();
