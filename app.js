@@ -1400,9 +1400,12 @@
       for (const x of L) {
         /* pour chaque enseigne de l'ensemble, le produit du vivier le moins cher ; la ligne va à la moins chère */
         const by = sub.map(() => null);
-        for (const [id, n] of x.pool) {
+        /* quantités du vivier, multipliées si la quantité de la ligne a été changée à la main (plus ou moins) */
+        const base = (x.pool.find(([id]) => id === x.pick) || [null, x.n])[1], mult = base ? x.n / base : 1;
+        for (const [id, n1] of x.pool) {
           const p = S.prods.get(id);
           if (!p) continue;
+          const n = Math.max(1, Math.round(n1 * mult));
           sub.forEach((ci, j) => { const o = p.offers[chans[ci].id]; if (o && o.price > 0 && !o.sim) { const c = Math.round(o.price * 100) * n; if (!by[j] || c < by[j].c) by[j] = { id, n, c }; } });
         }
         let j0 = -1;
