@@ -180,5 +180,271 @@
   ],
   "text": "Oiseaux, Rongeurs, Poissons",
   "at": "2026-10-31T15:35:20.943Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "legumes",
+  "host": "houra.fr",
+  "match": "B1557904",
+  "url": "https://www.houra.fr/catalogue/fruits-et-legumes/legumes-B1557904-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/fruits-et-legumes-B4000059-1.html",
+  "find": [
+   "^legumes$|^legumes "
+  ],
+  "text": "Légumes",
+  "at": "2026-10-31T15:27:25.386Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "pommes-de-terre",
+  "host": "houra.fr",
+  "match": "B1560357",
+  "url": "https://www.houra.fr/catalogue/nos-producteurs/ferme-de-vaulerand-B1560357-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/fruits-et-legumes-B4000059-1.html",
+  "find": [
+   "pommes? de terre|legumes? racines?"
+  ],
+  "text": "Pomme de Terre, Val d'Oise",
+  "at": "2026-10-31T15:27:40.437Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "porc",
+  "host": "houra.fr",
+  "match": "B1560206",
+  "url": "https://www.houra.fr/catalogue/nos-producteurs/le-porc-francilin-B1560206-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/le-marche-B4000200-1.html",
+  "find": [
+   "^porc"
+  ],
+  "text": "Porc du Bassin Parisien",
+  "at": "2026-10-31T15:28:09.888Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "volaille",
+  "host": "houra.fr",
+  "match": "B1558021",
+  "url": "https://www.houra.fr/catalogue/le-marche/volaille-lapin-du-marche-B1558021-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/le-marche-B4000200-1.html",
+  "find": [
+   "^volaille"
+  ],
+  "text": "Volaille, Lapin",
+  "at": "2026-10-31T15:28:43.944Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "crustaces",
+  "host": "houra.fr",
+  "match": "B1558022",
+  "url": "https://www.houra.fr/catalogue/le-marche/poissonnerie-du-marche-B1558022-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/le-marche-B4000200-1.html",
+  "find": [
+   "poissonnerie"
+  ],
+  "text": "Poissonnerie",
+  "at": "2026-10-31T15:29:27.271Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "traiteur-mer",
+  "host": "houra.fr",
+  "match": "B4000022",
+  "url": "https://www.houra.fr/catalogue/poisson-traiteur-de-la-mer-B4000022-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html",
+  "find": [
+   "traiteur de la mer|produits de la mer|saumon fume"
+  ],
+  "text": "Poisson, Traiteur de la mer",
+  "at": "2026-10-31T15:29:39.596Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "creme",
+  "host": "houra.fr",
+  "match": "B1556951",
+  "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/creme-fraiche-et-sauces-B1556951-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html",
+  "find": [
+   "^creme fraiche|^cremes?( |$)"
+  ],
+  "text": "Crème fraiche, sauce",
+  "at": "2026-10-31T15:31:24.996Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "fromages-pate-molle",
+  "host": "houra.fr",
+  "match": "B1556981",
+  "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/fromages-B1556981-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html",
+  "find": [
+   "camembert|pates? molles?|^fromages$"
+  ],
+  "text": "fromages",
+  "at": "2026-10-31T15:32:17.580Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "saucisson",
+  "host": "houra.fr",
+  "match": "B1557490",
+  "url": "https://www.houra.fr/catalogue/traiteur-charcuterie/saucissons-et-chorizos-B1557490-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/charcuterie-traiteur/charcuterie-B1557480-1.html",
+  "find": [
+   "saucisson"
+  ],
+  "text": "Saucisson, chorizo",
+  "at": "2026-10-31T15:33:39.079Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "lardons",
+  "host": "houra.fr",
+  "match": "B1557488",
+  "url": "https://www.houra.fr/catalogue/traiteur-charcuterie/lardons-poitrine-et-bacon-B1557488-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/charcuterie-traiteur/charcuterie-B1557480-1.html",
+  "find": [
+   "lardons?"
+  ],
+  "text": "Lardon, poitrine, bacon",
+  "at": "2026-10-31T15:33:53.200Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "saucisses-boudins",
+  "host": "houra.fr",
+  "match": "B1557487",
+  "url": "https://www.houra.fr/catalogue/traiteur-charcuterie/knacks-saucisses-et-boudins-B1557487-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/charcuterie-traiteur/charcuterie-B1557480-1.html",
+  "find": [
+   "knack|saucisses? (a cuire|cuite)|boudin"
+  ],
+  "text": "Knack, saucisse, boudin",
+  "at": "2026-10-31T15:34:04.701Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "pates-rillettes",
+  "host": "houra.fr",
+  "match": "B1557482",
+  "url": "https://www.houra.fr/catalogue/traiteur-charcuterie/foie-gras-B1557482-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/charcuterie-traiteur/charcuterie-B1557480-1.html",
+  "find": [
+   "pates? et rillettes|rillettes|foie gras"
+  ],
+  "text": "Foie gras",
+  "at": "2026-10-31T15:34:18.048Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "pain",
+  "host": "houra.fr",
+  "match": "B1558026",
+  "url": "https://www.houra.fr/catalogue/le-marche/pain-du-marche-B1558026-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/le-marche-B4000200-1.html",
+  "find": [
+   "pain et boulangerie|^pains?( |$)"
+  ],
+  "text": "Pain",
+  "at": "2026-10-31T15:35:18.890Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "viennoiseries",
+  "host": "houra.fr",
+  "match": "B4000034",
+  "url": "https://www.houra.fr/catalogue/pain-viennoiserie-B4000034-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+  "find": [
+   "viennoiserie|brioche|pain au lait"
+  ],
+  "text": "Pain, Viennoiserie",
+  "at": "2026-10-31T15:35:32.550Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "glaces",
+  "host": "houra.fr",
+  "match": "B1560356",
+  "url": "https://www.houra.fr/catalogue/nos-producteurs/maison-de-la-glace-B1560356-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/surgeles-B4000003-1.html",
+  "find": [
+   "glaces? et sorbets?|^glaces?( |$)"
+  ],
+  "text": "Glaces Artisanales Provençales",
+  "at": "2026-10-31T15:35:47.376Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "frites",
+  "host": "houra.fr",
+  "match": "B1557168",
+  "url": "https://www.houra.fr/catalogue/surgeles/frites-et-pommes-de-terre-surgelees-B1557168-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/surgeles-B4000003-1.html",
+  "find": [
+   "frites"
+  ],
+  "text": "Frites, pommes de terre",
+  "at": "2026-10-31T15:36:15.927Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "pizzas-surgelees",
+  "host": "houra.fr",
+  "match": "B1557179",
+  "url": "https://www.houra.fr/catalogue/surgeles/pizzas-et-quiches-surgelees-B1557179-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/surgeles-B4000003-1.html",
+  "find": [
+   "pizzas?"
+  ],
+  "text": "Pizza, quiche",
+  "at": "2026-10-31T15:36:34.737Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "aperitifs-surgeles",
+  "host": "houra.fr",
+  "match": "B1557147",
+  "url": "https://www.houra.fr/catalogue/surgeles/aperitifs-entrees-et-snacking-surgeles-B1557147-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/surgeles-B4000003-1.html",
+  "find": [
+   "aperitifs? et snacks?|^aperitif"
+  ],
+  "text": "Apéritif, entrée, snacking",
+  "at": "2026-10-31T15:37:46.619Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "desserts-surgeles",
+  "host": "houra.fr",
+  "match": "B1557152",
+  "url": "https://www.houra.fr/catalogue/surgeles/pains-patisseries-et-fruits-surgeles-B1557152-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/surgeles-B4000003-1.html",
+  "find": [
+   "pains?, patisseries?|patisseries? et|fruits surgeles"
+  ],
+  "text": "Pain, pâtisserie et fruit",
+  "at": "2026-10-31T15:38:24.516Z"
  }
 ]
