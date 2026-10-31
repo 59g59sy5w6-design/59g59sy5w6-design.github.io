@@ -446,5 +446,131 @@
   ],
   "text": "Pain, pâtisserie et fruit",
   "at": "2026-10-31T15:38:24.516Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "riz",
+  "host": "houra.fr",
+  "match": "B1557058",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/pates-riz-cereales-et-purees-B1557058-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+  "find": [
+   "^riz|riz,|riz et|feculent|riz, pates"
+  ],
+  "text": "Pâtes, Riz, Céréales",
+  "at": "2026-10-31T15:27:26.688Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "conserves",
+  "host": "houra.fr",
+  "match": "B1557080",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-poissons-pates-foie-gras-B1557080-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+  "find": [
+   "conserves? de poissons?|poissons? en conserve"
+  ],
+  "text": "Conserves de Poissons, Pâtés",
+  "at": "2026-10-31T15:28:58.325Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "plats-conserve",
+  "host": "houra.fr",
+  "match": "B1557038",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/plats-cuisines-repas-express-B1557038-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+  "find": [
+   "^plats? cuisines?"
+  ],
+  "text": "Plats Cuisinés",
+  "at": "2026-10-31T15:29:23.376Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "soupes",
+  "host": "houra.fr",
+  "match": "B1557093",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons-B1557093-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+  "find": [
+   "soupes?, potages?|^soupes?"
+  ],
+  "text": "Soupes, Potages",
+  "at": "2026-10-31T15:29:48.622Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "huile",
+  "host": "houra.fr",
+  "match": "B1558081",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/huile-herbes-aide-culinaire-B1558081-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+  "find": [
+   "^huiles?( |,|$)|huile et|huiles,"
+  ],
+  "text": "huiles et herbes d'exception",
+  "at": "2026-10-31T15:30:16.090Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "vinaigre-vinaigrette",
+  "host": "houra.fr",
+  "match": "B1557016",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/assaisonnements-et-condiments-B1557016-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+  "find": [
+   "vinaigre|vinaigrette|assaisonnement"
+  ],
+  "text": "Assaisonnements, Condiments",
+  "at": "2026-10-31T15:30:18.978Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "chips",
+  "host": "houra.fr",
+  "match": "B1557053",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/chips-B1557053-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+  "find": [
+   "^chips"
+  ],
+  "text": "chips croustillantes",
+  "at": "2026-10-31T15:31:41.445Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "biscuits-aperitif",
+  "host": "houra.fr",
+  "match": "B1557050",
+  "url": "https://www.houra.fr/catalogue/epicerie-salee/aperitif-chips-antipasti-tartinable-B1557050-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html",
+  "find": [
+   "aperitif, chips|^aperitif"
+  ],
+  "text": "Apéritif, Chips",
+  "at": "2026-10-31T15:32:20.283Z"
+ },
+ {
+  "retailer": "houra",
+  "rayon": "compotes",
+  "host": "houra.fr",
+  "match": "B1557642",
+  "url": "https://www.houra.fr/catalogue/epicerie-sucree/compote-fruit-au-sirop-creme-dessert-B1557642-1.html",
+  "prompt": "Return ONLY a JSON object, no other text: {\"products\": [one object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name + format), \"price\": current price as number in euros, \"was\": crossed-out price or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}], \"next_page\": URL of the next page or null}.",
+  "from": "https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html",
+  "find": [
+   "compotes?"
+  ],
+  "text": "Compote, Fruit au Sirop",
+  "at": "2026-10-31T15:35:36.034Z"
  }
 ]
