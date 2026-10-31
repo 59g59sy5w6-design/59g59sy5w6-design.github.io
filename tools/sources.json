@@ -1656,7 +1656,7 @@
    "rayon": "oeufs",
    "host": "courses.monoprix.fr",
    "match": "0f13a02c-f337",
-   "url": "https://courses.monoprix.fr/categories/produits-laitiers-œufs-et-fromages/œufs/0f13a02c-f337-4bc1-a822-7e1bfe552e1e?source=navigation",
+   "url": "https://courses.monoprix.fr/categories/produits-laitiers-œufs-et-fromages/œufs/0f13a02c-f337-4bc1-a822-7e1bfe552e1e?sortBy=favorite",
    "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
   },
   {
@@ -1813,14 +1813,6 @@
   },
   {
    "retailer": "carrefour",
-   "rayon": "tomates",
-   "host": "www.carrefour.fr",
-   "match": "pulpes-coulis-concentres-tomates",
-   "url": "https://www.carrefour.fr/r/epicerie-salee/sauces-chaudes/pulpes-coulis-concentres-tomates",
-   "prompt": "Return ONLY a JSON array, no other text, one object per product tile in page order: {\"title\": product title exactly as written (or the image alt text if no title), \"format\": the packaging/format line exactly as written (e.g. \"la boîte de 400g\"), \"price\": price as number in euros, \"unit\": price per kg text, \"promo\": promotion text or null, \"href\": product link path starting with /p/ or null}."
-  },
-  {
-   "retailer": "carrefour",
    "rayon": "thon",
    "host": "www.carrefour.fr",
    "match": "conserves-poissons/thon",
@@ -1899,6 +1891,7 @@
  },
  "magasins_note": "Enseignes dont les prix dépendent du magasin ou de la zone de livraison. Points de retrait : le robot choisit la carte du point. Livraison à domicile : il choisit la zone et, si Auchan demande une adresse, donne l'adresse publique de la mairie de la zone, jamais celle d'un utilisateur.",
  "ignore": [
-  "https://www.carrefour.fr/r/epicerie-salee/huiles-vinaigres-et-vinaigrettes/huiles-dolive"
+  "https://www.carrefour.fr/r/epicerie-salee/huiles-vinaigres-et-vinaigrettes/huiles-dolive",
+  "https://www.carrefour.fr/r/epicerie-salee/sauces-chaudes/pulpes-coulis-concentres-tomates"
  ]
 }

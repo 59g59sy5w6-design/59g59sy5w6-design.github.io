@@ -49,13 +49,17 @@ def page_key(url):
 
 
 F = json.load(open(os.path.join(lib.WORK, "fetches.json"), encoding="utf-8"))
-# une page relue plusieurs fois : garder la lecture la plus récente qui a donné des produits
+# une page relue plusieurs fois : garder la lecture la plus complète (produits nommés avec un prix, puis liens),
+# à égalité la plus récente ; une relecture qui a moins bien lu la page ne remplace pas la bonne lecture
+def score(f):
+    data = parse_json(f["text"])
+    items = data if isinstance(data, list) else (data or {}).get("products") or []
+    items = [x for x in items if isinstance(x, dict) and (x.get("name") or x.get("title")) and isinstance(x.get("price"), (int, float))]
+    return (len(items), sum(1 for x in items if x.get("url") or x.get("href")))
 latest = {}
 for f in sorted(F, key=lambda f: f["ts"]):
-    data = parse_json(f["text"])
-    n = len(data if isinstance(data, list) else (data or {}).get("products") or []) if data is not None else 0
     k = page_key(f["url"])
-    if n or k not in latest:
+    if k not in latest or score(f) >= score(latest[k]):
         latest[k] = f
 F = list(latest.values())
 
