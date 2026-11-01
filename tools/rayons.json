@@ -1412,13 +1412,15 @@
     "auchan": [
      "text=sandwich",
      "text=sushi",
-     "text=salade%20compos%C3%A9e"
+     "text=salade%20compos%C3%A9e",
+     "text=lentilles"
     ]
    },
    "filtre": {
     "oui": "salade|sandwich|wrap|club|sushi|maki|poke|bowl|\\bbox\\b|baguette|\\bpains?\\b|taboule|piemontaise|carotte rape|celeri remoulade|crudite|lunch|snack|burrito|bagel|panini|california|\\broll|\\boeuf|\\bthon|poulet|jambon|saumon",
-    "non": "surgel|conserve|chips|sauce\\b|vinaigrette|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|pizza|quiche|biscuit|dessert|sachet de salade|laitue|batavia|\\bmache\\b|\\broquette\\b|boisson|bebe"
-   }
+    "non": "surgel|conserve|chips|sauce\\b|vinaigrette|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|pizza|quiche|biscuit|dessert|sachet de salade|laitue|batavia|\\bmache\\b|\\broquette\\b|boisson|bebe|\\bdes \\d+ ?mois\\b"
+   },
+   "note": "La recherche Auchan « lentilles » est partagée avec le rayon légumes secs : les salades de lentilles viennent ici (filtres)."
   },
   {
    "id": "traiteur-vegetal",
@@ -2060,7 +2062,7 @@
     "oui": "lentille|pois chiche|haricot (rouge|blanc|noir|\\bsecs?\\b|coco|mungo|pinto|lingot|azuki)|flageolet|feve|pois casse|pois cass|legume sec|legumineuse|mogette|cocos|edamame|haricots secs|soja",
     "non": "surgel|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|plat cuisine|cassoulet|chili con|soupe|veloute|puree|salade composee|chips|biscuit|haricot vert|petit pois|pates|houmous|tartinable|bebe|boisson|\\blait\\b|sauce|tofu|steak|falafel|couscous (?:aux|au|royal)\\b|avec couscous|lentilles? de contact|\\bsolution|petit sale|\\bsaucisses?\\b.*\\blentilles?\\b|\\blentilles?\\b.*\\bsaucisses?\\b|\\bcuisinee?s?\\b|\\bsalades?\\b|\\bcurry\\b|\\bdahl\\b|\\bdal\\b|\\bfacon\\b|bolognaise|chorizo|\\bgalettes?\\b|\\bvegetales?\\b|\\bbouchees?\\b|\\bpoulet\\b|\\bdes \\d+ ?mois\\b|\\btorsades?\\b|\\bspaghetti|\\bplats?\\b"
    },
-   "note": "Secs et en conserve : contenances différentes, donc produits distincts dans le rapprochement. Les falafels et les plats de couscous vont au rayon oriental."
+   "note": "Secs et en conserve : contenances différentes, donc produits distincts dans le rapprochement. Les falafels et les plats de couscous vont au rayon oriental. La recherche Auchan « lentilles » sert aussi les plats en conserve, et les salades repas ; « pois chiches » et « haricots rouges » aussi les plats en conserve : le filtre « non » écarte les plats, et les solutions pour lentilles de contact sont hors courses."
   },
   {
    "id": "tomates",
@@ -2224,13 +2226,17 @@
     "auchan": [
      "text=cassoulet",
      "text=raviolis",
-     "text=couscous%20conserve"
+     "text=couscous%20conserve",
+     "text=lentilles",
+     "text=pois%20chiches",
+     "text=haricots%20rouges"
     ]
    },
    "filtre": {
     "oui": "cassoulet|ravioli|couscous|paella|choucroute|chili|lentilles cuisinees|petit sale|\\bconfits?\\b|boeuf bourguignon|blanquette|plat cuisine|repas|\\bbox\\b|\\bcup\\b|instantan|micro|tajine|curry|colombo|risotto|puree|poelee|\\bnouilles?\\b|riz cuisine|pates cuisinees|hachis|gratin|tartiflette|saucisses lentilles|bolognaise|carbonara|cannelloni|lasagne|chakchouka|\\btripes|andouillette|\\bboulettes?\\b|sauce tomate|tomate farcie|\\bdahl\\b|\\bdal\\b|\\bcuisinee?s?\\b|\\bsaucisses?\\b.*\\blentilles?\\b|\\blentilles?\\b.*\\bsaucisses?\\b",
-    "non": "surgel|frais|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|sauce\\b(?! tomate)|soupe|veloute|bouillon|chips|biscuit|dessert|bebe|petit pot|pates seches|riz nature|lentilles nature|haricot nature|\\bthon|sardine"
-   }
+    "non": "surgel|frais|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|sauce\\b(?! tomate)|soupe|veloute|bouillon|chips|biscuit|dessert|bebe|petit pot|pates seches|riz nature|lentilles nature|haricot nature|\\bthon|sardine|\\bdes \\d+ ?mois\\b"
+   },
+   "note": "Les recherches Auchan « lentilles », « pois chiches » et « haricots rouges » sont partagées avec le rayon légumes secs : les plats (petit salé, saucisses aux lentilles, currys, dahls, lentilles cuisinées) viennent ici (filtres)."
   },
   {
    "id": "soupes",
@@ -5199,7 +5205,7 @@
    },
    "filtre": {
     "oui": "oriental|orient|maghreb|maroc|marocain|tunisien|algerien|libanais|liban|turc|turquie|grec|grecque|israel|couscous|semoule|harissa|tajine|chorba|harira|merguez|ras el hanout|chermoula|zaatar|sumac|houmous|falafel|taboule|boulgour|pois chiche|feve|dattes|\\bdattes?\\b|loukoum|halva|halwa|baklava|corne de gazelle|makroud|pate de datte|eau de fleur d oranger|fleur d oranger|eau de rose|the a la menthe|menthe nanah|fruits secs orientaux|\\bamande|pistache|olives|huile d argan|citron confit|tahina|tehina|feta|tzatziki|dolma|feuille de vigne|brick|\\bpita|msemen|batbout|pain libanais|labneh|ayran|chawarma|kebab|durum|zahra|samia|le phare du cap bon|\\bdari|tipiak couscous|al wadi|cortas|cedar",
-    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|pates italiennes|spaghetti|riz basmati(?! .*oriental)|nouille asiatique|sauce soja|nuoc mam|curry indien|lait de coco|tortilla|tacos|salsa|guacamole|\\bbiere\\b|\\bvin\\b(?! .*(liban|maroc|grec))|dentifrice|shampoing|gel douche|lessive|nettoyant|bebe|infantile|semoule de ble fine ordinaire(?! .*oriental)|olives ordinaires(?! .*(grec|oriental|maroc))|pois chiches en conserve ordinaire(?! .*(oriental|houmous))|^(?!.*(?:royal|garni|merguez|poulet|boeuf|agneau|volaille|viande|boulettes?|legumes?|assiette|\\bplats?\\b|marocaine?|tunisienne?|algerienne?|orientale?|libanaise?|berbere|falafels?|taboule|houmous|kit|preparation|traiteur|lunch|bowl|epices? (?:pour |a |de |du )?couscous|melange d epices|ras el|raz el|hanout|assaisonnement|bouillon|harissa|tajine|chorba|harira|curry|sauce|halal|vermicelles?|pates|brick|gateau|dessert|patisserie|\\bmois\\b|bebe|soupe|salade|facon|cuisine)).*(?:semoule|couscous|boulgour|boulghour|pois chiches?|\\bfeves?\\b|lentilles?)"
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|pates italiennes|spaghetti|riz basmati(?! .*oriental)|nouille asiatique|sauce soja|nuoc mam|curry indien|lait de coco|tortilla|tacos|salsa|guacamole|\\bbiere\\b|\\bvin\\b(?! .*(liban|maroc|grec))|dentifrice|shampoing|gel douche|lessive|nettoyant|bebe|infantile|semoule de ble fine ordinaire(?! .*oriental)|olives ordinaires(?! .*(grec|oriental|maroc))|pois chiches en conserve ordinaire(?! .*(oriental|houmous))|^(?!.*(?:royal|garni|merguez|poulet|boeuf|agneau|volaille|viande|boulettes?|legumes?|assiette|\\bplats?\\b|marocaine?|tunisienne?|algerienne?|orientale?|libanaise?|berbere|falafels?|taboule|houmous|kit|preparation|traiteur|lunch|bowl|epices? (?:pour |a |de |du )?couscous|melange d epices|ras el|raz el|hanout|assaisonnement|bouillon|harissa|tajine|chorba|harira|curry|sauce|halal|vermicelles?|pates|brick|gateau|dessert|patisserie|\\bmois\\b|bebe|soupe|salade|facon|cuisine)).*(?:semoule|couscous|boulgour|boulghour|pois chiches?|\\bfeves?\\b|lentilles?)|\\bdes \\d+ ?mois\\b"
    },
    "note": "Houra : la page « couscous, paëlla et cuisine du monde en conserve » sert aux trois rayons du monde (filtres) ; les produits non reconnus par un filtre restent dans « plats cuisinés en conserve ». Semoules, couscous et boulgour nature vont au rayon « semoule, couscous, boulgour », pois chiches, fèves et lentilles telles quelles au rayon « lentilles, pois chiches et légumes secs » : le filtre « non » les écarte quand rien ne dit un plat, une épice ou une préparation. La recherche Auchan « couscous » sert aussi le rayon semoule."
   }
