@@ -193,7 +193,7 @@
    "^legumes$|^legumes "
   ],
   "text": "Légumes",
-  "at": "2026-11-01T03:27:49.536Z"
+  "at": "2026-10-31T15:27:25.386Z"
  },
  {
   "retailer": "houra",
@@ -207,7 +207,7 @@
    "pommes? de terre|legumes? racines?"
   ],
   "text": "Pomme de Terre, Val d'Oise",
-  "at": "2026-11-01T03:28:02.929Z"
+  "at": "2026-10-31T15:27:40.437Z"
  },
  {
   "retailer": "houra",
@@ -221,7 +221,7 @@
    "^porc"
   ],
   "text": "Porc du Bassin Parisien",
-  "at": "2026-11-01T03:28:31.411Z"
+  "at": "2026-10-31T15:28:09.888Z"
  },
  {
   "retailer": "houra",
@@ -235,7 +235,7 @@
    "^volaille"
   ],
   "text": "Volaille, Lapin",
-  "at": "2026-11-01T03:29:06.831Z"
+  "at": "2026-10-31T15:28:43.944Z"
  },
  {
   "retailer": "houra",
@@ -249,7 +249,7 @@
    "poissonnerie"
   ],
   "text": "Poissonnerie",
-  "at": "2026-11-01T03:29:53.508Z"
+  "at": "2026-10-31T15:29:27.271Z"
  },
  {
   "retailer": "houra",
@@ -263,7 +263,7 @@
    "traiteur de la mer|produits de la mer|saumon fume"
   ],
   "text": "Poisson, Traiteur de la mer",
-  "at": "2026-11-01T03:30:06.004Z"
+  "at": "2026-10-31T15:29:39.596Z"
  },
  {
   "retailer": "houra",
@@ -277,7 +277,7 @@
    "^creme fraiche|^cremes?( |$)"
   ],
   "text": "Crème fraiche, sauce",
-  "at": "2026-11-01T03:31:52.631Z"
+  "at": "2026-10-31T15:31:24.996Z"
  },
  {
   "retailer": "houra",
@@ -291,7 +291,7 @@
    "camembert|pates? molles?|^fromages$"
   ],
   "text": "fromages",
-  "at": "2026-11-01T03:32:42.383Z"
+  "at": "2026-10-31T15:32:17.580Z"
  },
  {
   "retailer": "houra",
@@ -305,7 +305,7 @@
    "saucisson"
   ],
   "text": "Saucisson, chorizo",
-  "at": "2026-11-01T03:34:10.460Z"
+  "at": "2026-10-31T15:33:39.079Z"
  },
  {
   "retailer": "houra",
@@ -319,7 +319,7 @@
    "lardons?"
   ],
   "text": "Lardon, poitrine, bacon",
-  "at": "2026-11-01T03:34:24.047Z"
+  "at": "2026-10-31T15:33:53.200Z"
  },
  {
   "retailer": "houra",
@@ -333,7 +333,7 @@
    "knack|saucisses? (a cuire|cuite)|boudin"
   ],
   "text": "Knack, saucisse, boudin",
-  "at": "2026-11-01T03:34:38.920Z"
+  "at": "2026-10-31T15:34:04.701Z"
  },
  {
   "retailer": "houra",
@@ -347,7 +347,7 @@
    "pates? et rillettes|rillettes|foie gras"
   ],
   "text": "Foie gras",
-  "at": "2026-11-01T03:34:51.889Z"
+  "at": "2026-10-31T15:34:18.048Z"
  },
  {
   "retailer": "houra",
@@ -361,7 +361,7 @@
    "pain et boulangerie|^pains?( |$)"
   ],
   "text": "Pain",
-  "at": "2026-11-01T03:35:49.997Z"
+  "at": "2026-10-31T15:35:18.890Z"
  },
  {
   "retailer": "houra",
@@ -375,7 +375,7 @@
    "viennoiserie|brioche|pain au lait"
   ],
   "text": "Pain, Viennoiserie",
-  "at": "2026-11-01T03:36:03.814Z"
+  "at": "2026-10-31T15:35:32.550Z"
  },
  {
   "retailer": "houra",
@@ -389,7 +389,7 @@
    "glaces? et sorbets?|^glaces?( |$)"
   ],
   "text": "Glaces Artisanales Provençales",
-  "at": "2026-11-01T03:36:18.426Z"
+  "at": "2026-10-31T15:35:47.376Z"
  },
  {
   "retailer": "houra",
@@ -403,7 +403,7 @@
    "frites"
   ],
   "text": "Frites, pommes de terre",
-  "at": "2026-11-01T03:36:52.146Z"
+  "at": "2026-10-31T15:36:15.927Z"
  },
  {
   "retailer": "houra",
@@ -417,7 +417,7 @@
    "pizzas?"
   ],
   "text": "Pizza, quiche",
-  "at": "2026-11-01T03:37:14.748Z"
+  "at": "2026-10-31T15:36:34.737Z"
  },
  {
   "retailer": "houra",
@@ -431,7 +431,7 @@
    "aperitifs? et snacks?|^aperitif"
   ],
   "text": "Apéritif, entrée, snacking",
-  "at": "2026-11-01T03:38:32.207Z"
+  "at": "2026-10-31T15:37:46.619Z"
  },
  {
   "retailer": "houra",
@@ -445,7 +445,7 @@
    "pains?, patisseries?|patisseries? et|fruits surgeles"
   ],
   "text": "Pain, pâtisserie et fruit",
-  "at": "2026-11-01T03:39:19.851Z"
+  "at": "2026-10-31T15:38:24.516Z"
  },
  {
   "retailer": "houra",
@@ -459,7 +459,7 @@
    "^riz|riz,|riz et|feculent|riz, pates"
   ],
   "text": "Pâtes, Riz, Céréales",
-  "at": "2026-10-31T15:27:26.688Z"
+  "at": "2026-11-01T03:27:44.486Z"
  },
  {
   "retailer": "houra",
@@ -473,7 +473,7 @@
    "conserves? de poissons?|poissons? en conserve"
   ],
   "text": "Conserves de Poissons, Pâtés",
-  "at": "2026-10-31T15:28:58.325Z"
+  "at": "2026-11-01T03:29:20.326Z"
  },
  {
   "retailer": "houra",
@@ -487,7 +487,7 @@
    "^plats? cuisines?"
   ],
   "text": "Plats Cuisinés",
-  "at": "2026-10-31T15:29:23.376Z"
+  "at": "2026-11-01T03:29:45.503Z"
  },
  {
   "retailer": "houra",
@@ -501,7 +501,7 @@
    "soupes?, potages?|^soupes?"
   ],
   "text": "Soupes, Potages",
-  "at": "2026-10-31T15:29:48.622Z"
+  "at": "2026-11-01T03:30:14.425Z"
  },
  {
   "retailer": "houra",
@@ -515,7 +515,7 @@
    "^huiles?( |,|$)|huile et|huiles,"
   ],
   "text": "huiles et herbes d'exception",
-  "at": "2026-10-31T15:30:16.090Z"
+  "at": "2026-11-01T03:30:41.534Z"
  },
  {
   "retailer": "houra",
@@ -529,7 +529,7 @@
    "vinaigre|vinaigrette|assaisonnement"
   ],
   "text": "Assaisonnements, Condiments",
-  "at": "2026-10-31T15:30:18.978Z"
+  "at": "2026-11-01T03:30:44.756Z"
  },
  {
   "retailer": "houra",
@@ -543,7 +543,7 @@
    "^chips"
   ],
   "text": "chips croustillantes",
-  "at": "2026-10-31T15:31:41.445Z"
+  "at": "2026-11-01T03:32:15.176Z"
  },
  {
   "retailer": "houra",
@@ -557,7 +557,7 @@
    "aperitif, chips|^aperitif"
   ],
   "text": "Apéritif, Chips",
-  "at": "2026-10-31T15:32:20.283Z"
+  "at": "2026-11-01T03:32:58.467Z"
  },
  {
   "retailer": "houra",
@@ -571,6 +571,6 @@
    "compotes?"
   ],
   "text": "Compote, Fruit au Sirop",
-  "at": "2026-10-31T15:35:36.034Z"
+  "at": "2026-11-01T03:36:23.018Z"
  }
 ]
