@@ -83,7 +83,11 @@ const server = http.createServer((req, res) => {
       await page.goto(base + "#/rayon/" + r.id); await ready();
       if (r.n || r.virtuel) await check("rayon " + r.id, ".card", r.n ? 1 : 0);
     }
-    const multi = cat.products.filter((p) => (p.o || []).length > 1);
+    /* au moins deux enseignes visibles : les points Auchan d'un même groupe n'en font qu'une, E.Leclerc (simulé) est désactivé sur un téléphone neuf */
+    const rets = await page.evaluate(() => fetch("data/retailers.json").then((r) => r.json()));
+    const grp = {}; rets.forEach((r) => { grp[r.id] = r.group || r.id; });
+    const groupsOf = (p) => new Set((p.o || []).map((o) => grp[cat.rets[o[0]]] || cat.rets[o[0]]).filter((g) => g !== "leclerc"));
+    const multi = cat.products.filter((p) => groupsOf(p).size > 1);
     await page.goto(base + "#/produit/" + encodeURIComponent(multi[0].i)); await ready();
     await check("fiche produit", ".offer", 2);
     /* les détails de l'univers arrivent après la fiche : nom affiché par l'enseigne et lien de la fiche */
