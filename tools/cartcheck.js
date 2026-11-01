@@ -630,10 +630,13 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
   await vctx.close();
 
   /* ---------- tout en magasin : le seuil d'un magasin de plus ----------
-     un panier de deux produits où un deuxième magasin ferait gagner un peu : sous le seuil (5 € par défaut), un seul
-     magasin, et le panier dit combien un deuxième ferait gagner ; seuil réglé juste sous ce gain, ou tout juste égal
-     (« au moins »), deux magasins, et le panier dit ce que le deuxième fait gagner ; le seuil n'entre jamais dans le
-     total ; les autres façons ne le comptent pas ; le réglage est repris par une copie et remis par « Effacer mes données » */
+     un panier de deux produits où un deuxième magasin ferait gagner un peu (moins de 5 €) : au seuil par défaut, un seul
+     magasin, et le panier dit ce qu'un deuxième ferait gagner (montant exact, calculé par le worker), la règle, le lien
+     vers le réglage et le geste « Aller quand même… », qui met le seuil à « Dès le premier centime » : deux magasins, et
+     le panier dit ce qu'ils font gagner ; « Annuler » rend le seuil et le seul magasin. Le lien ouvre « Pour aller plus
+     loin » des réglages sur le seuil (focus sur le choix en cours) ; un seuil plus bas que le gain y garde deux magasins.
+     Le seuil n'entre jamais dans le total ; les autres façons ne le comptent pas ; une copie le reprend (valeurs du
+     réglage seulement) et « Effacer mes données » le remet à 5 € */
   const mctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
   const mp = await mctx.newPage();
   mp.on("pageerror", (e) => fail("erreur JS (seuil d'un magasin) : " + e.message));
@@ -642,7 +645,7 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     await mp.goto(base + "#/"); await ready(mp);
     await mp.evaluate(() => { localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); localStorage.setItem("cabas.prefs", JSON.stringify({ zip: "94120", off: { leclerc: true }, comp: "mag", maxOrders: 3, offv: 1 })); });
     await mp.reload(); await ready(mp);
-    /* A : bien moins cher chez X que partout ailleurs ; B : le moins cher chez Y, de 0,20 € à 3 € de moins que chez X */
+    /* A : bien moins cher chez X que partout ailleurs ; B : le moins cher chez Y, de 1,10 € à 4,50 € de moins que chez X */
     const pair = await mp.evaluate(() => {
       const D = cabasDebug(), chans = D.chansOf(D.retsFor("mag"), "mag").map((c) => c.id);
       const at = (p, r) => { const o = p.offers[r]; return o && o.price > 0 && !o.sim ? Math.round(o.price * 100) : null; };
@@ -650,7 +653,7 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
       for (const B of ps) for (const X of chans) for (const Y of chans) {
         if (X === Y || !at(B, X) || !at(B, Y)) continue;
         const g = at(B, X) - at(B, Y);
-        if (g < 20 || g > 300 || chans.some((r) => r !== Y && at(B, r) && at(B, r) <= at(B, Y))) continue;
+        if (g < 110 || g > 450 || g % 100 === 0 || chans.some((r) => r !== Y && at(B, r) && at(B, r) <= at(B, Y))) continue;
         const A = ps.find((p) => p.id !== B.id && at(p, X) && chans.every((r) => r === X || !at(p, r) || at(p, r) - at(p, X) > 600));
         if (A) return { A: A.id, B: B.id, X, Y, g, one: at(A, X) + at(B, X) };
       }
@@ -662,51 +665,77 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
       await mp.evaluate((p) => localStorage.setItem("cabas.basket", JSON.stringify({ [p.A]: 1, [p.B]: 1 })), pair);
       await mp.reload(); await ready(mp);
       const look = async () => {
-        await mp.evaluate(() => { location.hash = "#/panier"; });
-        await mp.waitForFunction(() => { const D = cabasDebug(), R = D.RES(); return R.done && R.mode === "mag" && document.querySelector(".sum .st"); }, null, { timeout: 30000 });
+        if (await mp.evaluate(() => location.hash !== "#/panier")) await mp.evaluate(() => { location.hash = "#/panier"; });
+        await mp.waitForFunction(() => { const D = cabasDebug(), R = D.RES(); return D.S.route.name === "panier" && R.done && R.mode === "mag" && JSON.parse(R.base)[4] === D.magSeuil() && document.querySelector(".sum .st") && !document.querySelector(".sum.loading"); }, null, { timeout: 30000 });
         await mp.waitForTimeout(300);
         return mp.evaluate(() => {
           const D = cabasDebug(), R = D.RES(), f = R.steps[R.K].full;
-          return { n: f.orders.length, total: D.cartTotal(), subs: f.orders.reduce((a, o) => a + o.sub, 0), text: document.querySelector(".sum").textContent, shown: (document.querySelector(".sum .st .sr") || {}).textContent, say: D.speakText("panier"), seuil: D.magSeuil() };
+          return { n: f.orders.length, total: D.cartTotal(), subs: f.orders.reduce((a, o) => a + o.sub, 0), text: document.querySelector(".sum").textContent, shown: (document.querySelector(".sum .st .sr") || {}).textContent, say: D.speakText("panier"), seuil: D.magSeuil(), zero: R.by.mag.zero, btn: !!document.querySelector('.sum [data-act="magall"]'), link: !!document.querySelector('.sum a[href="#/reglages/magasin"]') };
         });
       };
-      /* 1. seuil par défaut : 5 € */
+      const two = `2 magasins\u00a0: ${eurC(pair.g)} de moins qu'un seul`;
+      /* 1. seuil par défaut, 5 € : un seul magasin, le gain d'un deuxième dit, le geste et le lien */
       let r = await look();
       const more = `Un deuxième magasin ferait gagner ${eurC(pair.g)}\u00a0: Cabas garde un seul magasin`;
       if (r.seuil !== 500) fail(`seuil d'un magasin : ${r.seuil} centimes par défaut au lieu de 500`);
+      if (!r.zero || r.zero.t[1] !== pair.one || r.zero.t[2] !== pair.one - pair.g) fail("seuil d'un magasin : totaux exacts de chaque nombre de magasins (worker) " + JSON.stringify(r.zero));
       if (r.n !== 1 || r.total !== pair.one) fail(`seuil d'un magasin : ${r.n} magasins, ${r.total} au lieu d'un seul magasin à ${pair.one}`);
-      if (!r.text.includes(more) || !/n'est retenu que s'il fait gagner au moins 5\u00a0€/.test(r.text)) fail("seuil d'un magasin : le panier ne dit pas ce qu'un deuxième magasin ferait gagner : « " + r.text.slice(0, 400) + " »");
+      if (!r.text.includes(more) || !r.text.includes("Un magasin de plus n'est retenu que s'il fait gagner au moins 5\u00a0€")) fail("seuil d'un magasin : le panier ne dit pas ce qu'un deuxième magasin ferait gagner : « " + r.text.slice(0, 500) + " »");
+      if (!r.text.startsWith("Total le plus bas en un seul magasin")) fail("seuil d'un magasin : le total ne dit pas qu'il est le plus bas en un seul magasin : « " + r.text.slice(0, 80) + " »");
+      if (!r.btn || !r.link || !r.text.includes("Aller quand même dans le magasin le moins cher pour chaque produit")) fail(`seuil d'un magasin : geste ${r.btn} ou lien vers le réglage ${r.link} absent`);
       if (r.shown !== eurC(r.total) || r.total !== r.subs) fail(`seuil d'un magasin : total affiché ${r.shown}, ${r.total}, somme des magasins ${r.subs} : le seuil ne doit pas y entrer`);
-      if (!/Un deuxième magasin ferait gagner \d+ euros?/.test(r.say)) fail("seuil d'un magasin : « Écouter » ne le dit pas : « " + r.say.slice(-200) + " »");
-      if (/minimums d'achat et la livraison/.test(r.text)) fail("seuil d'un magasin : le panier parle de minimums et de livraison en magasin");
-      /* 2. réglé juste sous le gain, dans les réglages (à côté de « Magasins au plus ») : deux magasins */
-      await mp.evaluate(() => { location.hash = "#/reglages"; }); await mp.waitForTimeout(400);
-      await mp.evaluate(() => { const d = document.querySelector("details.adv"); if (d) d.open = true; });
-      const near = await mp.evaluate(() => { const i = document.querySelector("#maggain"), k = document.querySelector("#maxkL"); return i && k ? { v: i.value, after: !!(k.compareDocumentPosition(i) & Node.DOCUMENT_POSITION_FOLLOWING) } : null; });
-      if (!near || near.v !== "5" || !near.after) fail("seuil d'un magasin : le champ des réglages manque, n'est pas à 5 ou pas après « Magasins au plus » " + JSON.stringify(near));
-      const below = ((pair.g - 1) / 100).toLocaleString("fr-FR");
-      await mp.fill("#maggain", below); await mp.press("#maggain", "Enter"); await mp.waitForTimeout(200);
-      if (((await stored(mp, "prefs")) || {}).magGain !== (pair.g - 1) / 100) fail("seuil d'un magasin : le réglage n'est pas gardé " + JSON.stringify((await stored(mp, "prefs")).magGain));
+      if (!/Un deuxième magasin ferait gagner \d+ euros?( \d+)?\s: Cabas garde un seul magasin\. Un magasin de plus n'est retenu que s'il fait gagner au moins 5 euros\./.test(r.say)) fail("seuil d'un magasin : « Écouter » ne le dit pas : « " + r.say.slice(-300) + " »");
+      if (/minimums d'achat et la livraison|le total ne baisse plus/.test(r.text)) fail("seuil d'un magasin : le panier parle de minimums et de livraison, ou dit que le total ne baisse plus");
+      /* 2. le geste : seuil à « Dès le premier centime », deux magasins, ce qu'ils font gagner ; toast avec « Annuler » */
+      await tap(mp, '.sum [data-act="magall"]');
+      const t1 = await toastText(mp);
+      if (!/Annuler/.test(t1)) fail("seuil d'un magasin : pas de toast avec « Annuler » après le geste : « " + t1 + " »");
+      if (((await stored(mp, "prefs")) || {}).magGain !== 0) fail("seuil d'un magasin : le geste ne met pas le seuil à 0 " + JSON.stringify((await stored(mp, "prefs")).magGain));
       r = await look();
-      if (r.n !== 2 || r.total !== pair.one - pair.g) fail(`seuil d'un magasin à ${below} € : ${r.n} magasins, ${r.total} au lieu de deux à ${pair.one - pair.g}`);
-      if (!r.text.includes(`Le deuxième magasin fait gagner ${eurC(pair.g)}, au moins les ${(pair.g - 1) % 100 ? eurC(pair.g - 1) : (pair.g - 1) / 100 + "\u00a0€"} demandés pour un magasin de plus`)) fail("seuil d'un magasin : le panier ne dit pas ce que le deuxième magasin fait gagner : « " + r.text.slice(0, 400) + " »");
+      if (r.n !== 2 || r.total !== pair.one - pair.g) fail(`seuil d'un magasin dès le premier centime : ${r.n} magasins, ${r.total} au lieu de deux à ${pair.one - pair.g}`);
+      if (!r.text.startsWith("Total le plus bas en magasin") || !r.text.includes(two) || r.btn) fail("seuil d'un magasin : le panier ne dit pas ce que font gagner deux magasins, ou garde le geste : « " + r.text.slice(0, 500) + " »");
       if (r.shown !== eurC(r.total) || r.total !== r.subs) fail("seuil d'un magasin : le seuil est entré dans le total");
-      /* 3. tout juste égal au gain : retenu (« au moins ») */
-      await mp.evaluate((g) => { const pr = JSON.parse(localStorage.getItem("cabas.prefs")); pr.magGain = g / 100; localStorage.setItem("cabas.prefs", JSON.stringify(pr)); }, pair.g);
-      await mp.reload(); await ready(mp); r = await look();
-      if (r.n !== 2) fail(`seuil d'un magasin égal au gain (${eurC(pair.g)}) : ${r.n} magasin au lieu de deux`);
-      /* 4. les autres façons ne le comptent pas ; une copie le reprend, borné ; « Effacer mes données » le remet à 5 € */
+      if (!new RegExp(`2 magasins\\s: ${Math.floor(pair.g / 100)} euros? ${pair.g % 100} de moins qu'un seul\\.`).test(r.say)) fail("seuil d'un magasin : « Écouter » ne dit pas ce que font gagner deux magasins : « " + r.say.slice(-200) + " »");
+      /* « Annuler » : le seuil d'avant, un seul magasin */
+      await mp.click("#toast [data-act=toastact]");
+      await mp.waitForTimeout(200);
+      if (((await stored(mp, "prefs")) || {}).magGain !== 5) fail("seuil d'un magasin : « Annuler » ne rend pas le seuil de 5 €");
+      r = await look();
+      if (r.n !== 1 || !r.text.includes(more)) fail(`seuil d'un magasin : après « Annuler », ${r.n} magasins`);
+      /* 3. le lien : « Pour aller plus loin » ouvert sur le seuil, à côté de « Magasins au plus », focus sur le choix en cours */
+      await tap(mp, '.sum a[href="#/reglages/magasin"]');
+      await mp.waitForFunction(() => location.hash === "#/reglages/magasin" && document.querySelector("#maggain"), null, { timeout: 8000 });
+      await mp.waitForTimeout(400);
+      const rg = await mp.evaluate(() => {
+        const g = document.querySelector("#maggain"), k = document.querySelector("#maxkL"), d = document.querySelector("details.rgadv"), a = document.activeElement;
+        return { open: !!(d && d.open), role: g.getAttribute("role"), label: (document.getElementById(g.getAttribute("aria-labelledby")) || {}).textContent || "", opts: [...g.querySelectorAll("[role=radio]")].map((b) => [b.dataset.v, b.textContent.trim(), b.getAttribute("aria-checked")]), after: !!(k.compareDocumentPosition(g) & Node.DOCUMENT_POSITION_FOLLOWING), focus: a && a.dataset ? a.dataset.act + ":" + a.dataset.v : "", extra: !!document.querySelector("#extra") };
+      });
+      const wantOpts = [["0", "Dès le premier centime"], ["1", "1\u00a0€"], ["2", "2\u00a0€"], ["5", "5\u00a0€"], ["10", "10\u00a0€"]];
+      if (!rg.open || rg.role !== "radiogroup" || !rg.after || !rg.label.startsWith("Un magasin de plus seulement s'il fait gagner au moins…")) fail("seuil d'un magasin : réglage mal placé ou mal nommé " + JSON.stringify(rg));
+      if (JSON.stringify(rg.opts.map((o) => [o[0], o[1]])) !== JSON.stringify(wantOpts) || rg.opts.filter((o) => o[2] === "true").map((o) => o[0]).join() !== "5") fail("seuil d'un magasin : choix du réglage " + JSON.stringify(rg.opts));
+      if (rg.focus !== "maggain:5") fail("seuil d'un magasin : le lien ne met pas le focus sur le choix en cours (" + rg.focus + ")");
+      if (rg.extra) fail("seuil d'un magasin : le coût d'une commande en plus est proposé tout en magasin, où le seuil le remplace");
+      /* un seuil sous le gain (1 € ou 2 €), choisi au clavier depuis le choix en cours : deux magasins */
+      const low = pair.g >= 200 ? 2 : 1;
+      await mp.keyboard.press("ArrowUp");
+      if (low === 1) { await mp.waitForTimeout(200); await mp.keyboard.press("ArrowUp"); }
+      await mp.waitForTimeout(300);
+      const after = await mp.evaluate(() => { const a = document.activeElement, d = document.querySelector("details.rgadv"); return { focus: a && a.dataset ? a.dataset.act + ":" + a.dataset.v : "", open: !!(d && d.open), checked: (document.querySelector('#maggain [aria-checked="true"]') || {}).dataset }; });
+      if (((await stored(mp, "prefs")) || {}).magGain !== low || after.focus !== "maggain:" + low || !after.open) fail(`seuil d'un magasin : au clavier, seuil ${JSON.stringify((await stored(mp, "prefs")).magGain)} au lieu de ${low}, focus ${after.focus}, ouvert ${after.open}`);
+      r = await look();
+      if (r.n !== 2 || r.total !== pair.one - pair.g || !r.text.includes(two)) fail(`seuil d'un magasin à ${low} € : ${r.n} magasins, ${r.total} au lieu de deux à ${pair.one - pair.g}, « ${r.text.slice(0, 300)} »`);
+      /* 4. les autres façons ne le comptent pas ; une copie le reprend, valeurs du réglage seulement ; « Effacer mes données » le remet à 5 € */
       const o = await mp.evaluate(() => {
         const D = cabasDebug(), R = D.RES();
-        const ok = D.importCheck({ app: "cabas", v: 1, data: { prefs: { magGain: 2.5 } } }), bad = D.importCheck({ app: "cabas", v: 1, data: { prefs: { magGain: 80 } } });
-        return { lam: ["mix", "liv", "drive"].map((h) => R.by[h].M.lambda), kept: ok.data.prefs && ok.data.prefs.magGain, bad: bad.data.prefs && bad.data.prefs.magGain };
+        const v = (x) => { const c = D.importCheck({ app: "cabas", v: 1, data: { prefs: { magGain: x } } }); return c.data.prefs ? c.data.prefs.magGain : undefined; };
+        return { lam: ["mix", "liv", "drive"].map((h) => R.by[h].M.lambda), kept: [0, 1, 2, 5, 10].map(v), bad: [2.5, 80, -1, "5"].map(v) };
       });
       if (o.lam.some((x) => x !== 0)) fail("seuil d'un magasin : compté dans une autre façon " + JSON.stringify(o.lam));
-      if (o.kept !== 2.5 || o.bad !== undefined) fail(`seuil d'un magasin : copie restaurée ${o.kept}, hors bornes ${o.bad}`);
+      if (JSON.stringify(o.kept) !== "[0,1,2,5,10]" || o.bad.some((x) => x !== undefined)) fail(`seuil d'un magasin : copie restaurée ${JSON.stringify(o.kept)}, hors réglage ${JSON.stringify(o.bad)}`);
       await mp.evaluate(() => { location.hash = "#/reglages"; }); await mp.waitForTimeout(400);
       await tap(mp, '[data-act="reset"]'); await mp.waitForTimeout(300); await tap(mp, '#sheet [data-act="resetok"]'); await mp.waitForTimeout(400);
-      const after = await mp.evaluate(() => cabasDebug().S.prefs.magGain);
-      if (after !== 5) fail(`seuil d'un magasin : « Effacer mes données » le laisse à ${after}`);
+      const after2 = await mp.evaluate(() => cabasDebug().S.prefs.magGain);
+      if (after2 !== 5) fail(`seuil d'un magasin : « Effacer mes données » le laisse à ${after2}`);
     }
   } catch (e) {
     fail("seuil d'un magasin interrompu : " + e.message.split("\n")[0]);

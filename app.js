@@ -107,8 +107,9 @@
      courses (0 dimanche à 6 samedi, null d'après les commandes) ; voice : lecture à voix haute « slow » ou « normal » ;
      wake : écran gardé allumé en mode magasin ; allergens : allergènes à éviter (clés d'Open Food Facts) ; facts : Nutri-Score
      et allergènes demandés à Open Food Facts à l'ouverture d'une fiche (sinon d'un geste) ; extraCost : coût d'une commande
-     ou d'un passage en magasin en plus, en euros, pour les quatre façons ; magGain : tout en magasin, ce qu'un magasin de
-     plus doit faire gagner au moins pour être retenu, en euros (5 par défaut, magSeuil) */
+     ou d'un passage en magasin en plus, en euros, pour les trois façons en ligne ; magGain : tout en magasin, ce qu'un
+     magasin de plus doit faire gagner au moins pour être retenu, en euros, 0 (« Dès le premier centime »), 1, 2, 5 (par
+     défaut) ou 10 (MAG_GAINS, magSeuil) */
   const PREFS0 = { zip: "", off: {}, fee: {}, pick: {}, pickManual: {}, liv: {}, drv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, maxOrders: 3, extraCost: 0, magGain: 5, manualCk: false, badge: true, theme: "auto", contrast: null, simple: false, budgetMode: "panier", shopDay: null, voice: "normal", wake: true, allergens: [], facts: true };
   const ROOTS = { accueil: "#/", rayons: "#/rayons", recherche: "#/recherche", listes: "#/listes", panier: "#/panier" };
   const S = {
@@ -1078,8 +1079,8 @@
      magasins (réglage « magasin » de data/retailers.json), au prix relevé le plus bas, jamais à un prix simulé.
      Au plus un quart des produits du panier, pour que la commande reste la base des courses. Seulement dans la
      première façon (« mix ») : tout livré et tout en drive passent par les commandes, tout en magasin n'a que des
-     magasins (chaque produit au prix relevé le plus bas d'une enseigne qui en a, chaque magasin en plus compté comme
-     une commande en plus). */
+     magasins (chaque produit au prix relevé le plus bas d'une enseigne qui en a ; un magasin de plus retenu seulement
+     s'il fait gagner au moins le seuil, magSeuil). */
   /* Règles de la personne pour un produit, par groupe d'enseigne (comme prefs.off) : épinglé à une enseigne (prefs.pin,
      ignoré quand l'enseigne n'est pas utilisée) ou exclu de certaines (prefs.ban) ; équivalents acceptés (cabas.flex,
      panier souple), pris seulement à un prix relevé. */
@@ -1134,58 +1135,44 @@
     return M;
   }
   /* Ce que coûte, dans le score de la répartition, une commande ou un magasin en plus, en centimes (optimizer.js :
-     M.lambda, jamais dans le total affiché, fullTotal). Livré ou retiré, tout livré, tout en drive : le coût des
-     réglages (prefs.extraCost, 0 par défaut). Tout en magasin : un magasin de plus n'est retenu que s'il fait gagner au
-     moins le seuil (magSeuil : prefs.magGain, 5 € par défaut, ou le coût d'un passage en plus quand il est plus haut ; les
-     deux disent ce qu'un passage de plus doit rapporter, ils ne s'additionnent pas). Un millième de centime de moins :
-     un magasin qui fait gagner tout juste le seuil est retenu (« au moins ») ; les prix étant en centimes entiers, rien
-     d'autre ne change. */
-  const MAG_GAIN = 5;
-  const magGain = () => { const v = S.prefs.magGain; return typeof v === "number" && v >= 0 ? v : MAG_GAIN; };
-  const magSeuil = () => Math.round(Math.max(S.prefs.extraCost || 0, magGain()) * 100);
+     M.lambda, jamais dans le total affiché, fullTotal). Livré ou retiré, tout livré, tout en drive : le coût d'une
+     commande ou d'un passage en magasin en plus (prefs.extraCost, 0 par défaut). Tout en magasin : le seuil d'un magasin
+     de plus seul (prefs.magGain, 5 € par défaut, « Dès le premier centime » à 0) ; un magasin de plus n'est retenu que
+     s'il fait gagner au moins ce seuil. Un millième de centime de moins : un magasin qui fait gagner tout juste le seuil
+     est retenu (« au moins ») ; les prix étant en centimes entiers, rien d'autre ne change. */
+  const MAG_GAINS = [0, 1, 2, 5, 10], MAG_GAIN = 5;
+  const magGain = () => { const v = S.prefs.magGain; return MAG_GAINS.includes(v) ? v : MAG_GAIN; };
+  const magSeuil = () => Math.round(magGain() * 100);
   function lamOf(h) {
     if (h !== "mag") return Math.round((S.prefs.extraCost || 0) * 100);
     const s = magSeuil();
     return s > 0 ? s - 0.001 : 0;
   }
-  /* tout en magasin : le total le plus bas de tout le panier en k magasins au plus, sans le seuil, pour dire ce qu'un
-     magasin de plus ferait gagner (ou fait gagner) ; sans minimum ni frais, le calcul est immédiat. Gardé tant que le
-     panier et ses réglages ne changent pas (RES.base). */
-  const MAG0 = { base: "", r: {} };
-  function magBestAt(k) {
-    if (MAG0.base !== RES.base) { MAG0.base = RES.base; MAG0.r = {}; }
-    if (!(k in MAG0.r)) {
-      const M = RES.by && RES.by.mag && RES.by.mag.M;
-      MAG0.r[k] = M && M.lines.length && M.chans.length >= k ? bestAt(Object.assign({}, M, { lambda: 0 }), k, 0, 1500).full : null;
-    }
-    return MAG0.r[k];
-  }
-  /* tout en magasin, une fois la répartition de tout le panier connue : ce que le magasin de plus ferait gagner quand
-     Cabas ne le prend pas (« more »), ou ce que fait gagner le dernier magasin retenu (« keep ») ; null sans seuil, ou
-     quand moins de magasins ne prendraient pas tout le panier (le panier le dit déjà) */
+  /* le seuil dit en toutes lettres : « Dès le premier centime », sinon « 5 € » */
+  const magGainText = (v) => (v > 0 ? eurR(v) : "Dès le premier centime");
+  /* Tout en magasin, une fois la répartition de tout le panier connue : ce qu'un magasin de plus ferait gagner quand
+     Cabas ne le prend pas (« more » : m magasins au lieu de n, le plus petit m, jusqu'au nombre de magasins au plus, qui
+     fait baisser le total), ou ce que font gagner les magasins retenus (« keep » : n magasins au lieu de j, le plus petit
+     nombre qui prend tout le panier). Les montants viennent des totaux exacts de chaque nombre de magasins, sans le
+     seuil, calculés par le worker avec la répartition (RES.by.mag.zero, totalsAt) ; null tant qu'ils manquent, quand le
+     calcul a été écourté, ou quand rien n'est à dire. */
   const ORDF = ["", "premier", "deuxième", "troisième", "quatrième", "cinquième", "sixième", "septième", "huitième"];
   function magNote(bst, K) {
-    const lam = magSeuil(), M = RES.by && RES.by.mag && RES.by.mag.M;
-    if (!lam || !M || !bst) return null;
-    const n = bst.orders.length, money = fullTotal(bst);
-    if (n < Math.min(K, M.chans.length)) {
-      const r = magBestAt(n + 1), g = r ? money - r.total : 0;
-      if (g >= 1) return { kind: "more", n, g, lam };
-    }
-    if (n > 1) {
-      const r = magBestAt(n - 1), g = r ? r.total - money : 0;
-      if (r && g >= 1) return { kind: "keep", n, g, lam };
-    }
+    const r = RES.by && RES.by.mag, z = r && r.zero;
+    if (!z || z.truncated || !bst || !bst.orders.length) return null;
+    const n = bst.orders.length, money = fullTotal(bst), lam = magSeuil();
+    for (let m = n + 1; m <= K; m++) { const t = z.t[m]; if (t != null && t < money) return { kind: "more", n, m, g: money - t, lam }; }
+    for (let j = 1; j < n; j++) { const t = z.t[j]; if (t != null) return t - money >= 1 ? { kind: "keep", n, j, g: t - money, lam } : null; }
     return null;
   }
-  /* sa phrase, sans point final : E formate les montants (eurC à l'écran, sayEur à voix haute) ; link : le lien vers
-     les réglages */
-  function magNoteText(d, E, link) {
-    const seuil = E === eurC ? eurR(d.lam / 100) : E(d.lam), rg = link ? ` (<a href="#/reglages">réglages</a>)` : "";
-    return d.kind === "more"
-      ? `Un ${ORDF[d.n + 1] || d.n + 1 + "e"} magasin ferait gagner ${E(d.g)}\u00a0: Cabas garde ${d.n === 1 ? "un seul magasin" : d.n + " magasins"}. Un magasin de plus n'est retenu que s'il fait gagner au moins ${seuil}${rg}`
-      : `Le ${ORDF[d.n] || d.n + "e"} magasin fait gagner ${E(d.g)}, au moins les ${seuil} demandés pour un magasin de plus${rg}\u00a0: Cabas le garde`;
+  /* sa phrase, sans point final : E formate les montants (eurC à l'écran, sayEur à voix haute) */
+  function magNoteText(d, E) {
+    const keep = d.n === 1 ? "un seul magasin" : d.n + " magasins";
+    if (d.kind === "keep") return `${d.n} magasins\u00a0: ${E(d.g)} de moins ${d.j === 1 ? "qu'un seul" : "qu'avec " + d.j}`;
+    return (d.m === d.n + 1 ? `Un ${ORDF[d.m] || d.m + "e"} magasin ferait gagner ${E(d.g)}` : `${d.m - d.n} magasins de plus feraient gagner ${E(d.g)}`) + `\u00a0: Cabas garde ${keep}`;
   }
+  /* la règle, après « more » : le seuil choisi, et ce qu'il compte (jamais le total) */
+  const magRuleText = (E) => `Un magasin de plus n'est retenu que s'il fait gagner au moins ${E === eurC ? eurR(magGain()) : E(magSeuil())}`;
   /* Répartition du panier : chaque nombre de commandes, de 1 au nombre d'enseignes, est calculé une fois, du plus petit au
      plus grand (optimizer.js, runAll). RES.steps[k] = { full, partial, truncated } : « full » prend tout le panier en
      k commandes au plus, « partial » laisse de côté les produits qu'aucune commande possible ne peut prendre. */
@@ -1229,12 +1216,19 @@
   function collect(seq, msg) {
     if (seq !== wSeq || !RES.by) return false;
     const mode = msg.mode == null ? RES.mode : msg.mode, r = RES.by[mode];
+    /* tout en magasin : le total exact de chaque nombre de magasins, sans le seuil (magNote) */
+    if (msg.zero) { r.zero = msg.zero; return true; }
     if (msg.done) { r.done = true; RES.queue = RES.queue.filter((x) => x !== mode); }
     else r.steps[msg.k] = msg;
     return true;
   }
   function runSync(seq, modes, ms) {
-    for (const mode of modes) { const M = RES.by[mode].M; runAll(M, M.chans.length, RES.lambda, (msg) => collect(seq, Object.assign({ mode }, msg)), ms); }
+    for (const mode of modes) {
+      const M = RES.by[mode].M;
+      /* comme le worker : tout en magasin, les totaux sans le seuil d'abord */
+      if (mode === "mag") collect(seq, { mode, zero: totalsAt(M, M.chans.length, ms) });
+      runAll(M, M.chans.length, RES.lambda, (msg) => collect(seq, Object.assign({ mode }, msg)), ms);
+    }
   }
   function startCalc(modes) {
     const seq = ++wSeq;
@@ -2120,11 +2114,14 @@
       }
       /* tout en magasin : ce qu'un magasin de plus ferait gagner, sous le seuil, ou ce que fait gagner le dernier retenu */
       const mn = mag && complete ? magNote(bst, K) : null;
-      if (mn && mn.kind === "keep") save = magNoteText(mn, eurC, false);
+      if (mn && mn.kind === "keep") save = magNoteText(mn, eurC);
       if (save && simUsed) save += ", selon la simulation";
       const sp = S.swapPrev;
       if (complete && sp && sp.key === JSON.stringify(S.basket) && sp.total - money >= 1) save = (save ? save + ". " : "") + `${eurC(sp.total - money)} de moins grâce aux remplacements`;
-      const more = mn && mn.kind === "more" ? magNoteText(mn, eurC, true) + "." : complete && k < K ? `Au-delà ${k === 1 ? (mag ? "d'un magasin" : "d'une commande") : "de " + k + " " + ordW(h, 2)}, le total ne baisse plus.` : "";
+      /* un magasin de plus laissé de côté : ce qu'il ferait gagner, la règle, le geste qui met le seuil à « Dès le premier
+         centime » (avec « Annuler ») et le lien vers le réglage */
+      const magBox = mn && mn.kind === "more" ? `<p class="sn" id="magmore">${magNoteText(mn, eurC)}. ${magRuleText(eurC)}. <a href="#/reglages/magasin">Changer ce montant</a></p><div class="btns" style="margin-top:10px"><button class="btn sm tint" type="button" data-act="magall">Aller quand même dans le magasin le moins cher pour chaque produit</button></div>` : "";
+      const more = mn && mn.kind === "more" ? "" : complete && k < K ? `Au-delà ${k === 1 ? (mag ? "d'un magasin" : "d'une commande") : "de " + k + " " + ordW(h, 2)}, le total ne baisse plus.` : "";
       const notCheapest = bst.orders.some((o) => o.items.some((x) => { const b = best(S.prods.get(x.l.id)); return b && b.ret !== o.ch.id && b.price * 100 * x.l.q < x.cost - 0.5; }));
       /* des produits hors de la façon (pas en drive, pas en magasin) : le titre dit pour combien de produits du panier */
       const nOf = M.lines.length + notHere.length, nIn = M.lines.length - skipped.length;
@@ -2132,7 +2129,8 @@
       const sl = !complete ? (altK ? (K === 1 ? (mag ? "Un seul magasin ne suffit pas" : "Une seule commande ne suffit pas") : `En ${K} ${ordW(h, 2)}, il manque des produits`) : forN)
         : notHere.length ? forN + (simUsed ? ", avec des prix simulés" : mag ? ", en magasin" : bst.orders.every((o) => pickup(S.retMap.get(o.ch.id))) ? ", retrait compris" : bst.orders.some((o) => pickup(S.retMap.get(o.ch.id))) ? ", livraison et retrait compris" : ", livraison comprise")
         : simUsed ? "Estimation avec des prix simulés"
-        : mag ? "Total le plus bas en magasin"
+        /* un magasin de plus laissé de côté par le seuil : le total est le plus bas pour ce nombre de magasins, pas dans l'absolu */
+        : mag ? (mn && mn.kind === "more" ? `Total le plus bas en ${mn.n === 1 ? "un seul magasin" : mn.n + " magasins"}` : "Total le plus bas en magasin")
         : bst.orders.some((o) => pickup(S.retMap.get(o.ch.id))) ? (bst.orders.every((o) => pickup(S.retMap.get(o.ch.id))) ? "Total le plus bas, retrait compris" : "Total le plus bas, livraison et retrait compris") : "Total le plus bas, livraison comprise";
       const where = k === 1 ? "chez " + esc(names[0]) : "en " + k + " " + ordW(h, k) + "\u00a0: " + esc(joinEt(names));
       /* la façon ne prend pas tout le panier (pas en drive, pas en magasin) : le total est donné sans ces produits */
@@ -2154,7 +2152,7 @@
       const sw = swaps(), swTot = sw.reduce((a, x) => a + x.save, 0);
       const swapCard = sw.length && !allDone ? `<button class="hcard" type="button" data-act="swaps">${ic("swap", "si")}<span><b>Économiser encore, environ ${eur(swTot)}</b><small>${plural(sw.length, "produit a", "produits ont")} un équivalent moins cher, d'une autre marque</small></span>${ic("chev", "chev")}</button>` : "";
       side = `<div class="sum${complete ? "" : " part"}"><p class="sl">${sl}</p><div class="st">${px(money / 100)}</div><p class="sh2">${sh2}</p>${hx ? `<div class="btns" style="margin-top:10px">${hxBtn}</div>` : ""}${budgetLine(S.duo.w && complete ? splitOf(bst).me.total : money, complete)}${fillCta}${doneBox}${altBox}` +
-        (save ? `<p class="sv">${save}</p>` : "") + (why ? `<p class="sn">${why}</p>` : "") + (more ? `<p class="sn">${more}</p>` : "") +
+        (save ? `<p class="sv">${save}</p>` : "") + (why ? `<p class="sn">${why}</p>` : "") + (more ? `<p class="sn">${more}</p>` : "") + magBox +
         /* tout en magasin, ni minimum ni livraison : un produit ailleurs que là où il est le moins cher, c'est un magasin
            de plus évité (le seuil, déjà dit par magNote, ou le nombre de magasins au plus) */
         (notCheapest && !(mn && mn.kind === "more") ? `<p class="sn">${mag ? "Certains produits ne sont pas pris dans le magasin où ils sont le moins chers\u00a0: il faudrait un magasin de plus." : "Certains produits ne sont pas pris là où ils sont le moins chers\u00a0: avec les minimums d'achat et la livraison, ce regroupement revient moins cher."}</p>` : "") +
@@ -2240,13 +2238,17 @@
       (nb ? `<button class="row" type="button" data-act="brokenclear"><span class="rt">Liens à revoir<small>${plural(nb, "lien ne menait", "liens ne menaient")} pas au bon produit\u00a0: Cabas ouvre la recherche du site à la place.</small></span><span class="val">Tout reproposer</span></button>` : "") +
       (nf ? `<button class="row link" type="button" data-act="firstreset">Revoir les étapes «\u00a0Avant de commencer\u00a0»</button>` : "") + `</div>`;
   }
-  VIEWS.reglages = () => {
+  VIEWS.reglages = (r) => {
     /* le nombre de commandes se compte par groupe d'enseigne utilisé (Auchan en livraison ou en retrait : une seule
        commande Auchan), comme dans le panier */
+    /* #/reglages/magasin (lien du panier, tout en magasin) : « Pour aller plus loin » ouvert ; à l'arrivée seulement
+       (lien, adresse tapée), pas au retour ni à un redessin sur place, le focus va au seuil d'un magasin de plus */
+    const toMag = !!r && r.id === "magasin", jump = toMag && (S.dir === "push" || S.dir === "tab" || (S.dir === "none" && S.scroll[S.cur] == null));
     const H = how(), nG = Math.max(1, chansOf(retsFor(H), H).length), K = Math.max(1, Math.min(nG, S.prefs.maxOrders || 3));
     const seg = (id, label, opts, act, key, cur, hint) => `<div class="row stack"><span class="rt" id="${id}">${label}${hint ? `<small>${hint}</small>` : ""}</span><div class="seg" role="radiogroup" aria-labelledby="${id}">${opts.map((v) => `<button type="button" role="radio" data-act="${act}" data-${key}="${v}" aria-checked="${v === cur}">${v}</button>`).join("")}</div></div>`;
     return {
       title: "Réglages", grouped: true,
+      mount: () => { const el = jump && ($('#maggain [aria-checked="true"]') || $("#maxkL")); if (el) { el.scrollIntoView({ block: "center" }); try { el.focus({ preventScroll: true }); } catch (e) { /* focus refusé */ } } },
       html: `<h1 class="lt">Réglages</h1>` + (pourOn() ? `<div class="banner pour" role="status">${ic("users")}<span><b>Les courses ${esc(deN(pourName()))}</b>Les enseignes, la livraison, le régime et le budget ci-dessous sont les siens, le temps de ses courses. Les tiens reviennent avec ton panier.</span><div class="bacts"><button class="btn sm tint" type="button" data-act="pourexit">Revenir à mes courses</button></div></div>` : "") +
         `<h2 class="gh">Affichage</h2><div class="group">${lookHtml()}${ttsOK() ? `<div class="row stack"><span class="rt" id="voiceL">Lecture à voix haute<small>Pour écouter ta liste, ta répartition et ta liste du magasin.</small></span><div class="seg" role="radiogroup" aria-labelledby="voiceL">${[["slow", "Lente"], ["normal", "Normale"]].map(([v, l]) => `<button type="button" role="radio" data-act="voice" data-v="${v}" aria-checked="${(S.prefs.voice === "slow" ? "slow" : "normal") === v}">${l}</button>`).join("")}</div></div>` : ""}${pourOn() ? "" : `<button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button>`}</div>` +
         /* pendant les courses d'un proche, ton code postal reste le tien et ne choisit pas ses enseignes : il n'est pas proposé */
@@ -2269,12 +2271,13 @@
         `<h2 class="gh">Répartition du panier</h2><div class="group">` +
         seg("foyerL", "Personnes à la maison", [1, 2, 3, 4, 5, 6], "wfoyer", "v", S.prefs.foyer || 0, "Pour les portions des repas.") +
         `<button class="row" type="button" data-act="budget"><span class="rt">Budget<small>${byMonth() ? "Par mois\u00a0: le panier dit ce qu'il te reste ce mois-ci, paniers commandés compris." : "Par panier\u00a0: le panier dit ce qu'il reste ou de combien tu dépasses."}</small></span><span class="val">${parseFloat(S.prefs.budget) > 0 ? eurR(parseFloat(S.prefs.budget)) + (byMonth() ? " par mois" : "") : "Aucun"}</span>${ic("chev", "chev")}</button>` +
-        /* options d'expert, repliées : le nombre de commandes au plus et ce que coûte une commande de plus */
-        `<details class="adv"><summary><span class="rt">Pour aller plus loin<small>${H === "mag" ? "Nombre de magasins au plus, gain minimum pour un magasin de plus, coût d'un passage en plus" : "Nombre de commandes au plus, coût d'une commande en plus"}</small></span>${ic("chev", "chev")}</summary>` +
+        /* options d'expert, repliées (ouvertes d'un redessin à l'autre, S.rgAdv) : le nombre de commandes au plus et ce que
+           coûte une commande de plus ; tout en magasin, le nombre de magasins au plus et, à côté, ce qu'un magasin de plus
+           doit faire gagner pour être retenu (magSeuil, jamais compté dans le total), qui remplace le coût d'une commande */
+        `<details class="adv rgadv"${S.rgAdv || toMag ? " open" : ""}><summary><span class="rt">Pour aller plus loin<small>${H === "mag" ? "Nombre de magasins au plus, gain minimum pour un magasin de plus" : "Nombre de commandes au plus, coût d'une commande en plus"}</small></span>${ic("chev", "chev")}</summary>` +
         seg("maxkL", H === "mag" ? "Magasins au plus" : "Commandes au plus", Array.from({ length: nG }, (_, i) => i + 1), "maxk", "k", K) +
-        /* tout en magasin : ce qu'un magasin de plus doit faire gagner pour être retenu (magSeuil), jamais compté dans le total */
-        (H === "mag" ? `<div class="row stack"><span class="rt" id="magGainL">Gain minimum pour un magasin de plus<small>Cabas ne t'envoie dans un magasin de plus que s'il te fait gagner au moins cette somme. Elle n'est jamais ajoutée au total.</small></span><div class="field" data-field="maggain"><span class="in"><input id="maggain" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="${esc(frNum(magGain()))}" aria-labelledby="magGainL"><span class="suf">€</span></span><small></small></div></div>` : "") +
-        `<div class="row stack"><span class="rt" id="extraL">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><div class="field" data-field="extra"><span class="in"><input id="extra" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="${esc(frNum(S.prefs.extraCost || 0))}" aria-labelledby="extraL"><span class="suf">€</span></span><small></small></div></div></details></div>` +
+        (H === "mag" ? `<div class="row stack"><span class="rt" id="magGainL">Un magasin de plus seulement s'il fait gagner au moins…<small>Sinon, Cabas garde moins de magasins et te dit ce que le magasin de plus ferait gagner. Ce montant n'est jamais ajouté au total.</small></span></div><div role="radiogroup" id="maggain" aria-labelledby="magGainL">${MAG_GAINS.map((v) => `<button class="opt" type="button" role="radio" data-act="maggain" data-v="${v}" aria-checked="${v === magGain()}"><span>${magGainText(v)}</span><span class="box">${ic("check")}</span></button>`).join("")}</div>`
+          : `<div class="row stack"><span class="rt" id="extraL">Coût d'une commande ou d'un passage en magasin en plus<small>Ton temps, les sacs, la réception, le trajet. Sert à choisir entre une et plusieurs commandes.</small></span><div class="field" data-field="extra"><span class="in"><input id="extra" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="${esc(frNum(S.prefs.extraCost || 0))}" aria-labelledby="extraL"><span class="suf">€</span></span><small></small></div></div>`) + `</details></div>` +
         commandesHtml() + duoRows() +
         `<h2 class="gh">Alimentation</h2><div class="group"><button class="row" type="button" data-act="diet"><span class="rt">Mon régime<small>Filtre la recherche, les rayons, Ma liste, les repas et les remplacements, d'après ce que les enseignes indiquent.</small></span><span class="val">${esc(dietLabel())}</span>${ic("chev", "chev")}</button>` +
         `<div class="row"><span class="rt" id="factsL">Nutri-Score et allergènes<small>Demandés à Open Food Facts à l'ouverture d'une fiche, avec le seul code-barres, et gardés 30 jours sur ce téléphone. Décoché, d'un geste sur la fiche.</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="factsauto" aria-labelledby="factsL"${S.prefs.facts !== false ? " checked" : ""}><span></span></label></div>` +
@@ -2354,7 +2357,7 @@
         `<div id="ftab">${fraisTable(amt0)}</div>` +
         `<p class="gf">Frais comptés par Cabas pour répartir ton panier. Chaque enseigne confirme les siens au moment de commander, selon le créneau.</p>` +
         S.rets.map(card).join("") + howList("howFL", "Livré, en drive ou en magasin") +
-        `<p class="gf">En magasin, ni minimum ni frais de livraison\u00a0: seulement ton déplacement, compté par le «\u00a0coût d'une commande ou d'un passage en magasin en plus\u00a0» des réglages.</p>` +
+        `<p class="gf">En magasin, ni minimum ni frais de livraison. Tout en magasin, un magasin de plus n'est retenu que s'il fait gagner au moins ${magGain() ? eurR(magGain()) : "un centime"}\u00a0; ce montant se règle dans les réglages, quand «\u00a0Tout en magasin\u00a0» est choisi.</p>` +
         (others.length ? `<h2 class="gh">Autres options</h2><div class="group">${others.map((x) => `<a class="row" href="#/enseigne/${esc(x.id)}"><span class="rt">${esc(x.name)}, ${esc(optionLabel(x).replace(/^./, (c) => c.toLowerCase()))}<small>${esc(feeShort(x))}</small></span>${ic("chev", "chev")}</a>`).join("")}</div><p class="gf">Une seule option par enseigne compte à la fois\u00a0: elle se choisit dans les <a href="#/reglages">réglages</a>.</p>` : ""),
     };
   };
@@ -2460,7 +2463,7 @@
       case "liste": return { name: "liste", id };
       case "suggestion": return { name: "suggestion" };
       case "panier": return { name: "panier" };
-      case "reglages": return { name: "reglages" };
+      case "reglages": return { name: "reglages", id };
       case "enseigne": return { name: "enseigne", id };
       case "apropos": return { name: "apropos" };
       case "comment": return { name: "comment", id };
@@ -3213,7 +3216,7 @@
   /* La liste entière, livraison comprise : pour chaque ensemble d'une à trois enseignes, chaque ligne prend le produit
      du vivier le moins cher dans ces enseignes ; une enseigne dont la commande n'atteint pas son minimum disqualifie
      l'ensemble ; frais de livraison et de service comptés. Renvoie le meilleur plan : lignes couvertes, puis total. */
-  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, sameForm, eansAll, eanLearned, listPlan, matchLine, freshNote, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, magNote, magSeuil, magBestAt, lamOf, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, recordFill, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems, composeMenu, ghIssueUrl, ghBody, scrub, watchCheck, watchHits, factsOf, factsFetch, allergHit, cmpVerdict, recFits, splitOf, duoAlone, duoRead, retRead, retourPour, retourDuo, sendPayload, linkOf, cleanName, cleanNote, pourOn, ownSplit });
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, sameForm, eansAll, eanLearned, listPlan, matchLine, freshNote, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, magNote, magSeuil, magGain, lamOf, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, recordFill, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems, composeMenu, ghIssueUrl, ghBody, scrub, watchCheck, watchHits, factsOf, factsFetch, allergHit, cmpVerdict, recFits, splitOf, duoAlone, duoRead, retRead, retourPour, retourDuo, sendPayload, linkOf, cleanName, cleanNote, pourOn, ownSplit });
   /* jeu d'essai (tests) : un petit catalogue v2 ajouté au catalogue chargé, rayons et produits compris */
   function mergeCatalog(extra) {
     const c = unpack(extra), seen = new Set(S.list.map((p) => p.id));
@@ -6035,7 +6038,7 @@
           if (k === "zip") { if (typeof x === "string" && /^\d{0,5}$/.test(x)) o.zip = x; }
           else if (k === "foyer" || k === "maxOrders") { if (Number.isInteger(x) && x >= 0 && x <= 10) o[k] = x; }
           else if (k === "budget" || k === "extraCost") { if (typeof x === "number" && x >= 0 && x <= 100000) o[k] = x; }
-          else if (k === "magGain") { if (typeof x === "number" && x >= 0 && x <= 50) o.magGain = x; }
+          else if (k === "magGain") { if (MAG_GAINS.includes(x)) o.magGain = x; }
           else if (k === "shopDay") { if (x === null || (Number.isInteger(x) && x >= 0 && x <= 6)) o.shopDay = x; }
           else if (k === "voice") { if (x === "slow" || x === "normal") o.voice = x; }
           else if (k === "theme") { if (["auto", "light", "dark"].includes(x)) o.theme = x; }
@@ -6412,7 +6415,7 @@
       if ((bst.skipped || []).length) out.push(`Hors commande\u00a0: ${bst.skipped.map((x) => sayItem(S.prods.get(x.l.id), x.l.q)).join("\u00a0; ")}.`);
       /* tout en magasin : ce qu'un magasin de plus ferait gagner, ou ce que fait gagner le dernier retenu, comme le panier */
       const mn = h === "mag" && st.full ? magNote(bst, res.K) : null;
-      if (mn) out.push(magNoteText(mn, sayEur, false) + ".");
+      if (mn) out.push(magNoteText(mn, sayEur) + "." + (mn.kind === "more" ? " " + magRuleText(sayEur) + "." : ""));
       tail();
     } else if (kind === "liste") {
       const L = (S.wl && S.wl.lines) || [], f = L.filter((x) => x.pick);
@@ -7580,7 +7583,16 @@
         else if (ch.length) { const r = S.allMap.get(pickOf(ch[0], groupsOf()[ch[0]])); toast(`${r.name}\u00a0: ${optionLabel(r).replace(/^./, (c) => c.toLowerCase())}, d'après ton code postal`); }
         break;
       }
-      case "maxk": S.prefs.maxOrders = +t.dataset.k; savePrefs(); rerender(); break;
+      case "maxk": S.prefs.maxOrders = +t.dataset.k; savePrefs(); rerenderKeep(t); break;
+      /* tout en magasin : ce qu'un magasin de plus doit faire gagner (réglages) */
+      case "maggain": { const v = +t.dataset.v; if (MAG_GAINS.includes(v)) { S.prefs.magGain = v; savePrefs(); } rerenderKeep(t); break; }
+      /* le panier garde moins de magasins à cause du seuil : y aller quand même, seuil à « Dès le premier centime » */
+      case "magall": {
+        const back = snap("prefs");
+        S.prefs.magGain = 0; savePrefs(); rerender();
+        undoable("Chaque produit dans le magasin où il est le moins cher", back);
+        break;
+      }
       case "clear": confirmSheet("Vider le panier\u00a0?", "Tous les produits du panier seront retirés.", "Vider le panier", "clearok"); break;
       case "clearok": {
         const undo = snap("basket", "guide", "free", "owners", "duo");
@@ -7645,7 +7657,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": { const undo = snap("lists"); S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); undoable("Liste supprimée", undo, 5000); break; }
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, drv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports", "eans"].forEach((x) => store.del(x)); S.facts = null; S.eans = null; S.scanQ = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; S.duo = {}; S.owners = {}; S.duoIn = null; S.send = null; S.retS = null; store.del("duo"); store.del("owners"); store.del("moved"); try { if (window.caches) ["cabas-partage", "cabas-demenage"].forEach((c) => caches.delete(c).catch(() => {})); } catch (e) { /* cache indisponible */ } speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, drv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.rgAdv = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports", "eans"].forEach((x) => store.del(x)); S.facts = null; S.eans = null; S.scanQ = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; S.duo = {}; S.owners = {}; S.duoIn = null; S.send = null; S.retS = null; store.del("duo"); store.del("owners"); store.del("moved"); try { if (window.caches) ["cabas-partage", "cabas-demenage"].forEach((c) => caches.delete(c).catch(() => {})); } catch (e) { /* cache indisponible */ } speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"), f = el._act; el.hidden = true; el._act = null; S.undo = null; if (f) f(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -8312,6 +8324,8 @@
     const d = e.target;
     /* « Et si » du panier : les scénarios se calculent à l'ouverture, et la section reste ouverte d'un redessin à l'autre */
     if (d && d.classList && d.classList.contains("wif")) { S.wifOpen = d.open; const el = $("#wif"); if (d.open && el) patchHtml(el, wifBody()); return; }
+    /* « Pour aller plus loin » des réglages : reste ouvert quand un choix redessine l'écran */
+    if (d && d.classList && d.classList.contains("rgadv")) { S.rgAdv = d.open; return; }
     if (!d || !d.classList || !d.classList.contains("univ") || !d.dataset.u) return;
     const st = store.get("univ", {}) || {}; st[d.dataset.u] = d.open; store.set("univ", st);
   }, true);
@@ -8350,8 +8364,6 @@
     }
     if (t.dataset && t.dataset.act === "wake") { S.prefs.wake = t.checked; savePrefs(); if (t.checked) wakeOn(); else wakeOff(); return; }
     if (t.id === "extra") { const v = numOf(t.value); S.prefs.extraCost = v > 0 ? Math.min(v, 50) : 0; t.value = frNum(S.prefs.extraCost); savePrefs(); return; }
-    /* le seuil d'un magasin de plus : 0 à 50 € ; un champ vidé ou illisible garde la valeur d'avant */
-    if (t.id === "maggain") { const v = numOf(t.value); if (v >= 0) S.prefs.magGain = Math.min(Math.round(v * 100) / 100, 50); t.value = frNum(magGain()); savePrefs(); return; }
     if (t.dataset && t.dataset.fee) { const v = numOf(t.value); const o = S.prefs.fee[t.dataset.fee] || {}; o.base = v >= 0 ? Math.min(v, 30) : 0; S.prefs.fee[t.dataset.fee] = o; t.value = frNum(o.base); savePrefs(); return; }
     if (t.id === "fmax") { const v = numOf(t.value); F(t.dataset.k).max = v > 0 ? String(v) : ""; refreshSheet(); }
 
@@ -8439,7 +8451,7 @@
       else if (e.target.id === "cmBud") { e.preventDefault(); const b = $('#view [data-act="compose"]'); if (b) b.click(); }
       else if (e.target.id === "cmpq") { e.preventDefault(); e.target.blur(); }
       else if (e.target.id === "freeT" || e.target.id === "freeP") { e.preventDefault(); const b = $('#sheet [data-act="freeok"]'); if (b) b.click(); }
-      else if (e.target.id === "fmax" || e.target.id === "extra" || e.target.id === "maggain" || e.target.id === "wzip" || e.target.id === "famt" || (e.target.dataset && e.target.dataset.fee)) { e.preventDefault(); e.target.blur(); }
+      else if (e.target.id === "fmax" || e.target.id === "extra" || e.target.id === "wzip" || e.target.id === "famt" || (e.target.dataset && e.target.dataset.fee)) { e.preventDefault(); e.target.blur(); }
       return;
     }
     /* clavier, hors champ de saisie : « / » va à la recherche ; « + » et « - » changent la quantité de la carte ou de la

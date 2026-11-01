@@ -12,12 +12,14 @@
 // Tout en magasin, le seuil d'un magasin de plus (M.lambda, posé par app.js comme lamOf) : sur les enseignes réelles et
 // sur des paniers à quatre magasins, la répartition minimise le total plus le seuil par magasin en plus (essai de toutes
 // les répartitions), à score égal avec le plus de magasins (« au moins ») ; le total ne compte jamais le seuil ; un
-// magasin de plus laissé de côté ferait gagner moins que le seuil, le dernier magasin retenu fait gagner au moins le seuil.
+// magasin de plus laissé de côté ferait gagner moins que le seuil, le dernier magasin retenu fait gagner au moins le seuil ;
+// seuils 0 (« Dès le premier centime »), 1, 2, 5 et 10 €, et tirés au hasard ; les totaux de chaque nombre de magasins
+// sans le seuil (totalsAt, envoyés par le worker pour dire ce qu'un magasin de plus ferait gagner) sont ceux de l'essai.
 // Usage : node tools/optcheck.js [nombre de paniers]
 const fs = require("fs");
 const path = require("path");
 const src = fs.readFileSync(path.join(__dirname, "..", "optimizer.js"), "utf8");
-const O = new Function(src + "; return { runAll, feeAt, buildModel, bestAt, HOWS, howPick, howChans };")();
+const O = new Function(src + "; return { runAll, feeAt, buildModel, bestAt, totalsAt, HOWS, howPick, howChans };")();
 
 let seed = 12345;
 const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
@@ -301,7 +303,7 @@ function checkMag(M, src, seuil, label) {
   const m = M.chans.length;
   /* comme lamOf dans app.js : un millième de centime de moins que le seuil ; le lambda de l'appel est ignoré */
   const M2 = Object.assign({}, M, { lambda: seuil > 0 ? seuil - 0.001 : 0 });
-  const got = steps(M2, 999999), w = bruteMag(src, m, seuil);
+  const got = steps(M2, 999999), w = bruteMag(src, m, seuil), z = O.totalsAt(M2, m, 5000);
   for (let K = 1; K <= m; K++) {
     mTested++;
     const r = got[K], want = w[K];
@@ -313,12 +315,17 @@ function checkMag(M, src, seuil, label) {
     const eWant = seuil > 0 ? want.eMax : want.eMin;
     if (e !== eWant) hFail(`${label}, seuil ${seuil}, ${K} au plus : ${e} magasins en plus au lieu de ${eWant}`);
     if (e === want.eMax && near(T + seuil * e, want.score) && w[K].eMax > 0 && e > 0 && w[e].T0 - T === seuil) mTie++;
+    /* le total exact de K magasins au plus, sans le seuil (totalsAt, ce que le panier compare) */
+    const zt = z.t[K] == null ? Infinity : z.t[K];
+    if (z.truncated || zt !== want.T0) hFail(`${label}, seuil ${seuil}, ${K} au plus : total sans le seuil ${zt} au lieu de ${want.T0}`);
     /* le total affiché (bestAt, comme le panier) ne compte jamais le seuil */
     const b = O.bestAt(M2, K, 0, 5000);
     if (!b.full || b.full.total !== T) hFail(`${label}, seuil ${seuil}, ${K} au plus : total affiché ${b.full && b.full.total} au lieu de ${T}`);
     /* la règle dite par le panier (magNote) : un magasin de plus ferait gagner moins que le seuil ; le dernier retenu au moins le seuil */
-    if (e + 2 <= K) { const g = T - w[e + 2].T0; if (seuil > 0 ? !(g < seuil) : g > 0) hFail(`${label}, seuil ${seuil} : un magasin de plus ferait gagner ${g}, il aurait dû être retenu`); if (g > 0) mMore++; }
-    if (e >= 1) { const g = w[e].T0 - T; if (w[e].T0 !== Infinity && (seuil > 0 ? !(g >= seuil) : !(g >= 1))) hFail(`${label}, seuil ${seuil} : le dernier magasin retenu fait gagner ${g}, moins que le seuil`); mKeep++; }
+    /* ce que dit le panier (magNote) : mm magasins au lieu de n = e + 1 feraient gagner moins que le seuil par magasin en
+       plus ; les magasins retenus font gagner au moins le seuil par magasin, comparés au plus petit nombre qui prend tout */
+    for (let mm = e + 2; mm <= K; mm++) { const g = T - w[mm].T0; if (seuil > 0 ? !(g < seuil * (mm - e - 1)) : g > 0) hFail(`${label}, seuil ${seuil} : ${mm - e - 1} magasins de plus feraient gagner ${g}, ils auraient dû être retenus`); if (mm === e + 2 && g > 0) mMore++; }
+    if (e >= 1) for (let j = 1; j <= e; j++) { if (w[j].T0 === Infinity) continue; const g = w[j].T0 - T; if (seuil > 0 ? !(g >= seuil * (e + 1 - j)) : !(g >= 1)) hFail(`${label}, seuil ${seuil} : ${e + 1} magasins font gagner ${g} sur ${j}, moins que le seuil`); mKeep++; break; }
   }
 }
 const N3 = Math.max(60, Math.round(N / 2));
@@ -387,14 +394,14 @@ for (let t = 0; t < N3; t++) {
       }
     }
     /* tout en magasin : le seuil d'un magasin de plus, 5 € par défaut, et un seuil tiré au hasard */
-    if (how === "mag") for (const seuil of [500, pickInt(1, 900)]) checkMag(M, src, seuil, `tout en magasin, panier ${t}`);
+    if (how === "mag") for (const seuil of [0, 100, 200, 500, 1000, pickInt(1, 900)]) checkMag(M, src, seuil, `tout en magasin, panier ${t}`);
   }
 }
 /* tout en magasin à quatre magasins, prix proches pour que le seuil départage souvent ; des égalités exactes au seuil */
 for (let t = 0; t < N3; t++) {
   const m = 4, n = pickInt(2, 6);
   const chans = Array.from({ length: m }, (_, c) => ({ id: "m" + c, store: { retailer: "m" + c }, mag: true, P: { min: 0, fixed: 0, tiers: [{ from: 0, fee: 0 }] } }));
-  const seuil = [500, 500, 100, pickInt(1, 700), 0][t % 5];
+  const seuil = [500, 0, 100, 200, 1000, pickInt(1, 700)][t % 6];
   const src = Array.from({ length: n }, (_, l) => {
     const base = pickInt(150, 1500), at = chans.map(() => (rnd() < 0.7 ? { cost: Math.max(1, base + pickInt(-180, 180)), sim: rnd() < 0.08 } : null));
     const opts = [{ id: "q" + l, at }];

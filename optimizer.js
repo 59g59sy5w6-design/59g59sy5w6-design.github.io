@@ -365,6 +365,22 @@ function bestAt(M, K, lambda, ms) {
    - partial : sinon, la répartition qui laisse le moins de produits de côté, puis la moins chère.
    « full » est cumulé d'une taille à l'autre : pour le même panier, plus de commandes autorisées ne donne jamais un
    total plus élevé. Les petites tailles passent d'abord : si le temps manque, seules les grandes sont écourtées. */
+/* Tout en magasin : le total le plus bas de tout le panier en k magasins au plus, sans le seuil d'un magasin de plus
+   (lambda 0), pour chaque k de 1 à Kmax ; t[k] vaut null quand k magasins ne prennent pas tout le panier. Calculé par
+   le worker avec la répartition (worker.js) : app.js en tire, au total exact de chaque nombre de magasins, ce qu'un
+   magasin de plus ferait gagner ou ce que font gagner les magasins retenus (magNote). */
+function totalsAt(M, Kmax, ms) {
+  const t = [null];
+  let truncated = false;
+  if (M.lines.length && M.chans.length) {
+    runAll(Object.assign({}, M, { lambda: 0 }), Kmax, 0, (m) => {
+      if (m.done) return;
+      t[m.k] = m.full ? m.full.itemsTotal + m.full.feesTotal + (m.full.compTotal || 0) : null;
+      if (m.truncated) truncated = true;
+    }, ms);
+  }
+  return { t, truncated };
+}
 function runAll(M, Kmax, lambda, report, budgetMs) {
   /* un modèle qui porte son propre coût d'une commande ou d'un magasin en plus (M.lambda, posé par app.js pour chaque
      façon : tout en magasin, le seuil d'un magasin de plus) l'emporte sur celui de l'appel ; le panier exact (M.exact)

@@ -91,6 +91,8 @@ const ROUTES = [
   ["demenage", "#/demenage"], ["transfert-demenage", TRANSFERT_MV],
   /* les autres façons de faire ses courses (prefs.comp, posé par prepare) : tout en drive, tout en magasin */
   ["panier-drive", "#/panier"], ["magasin-magasin", "#/magasin"], ["remplir-magasin", "#/remplir"], ["panier-magasin", "#/panier"], ["reglages-magasin", "#/reglages"],
+  /* le seuil d'un magasin de plus, tout en magasin : « Pour aller plus loin » ouvert par le lien du panier */
+  ["reglages-seuil-magasin", "#/reglages/magasin"],
   /* en dernier : « Faire ses courses » met le téléphone dans les courses d'un proche (le panier de l'aidant mis de côté) */
   ["proche", POUR],
 ];
@@ -279,6 +281,35 @@ async function prepare(page, rname, st) {
 /* états du gros panier (14 produits en deux exemplaires) : le tableau des prix et « Et si… » ouvert */
 const GROS_STEPS = [
   ["panier-tableau", async (page) => { await page.click("[data-act=cview][data-v=tab]"); await sleep(400); }, async (page) => { await page.click("[data-act=cview][data-v=cmd]").catch(() => {}); await sleep(300); }],
+  /* tout en magasin, deux produits dont le deuxième magasin ferait gagner moins que le seuil de 5 € : le panier dit ce
+     qu'il ferait gagner, avec le geste « Aller quand même… » et le lien vers le réglage ; puis le gros panier revient */
+  ["panier-seuil-magasin", async (page) => {
+    const ok = await page.evaluate(() => {
+      const D = cabasDebug(), chans = D.chansOf(D.retsFor("mag"), "mag").map((c) => c.id);
+      const at = (p, r) => { const o = p.offers[r]; return o && o.price > 0 && !o.sim ? Math.round(o.price * 100) : null; };
+      const ps = D.S.list.filter((p) => chans.filter((r) => at(p, r)).length >= 2);
+      let pair = null;
+      for (const B of ps) { for (const X of chans) for (const Y of chans) {
+        if (pair || X === Y || !at(B, X) || !at(B, Y)) continue;
+        const g = at(B, X) - at(B, Y);
+        if (g < 20 || g > 450 || chans.some((r) => r !== Y && at(B, r) && at(B, r) <= at(B, Y))) continue;
+        const A = ps.find((p) => p.id !== B.id && at(p, X) && chans.every((r) => r === X || !at(p, r) || at(p, r) - at(p, X) > 600));
+        if (A) pair = { A: A.id, B: B.id };
+      } if (pair) break; }
+      if (!pair) return false;
+      window.__seuilBack = { basket: D.S.basket, comp: D.S.prefs.comp };
+      D.S.prefs.comp = "mag"; D.S.basket = { [pair.A]: 1, [pair.B]: 1 };
+      location.hash = "#/";
+      return true;
+    });
+    if (!ok) throw new Error("seuil d'un magasin : aucun panier d'essai");
+    await sleep(250); await page.evaluate(() => { location.hash = "#/panier"; });
+    await page.waitForSelector('.sum [data-act="magall"]', { timeout: 15000 });
+    await page.evaluate(() => window.scrollTo(0, 0)); await sleep(400);
+  }, async (page) => {
+    await page.evaluate(() => { const D = cabasDebug(), b = window.__seuilBack; if (b) { D.S.basket = b.basket; D.S.prefs.comp = b.comp; } location.hash = "#/"; });
+    await sleep(250); await page.evaluate(() => { location.hash = "#/panier"; window.scrollTo(0, 0); }); await ready(page, "panier");
+  }],
   ["panier-et-si", async (page) => { await page.evaluate(() => { const d = document.querySelector("details.wif"); if (d) { d.scrollIntoView({ block: "start" }); d.querySelector("summary").click(); } }); await page.waitForFunction(() => !document.querySelector("details.wif .sk, details.wif .loading"), null, { timeout: 15000 }).catch(() => {}); await sleep(500); }, async (page) => { await page.evaluate(() => { const d = document.querySelector("details.wif[open]"); if (d) d.querySelector("summary").click(); window.scrollTo(0, 0); }); await sleep(200); }],
 ];
 
