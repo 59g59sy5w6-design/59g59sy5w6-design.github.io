@@ -10,7 +10,9 @@
   /* typographie française des textes venus des données (noms de produits, notes, sources, étapes des enseignes et des
      recettes) : espace insécable avant : ; ? ! et dans les guillemets, une virgule à la place d'un tiret cadratin */
   const TYPO_RE = / [:;?!»]|«|\u2014/;
-  const typo = (s) => { s = String(s == null ? "" : s); return TYPO_RE.test(s) ? s.replace(/ ([:;?!»])/g, "\u00a0$1").replace(/« /g, "«\u00a0").replace(/\s*\u2014\s*/g, ", ") : s; };
+  /* une date venue des données (notes du relevé) : « 1er novembre », comme dateFr */
+  const MONTH1 = /(^|[\s(])1 (janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\b/g;
+  const typo = (s) => { s = String(s == null ? "" : s); if (s.includes("1 ")) s = s.replace(MONTH1, "$11er $2"); return TYPO_RE.test(s) ? s.replace(/ ([:;?!»])/g, "\u00a0$1").replace(/« /g, "«\u00a0").replace(/\s*\u2014\s*/g, ", ") : s; };
   const tx = (s) => esc(typo(s));
   /* texte sans accents ni ponctuation ; le résultat est gardé, car marques, formats et noms de rayons reviennent des milliers de fois au chargement */
   const NORMC = new Map();
@@ -29,7 +31,9 @@
   const eurR = (v) => (Math.abs(v - Math.round(v)) < 0.005 ? Math.round(v).toLocaleString("fr-FR") + NB + "€" : eur(v));
   const ic = (n, cls) => `<svg class="ic ${cls || ""}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
   const plural = (n, one, many) => n.toLocaleString("fr-FR") + NB + (n > 1 ? many : one);
-  const dateFr = (iso) => { try { return new Date(iso + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { return iso; } };
+  /* le premier du mois : « 1er novembre », jamais « 1 novembre » */
+  const er1 = (s) => String(s).replace(/(^|\s)1(?= [a-zà-ÿ])/g, "$11er");
+  const dateFr = (iso) => { try { return er1(new Date(iso + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })); } catch (e) { return iso; } };
   const dayKey = (d) => d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
   /* « aujourd'hui à 14h17 », « hier à 9h05 », « le 28 octobre à 14h17 » */
   function whenFr(iso) {
@@ -39,7 +43,7 @@
     const now = new Date(), y = new Date(now.getTime() - 86400000);
     if (dayKey(d) === dayKey(now)) return "aujourd'hui à " + hm;
     if (dayKey(d) === dayKey(y)) return "hier à " + hm;
-    return "le " + d.toLocaleDateString("fr-FR", { day: "numeric", month: "long" }) + " à " + hm;
+    return "le " + er1(d.toLocaleDateString("fr-FR", { day: "numeric", month: "long" })) + " à " + hm;
   }
   const joinEt = (a) => (a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " et " + a[a.length - 1]);
   const store = {
@@ -294,14 +298,16 @@
     return changed;
   }
   /* la phrase qui dit d'où vient le point choisi (réglages, questions de départ) */
-  function autoText(g) {
+  /* welcome : la feuille des questions de départ ne propose pas de choisir entre retrait et livraison (elle demande
+     seulement si tu peux te déplacer) : la phrase ne le promet pas */
+  function autoText(g, welcome) {
     const ms = groupsOf()[g] || [], name = (ms[0] || {}).name || "", zip = S.prefs.zip || "";
     if ((S.prefs.pickManual || {})[g]) return `Choisi à la main.${zip ? ` Coche «\u00a0D'après mon code postal\u00a0» pour reprendre le point le plus proche de ${zip}.` : ""}`;
     if (!zip) return `Indique ton code postal\u00a0: Cabas choisit le point ${name} le plus proche parmi ceux qu'il relève.`;
     const a = autoPick(zip, g);
     if (!a) return `Cabas ne relève pas de point ${name} près de ${zip}\u00a0: choisis celui qui te va.`;
     const sec = (SECTEURS.find(([id]) => id === a.id) || [])[1] || (((S.allMap.get(a.id) || {}).channel || {}).where || "");
-    return (a.exact ? `D'après ton code postal (${zip})\u00a0: secteur ${sec}, le plus proche de chez toi` : `D'après ton département (${zip.slice(0, 2)})\u00a0: secteur ${sec}, le plus proche`) + " parmi ceux que Cabas relève. Retrait ou livraison, à toi de choisir.";
+    return (a.exact ? `D'après ton code postal (${zip})\u00a0: secteur ${sec}, le plus proche de chez toi` : `D'après ton département (${zip.slice(0, 2)})\u00a0: secteur ${sec}, le plus proche`) + " parmi ceux que Cabas relève." + (welcome ? "" : " Retrait ou livraison, à toi de choisir.");
   }
   function applyGroups() {
     S.rets = retsFor(S.prefs.comp !== false);
@@ -1376,8 +1382,10 @@
     if (installEvt) return `<div class="hcard tint" role="status"><svg class="si" aria-hidden="true"><use href="#i-logo"/></svg><span><b>Installe Cabas sur ton téléphone</b><small>Une icône sur l'écran d'accueil, l'appli en plein écran, et les prix même sans réseau.</small><button class="btn sm" type="button" data-act="installnow">Installer</button></span><button class="x" type="button" data-act="hideinstall" aria-label="Masquer">${ic("x")}</button></div>`;
     return `<div class="hcard tint" role="status"><svg class="si" aria-hidden="true"><use href="#i-logo"/></svg><span><b>Installe Cabas sur ton iPhone</b><small>Touche ${ic("share")} en bas de Safari, puis «\u00a0Sur l'écran d'accueil\u00a0».</small></span><button class="x" type="button" data-act="hideinstall" aria-label="Masquer">${ic("x")}</button></div>`;
   }
+  /* les sites lus : jamais celui d'une enseigne aux prix simulés (rien n'y est lu), dite à part quand elle est utilisée */
   function footNote() {
-    return `<p class="foot">${plural(S.list.length, "produit", "produits")} de ${esc(joinEt(S.rets.map((r) => r.service)))}. ${esc(freshText())}.<br><a class="act" href="#/apropos">À propos des prix${ic("chev")}</a></p>`;
+    const read = [...new Set(S.rets.filter((r) => !r.simulated).map((r) => r.service))], sim = [...new Set(S.rets.filter((r) => r.simulated).map((r) => r.name))];
+    return `<p class="foot">${plural(S.list.length, "produit", "produits")} de ${esc(joinEt(read))}${sim.length ? ", et des prix simulés pour " + esc(joinEt(sim)) : ""}. ${esc(freshText())}.<br><a class="act" href="#/apropos">À propos des prix${ic("chev")}</a></p>`;
   }
   /* hors ligne : les prix affichés sont ceux du dernier relevé */
   const netBanner = () => (S.offline ? `<div class="banner" role="status">${ic("wifi-off")}<span><b>Hors ligne</b>Les prix affichés sont ceux du dernier relevé.</span></div>` : "");
@@ -1450,10 +1458,12 @@
     ["semaine", "La semaine", "6 litres de lait, 3 paquets de pâtes, 12 œufs, beurre, yaourts nature x4, 12 bouteilles d'eau, papier toilette, café x2, jus d'orange x3, riz, huile de tournesol, thon x3, tomates pelées x2, sardines x2, emmental râpé, madeleines x2, coca 1,5 l x4, lessive, liquide vaisselle, sucre, farine", ["lait", "pates", "oeufs"]],
     ["petitdej", "Petit-déjeuner", "café moulu, lait demi-écrémé, jus d'orange, madeleines, sucre en poudre, beurre", ["cafe", "lait", "jus"]],
     ["pates", "Dîner de pâtes", "spaghetti, thon au naturel, tomates pelées, huile d'olive, emmental râpé", ["pates", "thon", "tomates"]],
+    ["menage", "Ménage", "lessive liquide, liquide vaisselle, papier toilette x2", ["lessive", "vaisselle", "papier"]],
     ["apero", "Apéro et dîner", "jambon blanc x2, camembert, saucisson, chips, bière blonde x6, vin rouge, pain", ["jambon-blanc", "fromages-pate-molle", "saucisson", "chips", "bieres", "vin-rouge"]],
     ["famille", "La famille", "couches taille 4, lait infantile, compotes, croquettes chat, lessive capsules, dentifrice, gel douche", ["couches", "lait-infantile", "croquettes-chat", "lessive-capsules-poudre", "dentifrice"]],
-    ["menage", "Ménage", "lessive liquide, liquide vaisselle, papier toilette x2", ["lessive", "vaisselle", "papier"]],
   ];
+  /* les quatre de l'accueil d'une première visite : la semaine (une commande entière, minimum atteint), puis trois petites
+     listes (petit-déjeuner, dîner de pâtes, ménage) qui montrent Ma liste et disent ce qu'il manque pour une livraison */
   const examples = () => (S.rayMap ? EXAMPLES.filter(([, , , needs]) => needs.every((r) => S.rayMap.has(r))) : EXAMPLES.filter(([k]) => k !== "apero" && k !== "famille")).slice(0, 4);
   /* « 34 rayons dans 7 univers : crèmerie, épicerie salée… » */
   function coverText() {
@@ -2362,7 +2372,7 @@
     markEnds();
     /* questions de départ (enseignes, déplacement, foyer, secteur) : à la première visite du panier avec des produits,
        quand elles changent le total, et jamais avant d'avoir vu ce que fait Cabas */
-    if (S.ready && !S.seen.welcome && r.name === "panier" && count() > 0 && !pourOn() && !location.hash.startsWith("#/partage")) setTimeout(() => { if ($("#sheet").hidden && S.route.name === "panier") welcomeSheet(); }, 450);
+    if (welcomeDue() && r.name === "panier" && !location.hash.startsWith("#/partage")) setTimeout(() => { if ($("#sheet").hidden && S.route.name === "panier") welcomeSheet(); }, 450);
     onScroll();
   }
   function rerender() { S.scroll[S.cur] = window.scrollY; S.dir = "none"; render(); }
@@ -2508,7 +2518,7 @@
   const byVal = (a, b) => valOf(a) - valOf(b);
   const packsOf = (p) => { const m = /^(\d+)\s*x/i.exec(p.format || ""); return m ? +m[1] : p.qty && p.qty.u === "pc" ? p.qty.v : 1; };
   /* mot d'ingrédient ou de parfum : dans « Tagliatelles aux œufs », le produit n'est pas des œufs */
-  const ING = new Set("au aux avec sans saveur saveurs parfum parfums gout extrait extraits sauce".split(" "));
+  const ING = new Set("au aux avec sans saveur saveurs parfum parfums gout extrait extraits sauce facon".split(" "));
   /* le mot qui suit « de » après un nom de préparation n'est qu'un ingrédient : « jus de citron », « purée de tomate »,
      « compote de pommes », « barres de céréales », « galettes de riz » ne sont ni des citrons, ni des tomates, ni des
      pommes, ni des céréales, ni du riz */
@@ -2577,13 +2587,30 @@
   }
   /* un mot qui change la nature du produit (lingettes pour « papier toilette », culotte pour « couches », pâtée pour
      « croquettes », nectar pour « jus », rissolées pour « pommes de terre ») l'écarte, sauf s'il est écrit */
-  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "allegee", "leger", "legere", "culotte", "patee", "sauce", "aromatise", "sirop", "concentre", "mousse", "margarine", "boire", "rissolee"], JUICE_ONLY = new Set(["boisson", "nectar"]);
+  /* pané, gravlax : du poisson préparé (« cabillaud », « saumon ») ; haché : de la viande, du poisson ou des herbes
+     hachés (« bœuf », « cabillaud », « persil ») ; douche, lavant : un soin lavant n'est pas une crème hydratante */
+  const NOTSAME = ["lingette", "boisson", "nectar", "humide", "allege", "allegee", "leger", "legere", "culotte", "patee", "sauce", "aromatise", "sirop", "concentre", "mousse", "margarine", "boire", "rissolee", "pane", "panee", "gravlax", "hache", "hachee", "douche", "lavant", "lavante"], JUICE_ONLY = new Set(["boisson", "nectar"]);
+  /* le rayon où ce mot désigne le produit de tous les jours, quand d'autres rayons le nomment en premier : le chocolat
+     est une tablette (pas du chocolat en poudre), les gâteaux sont des gâteaux moelleux (pas une préparation), les
+     cookies des biscuits (pas une glace), la vanille et le cacao ceux de la pâtisserie et du petit-déjeuner */
+  const HOME = { chocolat: "chocolat-tablettes", gateau: "gateaux", cookie: "biscuits-chocolat", vanille: "aide-patisserie", cacao: "chocolat-poudre" };
+  /* dans ce rayon, ces mots disent le produit ordinaire et ne sont pas une variante (une pâte à tartiner est aux
+     noisettes et au cacao, le saumon du traiteur est fumé, le chocolat de tous les jours est noir, la bière sans alcool
+     blonde) */
+  const RAY_PLAIN = { "pate-a-tartiner": ["noisette", "cacao", "chocolat"], "traiteur-mer": ["fume"], "chocolat-tablettes": ["noir"], "cidres-sans-alcool": ["blonde", "blond"] };
+  /* dans ce rayon, ces mots valent le mot demandé : un jambon supérieur, de Paris ou cuit est un jambon blanc */
+  const RAY_SAME = { "jambon-blanc": { blanc: ["superieur", "paris", "cuit"] } };
+  const raySame = (p, t, has) => ((RAY_SAME[p.r] || {})[t] || []).some(has);
+  /* un mélange de plusieurs produits de base (« 4 fromages dont mimolette », « 3 céréales ») n'est pas le produit ordinaire */
+  const MIX = /\b(\d+|deux|trois|quatre|cinq|six) (fromages|cereales|legumes|fruits|varietes|saveurs)\b|\bdont\b/;
   /* variétés d'un même rayon : huile d'olive ou de tournesol, sucre blanc ou roux, riz complet, pâtes complètes, yaourt au lait de chèvre,
      bière blonde ou ambrée, vin de telle région, croquettes au poulet ou au saumon */
   const VARIETY = new Set("olive tournesol colza arachide noix sesame pepins avocat lin isio friture melange graine chevre brebi soja coco grec grecque complete integrale sarrasin mais pois roux cassonade canne morceau fluide blonde blond ambree brune bordeaux bourgogne rhone languedoc loire provence beaujolais merlot cabernet syrah grenache chardonnay sauvignon pinot basmati thai long rond nature campagne cereales tradition".split(" ").map(stem));
   /* « beurre doux 60 % MG » : un beurre allégé qui ne dit pas son nom (le beurre est à 80 % ou plus) */
   // beurre à moins de 75 % de matière grasse : « 60%MG », « 60% M.G », ou « 60% » seul (le signe tombe à la normalisation)
   const lowFat = (p) => {
+    /* une crème fraîche à moins de 25 % de matière grasse est une crème légère */
+    if (p.r === "creme") return /\b([3-9]|1[0-9]|2[0-4]) ?(mg|m g)\b/.test(norm(p.name));
     if (p.r !== "beurre") return false;
     const n = norm(p.name);
     if (/\b(1[0-9]|[2-6][0-9]|7[0-4]) ?(mg|m g)\b/.test(n)) return true;
@@ -2597,10 +2624,13 @@
   const KIND = { pain: ["baguette", "ficelle", "flute", "batard", "boule", "fougasse"], soupe: ["mouline", "veloute", "potage", "gaspacho"], salade: ["laitue", "batavia", "frisee", "mache", "roquette", "mesclun", "iceberg", "scarole", "chene"] };
   /* le produit dit lui-même ce mot, en mot fort (pas un ingrédient : « Écrasé de pommes de terre aux carottes » n'est
      pas des carottes) */
-  const ownPre = (p, t) => { const so = strongOwn(p); if (so.has(t)) return true; if (!t.includes("_")) for (const w of so) if (!w.includes("_") && w.startsWith(t)) return true; return (KIND[t] || []).some((k) => so.has(k)); };
+  const ownPre = (p, t) => { const so = strongOwn(p); if (so.has(t)) return true; if (!t.includes("_")) for (const w of so) if (!w.includes("_") && w.startsWith(t)) return true; return (KIND[t] || []).some((k) => so.has(k)) || raySame(p, t, (k) => so.has(k)); };
   /* mots d'ingrédient de la ligne elle-même (« sardines à l'huile », « thon au naturel », « jus d'orange ») */
   const weakQ = (raw) => { const nt = norm(raw || "").split(" ").filter(Boolean), cs = collapse(nt.map(stem)), out = new Set(); const mark = (i) => ING.has(nt[i]) || nt[i] === "a" || ((nt[i] === "la" || nt[i] === "l") && nt[i - 1] === "a") || (DEW.has(nt[i]) && i > 0 && TYPEW.has(stem(nt[i - 1]))); nt.forEach((w, i) => { if (i && mark(i - 1)) out.add(cs[i]); }); return out; };
   const ownHas = (p, t) => { if (!p._ow) { const st = (idx(p)._b + " " + norm(p.name).replace(/\b1 2 /g, "demi ") + " " + norm(p.format) + " " + norm((p.tags || []).join(" "))).split(" ").filter(Boolean).map(stem); p._ow = new Set(st.concat(collapse(st))); } return p._ow.has(t); };
+  /* le mot est dans le produit lui-même, ou ce que le produit dit en vaut le sens (une baguette est un pain, un jambon
+     supérieur un jambon blanc) */
+  const ownTok = (p, t) => ownHas(p, t) || (KIND[t] || []).some((k) => ownHas(p, k)) || raySame(p, t, (k) => ownHas(p, k));
   /* rayons à part : un produit pour bébé, surgelé, en conserve ou glacé n'est pas le produit ordinaire du même nom */
   const QUAL = new Set(["bebe", "infantile", "surgele", "surgelee", "conserve", "glace", "repas"]);
   /* rayons dont ce mot est le premier produit nommé (« Poulet, dinde et volailles » pour « poulet ») */
@@ -2619,21 +2649,24 @@
   /* ce que le nom ajoute au produit et que la ligne ne demande pas : un ingrédient ou un parfum (« à l'oignon », « aux
      œufs », « au citron »), un usage (« à garnir », « façon bretzel », « spécial panini »), un second produit (« steak
      haché et purée », « shampoing et douche ») */
-  const NEUTRAL = new Set(["naturel", "nature", "huile", "jus", "eau", "saumure"]);
-  const XMARK = new Set(["et", "facon", "special", "speciale", "a"]);
+  /* « au froment », « au blé » : la matière du produit, pas un ingrédient ajouté */
+  const NEUTRAL = new Set(["naturel", "nature", "huile", "jus", "eau", "saumure", "froment", "ble"]);
+  /* « à la », « à l' » marquent un ingrédient ; « à » seul un usage (« oranges à déguster », « pâte à pizza ») */
+  const XMARK = new Set(["et", "facon", "special", "speciale", "dont"]);
   const ingExtra = (p, qs) => {
     /* pour les animaux, le parfum fait partie du produit (croquettes au poulet, au bœuf) */
     if ((rayon(p.r) || {}).u === "animaux") return 0;
-    const nt = norm(p.name).split(" ").filter(Boolean);
+    const nt = norm(p.name).split(" ").filter(Boolean), plainW = RAY_PLAIN[p.r] || [];
     let n = 0;
     nt.forEach((w, i) => {
       const at = w === "a" && (nt[i + 1] === "la" || nt[i + 1] === "l") ? i + 2 : (ING.has(w) && w !== "sans" && w !== "avec") || XMARK.has(w) ? i + 1 : -1;
-      if (at > 0 && at < nt.length) { const t = stem(nt[at]); if (!qs.has(t) && !NEUTRAL.has(t) && !/^\d/.test(t)) n++; }
+      if (at > 0 && at < nt.length) { const t = stem(nt[at]); if (!qs.has(t) && !NEUTRAL.has(t) && !plainW.includes(t) && !/^\d/.test(t)) n++; }
     });
     return n;
   };
   function matchLine(L) {
-    const out = { raw: L.raw, q: L.q, n: L.n, nGiven: !!L.nGiven, cands: [], avail: 0, pick: null };
+    /* wn : le nombre écrit (« tomates pelées x2 »), pour dire quand le plan le change */
+    const out = { raw: L.raw, q: L.q, n: L.n, nGiven: !!L.nGiven, wn: L.size ? 0 : L.n, cands: [], avail: 0, pick: null };
     if (!L.q) return out;
     /* « lait d'amande », « lait de soja » : des boissons végétales, de leur nom légal */
     const q = L.q.replace(/\blait (amande|avoine|soja|riz|noisette|epeautre)s?\b/g, "boisson $1");
@@ -2643,32 +2676,75 @@
     /* prix relevés seulement (repas) : le choix ne s'appuie jamais sur un prix simulé */
     const pb = L.real ? bestReal : best, valOf = (p) => { const b = pb(p); if (!b) return 1e12; const u = perUnit(p, b.price); return u == null ? b.price * 1000 : u; }, byVal = (a, b) => valOf(a) - valOf(b);
     let rel = sc.map((x) => x[1]);
+    /* une préférence ne vide jamais la ligne : elle ne vaut que si l'un de ses produits est vendu par tes enseignes */
+    const sells = (sub) => sub.length > 0 && sub.some((p) => pb(p));
+    /* « pâté » n'est pas « pâtes » : l'accent, qui tombe à la recherche, se lit dans la ligne écrite */
+    const ACC = "a-zà-ÿœæç", pateRe = new RegExp(`(^|[^${ACC}])p[aâ]tés?(?![${ACC}])`, "i");
+    const pateOf = (p) => pateRe.test(p.name) || pateRe.test((rayon(p.r) || {}).name || "");
+    if (pateRe.test(L.raw || "")) { const pt = rel.filter(pateOf); if (sells(pt)) rel = pt; }
+    else if (toks.includes("pate")) { const pt = rel.filter((p) => !pateOf(p)); if (sells(pt)) rel = pt; }
+    /* « couches taille 4 » : la taille écrite, pas une autre taille dont le poids contient ce chiffre (« taille 3, 4-9 kg ») */
+    const tm = /\btaille (\d+)\b/.exec(norm(L.raw || L.q));
+    if (tm) { const tre = new RegExp(`\\btaille ${tm[1]}\\b`), ta = rel.filter((p) => tre.test(norm(p.name))); if (sells(ta)) rel = ta; }
     /* le mot exact plutôt qu'un début de mot (« thon », pas « Thonon ») ; le rayon qui porte ce nom d'abord (« huile » :
        le rayon Huile, pas des sardines à l'huile) ; puis les résultats les plus pertinents */
     const exact = rel.filter((p) => { const st = allW(p); return toks.every((t) => st.has(t)); });
     if (exact.length) rel = exact;
+    else {
+      /* aucun produit n'a le mot entier : un début de mot ne vaut que pour une abréviation (« choco », « camemb »), pas
+         pour un autre mot (« piles » n'est pas « glace pilée ») */
+      const abbr = (st, t) => st.has(t) || [...st].some((w) => w.startsWith(t) && w.length - t.length >= (t.length >= 5 || /\d/.test(t) ? 2 : 3));
+      rel = rel.filter((p) => { const st = allW(p); return toks.every((t) => abbr(st, t)); });
+      if (!rel.length) return out;
+    }
     /* chaque mot désigne le produit lui-même, pas un ingrédient (« lentilles corail », pas des tranches végétales aux
        lentilles corail), quand certains produits le font */
     const wq = weakQ(L.raw), sToks = toks.filter((t) => !wq.has(t));
     const strongAll = rel.filter((p) => { const st = strongW(p); return sToks.every((t) => st.has(t)); });
     if (strongAll.length) rel = strongAll;
+    /* tous les mots de la ligne dans le produit lui-même, pas seulement dans le nom de son rayon : des capsules de
+       chocolat rangées avec les capsules de café ne sont pas des « capsules café », un nettoyant vitres n'est pas un
+       « nettoyant multi-usages » ; seul le premier mot d'un rayon qui n'en nomme qu'un vaut pour tous ses produits (un
+       spaghetti est des « pâtes »), comme « surgelé » ou « en conserve » pour les produits d'un rayon qui le dit (des
+       frites de son rayon surgelé sont des « frites surgelées »). Sans aucun produit vendu qui les dit tous, ceux qui
+       en disent le plus. */
+    const ownOk = (p, t) => ownTok(p, t) || (!headsOf(p.r).size && rayStrongInfo(p.r).first === t) || (QUAL.has(t) && rayStrong(p.r).has(t));
+    const ownN = (p) => toks.filter((t) => ownOk(p, t)).length;
+    const ownAll = rel.filter((p) => ownN(p) === toks.length);
+    if (sells(ownAll)) rel = ownAll;
+    else { const soldN = rel.filter((p) => pb(p)).map(ownN), mx = soldN.length ? Math.max(...soldN) : 0; if (mx > 0) { const most = rel.filter((p) => ownN(p) === mx); if (sells(most)) rel = most; } }
     /* « sardines à l'huile » n'est pas « sauce tomate sans huile » */
     if (!toks.includes("san")) { const noSans = rel.filter((p) => !toks.some((t) => sig(p).includes("sans " + t))); if (noSans.length) rel = noSans; }
     /* « jus d'orange » n'est pas une boisson au jus, « papier toilette » n'est pas des lingettes : un mot qui change la
-       nature du produit l'écarte, sauf si on l'a écrit */
-    const dn = NOTSAME.filter((w) => !toks.includes(w)), light = ["leger", "legere", "allege", "allegee", "light"].some((w) => toks.includes(w));
+       nature du produit l'écarte, sauf si on l'a écrit (au masculin ou au féminin : « viande hachée », « steak haché ») */
+    const written = (w) => toks.includes(w) || toks.includes(w + "e") || (/e$/.test(w) && toks.includes(w.slice(0, -1)));
+    const dn = NOTSAME.filter((w) => !written(w)), light = ["leger", "legere", "allege", "allegee", "light"].some((w) => toks.includes(w));
     /* « boisson au jus » et « nectar » ne valent que pour les jus : un cola est, de son nom légal, une « boisson gazeuse » */
     /* le mot doit être dans le produit lui-même : le rayon « Beurre et margarine » n'écarte pas le beurre */
     const noDown = rel.filter((p) => !dn.some((w) => ownHas(p, w) && (/^jus/.test(p.r) || !JUICE_ONLY.has(w))) && (light || !lowFat(p)));
     if (noDown.length) rel = noDown;
-    /* une préférence ne vide jamais la ligne : elle ne vaut que si l'un de ses produits est vendu par tes enseignes */
-    const sells = (sub) => sub.length > 0 && sub.some((p) => pb(p));
+    /* « blanc de poulet », « blanc de dinde » : un filet ou une escalope, pas des cuisses ni des pilons */
+    if (/\bblancs? (de )?(poulet|dinde|volaille)\b/.test(norm(L.raw || L.q))) { const wh = rel.filter((p) => !["cuisse", "pilon", "haut", "entier"].some((w) => ownHas(p, w) && !toks.includes(w))); if (sells(wh)) rel = wh; }
     const rayHas = (p, t) => rayStrong(p.r).has(t) && (!headsOf(p.r).has(t) || ownPre(p, t));
     const qual = (r) => [...rayStrong(r)].some((w) => QUAL.has(w) && !toks.includes(w));
     /* un produit pour bébé ou pour animaux n'est pas le produit ordinaire (« carottes » : ni un petit pot, ni une pâtée
-       pour chien), sauf dans le rayon qui le nomme (« lingettes », « croquettes ») */
-    const noBaby = rel.filter((p) => { const rs = rayStrong(p.r); return !(["bebe", "infantile"].some((w) => rs.has(w) && !toks.includes(w)) || (rayon(p.r) || {}).u === "animaux") || toks.some((t) => rayHas(p, t)); });
+       pour chien), sauf dans le rayon qui le nomme par un mot fort de la ligne (« lingettes », « croquettes », mais pas
+       « chocolat au lait » pour un lait de croissance) */
+    const noBaby = rel.filter((p) => { const rs = rayStrong(p.r); return !(["bebe", "infantile"].some((w) => rs.has(w) && !toks.includes(w)) || (rayon(p.r) || {}).u === "animaux") || sToks.some((t) => rayHas(p, t)); });
     if (sells(noBaby)) rel = noBaby;
+    /* une glace n'est pas le produit ordinaire de son parfum (« cookies », « vanille »), sauf si on l'a demandée */
+    const noIce = rel.filter((p) => !(rayStrongInfo(p.r).first === "glace" && !toks.some((t) => rayStrong(p.r).has(t))));
+    if (sells(noIce)) rel = noIce;
+    /* une marque seule (« nutella ») : son produit ordinaire, dans le rayon où elle en a le plus (la pâte à tartiner,
+       pas les croissants ni les crêpes surgelées) */
+    const bw = (p) => idx(p)._b.split(" ").filter(Boolean).map(stem);
+    const brandRel = rel.filter((p) => pb(p) && toks.every((t) => bw(p).includes(t)));
+    if (brandRel.length >= 3) {
+      const by = {};
+      brandRel.forEach((p) => { by[p.r] = (by[p.r] || 0) + 1; });
+      const topR = Object.keys(by).sort((a, b) => by[b] - by[a] || (qual(a) ? 1 : 0) - (qual(b) ? 1 : 0))[0], br = rel.filter((p) => p.r === topR);
+      if (sells(br)) rel = br;
+    }
     /* le produit frais d'abord : « tomates », « pommes », « citron », « salade » sont des fruits et légumes quand il y en
        a, qui le disent en tête de leur nom, pas une conserve, une purée, un jus ou une salade composée ; sauf quand un
        rayon ordinaire porte ce nom en premier (« poulet » : le rayon de la volaille, pas un plat rangé avec les légumes) */
@@ -2680,11 +2756,15 @@
     /* le même légume surgelé ou en conserve, rangé dans un rayon qui ne le nomme pas (« Haricots verts extra-fins »
        des légumes surgelés), le vaut ; pas un rayon qui lui est propre (« Tomates en conserve ») */
     if (sells(fresh)) rel = fresh.concat(rel.filter((p) => !fresh.includes(p) && ["surgele", "surgelee", "conserve"].some((w) => rayStrong(p.r).has(w)) && !toks.some((t) => rayStrong(p.r).has(t)) && sToks.every((t) => ownPre(p, t)) && leadPos(p, sToks[0]) === 0));
+    /* le rayon de tous les jours de ce mot, quand la ligne ne dit que lui (« chocolat », « chocolat au lait », « gâteaux ») */
+    const home = sToks.length === 1 && HOME[sToks[0]];
+    const homeSet = home ? rel.filter((p) => p.r === home) : [];
     /* le rayon qui porte ce nom d'abord (« huile » : le rayon Huile, pas des sardines à l'huile) ; dans un rayon qui en
        nomme plusieurs, le produit doit le dire lui-même ; le rayon dont c'est le premier mot (« pain » : le rayon du pain,
        pas les pains burger) ; pas un rayon à part (bébé, surgelé, conserve, glacé, salade repas) qu'on n'a pas demandé */
     const inRay = rel.filter((p) => toks.some((t) => rayHas(p, t)));
-    if (inRay.length) {
+    if (sells(homeSet)) rel = homeSet;
+    else if (sells(inRay)) {
       rel = inRay;
       /* plusieurs mots : le rayon qui les nomme tous ensemble (« jus de citron » : le rayon des vinaigres et jus de
          citron, pas celui des jus de fruits) ; sinon celui dont c'est le premier mot */
@@ -2693,10 +2773,23 @@
       if (sells(first)) rel = first;
       const plainRay = rel.filter((p) => !qual(p.r));
       if (sells(plainRay)) rel = plainRay;
+    } else if (sToks.length === 1 && !brandRel.length) {
+      /* aucun rayon ne nomme ce mot : le produit qui le dit en tête de son nom (« pesto » : un pesto, pas des haricots
+         façon pesto) ; quand aucun ne le fait, le mot n'est qu'un ingrédient d'autres produits (« échalotes » : des
+         rillettes aux échalotes) et la ligne reste sans produit, avec « Garder quand même » */
+      const lead = rel.filter((p) => leadPos(p, sToks[0]) <= 1);
+      if (sells(lead)) rel = lead;
+      else if (!lead.length) rel = [];
     }
     /* rayon qui en nomme plusieurs (« Pommes de terre, carottes, oignons et ail ») : « oignons » veut un produit qui le
-       dit lui-même, pas le moins cher du rayon */
-    rel = rel.filter((p) => { const H = headsOf(p.r); return toks.every((t) => !H.has(t) || ownPre(p, t)); });
+       dit lui-même, pas le moins cher du rayon ; seulement pour les mots forts de la ligne (dans « pâte à pizza », la
+       pâte, pas la pizza) ; quand la ligne est tout un morceau du nom du rayon (« viande hachée » du rayon « Viande
+       hachée et steaks hachés »), le filtre ne vide pas la ligne ; sinon il la vide plutôt que de donner un autre
+       produit (« crème solaire » n'est pas une crème hydratante) */
+    const heads = rel.filter((p) => { const H = headsOf(p.r); return sToks.every((t) => !H.has(t) || ownPre(p, t)); });
+    if (sells(heads) || !rel.every((p) => rayStrongInfo(p.r).segs.some((g) => sToks.every((t) => g.has(t))))) rel = heads;
+    /* un mot d'ingrédient de la ligne n'est pas le produit : pour « pâte à pizza », pas une pizza garnie à pâte fine */
+    if (wq.size) { const nh = rel.filter((p) => ![...wq].some((w) => leadPos(p, w) === 0)); if (sells(nh)) rel = nh; }
     /* mon régime : seuls les produits conformes, d'après ce que l'enseigne indique ; sans aucun, la ligne le dit et
        garde le meilleur produit (dietMiss) */
     if (dietOn()) { const fit = rel.filter((p) => dietOk(p)); if (fit.length) rel = fit; else out.dietMiss = true; }
@@ -2714,10 +2807,25 @@
     /* « sardines à l'huile » : l'huile d'olive ou de tournesol de la boîte n'est pas une variante de trop */
     const OILS = new Set(["olive", "tournesol", "colza", "arachide"]);
     /* le nom du rayon tout seul (« huile », « sucre ») : les variétés (olive ou tournesol, blanc ou roux) se valent et le
-       moins cher l'emporte ; mais un parfum, un « zéro », un bio ou un décaféiné restent en trop si on ne les a pas écrits */
-    const bare = avail.length && toks.every((t) => rayWords(avail[0].r).has(t));
+       moins cher l'emporte ; mais un parfum, un « zéro », un bio ou un décaféiné restent en trop si on ne les a pas écrits.
+       Seulement le premier produit que nomme le rayon : dans « Semoule, couscous, boulgour, quinoa… », un quinoa aux
+       olives n'est pas le quinoa ordinaire */
+    const bare = avail.length && toks.every((t) => (rayStrongInfo(avail[0].r).segs[0] || new Set()).has(t));
     /* un parfum ou un ingrédient du nom que la ligne ne demande pas compte aussi (« steaks hachés à l'oignon ») */
-    const extra = (p) => sig(p).split(" ").filter((t) => { const w = t.replace(/^sans /, ""); return (VARIANT.has(w) || (RAY_VARIANT[p.r] || []).includes(w)) && !qs.has(w) && !(qs.has("huile") && p.r !== "huile" && OILS.has(w)) && !(bare && VARIETY.has(w)); }).length;
+    /* un bio compte moitié moins qu'un parfum (le quinoa bio plutôt qu'un mélange quinoa et boulgour) ; un mélange de
+       produits de base (« 4 fromages dont… ») compte comme une variante ; ce qui est ordinaire dans le rayon ne compte
+       pas (RAY_PLAIN : les noisettes d'une pâte à tartiner) */
+    const mixQ = MIX.test(norm(L.raw || L.q));
+    const extra = (p) => {
+      const plainW = RAY_PLAIN[p.r] || [];
+      /* « au lait cru » dit comment le fromage est fait, pas une variante */
+      const cru = /\blait cru\b/.test(norm(p.name));
+      let n = sig(p).split(" ").filter((t) => t && !(cru && t === "cru") && (VARIANT.has(t) || (RAY_VARIANT[p.r] || []).includes(t)) && !qs.has(t) && !plainW.includes(t) && !(qs.has("huile") && p.r !== "huile" && OILS.has(t)) && !(bare && VARIETY.has(t))).reduce((a, t) => a + (t === "bio" ? 0.5 : 1), 0);
+      if (!mixQ && !/pizza/.test(p.r) && MIX.test(norm(p.name))) n += 1;
+      /* « légumes et quinoa », « quinoa et boulgour » : le mot demandé à côté d'un autre produit de base */
+      else { const nt = norm(p.name).split(" ").filter(Boolean).map(stem); if (nt.some((w, i) => qs.has(w) && ((nt[i + 1] === "et" && nt[i + 2] && !qs.has(nt[i + 2])) || (nt[i - 1] === "et" && nt[i - 2] && !qs.has(nt[i - 2]))))) n += 1; }
+      return n;
+    };
     const minX = Math.min(...avail.map(extra));
     let plain = avail.filter((p) => extra(p) === minX);
     const minI = Math.min(...plain.map((p) => ingExtra(p, qs)));
@@ -2726,7 +2834,7 @@
        un mot de parfum ou de variété du nom du rayon doit être dans le produit lui-même, quand c'est le cas de certains */
     if (bare) {
       const spec = toks.filter((t) => VARIANT.has(t) || ATTR.has(t) || (RAY_VARIANT[avail[0].r] || []).includes(t));
-      if (spec.length) { const own = plain.filter((p) => spec.every((t) => ownHas(p, t))); if (own.length) plain = own; }
+      if (spec.length) { const own = plain.filter((p) => spec.every((t) => ownTok(p, t))); if (own.length) plain = own; }
     }
     let pick = null, n = L.n;
     /* vivier : les produits acceptables pour cette ligne, avec la quantité à prendre de chacun (pour choisir, parmi eux,
@@ -2753,11 +2861,24 @@
       if (pick.qty && pick.qty.u === L.size.u && sz(pick)) n = Math.max(1, Math.round(tv / sz(pick)));
       set.forEach((p) => { const q = fit(p, tv, L.size.u); if (q !== 0 || p === pick) pool.set(p.id, p === pick ? n : q || 1); });
     } else {
-      /* formats courants : ceux que partagent plusieurs produits pertinents (1 L et 6 x 1 L pour le lait, 500 g et 1 kg pour les pâtes) */
+      /* formats courants : ceux que proposent plusieurs marques (1 L et 6 x 1 L pour le lait, 500 g et 1 kg pour les
+         pâtes ; quatre cuisses de poulet d'une même marque à 480 g ne font pas un format courant), plus le moins cher au
+         kilo de chaque enseigne parmi les formats de moins de deux fois la contenance médiane (le filet d'oranges de
+         1,5 kg, la barquette de cuisses de 500 g, pas le sac de 3 kg ni le cubi de 5 L) ; jamais plus de trois fois la
+         contenance médiane (la plus grande des deux du milieu, pour que quatre oranges à la pièce ne la tirent pas vers
+         le bas) */
       const keyS = (p) => (sz(p) ? p.qty.u + Math.round(sz(p) / Math.pow(10, Math.floor(Math.log10(sz(p))) - 1)) : "");
-      const cnt = {}, szs = plain.map(sz).filter(Boolean).sort((a, b) => a - b), med = szs.length ? szs[Math.floor((szs.length - 1) / 2)] : 0;
-      plain.forEach((p) => { const k = keyS(p); cnt[k] = (cnt[k] || 0) + 1; });
-      let common = plain.filter((p) => cnt[keyS(p)] >= 2 && (!med || sz(p) <= med * 3));
+      const uc = {};
+      plain.forEach((p) => { if (sz(p)) uc[p.qty.u] = (uc[p.qty.u] || 0) + 1; });
+      const um = Object.keys(uc).sort((a, b) => uc[b] - uc[a])[0];
+      const szs = plain.filter((p) => sz(p) && p.qty.u === um).map(sz).sort((a, b) => a - b), med = szs.length ? szs[Math.floor(szs.length / 2)] : 0;
+      const capOk = (p) => !med || !sz(p) || p.qty.u !== um || sz(p) <= med * 3;
+      const brands = {};
+      plain.forEach((p) => { const k = keyS(p); (brands[k] || (brands[k] = new Set())).add(idx(p)._b); });
+      let common = plain.filter((p) => brands[keyS(p)].size >= 2 && capOk(p));
+      const byRet = new Map();
+      plain.forEach((p) => { const b = pb(p); if (!b || (med && sz(p) && p.qty.u === um && sz(p) >= med * 2) || (common.length && !sz(p))) return; const c = byRet.get(b.ret); if (!c || valOf(p) < valOf(c)) byRet.set(b.ret, p); });
+      byRet.forEach((p) => { if (!common.includes(p)) common.push(p); });
       if (!common.length) common = plain;
       if (L.n > 1) {
         /* « 2 paquets de pâtes » : 2 paquets du format le plus courant ; « 6 bouteilles d'eau » : un pack de 6 s'il revient moins cher au litre */
@@ -2795,6 +2916,8 @@
     }
     out.pick = pick.id;
     out.n = n;
+    /* les autres formats de la variante la plus simple (repas : le paquet qui suffit pour la recette) */
+    out.alts = plain.slice(0, 40).map((p) => p.id);
     pool.set(pick.id, n);
     out.pool = [...pool.entries()];
     return out;
@@ -2876,6 +2999,10 @@
     if (M0.pick) return [M0];
     const toks = L.q.split(" ").filter(Boolean);
     if (toks.length < 2) return [suggestFix(M0, L)];
+    /* la phrase entière nomme un produit d'un rayon (« viande hachée », « pâte à pizza ») : une seule ligne, jamais
+       découpée en mots */
+    const mt = mToks(L.q);
+    if (S.rayons.some((r) => !r.virtuel && rayStrongInfo(r.id).segs.some((g) => mt.every((t) => g.has(t))))) return [suggestFix(M0, L)];
     const cw = catWords(), parts = [];
     let i = 0;
     while (i < toks.length) {
@@ -2904,7 +3031,7 @@
   const wlStep = (x, i) => `<div class="stepper soft"><button type="button" data-act="wldec" data-i="${i}" aria-label="${x.n > 1 ? "Un de moins" : "Retirer"}">${ic(x.n > 1 ? "minus" : "trash")}</button><span>${x.n}</span><button type="button" data-act="wlinc" data-i="${i}" aria-label="Un de plus">${ic("plus")}</button></div>`;
   /* une ligne de Ma liste : produit trouvé (avec son choix habituel ou sa quantité habituelle), ligne libre gardée, ou
      ligne sans produit (correction proposée, « Garder quand même », « Chercher ») ; data-rm permet le glisser pour retirer */
-  function wlRow(x, i) {
+  function wlRow(x, i, ch) {
     if (x.free && S.free[x.free]) {
       const f = S.free[x.free];
       return `<div class="item wli free" data-rm="l:${i}"><span class="thumb q">${ic("pen")}</span><div class="it">${norm(x.raw) !== norm(f.t) ? `<span class="wq">${esc(x.raw)}</span>` : ""}<b>${esc(f.t)}</b><small>Ligne libre${f.price > 0 ? ", " + esc(eur(f.price)) + " l'unité, prix saisi par toi" : ""}, ${esc(freeWhere(f))}</small></div><div class="ir"><span class="lp">${f.price > 0 ? eur(f.price * x.n) : "–"}</span>${wlStep(x, i)}</div></div>`;
@@ -2915,7 +3042,9 @@
       const yes = x.sugg ? `<button class="act" type="button" data-act="wlfix" data-i="${i}">Oui${ic("chev")}</button>` : "";
       return `<div class="item wli miss" data-rm="l:${i}"><span class="thumb q">${ic("search")}</span><div class="it"><span class="wq">${esc(x.raw)}</span><b>${off ? "Pas vendu par tes enseignes" : "Pas encore dans Cabas"}</b><small>${off ? "Vendu par une enseigne ou dans une zone que tu n'utilises pas." : "Cabas ne couvre que quelques rayons pour l'instant."}</small>${fix}<div class="acts">${yes}<button class="act" type="button" data-act="wlfree" data-i="${i}">Garder quand même${ic("chev")}</button></div></div><div class="ir"><button class="btn sm plain" type="button" data-act="wlsearch" data-i="${i}">Chercher</button></div></div>`;
     }
-    const p = S.prods.get(x.pick), b = best(p), u = b ? unitPrice(p, b.price) : "";
+    /* l'enseigne que la carte du plan donne à cette ligne (son offre là-bas), sinon le meilleur prix du produit : la
+       ligne ne dit jamais « chez Carrefour » sous une carte qui annonce une seule commande Monoprix */
+    const p = S.prods.get(x.pick), po = ch && p.offers[ch], b = po && po.price > 0 ? Object.assign({ ret: ch }, po) : best(p), u = b ? unitPrice(p, b.price) : "";
     let note = "", acts = `<button class="act" type="button" data-act="wlalt" data-i="${i}" aria-label="Autre choix pour ${esc(x.raw)}">Autre choix${ic("chev")}</button>`;
     if (x.usualAlt && x.usualDiet) {
       const a = S.prods.get(x.usualAlt.id);
@@ -2932,6 +3061,8 @@
       }
     }
     if (x.why && x.n > 1) { note += `<small>×\u00a0${x.n}${x.why === "habit" ? ", comme d'habitude" : " pour " + plural(+S.prefs.foyer || 1, "personne", "personnes")}.</small>`; acts += `<button class="act" type="button" data-act="wlqty1" data-i="${i}">Toujours 1${ic("chev")}</button>`; }
+    /* « tomates pelées x2 » devenu une seule boîte plus grande : la ligne le dit */
+    if (x.planned && x.nGiven && x.wn > 1 && x.n !== x.wn) note += `<small>${x.n}\u00a0×\u00a0${esc(p.format)} au lieu des ${x.wn} écrits\u00a0: à peu près la même quantité, pour la commande la moins chère.</small>`;
     if (x.dietMiss) note += `<small>Rien pour ton régime (${esc(dietWhy())}) sous «\u00a0${esc(x.q)}\u00a0»\u00a0: voici sans ce filtre.</small>`;
     return `<div class="item wli" data-rm="l:${i}"><a class="thumb" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 56)}</a><div class="it"><span class="wq">${esc(x.raw)}</span><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${u ? ", " + esc(u) : ""}${b ? ", chez " + esc(retName(b.ret)) + (b.sim ? " (simulé)" : "") : ""}${x.usual ? ", ton choix habituel" : ""}</small>${note}<div class="acts">${acts}</div></div><div class="ir"><span class="lp">${b ? eurC(Math.round(b.price * 100) * x.n) : "–"}</span>${wlStep(x, i)}</div></div>`;
   }
@@ -2957,12 +3088,16 @@
       plan = W.lines.some((x) => x.pick) ? listPlan(W.lines) : null;
       const apply = plan && !W.planApplied ? (plan.short ? plan.short.picks : plan.covered === plan.n ? plan.picks : null) : null;
       if (apply) {
-        for (const pk of apply) if (pk.id) { pk.line.pick = pk.id; pk.line.n = pk.n; }
+        for (const pk of apply) if (pk.id) { if (pk.line.n !== pk.n || pk.line.pick !== pk.id) pk.line.planned = true; pk.line.pick = pk.id; pk.line.n = pk.n; }
         W.planApplied = true;
         plan = listPlan(W.lines);
       }
     } catch (e) { plan = null; /* la liste s'affiche quand même, produit par produit */ }
     const found = W.lines.filter((x) => x.pick), nFree = W.lines.filter((x) => x.free && S.free[x.free]).length;
+    /* l'enseigne de chaque ligne d'après la carte, quand elle prend ce produit-là */
+    const chOf = new Map();
+    if (plan && plan.short) plan.short.picks.forEach((pk) => { if (pk.id && pk.id === pk.line.pick) chOf.set(pk.line, plan.short.ch); });
+    else if (plan) plan.picks.forEach((pk) => { if (pk.id && pk.ch && pk.id === pk.line.pick) chOf.set(pk.line, pk.ch); });
     let t = 0;
     found.forEach((x) => { const b = best(S.prods.get(x.pick)); if (b) t += Math.round(b.price * 100) * x.n; });
     const nArt = found.reduce((a, x) => a + x.n, 0);
@@ -2992,7 +3127,7 @@
       dockHtml: found.length ? `<button class="mini" type="button" data-act="wladd"><span class="mn">${nArt}</span><span class="ml">Ajouter au panier</span><span class="mp">${eurC(plan && !plan.short && plan.covered === plan.n && plan.picks.every((pk) => pk.id === pk.line.pick && pk.n === pk.line.n) ? plan.total : t)}</span></button>` : "",
       /* un seul appel à l'action plein : le dock ; en bas de page, seulement « Enregistrer en liste » */
       html: `<h1 class="lt">Ma liste</h1><p class="lt-sub">${plural(found.length, "produit trouvé", "produits trouvés")} sur ${W.lines.length}${nFree ? ", " + plural(nFree, "ligne libre", "lignes libres") : ""}${found.length && !(plan && !plan.short) ? ", environ " + eurC(t) + " au meilleur prix de chaque produit" : ""}</p>` + pasteHtml + planHtml +
-        `<div class="order wlist" style="margin-top:12px">${W.lines.map(wlRow).join("")}</div>` +
+        `<div class="order wlist" style="margin-top:12px">${W.lines.map((x, i) => wlRow(x, i, chOf.get(x))).join("")}</div>` +
         `<p class="gf">Pour chaque ligne, le produit le moins cher au kilo ou au litre parmi les plus proches de ce que tu as écrit, dans un format courant. «\u00a0Autre choix\u00a0» pour en prendre un autre.</p>` +
         (found.length ? `<div class="pad btns" style="padding-top:16px"><button class="btn tint" type="button" data-act="wlsave">Enregistrer en liste</button>${speakBtn("liste", "Écouter ma liste", "btn ghost")}</div>` : ""),
     };
@@ -3272,8 +3407,8 @@
      relevés, jamais sur un prix simulé. */
   /* variantes qui ne valent que dans un rayon : une bière forte n'est pas la bière de tous les jours, alors qu'une
      moutarde forte est la moutarde ordinaire */
-  const RAY_VARIANT = { bieres: ["forte", "fort"], cafe: ["grain", "soluble"], "legumes-surgeles": ["cuit", "cuite"] };
-  const VARIANT = new Set("zero light sucre stevia max cherry vanille citron fraise peche menthe framboise mangue pamplemousse grenade cerise aromatisee decafeine decaf bio lactose croissance vitamine omega chocolat pepite nappee noisette amande caramel gluten complet complete integrale magnesium humide sensitive hypoallergenique couleur noir marseille brebi chevre soja coco vegetal grec grecque bifidu calcium graine melange isio friture roux cassonade canne morceau fluide sarrasin mais pois tournesol colza olive arachide noix sesame pepins avocat lin fondue cru fume sec dinde poulet volaille halal casher chaton chiot junior senior sterilise capsule poudre feuille recharge culotte pants blonde ambree brune blanche ipa alcool rose fruits epice epices piment sale paprika barbecue fluor blancheur sensible antipelliculaire gras secs normaux homme femme bebe enfant kid electrique precuit precuite mini mure myrtille multicereale vegetau vegetarien".split(" ").map(stem));
+  const RAY_VARIANT = { bieres: ["forte", "fort"], cafe: ["grain", "soluble"], "legumes-surgeles": ["cuit", "cuite"], "chocolat-tablettes": ["blanc"] };
+  const VARIANT = new Set("zero light sucre stevia max cherry vanille citron fraise peche menthe framboise mangue pamplemousse grenade cerise aromatisee decafeine decaf bio lactose croissance vitamine omega chocolat pepite nappee noisette amande caramel gluten complet complete integrale magnesium humide sensitive hypoallergenique couleur noir marseille brebi chevre soja coco vegetal grec grecque bifidu calcium graine melange isio friture roux cassonade canne morceau fluide sarrasin mais pois tournesol colza olive arachide noix sesame pepins avocat lin fondue cru fume sec dinde poulet volaille halal casher chaton chiot junior senior sterilise capsule poudre feuille recharge culotte pants blonde ambree brune blanche ipa alcool rose fruits epice epices piment sale paprika barbecue fluor blancheur sensible antipelliculaire gras secs normaux homme femme bebe enfant kid electrique precuit precuite mini mure myrtille multicereale vegetau vegetarien sel speculoos latte matcha boulgour quinoa chute cacahuete croute cappuccino macchiato tete foie canard lapin panache panachee".split(" ").map(stem));
   const ATTR = new Set(("gazeuse petillante bulle plate aromatisee citron fraise peche menthe framboise mangue pamplemousse grenade cerise vanille " +
     "zero light sucre stevia max cherry pulpe concentre presse orange sanguine multifruit agrume " +
     "bio lactose entier ecreme demi croissance vitamine omega montagne microfiltre " +
@@ -3659,8 +3794,10 @@
   /* nom du produit tel que l'enseigne l'affiche, sinon le nom Cabas gardé dans l'instantané */
   const siteName = (rid, x) => { const p = S.prods.get(x.id), det = p && detailsNow(p), d = det && det[rid]; return (d && d.name) || ""; };
   const curIdx = (o, st) => { let i = (S.guide.cur || {})[o.rid]; if (!(i >= 0 && i < st.n)) { i = st.L.findIndex((x) => !ckOf(o.rid, x.id)); if (i < 0) i = 0; } return i; };
-  function fillAdvance(o) {
-    const st = ordState(o), i0 = curIdx(o, st);
+  /* après une coche, le produit suivant pas encore coché, en partant de celui qu'on vient de cocher (pas du « premier
+     pas coché », qui serait déjà le suivant : le deuxième produit était sauté) */
+  function fillAdvance(o, fromId) {
+    const st = ordState(o), j0 = fromId != null ? st.L.findIndex((x) => x.id === fromId) : -1, i0 = j0 >= 0 ? j0 : curIdx(o, st);
     for (let k = 1; k <= st.n; k++) { const j = (i0 + k) % st.n; if (!ckOf(o.rid, st.L[j].id)) { S.guide.cur = Object.assign({}, S.guide.cur, { [o.rid]: j }); return; } }
   }
   /* ce que devient une commande quand son sous-total change : son total, ses frais, son minimum d'achat */
@@ -3730,7 +3867,7 @@
     const s = (fillActive() && snapOf()) || fillSnap();
     if (!s) return "";
     const L = [], pv = !fillActive();
-    if (!rid) L.push(`${pourOn() ? "Les courses " + deN(pourName()) : "Mes courses"} du ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}, avec Cabas`, "");
+    if (!rid) L.push(`${pourOn() ? "Les courses " + deN(pourName()) : "Mes courses"} du ${er1(new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" }))}, avec Cabas`, "");
     const line = (x, nm) => `- ${x.q > 1 ? x.q + " x " : ""}${nm}${x.f && !norm(nm).includes(norm(x.f)) ? ", " + x.f : ""}`;
     for (const o of s.orders.filter((y) => !rid || y.rid === rid)) {
       const r = S.allMap.get(o.rid) || { name: o.rid, service: o.rid }, st = ordState(o, pv), ch = r.channel || {};
@@ -3805,7 +3942,7 @@
     if (away < 1500 || S.prefs.manualCk || !o || ckOf(op.rid, op.id) || !o.items.some((x) => x.id === op.id && !x.st)) { if (here && S.route.id === op.rid) rerender(); return; }
     const cur0 = (S.guide.cur || {})[op.rid], x = o.items.find((y) => y.id === op.id);
     S.guide.ck[op.rid + "|" + op.id] = 1;
-    fillAdvance(o);
+    fillAdvance(o, op.id);
     saveGuide(); renderChrome();
     if (here) { if (ordState(o).k === ordState(o).n) window.scrollTo(0, 0); rerender(); }
     undoable(`${x.nm || "Produit"} coché`, () => { delete S.guide.ck[op.rid + "|" + op.id]; S.guide.cur = Object.assign({}, S.guide.cur, { [op.rid]: cur0 }); saveGuide(); }, 6000);
@@ -4179,7 +4316,7 @@
     const t = new Date(iso + "T12:00:00"), today = isoDay(new Date()), tom = isoDay(new Date(Date.now() + 864e5));
     if (iso === today) return "aujourd'hui";
     if (iso === tom) return "demain";
-    const s = t.toLocaleDateString("fr-FR", short ? { weekday: "short", day: "numeric" } : { weekday: "long", day: "numeric", month: "long" });
+    const s = er1(t.toLocaleDateString("fr-FR", short ? { weekday: "short", day: "numeric" } : { weekday: "long", day: "numeric", month: "long" }));
     return s.replace(/\.$/, "");
   }
   function whenText(w) {
@@ -4417,7 +4554,7 @@
   function cartText() {
     const res = cartResult(), st = res.steps[res.K], bst = st && (st.full || st.partial);
     const line = (id, q) => { const p = S.prods.get(id); return `- ${q > 1 ? q + " x " : ""}${p.brand} ${p.name}${p.format ? ", " + p.format : ""}`; };
-    const L = [`${pourOn() ? "Les courses " + deN(pourName()) : "Mes courses"} du ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}, avec Cabas`];
+    const L = [`${pourOn() ? "Les courses " + deN(pourName()) : "Mes courses"} du ${er1(new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" }))}, avec Cabas`];
     if (bst) {
       for (const o of bst.orders) {
         const r = S.retMap.get(o.ch.id), ch = r.channel || {};
@@ -4616,11 +4753,23 @@
     return { orders, mag, skip };
   }
   /* la valeur d'un ow dans l'instantané suit « À qui est ce produit » pendant le remplissage */
+  /* une ligne de l'instantané prend parfois un autre produit que celui du panier : l'équivalent pris par le panier
+     souple (x.src) ; ses exemplaires de l'autre se comptent alors d'après chaque produit du panier qu'elle remplace */
   function snapOwn(id, v) {
     const s = snapOf();
     if (!s || !s.own) return;
+    const own = S.owners || {};
     let rem = v;
-    for (const x of s.orders.flatMap((o) => o.items).concat(s.comp, s.skipped)) if (x.id === id) { const k = Math.min(x.q, rem); if (k > 0) x.ow = k; else delete x.ow; rem -= k; }
+    for (const x of s.orders.flatMap((o) => o.items).concat(s.comp, s.skipped)) {
+      const src = srcOf(x), q0 = src[id];
+      if (!(q0 > 0)) continue;
+      const k = Math.min(q0, Math.max(0, rem));
+      rem -= k;
+      let oth = 0;
+      for (const [b, q] of Object.entries(src)) if (b !== id) oth += Math.min(q, Math.max(0, own[b] | 0));
+      const ow = Math.min(x.q, k + oth);
+      if (ow > 0) x.ow = ow; else delete x.ow;
+    }
     saveGuide();
   }
   /* « À Sam », « 1 à toi, 2 à Sam » ; rien pour une ligne qui est toute à toi */
@@ -4698,10 +4847,12 @@
   function fillParts(sp) {
     const s = fillUsable() ? snapOf() : null;
     if (!s || s.preview) return "";
-    const D = snapSplit(s), sum = (L) => L.reduce((a, z) => a + z[2], 0);
-    const ot = D.orders.reduce((a, y) => a + y.oSub + y.oFee, 0) + sum(D.mag.ot), me = D.orders.reduce((a, y) => a + y.mSub + y.mFee, 0) + D.mag.me.reduce((a, y) => a + y.cost, 0);
+    /* une commande notée « Pas passée » ne compte pas, comme dans ce que « Envoyer sa part » envoie (retRead) */
+    const D = snapSplit(s), sum = (L) => L.reduce((a, z) => a + z[2], 0), live = D.orders.filter((y) => !y.st.drop), gone = D.orders.filter((y) => y.st.drop);
+    const ot = live.reduce((a, y) => a + y.oSub + y.oFee, 0) + sum(D.mag.ot), me = live.reduce((a, y) => a + y.mSub + y.mFee, 0) + D.mag.me.reduce((a, y) => a + y.cost, 0);
     if (Math.abs(ot - sp.other.total) < 1 && Math.abs(me - sp.me.total) < 1) return "";
-    return `<p class="hint">D'après ce qui est commandé dans «\u00a0Remplir mes paniers\u00a0»\u00a0: ta part ${eurC(me)}, part ${esc(deN(duoName()))} ${eurC(ot)}${D.skip.ot.length ? ", sans ses produits laissés de côté" : ""}. C'est ce que «\u00a0Envoyer sa part\u00a0» lui envoie.</p>`;
+    const why = [gone.length === 1 ? `sans la commande ${esc(retName(gone[0].rid))} pas passée` : gone.length ? "sans les commandes pas passées" : "", D.skip.ot.length ? "sans ses produits laissés de côté" : ""].filter(Boolean).join(", ");
+    return `<p class="hint">D'après ce qui est commandé dans «\u00a0Remplir mes paniers\u00a0»\u00a0: ta part ${eurC(me)}, part ${esc(deN(duoName()))} ${eurC(ot)}${why ? ", " + why : ""}. C'est ce que «\u00a0Envoyer sa part\u00a0» lui envoie.</p>`;
   }
   const duoBox = (bst, complete) => (S.duo.w ? `<section class="order duo noprint" id="duo" aria-labelledby="duoT">${duoBody(bst, complete)}</section>` : "");
   /* la liste de l'autre rejoint le panier ; une autre liste de commande à deux en sort d'abord (confirmé avant) */
@@ -4964,7 +5115,8 @@
           (X.kind === "pour" ? `<h3 class="gh" id="sendDL">Pour quel jour</h3><div class="tagset" role="radiogroup" aria-labelledby="sendDL"><button class="chip" type="button" role="radio" data-act="sendday" data-d="" aria-checked="${!X.j}">Peu importe</button>${days.map((d) => `<button class="chip" type="button" role="radio" data-act="sendday" data-d="${d}" aria-checked="${X.j === d}">${esc(dayLabel(d, true).replace(/^./, (c) => c.toUpperCase()))}</button>`).join("")}</div>` +
             `<div style="padding-top:14px">${field("sendB", "Budget, si tu veux", `type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="${esc(X.b)}"`, "Cabas dira à ton proche ce qu'il reste, livraison comprise.", "€")}</div>` +
             (myDiet().d.length || myDiet().a.length ? `<div class="group"><div class="row"><span class="rt" id="sendDtL">Joindre mon régime<small>${esc(dietText(myDiet().d, myDiet().a).replace(/^./, (c) => c.toUpperCase()))}. Tes courses le suivront, d'après ce que les enseignes indiquent.</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="senddiet" aria-labelledby="sendDtL"${X.diet ? " checked" : ""}><span></span></label></div></div>` : "") : "") +
-          `<p class="gf">Le lien contient ta liste, ${X.kind === "pour" ? "tes enseignes, ta façon de recevoir tes courses " : ""}et ce que tu écris ici, rien d'autre : ni ton adresse, ni ton code postal. Il part par le partage de ton téléphone, sans serveur.</p>`,
+          /* tout ce que le lien emporte, régime et allergènes compris quand ils sont joints (données de santé) */
+          `<p class="gf">Le lien contient ${X.kind === "pour" ? `ta liste, tes enseignes, ta façon de recevoir tes courses, le jour et le budget si tu les choisis${myDiet().d.length || myDiet().a.length ? ", ton régime et tes allergènes si tu les joins" : ""}, et ce que tu écris ici` : "ta liste et ce que tu écris ici"}, rien d'autre : ni ton adresse, ni ton code postal. Il part par le partage de ton téléphone, sans serveur.</p>`,
         foot: `<button class="btn" type="button" data-act="sendok"${n ? "" : " disabled"}>${X.kind === "pour" ? "Envoyer à mon proche" : "Envoyer ma liste"}</button>`,
       };
     };
@@ -5100,6 +5252,9 @@
   /* une carte sur l'accueil, une seule : les courses du proche en cours, à reprendre, ou la commande à deux */
   function duoCard() {
     const P = S.duo.pour;
+    /* ses courses finies pendant qu'elles sont dans le panier (retour envoyé, ou chaque commande notée) : l'accueil le
+       dit et propose de revenir à ses propres courses */
+    if (pourOn() && (P.rs || guideDone(S.guide))) return `<section class="hcard col arr" aria-labelledby="pourT"><div class="arrh">${ic("users", "si")}<span><b id="pourT">Courses ${esc(deN(pourName()))} terminées</b><small>${P.rs ? "Retour envoyé " + esc(whenFr(P.rs)) : "Toutes ses commandes sont notées"}. Ton panier est mis de côté jusqu'à ce que tu y reviennes.</small></span></div><div class="btns two"><button class="btn sm tint" type="button" data-act="pourexit">Revenir à mes courses</button><button class="btn sm ghost" type="button" data-act="pourforget">Oublier ses courses</button></div></section>`;
     if (pourOn()) return `<a class="hcard tint" href="#/panier" data-tab="panier">${ic("users", "si")}<span><b>Les courses ${esc(deN(pourName()))}</b><small>${plural(count(), "article", "articles")} dans son panier${P.j ? ", pour " + esc(dayLabel(P.j)) : ""}. Le tien est mis de côté.</small></span>${ic("chev", "chev")}</a>`;
     /* toutes ses commandes passées ou abandonnées, ou le retour envoyé : terminées, à revoir ou à oublier */
     if (P && P.alt && pourDone(P)) return `<section class="hcard col arr" aria-labelledby="pourT"><div class="arrh">${ic("users", "si")}<span><b id="pourT">Courses ${esc(deN(pourName()))} terminées</b><small>${P.rs ? "Retour envoyé " + esc(whenFr(P.rs)) : "Toutes ses commandes sont notées"}. Son panier reste sur ce téléphone tant que tu ne l'oublies pas.</small></span></div><div class="btns two"><button class="btn sm tint" type="button" data-act="pourgo">Revoir ses courses</button><button class="btn sm ghost" type="button" data-act="pourforget">Oublier ses courses</button></div></section>`;
@@ -5108,7 +5263,8 @@
     return "";
   }
   /* les courses du proche (mises de côté) sont-elles finies : retour envoyé, ou chaque commande passée ou abandonnée */
-  const pourDone = (P) => { if (P.rs) return true; const g = (P.alt && P.alt.guide) || {}, sn = g.snap; return !!sn && sn.orders.length > 0 && sn.orders.every((o) => (g.done || {})[o.rid] || (g.drop || {})[o.rid]); };
+  const guideDone = (g) => { const sn = g && g.snap; return !!sn && sn.orders.length > 0 && sn.orders.every((o) => (g.done || {})[o.rid] || (g.drop || {})[o.rid]); };
+  const pourDone = (P) => !!P.rs || guideDone(P.alt && P.alt.guide);
   /* Listes et réglages : « À plusieurs » */
   function duoRows() {
     const P = S.duo.pour, rows = [];
@@ -5179,8 +5335,10 @@
   /* secteur Auchan des questions de départ : la phrase d'où vient le choix, puis les trois secteurs (un geste = à la main) */
   function sectHtml() {
     const G = groupsOf().auchan || [], pk = G.length ? pickOf("auchan", G) : "";
-    return `<p class="gf" aria-live="polite">${esc(autoText("auchan"))}</p><div class="group" role="radiogroup" aria-labelledby="wsectL">${SECTEURS.map(([id, l]) => opt("wsect", esc(l), pk === id || (S.allMap.get(id) || {}).livraison === pk, `data-id="${id}"`, null, true)).join("")}</div>`;
+    return `<p class="gf" aria-live="polite">${esc(autoText("auchan", true))}</p><div class="group" role="radiogroup" aria-labelledby="wsectL">${SECTEURS.map(([id, l]) => opt("wsect", esc(l), pk === id || (S.allMap.get(id) || {}).livraison === pk, `data-id="${id}"`, null, true)).join("")}</div>`;
   }
+  /* les questions de départ s'ouvriront à la première visite du panier avec des produits */
+  const welcomeDue = () => S.ready && !S.seen.welcome && count() > 0 && !pourOn();
   function welcomeSheet() {
     const build = () => {
       const groups = new Map();
@@ -5380,7 +5538,7 @@
   }
   VIEWS.magasin = () => {
     const mag = storeMag(), mode = storeMode(), L = storeItems(mode).sort((a, b) => storeOrder(a) - storeOrder(b));
-    const k = L.filter((x) => S.guide.ck[storeKey(x)]).length, today = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+    const k = L.filter((x) => S.guide.ck[storeKey(x)]).length, today = er1(new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }));
     const groups = [];
     for (const x of L) { const u = x.free ? "Lignes libres" : univName((rayon(S.prods.get(x.id).r) || {}).u) || "Autres"; const g = groups[groups.length - 1]; if (g && g.u === u) g.xs.push(x); else groups.push({ u, xs: [x] }); }
     const seg = mag.length && count() ? `<div class="pad noprint"><div class="seg" role="radiogroup" aria-label="Liste affichée"><button type="button" role="radio" data-act="storemode" data-v="mag" aria-checked="${mode === "mag"}">À acheter en magasin</button><button type="button" role="radio" data-act="storemode" data-v="all" aria-checked="${mode === "all"}">Tout le panier</button></div></div>` : "";
@@ -5719,13 +5877,29 @@
     if (!m) { m = matchLine({ raw: q, q: norm(q).split(" ").filter((t) => t && !STOP.has(t)).join(" "), n: 1, real: true }); RECM.map.set(q, m); }
     return m;
   }
+  /* les courses d'un ingrédient : parmi les formats de la variante la plus simple (prix relevés), celui qui couvre le
+     besoin au plus petit prix, en paquets entiers ; à prix égal, le moins cher au kilo. 50 ml de lait ne font pas
+     acheter six litres, ni 60 g d'emmental râpé un kilo. */
+  function recBuy(m, u, need) {
+    const key = m.pick + "|" + u + "|" + Math.round(need * 10);
+    if (RECM && RECM.buy && RECM.buy.has(key)) return RECM.buy.get(key);
+    let bestB = null;
+    for (const id of [m.pick].concat(m.alts || [])) {
+      const p = S.prods.get(id), b = p && bestReal(p), v = (p && p.qty && p.qty.v) || 0;
+      if (!b || !v || p.qty.u !== u) continue;
+      const n = Math.max(1, Math.ceil(need / v - 1e-9)), c = Math.round(b.price * 100) * n, unit = b.price / v;
+      if (!bestB || c < bestB.c || (c === bestB.c && unit < bestB.unit)) bestB = { p, b, n, c, unit, v };
+    }
+    if (!bestB) { const p = S.prods.get(m.pick), b = bestReal(p); bestB = { p, b, n: 1, c: Math.round(b.price * 100), v: 0 }; }
+    if (RECM) (RECM.buy || (RECM.buy = new Map())).set(key, bestB);
+    return bestB;
+  }
   function recIng(g, k) {
     const m = recMatch(g.q);
     const need = g.need * k;
     if (!m.pick) return { g, need, p: null, off: m.cands.length > 0 };
-    const p = S.prods.get(m.pick), b = bestReal(p), v = (p.qty && p.qty.v) || 0;
+    const { p, b, n, v } = recBuy(m, g.u, need);
     const same = v && p.qty.u === g.u;
-    const n = same ? Math.max(1, Math.ceil(need / v - 1e-9)) : 1;
     const used = same ? (b.price * need) / v : b.price;
     /* ingrédient qui ne correspond pas au régime (aucun produit conforme) : la recette le dit, elle reste ouvrable */
     return { g, need, p, b, n, used, buy: b.price * n, bad: !!m.dietMiss };
@@ -5841,8 +6015,8 @@
   function composeOnce(o, meals, P) {
     /* ce qu'une ou deux recettes ajoutent aux courses déjà prévues (centimes), produit par produit, paquets entiers */
     const need = new Map();
-    const pk = (q) => { if (!P.M.has(q)) { const m = recMatch(q), p = m.pick && S.prods.get(m.pick), b = p && bestReal(p); P.M.set(q, b ? { c: Math.round(b.price * 100), v: (p.qty && p.qty.v) || 0, u: p.qty && p.qty.u } : null); } return P.M.get(q); };
-    const buyQ = (q, u, n) => { const x = pk(q); if (!x || !(n > 0)) return 0; return x.c * (x.v && x.u === u ? Math.max(1, Math.ceil(n / x.v - 1e-9)) : 1); };
+    /* même choix de paquets que les courses d'une recette (recBuy) */
+    const buyQ = (q, u, n) => { if (!(n > 0)) return 0; const m = recMatch(q); return m.pick && bestReal(S.prods.get(m.pick)) ? recBuy(m, u, n).c : 0; };
     const adds = (rcs) => { const d = new Map(); for (const rc of rcs) for (const g of rc.ing) { const y = d.get(g.q) || { u: g.u, n: 0 }; y.n += (g.need * o.people) / rc.portions; d.set(g.q, y); } let c = 0; d.forEach((y, q) => { const n0 = (need.get(q) || { n: 0 }).n; c += buyQ(q, y.u, n0 + y.n) - buyQ(q, y.u, n0); }); return { c, d }; };
     const picks = [], mains = {}, sideUse = {};
     let out = false;
@@ -6805,7 +6979,7 @@
       case "reload": location.reload(); break;
       case "install": installSheet(); break;
       case "installnow": installNow(); break;
-      case "savelist": nameSheet("Nouvelle liste", "Courses du " + new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" }), "savelistok"); break;
+      case "savelist": nameSheet("Nouvelle liste", "Courses du " + er1(new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })), "savelistok"); break;
       case "savelistok": {
         const nm = ($("#nameIn").value || "").trim() || "Ma liste";
         const L = { id: Date.now().toString(36), name: nm, items: Object.assign({}, S.basket), at: new Date().toISOString().slice(0, 10) };
@@ -7074,7 +7248,7 @@
       case "wlplan": {
         const W = S.wl, plan = W && W.plan;
         if (!plan) break;
-        for (const pk of plan.picks) if (pk.id) { pk.line.pick = pk.id; pk.line.n = pk.n; }
+        for (const pk of plan.picks) if (pk.id) { if (pk.line.n !== pk.n || pk.line.pick !== pk.id) pk.line.planned = true; pk.line.pick = pk.id; pk.line.n = pk.n; }
         rerender(); toast("Produits choisis pour la commande la moins chère"); break;
       }
       case "wlex": {
@@ -7117,14 +7291,14 @@
         window.scrollTo(0, 0); rerender(); break;
       }
       case "wledit": if (S.wl) S.wl.lines = null; rerender(); break;
-      case "wlinc": { const x = S.wl && S.wl.lines[+t.dataset.i]; if (x) { x.n = Math.min(99, x.n + 1); if (x.free && S.free[x.free]) { S.free[x.free].q = x.n; saveFree(); } rerender(); } break; }
-      case "wldec": { const L = S.wl && S.wl.lines, i = +t.dataset.i, x = L && L[i]; if (x) { if (x.n > 1) { x.n--; if (x.free && S.free[x.free]) { S.free[x.free].q = x.n; saveFree(); } } else wlRemove(i); rerender(); } break; }
+      case "wlinc": { const x = S.wl && S.wl.lines[+t.dataset.i]; if (x) { x.n = Math.min(99, x.n + 1); x.planned = false; if (x.free && S.free[x.free]) { S.free[x.free].q = x.n; saveFree(); } rerender(); } break; }
+      case "wldec": { const L = S.wl && S.wl.lines, i = +t.dataset.i, x = L && L[i]; if (x) { if (x.n > 1) { x.n--; x.planned = false; if (x.free && S.free[x.free]) { S.free[x.free].q = x.n; saveFree(); } } else wlRemove(i); rerender(); } break; }
       case "wlalt": wlAltSheet(+t.dataset.i); break;
       case "wlpick": {
         /* le choix est mémorisé pour cette ligne (« lait » = ce produit), sauf « Juste cette fois » */
         const x = S.wl && S.wl.lines[+t.dataset.i];
         if (!x) { closeSheet(); break; }
-        x.pick = id; x.usualAlt = null;
+        x.pick = id; x.usualAlt = null; x.planned = false;
         const key = norm(x.q);
         closeSheet(); rerender();
         if (key && S.prods.has(id)) {
@@ -7154,10 +7328,14 @@
       case "wladd": {
         const n = addItems(wlItems(), false);
         S.wl = null; store.set("draft", "");
-        renderChrome(); bumpBadge(); switchTab("panier");
-        toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier"); break;
+        renderChrome(); bumpBadge();
+        /* les questions de départ s'ouvrent dans la foulée : pas de toast par-dessus la feuille (il cachait un secteur) */
+        const quiet = welcomeDue();
+        switchTab("panier");
+        if (!quiet) toast(plural(n, "produit ajouté", "produits ajoutés") + " au panier");
+        break;
       }
-      case "wlsave": nameSheet("Nouvelle liste", "Ma liste du " + new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" }), "wlsaveok"); break;
+      case "wlsave": nameSheet("Nouvelle liste", "Ma liste du " + er1(new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })), "wlsaveok"); break;
       case "wlsaveok": {
         const nm = ($("#nameIn").value || "").trim() || "Ma liste";
         const L = { id: Date.now().toString(36), name: nm, items: wlItems(), at: new Date().toISOString().slice(0, 10) }, fr = wlFree();
@@ -7209,7 +7387,7 @@
         const o = fillOrd(id);
         if (!o) break;
         const k = id + "|" + t.dataset.p, on = !S.guide.ck[k], main = !t.closest(".gi");
-        if (on) { S.guide.ck[k] = 1; buzz("add"); if (main) fillAdvance(o); } else delete S.guide.ck[k];
+        if (on) { S.guide.ck[k] = 1; buzz("add"); if (main) fillAdvance(o, t.dataset.p); } else delete S.guide.ck[k];
         if (S.guide.open && S.guide.open.rid === id && S.guide.open.id === t.dataset.p) S.guide.open = null;
         saveGuide(); renderChrome();
         const st = ordState(o);

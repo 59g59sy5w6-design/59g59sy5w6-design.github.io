@@ -1,5 +1,5 @@
 // Audit des textes de Cabas : tutoiement, aucun tiret cadratin, aucun émoji, espace insécable avant : ; ? ! et dans les
-// guillemets, « simulé » à côté de chaque prix E.Leclerc (et dans chaque cellule de sa colonne d'un tableau), « saisi
+// guillemets, « 1er » pour le premier du mois, « simulé » à côté de chaque prix E.Leclerc (et dans chaque cellule de sa colonne d'un tableau), « saisi
 // par toi » (ou « d'après ce que tu as collé ») à côté de chaque montant qui n'est pas un prix relevé. Deux passes : les
 // fichiers (sources servies, données, documentation), puis le texte affiché (nœuds de texte, aria-label, placeholder) de chaque écran et de chaque feuille de tools/a11y.cjs,
 // à 390 px, états plein (E.Leclerc activé, un total payé, une ligne libre à prix saisi) et vide ; en plus, « Et si »
@@ -76,6 +76,8 @@ const AUDIT_JS = `((amounts) => {
     if (/ [:;?!]/.test(t)) out.push({ cat: "insécable", msg: how + " espace ordinaire avant la ponctuation : « " + short(t) + " »" });
     if (/« | »/.test(t)) out.push({ cat: "insécable", msg: how + " espace ordinaire dans les guillemets : « " + short(t) + " »" });
     if (/\\b(vous|votre|vos)\\b/i.test(t.replace(/«[^»]*»/g, ""))) out.push({ cat: "tutoiement", msg: how + " « " + short(t) + " »" });
+    /* le premier du mois s'écrit « 1er novembre », jamais « 1 novembre » */
+    if (/(^|[^\\d,.])1[\\s\\u00a0](janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|janv|févr|avr|juil|sept|oct|nov|déc)\\b/i.test(t)) out.push({ cat: "date", msg: how + " « 1 » au lieu de « 1er » : « " + short(t) + " »" });
   };
   const BOX = ".row, .orow, .offer, li, tr, .order, .hcard, .deal, .sum, .card, .opt, .gi, .banner, .of, .item, p, .cmpc, .ans";
   const near = (el) => el.closest(BOX) || el.parentElement;

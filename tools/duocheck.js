@@ -194,9 +194,13 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     check(R && JSON.stringify(R.f) === JSON.stringify([["Bougies d'anniversaire", 1]]), "retour : la ligne libre du proche n'y est pas " + JSON.stringify(R && R.f));
     const snapTot = await B.evaluate(() => { const d = cabasDebug(); const s = d.S.guide.snap; return s.orders.reduce((a, o) => a + d.ordState(o).tot, 0); });
     check(sheetTot === snapTot, `retour : total de la feuille ${sheetTot} au lieu de ${snapTot}`);
-    /* revenir à ses courses : le panier de l'aidant revient à l'identique */
-    await go(B, "#/panier");
-    await B.click(".banner.pour [data-act=pourexit]");
+    /* le retour envoyé, sans avoir touché « Revenir à mes courses » : l'accueil dit ses courses terminées et propose de
+       revenir aux siennes (plus « Les courses de Camille » en cours) */
+    await go(B, "#/");
+    const hv0 = await text(B, "#view");
+    check(/Courses de Camille b terminées/.test(hv0) && !/Le tien est mis de côté/.test(hv0) && (await B.$("#view .hcard [data-act=pourexit]")), "accueil : retour envoyé, les courses du proche restent « en cours » « " + hv0.slice(0, 200) + " »");
+    /* revenir à ses courses depuis cette carte : le panier de l'aidant revient à l'identique */
+    await B.click("#view .hcard [data-act=pourexit]");
     await B.waitForTimeout(300);
     sb = await all(B);
     check(JSON.stringify(sb.basket) === JSON.stringify(AIDANT) && sb.prefs.comp !== false && !sb.prefs.budget && !(sb.prefs.diet || {}).gluten && sb.prefs.zip === "75011", "retour à mes courses : panier ou réglages de l'aidant pas rendus " + JSON.stringify(sb.prefs));
@@ -382,6 +386,66 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     await B.waitForTimeout(300);
     sb = await all(B);
     check(JSON.stringify(Object.keys(sb.basket).sort().map((k) => [k, sb.basket[k]])) === JSON.stringify(Object.keys(MINE).sort().map((k) => [k, MINE[k]])) && !Object.keys(sb.owners).length && !sb.duo.w, "duo : « Retirer la liste de Sam » laisse ses produits");
+
+    /* ---------- 4 ter. à qui est une ligne prise par un équivalent, commande pas passée ---------- */
+    /* le produit de Sam est pris par un équivalent accepté (panier souple) : l'instantané a la ligne de l'équivalent,
+       qui garde d'où elle vient (src). « À toi » dans « À qui est ce produit » doit la rendre à l'aidant dans
+       l'instantané aussi, sinon « Envoyer sa part » envoie à Sam des produits qui ne sont plus les siens */
+    {
+      const keepB = await all(B);
+      const OWNED = await B.evaluate(() => {
+        const d = cabasDebug(), out = [];
+        for (const p of d.S.list) {
+          const o = p.offers["auchan-livraison-perreux"];
+          if (!o || !(o.price > 3) || o.sim) continue;
+          const e = d.equivOf(p).find((x) => { const y = x.e.offers["auchan-livraison-perreux"]; return y && !y.sim && y.price < o.price * 0.8; });
+          if (e) { out.push([p.id, e.e.id]); break; }
+        }
+        return out[0] || null;
+      });
+      if (check(OWNED, "à deux : jeu d'essai, aucun produit avec un équivalent moins cher chez Auchan")) {
+        const [P, E] = OWNED, MINE2 = { "contrex-eau-minerale-naturelle-6-x-1-l": 3, "president-beurre-gastronomique-doux-82-mg-250-g": 3, "barilla-pates-capellini-n-1-500-g": 4, "carapelli-huile-d-olive-vierge-extra-classico-75-cl": 2 };
+        await load(B, { basket: Object.assign({}, MINE2, { [P]: 2 }), owners: { [P]: 2 }, flex: { [P]: [E] }, duo: { w: { t: "abcd1234", n: "Sam", at: new Date().toISOString(), k: "duo" } }, seen: { welcome: 1, first: { monoprix: 1, carrefour: 1, houra: 1, auchan: 1 } }, prefs: { off: { leclerc: true }, offv: 1, maxOrders: 1 } }, "#/panier");
+        await settled(B);
+        await B.click("[data-act=fillgo]");
+        await B.waitForTimeout(500); await ready(B);
+        const lineOf = () => B.evaluate((P) => { const s = cabasDebug().S.guide.snap; return s.orders.flatMap((o) => o.items).concat(s.comp, s.skipped).filter((x) => x.id === P || (x.src && x.src[P])); }, P);
+        const L1 = await lineOf();
+        if (check(L1.length && L1.every((x) => x.ow === Math.min(x.q, 2)), "à deux : l'instantané ne garde pas les exemplaires de Sam sur la ligne de l'équivalent " + JSON.stringify(L1))) {
+          await go(B, "#/panier"); await settled(B);
+          await B.click(`[data-act=itemopt][data-id="${P}"]`);
+          await B.waitForSelector("#sheet [data-act=itemown]");
+          await B.click('#sheet [data-act=itemown][data-v="0"]');
+          await B.waitForTimeout(250);
+          const L2 = await lineOf();
+          check(L2.length && L2.every((x) => !x.ow), "à deux : « À toi » sur un produit pris par un équivalent ne change pas l'instantané " + JSON.stringify(L2));
+          await B.keyboard.press("Escape");
+        }
+      }
+      /* une commande notée « Pas passée » : le panier dit la part de ce qui est vraiment commandé, comme « Envoyer sa part » */
+      const OTH = { "contrex-eau-minerale-naturelle-6-x-1-l": 2, "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l": 2, "president-beurre-gastronomique-doux-82-mg-250-g": 2, "barilla-pates-capellini-n-1-500-g": 4, "carapelli-huile-d-olive-vierge-extra-classico-75-cl": 1, "parmentier-sardines-a-l-huile-de-tournesol-135-g": 3 };
+      const bk = Object.assign({}, AIDANT, { "entremont-emmental-rape-francais-160-g": 1 });
+      for (const [k, q] of Object.entries(OTH)) bk[k] = (bk[k] || 0) + q;
+      await load(B, { basket: bk, owners: OTH, duo: { w: { t: "abcd1234", n: "Sam", at: new Date().toISOString(), k: "duo" } }, seen: { welcome: 1, first: { monoprix: 1, carrefour: 1, houra: 1, auchan: 1 } }, prefs: { off: { leclerc: true }, offv: 1, maxOrders: 3 } }, "#/panier");
+      await settled(B);
+      await B.click("[data-act=fillgo]");
+      await B.waitForTimeout(500); await ready(B);
+      const rids = await B.evaluate(() => cabasDebug().S.guide.snap.orders.map((o) => o.rid));
+      for (const rid of rids) await B.evaluate((r) => { const b = document.createElement("button"); b.dataset.act = "filldrop"; b.dataset.id = r; document.querySelector("#view").appendChild(b); b.click(); }, rid);
+      await B.waitForTimeout(300);
+      await go(B, "#/panier"); await settled(B);
+      const dv = await text(B, "#duo");
+      check(/D'après ce qui est commandé/.test(dv) && /pas passée/.test(dv), "à deux : commande pas passée, le panier ne dit pas la part de ce qui est commandé « " + dv.slice(0, 300) + " »");
+      const part = /part de Sam ([\d\s ,]+€)/.exec(dv);
+      await B.click("#duo [data-act=duoback]");
+      await B.waitForSelector("#retM");
+      await B.click("[data-act=retsend]");
+      await B.waitForTimeout(300);
+      const s6 = await lastShare(B);
+      check(part && s6 && s6.text.includes(part[1].trim()), "à deux : la part dite par le panier n'est pas celle envoyée « " + (part && part[1]) + " » / « " + (s6 && s6.text) + " »");
+      /* la suite reprend le téléphone de l'aidant tel qu'il était */
+      await load(B, keepB, "#/");
+    }
 
     /* une commande E.Leclerc dans le retour : prix simulés, dits comme tels, jamais « relevés » seuls */
     await go(A, "#/retour/j" + b64({ app: "cabas", v: 1, k: "retour", w: "duo", at: new Date().toISOString(), o: [{ r: "leclerc-livraison", s: "ok", d: plus(1), sl: "soir", i: [["candia-lait-1-2-ecreme-6-x-1-l", 2, 1398]], fe: 500 }], c: [], x: [], al: 2500 }));

@@ -542,7 +542,7 @@
     {
       "id": "pizza-maison", "name": "Pizza maison au jambon", "kind": "plat", "main": "pain", "diet": ["alcohol"], "complete": true, "portions": 4, "minutes": 30,
       "ing": [
-        { "q": "pâte à pizza fraîche", "need": 385, "u": "g", "t": "1 pâte à pizza" },
+        { "q": "pâte à pizza", "need": 385, "u": "g", "t": "1 pâte à pizza" },
         { "q": "sauce tomate", "need": 200, "u": "g", "t": "un demi-pot de sauce tomate" },
         { "q": "mozzarella", "need": 125, "u": "g", "t": "1 mozzarella" },
         { "q": "jambon blanc", "need": 120, "u": "g", "t": "3 tranches de jambon" },

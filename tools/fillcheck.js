@@ -147,6 +147,8 @@ const server = http.createServer((req, res) => {
     if (ck1.length !== 1) fail("retour : un produit coché attendu, " + ck1.length);
     if (!/coché/.test(tx) || !/Annuler/.test(tx)) fail(`retour : toast « ${tx} »`);
     if ((await curName()) === n0) fail("retour : le produit suivant devrait s'afficher");
+    /* le suivant est le produit 2, pas le 3 (le 2 sauté puis remis en tout dernier) */
+    if (((await stored("guide")).cur || {})[first] !== 1) fail("retour : après le produit 1, le guide passe au produit " + ((((await stored("guide")).cur || {})[first] | 0) + 1) + " au lieu du 2");
     await page.click("#toast button"); await page.waitForTimeout(350);
     g = await stored("guide");
     if (Object.keys(g.ck || {}).length) fail("Annuler : la coche reste");
@@ -236,6 +238,13 @@ const server = http.createServer((req, res) => {
     await page.click(".dock .btn"); await page.waitForTimeout(400);
     if (/Avant de commencer/.test(await text("#view h1"))) await page.click(".dock [data-act=fillready]");
     await page.waitForSelector("#fpn", { timeout: 15000 });
+    /* « C'est dans mon panier » sur le premier produit d'une commande : le guide passe au produit 2 */
+    {
+      const order2 = await page.evaluate((r) => window.cabasDebug().S.guide.snap.orders.find((o) => o.rid === r).items.filter((x) => !x.st).map((x) => x.id), second);
+      await page.click("#view .fbtns [data-act=fillck]"); await page.waitForTimeout(150);
+      const g2 = await stored("guide");
+      if (order2.length > 2 && ((g2.cur || {})[second] !== 1 || !(g2.ck || {})[second + "|" + order2[0]])) fail(`« C'est dans mon panier » : après le produit 1, le guide passe au produit ${(((g2.cur || {})[second]) | 0) + 1} au lieu du 2`);
+    }
     for (let i = 0; i < 40 && (await page.locator("#view .fbtns [data-act=fillck]").count()); i++) { await page.click("#view .fbtns [data-act=fillck]"); await page.waitForTimeout(120); }
     await page.click(".dock [data-act=filldone]"); await page.waitForTimeout(400);
     if (!/Toutes tes commandes sont passées/.test(await toastText())) fail("dernière commande : toast « " + (await toastText()) + " »");
@@ -321,16 +330,23 @@ const server = http.createServer((req, res) => {
     /* un vrai panier qu'une commande prend en entier (« La semaine »), dont un produit a un équivalent moins cher chez
        la même enseigne, accepté (cabas.flex) */
     const pe = await f.evaluate(async () => {
+      /* « La semaine » d'abord, puis les listes « semaine » par profil (data/listes.json), tant qu'aucun de leurs produits
+         n'a d'équivalent moins cher (le choix de Ma liste prend souvent déjà le moins cher) */
       const D = cabasDebug(), src = await fetch("app.js").then((r) => r.text()), ex = /\["semaine", "La semaine", "([^"]+)"/.exec(src);
-      const plan = D.listPlan(D.readList(ex[1])), b = {};
-      plan.picks.forEach((pk) => { if (pk.id) b[pk.id] = pk.n; });
-      for (const id of Object.keys(b)) {
-        const p = D.S.prods.get(id);
-        for (const rid of Object.keys(p.offers)) {
-          const po = p.offers[rid];
-          if (!po || !(po.price > 0) || po.sim) continue;
+      const L = await fetch("data/listes.json").then((r) => r.json()), texts = [ex[1]].concat(L.listes.filter((x) => x.kind === "semaine").map((x) => x.text));
+      for (const t of texts) {
+        const plan = D.listPlan(D.readList(t)), b = {};
+        if (!plan || !plan.picks || plan.covered !== plan.n || !plan.orders || plan.orders.length !== 1) continue;
+        plan.picks.forEach((pk) => { if (pk.id) b[pk.id] = pk.n; });
+        /* un produit du panier, sinon un produit de plus, vendu par l'enseigne de la commande, dont un équivalent est
+           moins cher chez elle : l'équivalent accepté est alors pris dans cette commande */
+        const rid = plan.orders[0].ch, ids = Object.keys(b).concat(D.S.list.filter((p) => p.offers[rid] && !b[p.id]).slice(0, 3000).map((p) => p.id));
+        for (const id of ids) {
+          const p = D.S.prods.get(id), po = p.offers[rid];
+          /* jamais dans un rayon au poids variable : le panier souple n'y prend pas d'équivalent */
+          if (!po || !(po.price > 0) || po.sim || (D.S.rayMap.get(p.r) || {}).frais) continue;
           const E = D.equivOf(p, rid, 8).find((x) => x.e.id !== id && !b[x.e.id] && x.price < po.price);
-          if (E && D.equivOf(E.e, rid, 8).some((x) => x.e.id !== E.e.id)) return { b, P: id, E: E.e.id, rid };
+          if (E && D.equivOf(E.e, rid, 8).some((x) => x.e.id !== E.e.id)) { if (!b[id]) b[id] = 1; return { b, P: id, E: E.e.id, rid }; }
         }
       }
       return null;
@@ -342,7 +358,7 @@ const server = http.createServer((req, res) => {
       await f.waitForFunction(() => cabasDebug().RES().done, null, { timeout: 30000 }); await f.waitForTimeout(400);
       await f.click("[data-act=fillgo]"); await f.waitForTimeout(700);
       const line = await f.evaluate(({ E }) => { const s = cabasDebug().S.guide.snap; if (!s) return null; for (const o of s.orders) { const i = o.items.filter((x) => !x.st).findIndex((x) => x.id === E); if (i >= 0) return { rid: o.rid, i, src: o.items.filter((x) => !x.st)[i].src || null }; } return null; }, pe);
-      if (!line) fail("panier souple : l'équivalent accepté n'est pas pris dans l'instantané de « Remplir mes paniers »");
+      if (!line) fail("panier souple : l'équivalent accepté n'est pas pris dans l'instantané de « Remplir mes paniers » " + JSON.stringify(pe.P) + " " + pe.rid + " " + JSON.stringify(await f.evaluate(() => { const s = cabasDebug().S.guide.snap; return s && s.orders.map((o) => o.rid); })));
       else {
         if (!line.src || !line.src[pe.P]) fail("instantané : la ligne de l'équivalent ne dit pas quel produit du panier elle remplace " + JSON.stringify(line.src));
         await f.evaluate((h) => { location.hash = h; }, "#/remplir/" + line.rid); await f.waitForTimeout(600);

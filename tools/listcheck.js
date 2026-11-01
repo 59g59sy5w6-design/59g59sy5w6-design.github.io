@@ -1,5 +1,7 @@
 // Vérification de Ma liste : plus de soixante lignes du quotidien (lait, pommes, tomates, steak haché, café, thé, carottes,
-// citron, pain de mie...) dont chaque choix est le produit ordinaire attendu (rayon et mots du nom, jamais un identifiant),
+// citron, pain de mie...) et les lignes de la vérification finale (viande hachée, pâte à pizza, chocolat au lait, capsules café,
+// pâté, cabillaud, oranges, jambon blanc… ; « piles » ne trouve rien) dont chaque choix est le produit ordinaire attendu
+// (rayon et mots du nom, jamais un identifiant), lignes de « La semaine » qui font avec les frais le total de la carte du plan,
 // « coca 6 x 1,5 l » (six bouteilles de 1,5 L) ; choix habituel mémorisé (repris d'office, ou signalé quand il est plus de 15 % plus cher,
 // « Garder le mien »), quantité habituelle d'après les paniers commandés (« × 2, comme d'habitude », « Toujours 1 »),
 // usualQty sur un historique fixe, orthographe (« spagetti x2 » trouve un spaghetti, « zzzz » reste sans suggestion,
@@ -162,6 +164,53 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
       if (!d.r) { fail(`« ${t} » : aucun produit`); return; }
       if (!ray.test(d.r) || (want && !want.test(d.name)) || (not && not.test(d.name))) fail(`« ${t} » : « ${d.shown} » (rayon ${d.r}) n'est pas le produit ordinaire attendu`);
     });
+    /* lignes de la vérification finale : le produit lui-même, pas un ingrédient, une saveur ou le nom de son rayon
+       (« capsules café », « nettoyant multi-usages », « raisins secs »), pas un autre rayon (« chocolat au lait » n'est
+       pas un lait de croissance, « pâté » pas des pâtes), pas une préparation (« cabillaud » n'est pas pané, « saumon »
+       pas un gravlax), la variante la plus simple (« pâte à tartiner » sans spéculoos, « quinoa » sans boulgour,
+       « gruyère râpé » sans autres fromages), le format ordinaire le moins cher (« oranges », « cuisses de poulet »,
+       « jambon blanc ») ; un mot que le catalogue n'a pas (« piles ») ne trouve rien plutôt qu'une glace pilée */
+    const ORDINARY = [
+      ["viande hachée", /^(viandes-surgelees|viande-hachee)$/, /hach/, /oignon|brochette|chipolata|puree|vegetal/],
+      ["pâte à pizza", /^pizzas-quiches-fraiches$/, /pate a pizza/, /jambon|fromage|chorizo|champignon/],
+      ["chocolat", /^chocolat-tablettes$/, /chocolat/, /latte|poudre|blanc|croissance|bebe/],
+      ["chocolat au lait", /^(chocolat-tablettes|aide-patisserie|chocolat-bouchees)$/, /chocolat.*lait/, /bebe|croissance|infantile|brioche|biscuit/],
+      ["biscottes", /^biscottes$/, /biscotte/, /sans sel|gourmand|brioche|complet|fibre/],
+      ["nutella", /^pate-a-tartiner$/, /nutella/, /croissant|crepe|donut|biscuit|cookie|glace/],
+      ["raisins secs", /^(fruits-secs|aide-patisserie)$/, /raisin/, /biscuit|melange|mix/],
+      ["capsules café", /^capsules$/, /cafe|espresso/, /nesquik|chocolat|\bthe\b|cappuccino/],
+      ["gâteaux", /^gateaux$/, /gateau|cake|madeleine|moelleux/, /chapelure|levure|preparation/],
+      ["cookies", /^(biscuits-chocolat|biscuits-secs)$/, /cookie/, /glace|dough|apero/],
+      ["nettoyant multi-usages", /^nettoyants-menagers$/, /multi/, /vitre/],
+      ["pâté", /^pates-rillettes$/, /\bpate\b/, /spaghetti|torti|\bpates\b/],
+      ["cabillaud", /^poissons(-surgeles)?$/, /cabillaud/, /pane|batonnet|croustibat|hache|tarama/],
+      ["filet de cabillaud", /^poissons(-surgeles)?$/, /filet.*cabillaud/, /pane|batonnet/],
+      ["saumon", /^(poissons|traiteur-mer|poissons-surgeles)$/, /saumon/, /gravlax|chutes|marine|oeuf/],
+      ["saumon fumé", /^traiteur-mer$/, /saumon fume/, /chutes|gravlax/],
+      ["pâte à tartiner", /^pate-a-tartiner$/, /tartiner/, /speculoos|biscoff/],
+      ["quinoa", /^semoule-cereales$/, /quinoa/, /boulgour|legume|tomate|olive|riz/],
+      ["gruyère râpé", /^fromages$/, /gruyere/, /fromages|mimolette|dont/],
+      ["crème hydratante", /^soins-(corps|visage)$/, /hydratant/, /douche|lavant/],
+      ["blanc de poulet", /^(volaille|jambon-blanc)$/, /poulet/, /cuisse|pilon/],
+      ["oranges", /^fruits$/, /orange/, /de table/, 5],
+      ["cuisses de poulet", /^volaille$/, /cuisse/, /marine|curry/, 10],
+      ["jambon blanc", /^jambon-blanc$/, /jambon/, /\bcru\b|poulet|dinde/, 20],
+    ];
+    const ord = await page.evaluate((T) => { const D = cabasDebug(), P = D.S.prods, nm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/œ/g, "oe").replace(/[^a-z0-9]+/g, " ");
+      return T.map((t) => { const M = D.matchLine(D.parseLine(t)), p = M.pick && P.get(M.pick), b = p && D.best(p); return p ? { t, r: p.r, name: nm(p.brand + " " + p.name), shown: p.brand + " " + p.name, unit: b ? D.perUnit(p, b.price) : null } : { t, r: null }; }); }, ORDINARY.map((x) => x[0]).concat(["piles"]));
+    ORDINARY.forEach(([t, ray, want, not, maxU], i) => {
+      const d = ord[i];
+      if (!d.r) { fail(`« ${t} » : aucun produit`); return; }
+      if (!ray.test(d.r) || (want && !want.test(d.name)) || (not && not.test(d.name))) fail(`« ${t} » : « ${d.shown} » (rayon ${d.r}) n'est pas le produit ordinaire attendu`);
+      if (maxU && d.unit != null && d.unit > maxU) fail(`« ${t} » : « ${d.shown} » à ${d.unit.toFixed(2)} € le kilo, un format ordinaire moins cher est vendu`);
+    });
+    const piles = ord[ORDINARY.length];
+    if (piles.r && (!/\bpiles?\b/.test(piles.name) || /glace/.test(piles.name))) fail(`« piles » : « ${piles.shown} » au lieu d'aucun produit`);
+    /* une ligne dont la phrase entière est un produit d'un rayon (« viande hachée », « pâte à pizza ») reste une seule
+       ligne, jamais découpée en « viande » et « hachée » */
+    const whole = await page.evaluate(() => cabasDebug().readList("viande hachée\npâte à pizza").map((x) => x.raw));
+    if (whole.length !== 2) fail("« viande hachée », « pâte à pizza » : découpées en " + JSON.stringify(whole));
+
     /* « coca 6 x 1,5 l » : six bouteilles de 1,5 L (ou un pack de six), pas six packs de 25 cl */
     const six = await page.evaluate(() => { const D = cabasDebug(), M = D.matchLine(D.parseLine("coca 6 x 1,5 l")), p = M.pick && D.S.prods.get(M.pick), m = p && /^(\d+)\s*x/i.exec(p.format || ""); return p ? { total: p.qty.v * M.n, unit: p.qty.v / (m ? +m[1] : 1), shown: p.brand + " " + p.name + " " + p.format + " x" + M.n } : null; });
     if (!six || Math.abs(six.total - 9000) > 1500 || Math.abs(six.unit - 1500) > 250) fail("« coca 6 x 1,5 l » : " + JSON.stringify(six));
@@ -352,7 +401,7 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
       await page.evaluate((x) => cabasDebug().merge(x), extra);
     };
     await withExtra(PREFS);
-    const WORDS = [["jambon", "jambon-blanc", /jambon/i], ["camembert", "fromages-pate-molle", /^Camembert$/], ["lessive capsules", "lessive-capsules-poudre", /capsules/i], ["couches", "couches", /^Couches/], ["croquettes chat", "croquettes-chat", /adulte/i], ["vin rouge", "vin-rouge", /rouge/i], ["bière blonde x6", "bieres", /^Bière blonde(?!.*\b(légère|forte)\b)/i], ["chips", "chips", /nature/i], ["saucisson", "saucisson", /saucisson/i], ["dentifrice", "dentifrice", /dentifrice/i], ["pain", "pain", /baguette/i], ["camenbert", "fromages-pate-molle", /^Camembert$/]];
+    const WORDS = [["jambon", "jambon-blanc", /jambon/i], ["camembert", "fromages-pate-molle", /^Camembert$/], ["lessive capsules", "lessive-capsules-poudre", /capsules/i], ["couches", "couches", /^Couches/], ["croquettes chat", "croquettes-chat", /^Croquettes(?!.*chaton)/i], ["vin rouge", "vin-rouge", /rouge/i], ["bière blonde x6", "bieres", /^Bière blonde(?!.*\b(légère|forte)\b)/i], ["chips", "chips", /nature/i], ["saucisson", "saucisson", /saucisson/i], ["dentifrice", "dentifrice", /dentifrice/i], ["pain", "pain", /baguette/i], ["camenbert", "fromages-pate-molle", /^Camembert$/]];
     const got = await page.evaluate((qs) => { const D = cabasDebug(); return D.readList(qs.join("\n")).map((x) => { const p = x.pick && D.S.prods.get(x.pick); return { raw: x.raw, r: p ? p.r : null, name: p ? p.name : null, n: x.n }; }); }, WORDS.map((w) => w[0]));
     WORDS.forEach(([q, r, re], i) => { const g = got[i]; if (!g || g.r !== r || !re.test(g.name || "")) fail(`Ma liste « ${q} » : attendu rayon ${r} et ${re}, obtenu ${g ? g.r + " / " + g.name : "rien"}`); });
     if (got[6] && got[6].n !== 1) fail("« bière blonde x6 » : un pack de 6 attendu en quantité 1, obtenu " + got[6].n);
@@ -461,6 +510,17 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     else {
       const r = await page.evaluate((text) => { const D = cabasDebug(), lines = D.readList(text), plan = D.listPlan(lines); return { miss: lines.filter((x) => !x.pick).map((x) => x.raw), plan: plan && { short: !!plan.short, covered: plan.covered, n: plan.n } }; }, ex[1]);
       if (r.miss.length || !r.plan || r.plan.short || r.plan.covered !== r.plan.n) fail(`accueil, « La semaine » : la liste devrait se commander en entier (${JSON.stringify(r)})`);
+      /* à l'écran, chaque ligne dit l'enseigne et le prix que compte la carte du plan : la somme des lignes plus les
+         frais fait le total de la carte, et aucune ligne ne nomme une enseigne absente de la carte */
+      await runList(ex[1], { prefs: PREFS });
+      const sc = await page.evaluate(() => {
+        const D = cabasDebug(), W = D.S.wl, plan = W.plan, cents = (s) => Math.round(parseFloat(String(s).replace(/[^\d,]/g, "").replace(",", ".")) * 100);
+        const rows = [...document.querySelectorAll(".wlist .wli:not(.miss):not(.free)")];
+        return { sum: rows.reduce((a, r) => a + cents(r.querySelector(".lp").textContent), 0), fees: plan ? plan.orders.reduce((a, o) => a + o.fee, 0) : 0, total: plan ? plan.total : null, names: plan ? plan.orders.map((o) => D.S.retMap.get(o.ch).name) : [], where: rows.map((r) => ((/chez ([^,.(]+)/.exec(r.querySelector("small").textContent) || [])[1] || "").trim()) };
+      });
+      if (sc.total == null || sc.sum + sc.fees !== sc.total) fail(`Ma liste, « La semaine » : lignes ${sc.sum} + frais ${sc.fees} au lieu du total de la carte ${sc.total}`);
+      const elsewhere = sc.where.filter((w) => w && !sc.names.includes(w));
+      if (elsewhere.length) fail(`Ma liste, « La semaine » : des lignes nomment une autre enseigne que la carte (${[...new Set(elsewhere)].join(", ")} ; carte : ${sc.names.join(", ")})`);
     }
     await page.evaluate(() => { location.hash = "#/listes"; }); await page.waitForTimeout(800);
     if ((await page.locator("#profs [data-act=prof]").count()) !== pk.size) fail("écran Listes : une pastille par profil attendue");
