@@ -159,11 +159,14 @@ const server = http.createServer((req, res) => {
       const fake = JSON.parse(JSON.stringify(src)); fake.id = "essai-partiel"; fake.name = "Essai partiel"; fake.main = "essai"; fake.ing.push({ q: "zzqx introuvable", need: 100, u: "g", t: "100 g d'introuvable" });
       S.recs.push(fake);
       const c = D.recCost(fake), r = D.composeMenu({ meals: 7, people: 2 }), all = D.composeMenu({ meals: 40, people: 2 });
-      return { miss: c.miss.length, okPrice: c.ok.length, in7: r.picks.some((x) => x.rc.id === "essai-partiel"), last: all.picks.findIndex((x) => x.rc.id === "essai-partiel"), n: all.picks.length, partial: all.miss };
+      const last = all.picks.findIndex((x) => x.rc.id === "essai-partiel");
+      /* les plats complets d'abord : après le plat d'essai, seulement d'autres plats au coût partiel (le catalogue relevé peut en avoir) */
+      const after = last < 0 ? [] : all.picks.slice(last + 1).filter((x) => !D.recCost(x.rc).miss.length).map((x) => x.rc.id);
+      return { miss: c.miss.length, okPrice: c.ok.length, in7: r.picks.some((x) => x.rc.id === "essai-partiel"), last, after, n: all.picks.length, partial: all.miss };
     });
     if (P.miss !== 1 || !P.okPrice) fail(`coût partiel : ${JSON.stringify(P)}`);
     if (P.in7) fail("un plat au coût partiel passe avant des plats complets");
-    if (P.last >= 0 && P.last !== P.n - 1) fail(`le plat au coût partiel n'arrive pas en dernier (${P.last} sur ${P.n})`);
+    if (P.after.length) fail(`des plats complets arrivent après le plat au coût partiel (${P.after.join(", ")})`);
     if (P.last >= 0 && !P.partial.includes("zzqx introuvable")) fail("la semaine ne dit pas l'ingrédient manquant");
     await go("#/repas/essai-partiel");
     const ptxt = await page.$eval("#view", (e) => e.textContent.replace(/\s+/g, " "));
