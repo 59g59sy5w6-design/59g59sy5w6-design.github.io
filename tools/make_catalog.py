@@ -382,8 +382,13 @@ for n, (lst, pp, base) in enumerate(built):
     if cnt:
         top = first or cnt.most_common(1)[0][0]
         wish[top].append((cnt[top], first == top, n))
+# un produit publié qui se sépare en deux (fiches bio et non bio d'abord réunies, fiche surgelée et fiche fraîche) : son
+# identifiant reste à celui qui garde la marque, le nom et la contenance affichés jusque-là, ceux que les paniers et les
+# listes des téléphones montrent ; à défaut, à celui qui reprend le plus de ses fiches
+prev_look = {pp['id']: (pp['brand'], pp['name'], pp['format']) for pp in last_cat['products']}
 for pid0, cands in wish.items():
-    cands.sort(key=lambda t: (-t[0], not t[1]))
+    look = lambda t: (built[t[2]][1]['brand'], built[t[2]][1]['name'], built[t[2]][1]['format']) == prev_look.get(pid0)
+    cands.sort(key=lambda t: (not look(t), -t[0], not t[1]))
     built[cands[0][2]][1]['id'] = pid0
 used = {pp['id'] for pp in products if pp['id']}
 fresh_ids = 0

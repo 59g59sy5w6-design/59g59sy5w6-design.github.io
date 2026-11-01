@@ -240,6 +240,26 @@
    "prompt": ""
   },
   {
+   "retailer": "auchan*",
+   "rayon": "pommes-de-terre",
+   "regimes": [],
+   "lot": "frais-1",
+   "host": "auchan.fr",
+   "match": "text=carottes",
+   "url": "https://www.auchan.fr/recherche?text=carottes",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan*",
+   "rayon": "pommes-de-terre",
+   "regimes": [],
+   "lot": "frais-1",
+   "host": "auchan.fr",
+   "match": "text=ail",
+   "url": "https://www.auchan.fr/recherche?text=ail",
+   "prompt": ""
+  },
+  {
    "retailer": "monoprix",
    "rayon": "salades-herbes",
    "regimes": [],
@@ -4281,16 +4301,6 @@
    "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
   },
   {
-   "retailer": "monoprix",
-   "rayon": "riz",
-   "regimes": [],
-   "lot": "epicerie-1",
-   "host": "courses.monoprix.fr",
-   "match": "15224b3f",
-   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/p%C3%A2te-riz-c%C3%A9r%C3%A9ale-et-pur%C3%A9e/riz/riz-express/15224b3f-b40e-4fa9-a618-04bb18897c97?sortBy=favorite",
-   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
-  },
-  {
    "retailer": "carrefour",
    "rayon": "riz",
    "regimes": [],
@@ -4924,6 +4934,16 @@
    "host": "courses.monoprix.fr",
    "match": "3d9a81ab",
    "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/plat-cuisin%C3%A9-et-repas-express/3d9a81ab-cc19-41e0-8520-cc2679cc6575?sortBy=favorite",
+   "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
+  },
+  {
+   "retailer": "monoprix",
+   "rayon": "plats-conserve",
+   "regimes": [],
+   "lot": "epicerie-1",
+   "host": "courses.monoprix.fr",
+   "match": "15224b3f",
+   "url": "https://courses.monoprix.fr/categories/epicerie-sal%C3%A9e/p%C3%A2te-riz-c%C3%A9r%C3%A9ale-et-pur%C3%A9e/riz/riz-express/15224b3f-b40e-4fa9-a618-04bb18897c97?sortBy=favorite",
    "prompt": "Return ONLY a JSON array, no other text. One object per product listed on the page, in page order: {\"name\": full product name exactly as written (brand + name), \"format\": pack size text as written (e.g. \"6 x 1,5 L\"), \"price\": current price as a number in euros, \"was\": previous crossed-out price as number or null, \"unit\": price per unit text as written (e.g. \"0,25 €/l\") or null, \"promo\": promotion text or null, \"url\": absolute product page URL or null}. Include every product on the page, do not skip any."
   },
   {

@@ -5,7 +5,7 @@ Entrée : tools/work/items.json. Sortie : tools/work/clusters.json.
 Options : --review écrit les rapprochements possibles non faits dans tools/work/review.txt (triés par rayon),
 --multi liste les rapprochements faits.
 """
-import collections, json, os, sys
+import collections, json, os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lib  # noqa: E402
@@ -44,9 +44,22 @@ def fam_key(it):
     return fam
 
 
+# Sous-marque bio (« Auchan Bio », « Monoprix Bio », « Carrefour Bio ») : family() la ramène à l'enseigne, et le mot bio
+# n'est alors que dans la marque. Il compte comme un mot fort du nom, sans quoi « AUCHAN BIO Olives vertes dénoyautées »
+# (3,08 €) était réuni à l'« Auchan Olives vertes dénoyautées » de Houra (1,48 €), et le produit non bio portait l'étiquette bio.
+BIO_BRAND = re.compile(r'\bbio\b')
+
+
+def strong_of(it):
+    s = set(strong(it['tok'], it['ray']))
+    if BIO_BRAND.search(key(it['brand'] or '')):
+        s.add('bio')
+    return sorted(s)
+
+
 for it in items:
     it['tok'] = tokens(it['label'])
-    it['strong'] = sorted(strong(it['tok'], it['ray']))
+    it['strong'] = strong_of(it)
     it['fam'] = fam_key(it)
     it['q'] = qsig(it)
 
@@ -68,10 +81,13 @@ def union(a, b):
 
 
 # un même code produit Auchan (pr-C..., dans le rid) lu dans plusieurs magasins ou zones de livraison : même produit,
-# sans heuristique ; sinon deux produits Auchan de même nom et de même contenance se retrouvaient dédoublés par magasin
+# sans heuristique ; sinon deux produits Auchan de même nom et de même contenance se retrouvaient dédoublés par magasin.
+# Seule une référence Auchan (C suivi de chiffres) compte : la tête d'un identifiant de vendeur de la place de marché
+# (« 174 » pour « /pr-174cb6db-... ») réunissait une tête de rasoir et un moule à gâteaux, un filtre d'aquarium et un
+# grillage à poules.
 bycode = {}
 for it in items:
-    if it['ret'].split('-')[0] == 'auchan' and ':' in it['rid']:
+    if it['ret'].split('-')[0] == 'auchan' and re.fullmatch(r'C\d+', it['rid'].split(':', 1)[-1]):
         code = it['rid'].split(':', 1)[1]
         if code in bycode:
             union(bycode[code], it['rid'])

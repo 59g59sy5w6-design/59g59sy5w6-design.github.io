@@ -2,7 +2,7 @@
 des statistiques : produits par univers et par rayon, offres par enseigne, taille brute et gzip.
 Sort avec le code 1 à la première règle violée. Usage : python3 tools/catcheck.py
 """
-import collections, datetime, gzip, json, os, sys
+import collections, datetime, gzip, json, os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lib  # noqa: E402
@@ -102,6 +102,9 @@ def main():
     for p in cat['products']:
         expected[univ_of[p['r']]].add(p['i'])
     sizes = {}
+    # « la pièce » (poids de référence d'une pièce) ne doit pas contredire le nom chez l'enseigne : « Colis de 2 kilos »,
+    # « Barquette de 4 fruits » sont des lots, pas une pièce de 170 g
+    piece = {p['i']: p for p in cat['products'] if p['f'] == 'la pièce'}
     for u in univ:
         path_u = os.path.join(det_dir, u + '.json')
         if not expected[u]:
@@ -120,6 +123,15 @@ def main():
                 check(ret in cat['rets'] and set(dd) <= {'n', 'u', 'p', 'w'} and {'n', 'u'} <= set(dd), f'details/{u}.json {pid} {ret} : {sorted(dd)}')
                 check(isinstance(dd['n'], str) and isinstance(dd['u'], str), f'details/{u}.json {pid} {ret} : n et u sont des chaînes')
                 check('w' not in dd or isinstance(dd['w'], (int, float)), f'details/{u}.json {pid} {ret} : w')
+                if pid in piece and isinstance(dd.get('n'), str):
+                    k = lib.key(dd['n'])
+                    lot = re.search(r'\b(\d+) (?:fruits|legumes|pieces)\b', k)
+                    kilo = re.search(r'\b(\d+(?: \d+)?) ?(?:kilos?|kg)\b', k)
+                    q = piece[pid].get('q')
+                    grams = q[0] if q and q[1] == 'g' else None
+                    check(not (lot and int(lot.group(1)) > 1), f"{pid} : « la pièce » mais « {dd['n']} » chez {ret}")
+                    check(not (kilo and grams and abs(grams / (float(kilo.group(1).replace(' ', '.')) * 1000) - 1) > 0.25),
+                          f"{pid} : « la pièce » de {grams} g mais « {dd['n']} » chez {ret}")
         check(len(rawu) <= MAX_RAW, f'details/{u}.json trop gros')
     gz = len(gzip.compress(raw))
     check(len(raw) <= MAX_RAW, 'catalog.json dépasse 16 Mo')
