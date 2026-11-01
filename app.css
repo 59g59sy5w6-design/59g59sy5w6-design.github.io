@@ -602,6 +602,11 @@ a.hcard:active, button.hcard:active { background: var(--fill); }
 .banner.good { background: var(--brand-tint); color: var(--brand-ink); }
 .banner.good .ic { color: var(--brand-ink); }
 .banner.warn { background: var(--warn-bg); color: var(--warn); }
+/* courses d'un proche : deux actions sous le texte du bandeau ; un mot écrit par une personne garde ses retours à la ligne */
+.banner .bacts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.banner .bacts .btn.sm { margin-top: 0; grid-column: auto; }
+.note { white-space: pre-line; overflow-wrap: anywhere; }
+.order.duo .of .ln:first-child { margin-top: 0; }
 .banner.warn .ic { color: var(--warn); }
 /* budget : ce qu'il reste ou le dépassement, une barre, puis « Tenir le budget » et « Modifier » */
 .bud { display: grid; gap: 6px; margin-top: 10px; padding: 10px 12px 8px; border-radius: var(--r-s); background: var(--fill); color: var(--ink); font-size: 0.9375rem; line-height: 1.33; font-weight: 600; }

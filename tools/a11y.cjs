@@ -60,10 +60,19 @@ const STATES = {
     menu: [{ id: "pates-thon-tomate", portions: 4 }, { id: "omelette-fromage", portions: 2 }],
     reports: [{ id: "r1", at: new Date().toISOString(), k: "manque", pid: "", ret: "", text: "Le riz basmati de Monoprix n'est pas dans Cabas." }],
     recent: ["lait", "pâtes", "café"], seenAt: "", seenp: { "barilla-pates-capellini-n-1-500-g": 9.9, "candia-lait-1-2-ecreme-6-x-1-l": 9.9 }, drops: [],
+    /* une commande à deux en cours (prénoms inventés) : l'eau et une partie du lait sont à l'autre personne */
+    owners: { "contrex-eau-minerale-naturelle-6-x-1-l": 2, "entremont-emmental-rape-francais-160-g": 1 },
+    duo: { me: "Alex", w: { t: "a11yduo1", n: "Sam", m: "Je prends l'eau.", at: new Date().toISOString(), k: "duo" } },
   },
 };
 const PARTAGE = "#/partage/" + b64e(JSON.stringify({ n: "Liste de Camille", i: Object.entries(LIST_ITEMS) }));
 /* lien de transfert entre deux téléphones (non compressé) : un panier et une liste */
+/* courses pour un proche et commande à deux : les liens reçus (#/pour, #/duo, #/retour), prénoms inventés */
+const linkJ = (o) => "j" + b64e(JSON.stringify(o));
+const POUR = "#/pour/" + linkJ({ app: "cabas", v: 1, k: "pour", t: "a11ypour1", at: new Date().toISOString(), n: "Dominique", m: "Le lait demi-écrémé, pas entier.\nMerci !", i: Object.entries(PRODS), f: [["Bougies d'anniversaire", 1]], j: plus(2), b: 60, d: ["gluten"], a: ["peanuts"], e: { off: { leclerc: true }, pick: {}, liv: {}, comp: false } });
+const DUO = "#/duo/" + linkJ({ app: "cabas", v: 1, k: "duo", t: "a11yduo2", at: new Date().toISOString(), n: "Sam", m: "Je prends l'eau.", i: [["contrex-eau-minerale-naturelle-6-x-1-l", 2], ["candia-lait-1-2-ecreme-6-x-1-l", 1]], f: [["Piles AA", 1]] });
+const RETOUR = "#/retour/" + linkJ({ app: "cabas", v: 1, k: "retour", w: "pour", t: "a11ypour1", at: new Date().toISOString(), n: "Alex", m: "J'ai pris des pommes à la place.", o: [{ r: "houra", s: "ok", d: plus(2), sl: "matin", i: [["contrex-eau-minerale-naturelle-6-x-1-l", 2, 918], ["candia-lait-1-2-ecreme-6-x-1-l", 1, 699], ["parmentier-sardines-a-l-huile-de-tournesol-135-g", 2, 398]], fe: 990 }, { r: "monoprix", s: "plan", i: [["tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l", 1, 349], ["entremont-emmental-rape-francais-160-g", 2, 498]], fe: 1520 }], c: [["carapelli-huile-d-olive-vierge-extra-classico-75-cl", 1, 1165, "auchan"]], x: [["barilla-pates-capellini-n-1-500-g", 3]] });
+const RETOUR_DUO = "#/retour/" + linkJ({ app: "cabas", v: 1, k: "retour", w: "duo", t: "a11yduo2", at: new Date().toISOString(), n: "Alex", o: [{ r: "monoprix", s: "ok", d: plus(1), sl: "soir", i: [["contrex-eau-minerale-naturelle-6-x-1-l", 2, 918], ["candia-lait-1-2-ecreme-6-x-1-l", 1, 799]], fe: 412 }], c: [], x: [], al: 2905 });
 const TRANSFERT = "#/transfert/j" + b64e(JSON.stringify({ app: "cabas", v: 1, at: new Date().toISOString(), data: { basket: LIST_ITEMS, lists: [{ id: "t1", name: "Courses", items: LIST_ITEMS }], seen: { welcome: 1 } } }));
 const ROUTES = [
   ["accueil", "#/"], ["rayons", "#/rayons"], ["rayon-pates", "#/rayon/pates"], ["produit", "#/produit/barilla-pates-capellini-n-1-500-g"],
@@ -75,19 +84,23 @@ const ROUTES = [
   ["magasin", "#/magasin"], ["mouvements", "#/mouvements"], ["transfert", TRANSFERT],
   ["comparer", "#/comparer/barilla-pates-capellini-n-1-500-g/barilla-pates-spaghetti-n-5-500-g"],
   ["frais", "#/frais"], ["frais-houra", "#/frais/houra"], ["rayon-bio", "#/rayon/bio"], ["rayon-halal", "#/rayon/halal"], ["recette-semaine", "#/repas/omelette-fromage"],
-  ["demande", "#/recherche"],
+  ["demande", "#/recherche"], ["pour", POUR], ["duo", DUO], ["retour", RETOUR], ["retour-duo", RETOUR_DUO],
+  /* en dernier : « Faire ses courses » met le téléphone dans les courses d'un proche (le panier de l'aidant mis de côté) */
+  ["proche", POUR],
 ];
 /* phrase de « Demande à Cabas » tapée sur l'écran « demande » */
 const ASK = "pâtes complètes à moins de 2 € chez Houra";
 /* écrans mesurés aussi à l'état vide (première visite) */
-const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander", "magasin", "mouvements", "frais"];
+const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander", "magasin", "mouvements", "frais", "pour", "duo", "retour", "proche"];
 /* feuilles ouvertes depuis chaque écran : nom, bouton qui l'ouvre ; celles du panier demandent un gros panier
    (14 produits vendus par plusieurs enseignes, en deux exemplaires), qui atteint les minimums de commande */
 const SHEETS = {
   reglages: [["zip", "[data-act=zip]"], ["budget", "[data-act=budget]"], ["welcome", "[data-act=welcome]"], ["install", "[data-act=install], [data-act=installnow]"], ["reset", "[data-act=reset]"], ["delais", "[data-act=leads]"], ["jour-courses", "[data-act=shopdays]"], ["alertes", "[data-act=watchlist]"], ["signaler-demander", "#view [data-act=report]"], ["regime", "[data-act=diet]"], ["mes-choix", "[data-act=usual]"], ["mes-signalements", "[data-act=reports]"]],
   produit: [["comparer", "#view [data-act=cmppick]"], ["previens-moi", "#view [data-act=watch]"], ["signaler", "#view [data-act=report]"]],
   /* « Remplir mes paniers » est un écran (#/remplir), plus une feuille : ses feuilles sont mesurées depuis le mode guidé */
-  "panier-gros": [["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"], ["ou-le-prendre", "[data-act=itemopt]"], ["panier-souple", "[data-act=flex]"]],
+  "panier-gros": [["swaps", "[data-act=swaps]"], ["budget", "[data-act=budget]"], ["ou-le-prendre", "[data-act=itemopt]"], ["panier-souple", "[data-act=flex]"], ["envoyer", "#view [data-act=duosend]"], ["sa-part", "#duo [data-act=duoback]"]],
+  listes: [["envoyer-proche", "[data-act=duosend][data-k=pour]"]],
+  proche: [["retour-proche", "#view [data-act=pourback]"], ["oublier", "#view [data-act=pourforget]"]],
   "remplir-guide": [["pas-trouve", "#view [data-act=fillmiss]"]],
   "remplir-fin": [["when", "#view [data-act=when]"]],
   economies: [["total-paye", "[data-act=paid]"]],
@@ -231,6 +244,7 @@ async function ready(page, route) {
 /* écrans qui demandent un geste avant la mesure : Ma liste cherchée, une recherche, une demande en phrase */
 async function prepare(page, rname, st) {
   if (rname === "ecrire" && st === "plein") { await page.click("[data-act=wlgo]").catch(() => {}); await page.waitForSelector("[data-act=wlalt], .banner", { timeout: 20000 }).catch(() => {}); await sleep(300); }
+  if (rname === "proche") { await page.click("[data-act=pourgo]").catch(() => {}); await page.waitForFunction(() => location.hash === "#/panier", null, { timeout: 8000 }).catch(() => {}); await ready(page, "panier"); }
   if ((rname === "recherche" && st === "plein") || rname === "demande") { const i = await page.$("#q"); if (i) { await i.fill(rname === "demande" ? ASK : "lait"); await sleep(rname === "demande" ? 1200 : 600); } }
   await page.evaluate(() => window.scrollTo(0, 0));
 }
