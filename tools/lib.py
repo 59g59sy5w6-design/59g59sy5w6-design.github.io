@@ -456,7 +456,8 @@ def routes(url):
 
 # ---------------------------------------------------------------- quantities
 NUM = r'(\d+(?:[.,]\d+)?)'
-UNIT = r'(kg|g|cl|ml|litres?|l)\b'
+# « kilos » et « kilogrammes » écrits en toutes lettres (« Colis de 2 kilos » chez Houra) valent des kilos
+UNIT = r'(kg|kilos?|kilogrammes?|g|cl|ml|litres?|l)\b'
 
 
 def tofloat(s):
@@ -465,7 +466,7 @@ def tofloat(s):
 
 def unit_norm(v, u):
     u = u.lower()
-    if u == 'kg':
+    if u == 'kg' or u.startswith('kilo'):
         return v * 1000, 'g'
     if u == 'g':
         return v, 'g'

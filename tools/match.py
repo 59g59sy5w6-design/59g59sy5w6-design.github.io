@@ -44,9 +44,22 @@ def fam_key(it):
     return fam
 
 
+# Sous-marque bio (« Auchan Bio », « Monoprix Bio », « Carrefour Bio ») : family() la ramène à l'enseigne, et le mot bio
+# n'est alors que dans la marque. Il compte comme un mot fort du nom, sans quoi « AUCHAN BIO Olives vertes dénoyautées »
+# (3,08 €) était réuni à l'« Auchan Olives vertes dénoyautées » de Houra (1,48 €), et le produit non bio portait l'étiquette bio.
+BIO_BRAND = re.compile(r'\bbio\b')
+
+
+def strong_of(it):
+    s = set(strong(it['tok'], it['ray']))
+    if BIO_BRAND.search(key(it['brand'] or '')):
+        s.add('bio')
+    return sorted(s)
+
+
 for it in items:
     it['tok'] = tokens(it['label'])
-    it['strong'] = sorted(strong(it['tok'], it['ray']))
+    it['strong'] = strong_of(it)
     it['fam'] = fam_key(it)
     it['q'] = qsig(it)
 

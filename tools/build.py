@@ -98,6 +98,55 @@ def place(label, rays, old=None, check=None):
     return lib.best_rayon(ok, label) if ok else None
 
 
+def measure(ret, ray, fmt, full, label):
+    """Contenance d'une fiche d'après son conditionnement (fmt) et son nom lu (full) : qty {n, v, u}, qty_alt (l'autre
+    contenance écrite : poids égoutté d'une conserve, « 0,456 L » d'une bouteille de 50 cl), rolls (rouleaux, œufs, couches,
+    capsules, pièces), lav (lavages), pcs (mot qui compte les pièces), approx (poids indicatif, prix ajusté à la pesée).
+    Appliquée aussi aux produits repris du relevé précédent, pour qu'une règle corrigée vaille sans attendre une relecture."""
+    qtext = ' '.join(x for x in [fmt, full or ''] if x)
+    qty = qty_alt = rolls = lav = pcs = None
+    approx = False
+    unite = lib.RAYON_UNITE.get(ray)
+    if unite == 'rouleau':
+        # des lingettes (papier toilette humide) ne se comptent pas en rouleaux : « x50 » est leur nombre
+        rolls = None if re.search(r'\blingettes?\b', key(qtext)) else (parse_rolls(fmt) or parse_rolls(full))
+    elif unite == 'oeuf':
+        # boîte de 6, 10, 12 œufs : compté à l'œuf, comme les rouleaux de papier
+        rolls = parse_oeufs(fmt) or parse_oeufs(full)
+    else:
+        if ret == 'monoprix':
+            qty, qty_alt = parse_qty(full) or parse_qty(fmt), parse_qty(fmt)
+        else:
+            qty, qty_alt = parse_qty(fmt) or parse_qty(full), parse_qty(full)
+        if unite == 'lavage':
+            lav = parse_lavages(qtext)
+        elif unite:
+            # couches, capsules, pièces : le nombre compte, la contenance en grammes reste informative
+            p = parse_pieces(fmt, unite) or parse_pieces(full, unite)
+            if p:
+                rolls, pcs = p
+        if not qty and re.search(r'\b(?:le|au) (?:kg|kilo)\b', key(qtext)):
+            # vendu au poids (« Tomate grappe, le kg ») : le prix affiché est celui du kilo
+            qty = {'n': 1, 'v': 1000.0, 'u': 'g'}
+        if not qty and ray in lib.RAYON_FRAIS:
+            # frais vendu à la pièce sans poids écrit : poids de référence (PIECE_WEIGHT), contenance approximative ;
+            # un lot (« Lot de 4 », « 6 pièces », « Barquette de 4 fruits ») compte ses pièces
+            g = lib.piece_weight(label)
+            if g:
+                m = re.search(r'(?:lot de|x)\s*(\d+)\b|(\d+)\s*(?:pi[eè]ces|fruits|l[ée]gumes)\b', qtext.lower())
+                n = int(m.group(1) or m.group(2)) if m else 1
+                qty, approx = {'n': n if 1 <= n <= 24 else 1, 'v': float(g), 'u': 'g'}, True
+        if qty and re.search(r'\b(?:environ|env|approx)\b', key(qtext)):
+            # poids écrit à titre indicatif (« 1,2 kg environ », « la pièce de 300 g env. ») : prix ajusté à la pesée
+            approx = True
+            m = re.search(r'\b(\d+)\s*pi[eè]ces\b', qtext.lower())
+            if qty['n'] == 1 and m and 2 <= int(m.group(1)) <= 24:
+                # « 2 pièces - environ 300g » : le poids est celui des deux pièces
+                n = int(m.group(1))
+                qty = {'n': n, 'v': float(round(qty['v'] / n)), 'u': qty['u']}
+    return {'qty': qty, 'qty_alt': qty_alt, 'rolls': rolls, 'lav': lav, 'pcs': pcs, 'approx': approx}
+
+
 def full_label(it):
     """Désignation et contenance, pour le filtre final (hors_rayon) : sans la marque, comme avant."""
     return (it.get("label") or "") + " " + (it.get("fmt_raw") or "")
@@ -273,43 +322,10 @@ for r in raw:
     label = re.sub(r'(?:^|[\s,]+)(?:le pack de |la bouteille de |les? |lot de )?(?<![\d.,])\d+(?:[.,]\d+)?\s*(?:x\s*\d+(?:[.,]\d+)?\s*)?(?:kg|g|cl|ml|l)\b\.?$', '', label, flags=re.I).strip(' ,-')
     label = re.sub(r'\s+x\s*\d+$', '', label).strip(' ,-')
     label = label[:1].upper() + label[1:] if label else label
-    qtext = ' '.join(x for x in [fmt, r.get('name') or r.get('title') or ''] if x)
     full = r.get('name') or r.get('title')
-    qty = None
-    rolls = lav = pcs = None
-    qty_alt = None   # l'autre contenance écrite (poids égoutté d'une conserve, « 0,456 L » d'une bouteille de 50 cl)
-    approx = False
-    unite = lib.RAYON_UNITE.get(ray)
-    if unite == 'rouleau':
-        rolls = parse_rolls(fmt) or parse_rolls(full)
-    elif unite == 'oeuf':
-        # boîte de 6, 10, 12 œufs : compté à l'œuf, comme les rouleaux de papier
-        rolls = parse_oeufs(fmt) or parse_oeufs(full)
-    else:
-        if ret == 'monoprix':
-            qty, qty_alt = parse_qty(r.get('name')) or parse_qty(fmt), parse_qty(fmt)
-        else:
-            qty, qty_alt = parse_qty(fmt) or parse_qty(full), parse_qty(full)
-        if unite == 'lavage':
-            lav = parse_lavages(qtext)
-        elif unite:
-            # couches, capsules, pièces : le nombre compte, la contenance en grammes reste informative
-            p = parse_pieces(fmt, unite) or parse_pieces(full, unite)
-            if p:
-                rolls, pcs = p
-        if not qty and re.search(r'\b(?:le|au) (?:kg|kilo)\b', key(qtext)):
-            # vendu au poids (« Tomate grappe, le kg ») : le prix affiché est celui du kilo
-            qty = {'n': 1, 'v': 1000.0, 'u': 'g'}
-        if not qty and ray in lib.RAYON_FRAIS:
-            # frais vendu à la pièce sans poids écrit : poids de référence (PIECE_WEIGHT), contenance approximative
-            g = lib.piece_weight(label)
-            if g:
-                m = re.search(r'(?:lot de|x)\s*(\d+)\b|(\d+)\s*pi[eè]ces', qtext.lower())
-                n = int(m.group(1) or m.group(2)) if m else 1
-                qty, approx = {'n': n if 1 <= n <= 24 else 1, 'v': float(g), 'u': 'g'}, True
-        if qty and re.search(r'\b(?:environ|env|approx)\b', key(qtext)):
-            # poids écrit à titre indicatif (« 1,2 kg environ », « la pièce de 300 g env. ») : prix ajusté à la pesée
-            approx = True
+    qtext = ' '.join(x for x in [fmt, full or ''] if x)
+    mz = measure(ret, ray, fmt, full, label)
+    qty, qty_alt, rolls, lav, pcs, approx = mz['qty'], mz['qty_alt'], mz['rolls'], mz['lav'], mz['pcs'], mz['approx']
     doubt = None
     if ret in CHECKED and ray not in NO_UNIT_CHECK and not approx:
         # le prix doit concorder avec le prix au kilo ou au litre pour l'une des contenances écrites
@@ -402,6 +418,26 @@ for it in items:
     kept.append(it)
 items = kept
 
+# Produit repris du relevé précédent : sa contenance est celle de sa lecture. Deux règles corrigées depuis valent sans
+# attendre une relecture : des lingettes (papier toilette humide) comptées en rouleaux (« x50 » : 0,05 € le « rouleau »), et
+# un lot de produits frais lu comme une seule pièce (« Colis de 2 kilos », « Barquette de 4 fruits » : 170 g au lieu de 2 kg,
+# 42,94 € le kilo au lieu de 3,65 € ; « 2 pièces - environ 300g » affiché « la pièce »). Les autres contenances restent
+# celles lues : les règles de lecture ont changé depuis pour d'autres produits, qu'une relecture remettra à jour.
+requalified = []
+for it in items:
+    if not it.get('carried'):
+        continue
+    mz = measure(it['ret'], it['ray'], it.get('fmt_raw') or '', it.get('full'), it.get('label') or '')
+    if lib.RAYON_UNITE.get(it['ray']) == 'rouleau' and it.get('rolls') and mz['rolls'] is None:
+        requalified.append((it['rid'], it.get('full'), f"{it['rolls']} rouleaux", 'sans compte'))
+        it['rolls'] = None
+    q, nq, g = it.get('qty'), mz['qty'], lib.piece_weight(it.get('label') or '')
+    # lot lu comme une pièce : poids de référence d'une pièce (q vaut PIECE_WEIGHT), ou poids du lot écrit pour une pièce
+    lot = bool(q and nq and nq != q and q.get('n') == 1 and (q.get('v') == g or (nq['n'] > 1 and abs(nq['n'] * nq['v'] - q['v']) <= nq['n'])))
+    if it.get('approx') and lot:
+        requalified.append((it['rid'], it.get('full'), q, mz['qty']))
+        it['qty'], it['approx'] = mz['qty'], mz['approx'] or None
+
 # un même produit d'une enseigne lu dans plusieurs rayons : il reste dans le rayon le plus ordinaire (lib.best_rayon),
 # avec la lecture la plus récente et les étiquettes de régime de tous les rayons où il a été lu
 by_rid = collections.defaultdict(list)
@@ -444,6 +480,8 @@ print("produits normalisés", len(items), dict(collections.Counter(i["ret"] for 
 print("lus dans plusieurs rayons", len(multi_rayon), "(détail dans tools/work/report.json, multi_rayon)")
 for (a, b), n in sorted(moved.items()):
     print(f"   {n} produits repris déplacés de {a} vers {b}")
+for rid, name, a, b in requalified:
+    print(f"   contenance corrigée sans relecture : {rid} {name} : {a} -> {b}")
 print("sans marque reconnue", len(unbranded), "(liste complète dans tools/work/unbranded.json)")
 json.dump(unbranded, open(os.path.join(lib.WORK, "unbranded.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 for u in unbranded[:30]:
