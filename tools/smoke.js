@@ -3,8 +3,8 @@
 // mes paniers, Recommander, recherche, guide des frais, À propos, mode magasin, Ce qui a bougé, listes par profil, lien
 // de transfert abîmé) et vérifie qu'ils s'affichent sans erreur ; la fiche avec Nutri-Score, allergènes et labels
 // d'après Open Food Facts (réponse simulée, tools/fixtures/openfoodfacts.json : seul le code part, gardé sur le
-// téléphone, réglage décoché), #/comparer, le signalement (gardé, lien GitHub sans donnée personnelle) et un seuil de
-// prix atteint ; puis
+// téléphone, réglage décoché), #/comparer, le signalement (gardé, lien GitHub sans donnée personnelle), « À venir »
+// (#/comment/avenir, demande d'une enseigne ou d'une ville) et un seuil de prix atteint ; puis
 // l'affichage (thème, contraste renforcé, mode confort et taille du texte posés avant le premier rendu, cibles de 60 px
 // en confort) et le bon Auchan d'après le code postal. Code de sortie 1 en cas de problème.
 // Usage : node tools/smoke.js
@@ -106,6 +106,7 @@ const server = http.createServer((req, res) => {
     await page.goto(base + "#/remplir"); await ready();
     await page.waitForSelector(".fillc", { timeout: 20000 }).catch(() => {});
     if (await check("remplir", ".fillc", 1)) {
+      await check("remplir, ligne vers « À venir »", '#view .gf a[href="#/comment/avenir"]', 1);
       await page.click(".dock [data-act=fill]"); await page.waitForTimeout(500); await ready();
       await check("remplir, mode guidé", "#view .steps li, #fpn", 1);
       const g = await page.evaluate(() => JSON.parse(localStorage.getItem("cabas.guide") || "{}"));
@@ -229,6 +230,34 @@ const server = http.createServer((req, res) => {
     if (!wst[0][PE.i] || wst[0][PE.i].max !== cur + 100 || !wst[1][PE.i]) problems.push("préviens-moi : " + JSON.stringify(wst));
     await page.goto(base + "#/"); await ready(); await page.waitForTimeout(400);
     await check("accueil, seuil atteint", '#view [aria-label="Ton seuil est atteint"] a.row', 1);
+
+    /* « À venir » : depuis les réglages, #/comment/avenir arrive sur la section (titre en haut, focus dessus), quatre
+       projets, aucune autre appli nommée ; « Demander une enseigne ou ta ville » ouvre le signalement sur ce choix, et
+       le code postal écrit ne part pas dans le ticket */
+    await page.goto(base + "#/reglages"); await ready();
+    await page.click('#view a[href="#/comment/avenir"]'); await ready(); await page.waitForTimeout(600);
+    const av = await page.evaluate(() => { const h = document.getElementById("avenir"), l = document.querySelector("#view .soonl"); return h && l ? { top: Math.round(h.getBoundingClientRect().top), focus: document.activeElement === h, items: l.querySelectorAll(":scope > li").length, text: document.getElementById("view").textContent } : null; });
+    if (!av) problems.push("à venir : section absente de #/comment/avenir");
+    else {
+      if (av.top < 40 || av.top > 160 || !av.focus) problems.push(`à venir : titre à ${av.top} px, focus ${av.focus ? "dessus" : "ailleurs"}`);
+      if (av.items !== 4) problems.push(`à venir : ${av.items} projets, 4 attendus`);
+      if (!/si les enseignes l'acceptent/.test(av.text) || !/Lidl/.test(av.text) || !/Île-de-France/.test(av.text) || !/Remplir mes paniers/.test(av.text)) problems.push("à venir : texte incomplet");
+      if (/Jow|Miam|ChatGPT|partenaire officiel/i.test(av.text)) problems.push("à venir : une autre appli ou un partenariat est nommé");
+    }
+    await page.evaluate(() => window.scrollTo(0, 0)); await page.goto(base + "#/"); await ready();
+    await page.goto(base + "#/comment"); await ready(); await page.waitForTimeout(300);
+    if ((await page.evaluate(() => window.scrollY)) !== 0) problems.push("comment : la page sans « avenir » ne s'ouvre pas en haut");
+    await page.click('#view [data-act="report"][data-k="enseigne"]'); await page.waitForTimeout(500);
+    if (!(await page.$('#sheet [data-act="repk"][data-k="enseigne"][aria-checked="true"]'))) problems.push("à venir : la demande ne s'ouvre pas sur « Demander une enseigne ou une ville »");
+    await page.fill("#repT", "Lyon 69003, et Lidl");
+    await page.click('#sheet [data-act="repok"]'); await page.waitForTimeout(400);
+    const gh2 = await page.evaluate(() => { const a = document.querySelector('#sheet a[data-act="repsent"]'); return a ? a.getAttribute("href") : ""; });
+    if (!gh2) problems.push("à venir : pas de confirmation avant GitHub");
+    else {
+      const u = new URL(gh2), t = u.searchParams.get("title") || "", b = u.searchParams.get("body") || "";
+      if (!/^Demander une enseigne ou une ville/.test(t) || /69003/.test(t + b) || !/Lyon/.test(b)) problems.push(`à venir : ticket « ${t} » ${b.slice(0, 120)}`);
+    }
+    await page.click("#sheet .sheet-h [data-act=close]"); await page.waitForTimeout(300);
 
     /* le bon Auchan d'après le code postal (données publiques de data/retailers.json, code postal sur le téléphone) */
     const ap = await page.evaluate(() => { const D = cabasDebug(); return ["94120", "75015", "75116", "92100", "93100", "78000", "91300", "13001", "123"].map((z) => { const a = D.autoPick(z, "auchan"); return a ? a.id + (a.exact ? "" : "~") : null; }); });

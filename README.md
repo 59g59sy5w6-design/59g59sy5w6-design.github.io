@@ -13,6 +13,7 @@ Elle s'ouvre à l'adresse https://59g59sy5w6-design.github.io et s'installe sur 
 - **Le panier** : une, deux ou trois commandes, calculées exactement avec les minimums d'achat et les paliers de frais de chaque enseigne ; les produits qu'aucune commande ne prend sont à acheter en magasin, et « Tout me faire livrer » évite tout déplacement. Pour chaque produit, « Où le prendre » : toujours ou jamais chez une enseigne, ou un équivalent accepté. « Et si… », « Compléter pour 2,83 € » sous le minimum, le tableau des prix, un budget par panier ou par mois.
 - **Économiser encore** : pour chaque produit, un équivalent moins cher au kilo ou au litre, jamais imposé.
 - **Remplir mes paniers** : chaque produit s'ouvre sur le site de son enseigne, avec sa quantité ; tu l'ajoutes toi-même, Cabas le coche à ton retour. Rien n'est automatisé chez les enseignes.
+- **À plusieurs** : un proche fait tes courses à partir d'un lien (ta liste, ton régime, ton budget) et te renvoie ce qui est commandé ; ou deux listes passent dans une même commande, avec la part exacte de chacun, frais compris.
 - **Après la commande** : le créneau dans ton calendrier, « Ta commande est arrivée ? », ce qui manquait remis au prochain panier, le total payé noté à part, et le panier de la semaine le jour des courses.
 - **En magasin** : le mode magasin (ta liste par rayon, en gros caractères, à cocher), une impression propre, et le scanner qui dit où un produit est le moins cher.
 - **Repas à petit prix** : 60 recettes au coût de la portion, et une semaine de repas qui tient dans ton budget et ton régime.
@@ -21,6 +22,19 @@ Elle s'ouvre à l'adresse https://59g59sy5w6-design.github.io et s'installe sur 
 - **Pour tout le monde** : cinq tailles de texte, clair ou sombre, contraste renforcé, mode confort (gros boutons, une colonne), lecture à voix haute, et chaque suppression qui se rattrape par « Annuler ».
 - **Tes données** : tout reste sur ton téléphone ; une copie en fichier, ou l'envoi vers un autre téléphone par un simple lien.
 - **Partage** : la répartition en texte, une liste par lien, une image d'économies à publier.
+- **Signaler ou demander** : un prix faux, un produit qui manque, une enseigne ou ta ville ; gardé sur ton téléphone, envoyé seulement si tu le veux, après avoir vu le texte, sans rien de personnel.
+- **À venir**, dans « Comment ça marche » : ce que Cabas prépare, si les enseignes l'acceptent (voir plus bas).
+
+## À venir
+
+Ce que Cabas prépare, si les enseignes l'acceptent. Aucun accord n'existe pour l'instant et aucune date n'est promise : Cabas n'est lié à aucune enseigne.
+
+- **Remplir tes paniers en un clic** : tes produits iraient d'un geste dans ton panier chez l'enseigne, comme le font déjà certaines applis de recettes avec des enseignes. Il faut pour cela que chaque enseigne ouvre l'accès à son panier. En attendant, « Remplir mes paniers » ouvre chaque produit pour toi.
+- **Partout en France** : aujourd'hui, l'Île-de-France seulement (Monoprix, Carrefour et Houra en livraison, Auchan dans les secteurs relus, en retrait et en livraison).
+- **Tous les rayons, et plus de produits** : aujourd'hui, Monoprix et Carrefour ne sont relus que sur une partie de leurs rayons.
+- **D'autres enseignes** : par exemple Lidl, Intermarché, Courses U et Franprix, et les vrais prix E.Leclerc à la place des prix simulés.
+
+Dans l'appli, « Demander une enseigne ou ta ville » dit où Cabas est attendu. Ce que chaque étape demande est détaillé dans `CLAUDE.md`, section « Feuille de route ».
 
 ## D'où viennent les prix
 

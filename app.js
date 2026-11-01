@@ -2038,7 +2038,7 @@
         `<div class="row"><span class="rt" id="factsL">Nutri-Score et allergènes<small>Demandés à Open Food Facts à l'ouverture d'une fiche, avec le seul code-barres, et gardés 30 jours sur ce téléphone. Décoché, d'un geste sur la fiche.</small></span><label class="sw hit"><input type="checkbox" role="switch" data-act="factsauto" aria-labelledby="factsL"${S.prefs.facts !== false ? " checked" : ""}><span></span></label></div>` +
         `<button class="row" type="button" data-act="watchlist"><span class="rt">Mes alertes de prix<small>${Object.keys(watchAll()).length ? "L'accueil te dit quand un prix passe sous ton seuil." : "Sur la fiche d'un produit\u00a0: «\u00a0Préviens-moi quand le prix baisse\u00a0»."}</small></span>${Object.keys(watchAll()).length ? `<span class="val num">${Object.keys(watchAll()).length}</span>` : ""}${ic("chev", "chev")}</button></div>` +
         `<h2 class="gh">Mes choix et mes marques</h2><div class="group"><button class="row" type="button" data-act="usual"><span class="rt">Mes choix habituels<small>${usualCount() ? "Ce que tu as choisi dans Ma liste revient d'office, tant que le prix suit." : "Choisis un produit dans Ma liste : Cabas s'en souvient."}</small></span>${usualCount() ? `<span class="val num">${usualCount()}</span>` : ""}${ic("chev", "chev")}</button></div>` +
-        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/comment"><span class="rt">Comment ça marche</span>${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="${installEvt ? "installnow" : "install"}"><span class="rt">${isIOS ? "Installer Cabas sur l'iPhone" : "Installer Cabas sur le téléphone"}</span>${ic("chev", "chev")}</button>`}<button class="row" type="button" data-act="shareapp"><span class="rt">Faire connaître Cabas<small>Une image et un lien à envoyer à qui fait ses courses</small></span>${ic("share", "chev")}</button><button class="row" type="button" data-act="report"><span class="rt">Signaler ou demander<small>Un produit qui manque, une enseigne, quelque chose qui ne va pas</small></span>${ic("chev", "chev")}</button>${reportsAll().length ? `<button class="row" type="button" data-act="reports"><span class="rt">Mes signalements</span><span class="val num">${reportsAll().length}</span>${ic("chev", "chev")}</button>` : ""}<div class="row"><span class="rt">Version</span><span class="val">1.2</span></div></div>` +
+        `<h2 class="gh">À propos</h2><div class="group"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${(S.hist || []).length ? `<span class="val num">${eurC(S.hist.reduce((a, x) => a + (x.s || 0), 0))}</span>` : ""}${ic("chev", "chev")}</a><a class="row" href="#/comment"><span class="rt">Comment ça marche</span>${ic("chev", "chev")}</a><a class="row" href="#/comment/avenir"><span class="rt">À venir<small>Ce que Cabas prépare, si les enseignes l'acceptent</small></span>${ic("chev", "chev")}</a><a class="row" href="#/apropos"><span class="rt">À propos des prix</span>${ic("chev", "chev")}</a>${standalone() ? "" : `<button class="row" type="button" data-act="${installEvt ? "installnow" : "install"}"><span class="rt">${isIOS ? "Installer Cabas sur l'iPhone" : "Installer Cabas sur le téléphone"}</span>${ic("chev", "chev")}</button>`}<button class="row" type="button" data-act="shareapp"><span class="rt">Faire connaître Cabas<small>Une image et un lien à envoyer à qui fait ses courses</small></span>${ic("share", "chev")}</button><button class="row" type="button" data-act="report"><span class="rt">Signaler ou demander<small>Un produit qui manque, une enseigne, quelque chose qui ne va pas</small></span>${ic("chev", "chev")}</button>${reportsAll().length ? `<button class="row" type="button" data-act="reports"><span class="rt">Mes signalements</span><span class="val num">${reportsAll().length}</span>${ic("chev", "chev")}</button>` : ""}<div class="row"><span class="rt">Version</span><span class="val">1.2</span></div></div>` +
         dataHtml() +
         `<div class="group" style="margin-top:32px"><button class="row danger" type="button" data-act="reset">Effacer mes données</button></div><p class="gf">Ton panier, tes listes et tes réglages restent sur cet appareil.</p>`,
     };
@@ -2115,14 +2115,47 @@
         (others.length ? `<h2 class="gh">Autres options</h2><div class="group">${others.map((x) => `<a class="row" href="#/enseigne/${esc(x.id)}"><span class="rt">${esc(x.name)}, ${esc(optionLabel(x).replace(/^./, (c) => c.toLowerCase()))}<small>${esc(feeShort(x))}</small></span>${ic("chev", "chev")}</a>`).join("")}</div><p class="gf">Une seule option par enseigne compte à la fois\u00a0: elle se choisit dans les <a href="#/reglages">réglages</a>.</p>` : ""),
     };
   };
-  /* ce que se demande quelqu'un qui découvre Cabas : ce que ça fait, d'où viennent les prix, ce que ça coûte, où ça marche */
-  VIEWS.comment = () => {
+  /* « À venir » (#/comment/avenir) : ce que Cabas prépare si les enseignes l'acceptent, sans date ni accord annoncé ;
+     chaque ligne dit aussi ce qui existe aujourd'hui, tiré des données (enseignes, points Auchan, rayons relus) */
+  function soonHtml() {
+    const real = S.allRets.filter((r) => !r.simulated), sim = [...new Set(S.allRets.filter((r) => r.simulated).map((r) => r.name))];
+    const brands = [...new Set(real.map((r) => r.name))];
+    const where = (r) => String((r.channel || {}).where || "").replace(/\s*\(.*\)\s*$/, "");
+    const solo = [...new Set(real.filter((r) => !r.group).map((r) => r.name))];
+    const grp = [...new Set(real.filter((r) => r.group).map((r) => r.name))];
+    /* les secteurs relus d'une enseigne à plusieurs options (Auchan) : retrait d'abord, puis livraison */
+    const zones = grp.map((n) => {
+      const xs = real.filter((r) => r.group && r.name === n), pk = xs.filter(pickup).map(where).filter(Boolean), lv = xs.filter((r) => !pickup(r)).map(where).filter(Boolean);
+      return n + [pk.length ? " en retrait à " + joinEt(pk) : "", lv.length ? " en livraison pour " + joinEt(lv) : ""].filter(Boolean).join(", et");
+    });
+    const today = "Aujourd'hui, l'Île-de-France seulement\u00a0: " + [solo.length ? joinEt(solo) + " en livraison" : "", ...zones].filter(Boolean).join(", ") + ".";
+    /* rayons relus par enseigne (data/status.json) : celles qui en lisent moins de 60 % de la mieux relue sont nommées */
+    const nray = new Map();
+    for (const r of real) { const k = Object.keys(statusRays(r.id) || {}).filter((id) => rayon(id)).length; nray.set(r.name, Math.max(nray.get(r.name) || 0, k)); }
+    const top = [...nray.entries()].sort((a, b) => b[1] - a[1])[0], few = top && top[1] ? [...nray.entries()].filter(([, k]) => k && k < top[1] * 0.6).sort((a, b) => b[1] - a[1]) : [];
+    const rays = few.length ? `Aujourd'hui, ${esc(few[0][0])} n'est relu que sur ${plural(few[0][1], "rayon", "rayons")}${few.length > 1 ? (few.length > 2 ? ", " : " et ") + joinEt(few.slice(1).map(([n, k]) => esc(n) + " sur " + k.toLocaleString("fr-FR"))) : ""}, contre ${top[1].toLocaleString("fr-FR")} chez ${esc(top[0])}.`
+      : `Aujourd'hui, ${esc(coverText().replace(/^./, (c) => c.toLowerCase()))}.`;
+    const item = (icon, t, d, now) => `<li class="row soon"><span class="mono" aria-hidden="true">${ic(icon)}</span><span class="rt"><b>${t}</b><small>${d}</small><small class="now">${now}</small></span></li>`;
+    return `<h2 class="gh" id="avenir" tabindex="-1">À venir</h2><div class="group"><div class="prose"><p>Ce que Cabas prépare, si les enseignes l'acceptent. Aucun accord n'existe pour l'instant et aucune date n'est promise\u00a0: Cabas n'est lié à aucune enseigne.</p></div>` +
+      `<ul class="soonl" role="list" aria-label="Ce que Cabas prépare">` +
+      item("bag", "Remplir tes paniers en un clic", "Tes produits iraient d'un geste dans ton panier chez l'enseigne, comme le font déjà certaines applis de recettes avec des enseignes. Il faut pour cela que chaque enseigne ouvre l'accès à son panier.", "En attendant, «\u00a0Remplir mes paniers\u00a0» ouvre chaque produit pour toi\u00a0: tu l'ajoutes au panier du site, Cabas le coche à ton retour.") +
+      item("pin", "Partout en France", "Les prix de ton magasin et de ta zone de livraison, où que tu habites.", tx(today)) +
+      item("grid", "Tous les rayons, et plus de produits", "Chaque rayon de chaque enseigne, et plus de produits comparés d'une enseigne à l'autre.", rays) +
+      item("store", "D'autres enseignes", `Par exemple Lidl, Intermarché, Courses U et Franprix${sim.length ? `, et les vrais prix ${esc(joinEt(sim))} à la place des prix simulés` : ""}.`, `Aujourd'hui, ${esc(joinEt(brands))}, aux prix relevés sur leurs sites${sim.length ? `, et ${esc(joinEt(sim))} aux prix simulés` : ""}.`) +
+      `</ul><button class="row link" type="button" data-act="report" data-k="enseigne"><span class="rt">Demander une enseigne ou ta ville<small>Ta demande reste sur ton téléphone tant que tu ne l'envoies pas</small></span>${ic("chev", "chev")}</button></div>` +
+      `<p class="gf">Avant de l'envoyer, tu vois le texte exact. Adresse électronique, téléphone et code postal en sont retirés.</p>`;
+  }
+  /* ce que se demande quelqu'un qui découvre Cabas : ce que ça fait, d'où viennent les prix, ce que ça coûte, où ça marche,
+     ce qui vient ; #/comment/avenir y mène directement (Remplir mes paniers, réglages) */
+  VIEWS.comment = (r) => {
     const m = S.meta || {};
-    const rets = S.allRets.filter((r) => !r.simulated).map((r) => r.group ? null : r.name).filter(Boolean);
     const names = joinEt([...new Set(S.allRets.filter((r) => !r.simulated).map((r) => r.name.split(" ")[0]))]);
     const step = (n, t, d) => `<div class="step"><span class="sn">${n}</span><div><b>${t}</b><p>${d}</p></div></div>`;
+    /* vers « À venir » à l'arrivée seulement (lien, adresse tapée), pas au retour ni à un redessin sur place */
+    const jump = !!r && r.id === "avenir" && (S.dir === "push" || S.dir === "tab" || (S.dir === "none" && S.scroll[S.cur] == null));
     return {
       title: "Comment ça marche", grouped: true,
+      mount: () => { const el = jump && $("#avenir"); if (el) { el.scrollIntoView({ block: "start" }); try { el.focus({ preventScroll: true }); } catch (e) { /* focus refusé */ } } },
       html: `<h1 class="lt">Comment ça marche</h1><p class="lt-sub">Cabas compare les prix des courses en ligne et répartit ton panier pour payer le moins cher, livraison comprise.</p>` +
         `<div class="how">` +
         step(1, "Écris ta liste, ou ajoute des produits", "Une ligne par produit, avec les quantités («\u00a02 paquets de pâtes\u00a0», «\u00a06 œufs\u00a0»). Tu peux aussi dicter, parcourir les rayons ou scanner un code-barres en magasin.") +
@@ -2131,9 +2164,10 @@
         step(4, "Tu remplis tes paniers sur les sites des enseignes", "«\u00a0Remplir mes paniers\u00a0» ouvre chaque produit sur le site de l'enseigne\u00a0: tu l'ajoutes à ton panier là-bas, tu reviens, Cabas le coche. Il ne vend rien, ne commande rien à ta place, ne prend aucune commission et n'est lié à aucune enseigne.") +
         `</div>` +
         `<h2 class="gh">D'où viennent les prix</h2><div class="group"><div class="prose"><p>Les prix sont relevés sur les sites des enseignes, page de rayon par page de rayon, et chaque prix garde la date de son relevé${m.updatedAt ? " (dernier relevé le " + esc(dateFr(m.updatedAt)) + ")" : ""}. Rien n'est estimé${S.allRets.some((r) => r.simulated) ? ", sauf E.Leclerc, dont les prix sont simulés et signalés comme tels partout" : ""}. Les offres en cours sont signalées mais pas déduites.</p><p>Les prix Auchan dépendent du magasin\u00a0: Cabas relève plusieurs points de retrait et zones de livraison, et tu choisis le tien.</p></div></div>` +
-        `<h2 class="gh">Où ça marche</h2><div class="group"><div class="prose"><p>Pour l'instant en Île-de-France, là où ${esc(names)} livrent ou proposent un retrait. ${esc(coverText())}. D'autres rayons suivent.</p></div></div>` +
+        `<h2 class="gh">Où ça marche</h2><div class="group"><div class="prose"><p>Pour l'instant en Île-de-France, là où ${esc(names)} livrent ou proposent un retrait. ${esc(coverText())}. La suite est plus bas, dans «\u00a0À venir\u00a0».</p></div></div>` +
         `<h2 class="gh">À plusieurs</h2><div class="group"><div class="prose"><p>Un proche peut faire tes courses : tu lui envoies ta liste par un lien, avec ton régime et ton budget si tu veux. Il commande pour toi, à part de ses propres courses, puis te renvoie un lien : ce qui est commandé, chez qui, quand ça arrive et ce qui manque. Ton adresse n'est jamais dans Cabas : il la choisit sur le site de l'enseigne.</p><p>À deux (colocation, voisins, famille), ta liste et celle de l'autre peuvent aussi passer dans une même commande pour atteindre le minimum et partager la livraison : Cabas donne la part de chacun, frais compris, et ce que chacun aurait payé seul.</p></div><button class="row link" type="button" data-act="duosend">Envoyer ma liste à un proche</button></div>` +
         `<h2 class="gh">Ce que ça coûte</h2><div class="group"><div class="prose"><p>Rien. Pas de compte, pas de publicité, pas de suivi. Tes listes, ton panier et tes commandes restent dans ton téléphone. Cabas s'installe sur l'écran d'accueil et marche sans réseau avec le dernier relevé.</p></div></div>` +
+        soonHtml() +
         `<div class="pad btns" style="padding-top:18px"><a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><button class="btn tint" type="button" data-act="shareapp">${ic("share")}Faire connaître Cabas</button></div>` +
         `<p class="gf"><a href="#/apropos">À propos des prix</a>, enseigne par enseigne.</p>`,
     };
@@ -2185,7 +2219,7 @@
       case "reglages": return { name: "reglages" };
       case "enseigne": return { name: "enseigne", id };
       case "apropos": return { name: "apropos" };
-      case "comment": return { name: "comment" };
+      case "comment": return { name: "comment", id };
       case "ecrire": return { name: "ecrire" };
       case "partage": return { name: "partage", id };
       case "economies": return { name: "economies" };
@@ -3692,7 +3726,8 @@
       html: `<h1 class="lt">Remplir mes paniers</h1><p class="lt-sub">${sub}</p>` + pourBanner(fin) + stl + done +
         s.orders.map((o) => fillOrdCard(o, s)).join("") + magBox + skipBox + freeBox +
         `<div class="group" style="margin-top:28px">${S.duo.w ? `<button class="row link" type="button" data-act="duoback">Envoyer sa part à ${esc(duoName())}</button>` : ""}<button class="row link" type="button" data-act="fillcopy">Copier toutes les listes</button><button class="row link" type="button" data-act="fillshare">Partager les listes</button>${fin ? `<button class="row link" type="button" data-act="savelist">Garder en liste</button><button class="row danger" type="button" data-act="clear">Vider le panier</button>` : !pv ? `<button class="row danger" type="button" data-act="fillstop">Arrêter le remplissage</button>` : ""}</div>` +
-        `<p class="gf">Cabas ouvre seulement des liens\u00a0: c'est toi qui ajoutes chaque produit et qui paies sur le site de l'enseigne. Tes listes restent sur ton téléphone.</p>`,
+        `<p class="gf">Cabas ouvre seulement des liens\u00a0: c'est toi qui ajoutes chaque produit et qui paies sur le site de l'enseigne. Tes listes restent sur ton téléphone.</p>` +
+        `<p class="gf"><a href="#/comment/avenir">Remplir en un clic</a>\u00a0: ce que Cabas prépare, si les enseignes l'acceptent.</p>`,
     });
   }
   /* « Avant de commencer » : la première fois chez une enseigne, ce qu'il faut faire sur son site (data/retailers.json) */
@@ -6009,7 +6044,7 @@
         body: (p ? `<p>${esc(pname(p))}, ${esc(p.format)}.</p>` : `<p>Un produit qui manque, une enseigne à ajouter, quelque chose qui ne va pas : dis-le, Cabas s'améliore avec.</p>`) +
           `<div class="group gap" role="radiogroup" aria-label="Ce que tu signales">${kinds.map(([k, l]) => `<button class="opt" type="button" role="radio" aria-checked="${R.k === k}" data-act="repk" data-k="${k}"><span>${l}</span>${R.k === k ? ic("check", "chk") : ""}</button>`).join("")}</div>` +
           ((R.k === "prix" || R.k === "lien") && rets.length ? `<h3 class="gh" id="repRL">Chez quelle enseigne</h3><div class="tagset" role="radiogroup" aria-labelledby="repRL">${chip("", "Je ne sais pas")}${rets.map((r) => chip(r.id, r.name)).join("")}</div>` : "") +
-          `<div class="field" data-field="repT" style="padding-top:14px"><label for="repT">Ton message, si tu veux</label><span class="in ta"><textarea id="repT" rows="4" maxlength="500" aria-describedby="repTH">${esc(R.text)}</textarea></span><small id="repTH">N'écris ni ton nom, ni ton adresse, ni ton téléphone : si tu l'envoies, ce texte sera public.</small></div>`,
+          `<div class="field" data-field="repT" style="padding-top:14px"><label for="repT">${R.k === "enseigne" ? "L'enseigne ou la ville que tu attends" : "Ton message, si tu veux"}</label><span class="in ta"><textarea id="repT" rows="4" maxlength="500" aria-describedby="repTH">${esc(R.text)}</textarea></span><small id="repTH">${R.k === "enseigne" ? "Le nom de ta ville suffit. " : ""}N'écris ni ton nom, ni ton adresse, ni ton téléphone : si tu l'envoies, ce texte sera public.</small></div>`,
         foot: `<button class="btn" type="button" data-act="repok">Garder ce signalement</button>`,
       };
     };

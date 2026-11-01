@@ -78,7 +78,7 @@ const ROUTES = [
   ["accueil", "#/"], ["rayons", "#/rayons"], ["rayon-pates", "#/rayon/pates"], ["produit", "#/produit/barilla-pates-capellini-n-1-500-g"],
   ["recherche", "#/recherche"], ["listes", "#/listes"], ["liste", "#/liste/l1"], ["suggestion", "#/suggestion"], ["panier", "#/panier"],
   ["reglages", "#/reglages"], ["enseigne-houra", "#/enseigne/houra"], ["enseigne-auchan", "#/enseigne/auchan"], ["enseigne-leclerc", "#/enseigne/leclerc"],
-  ["apropos", "#/apropos"], ["comment", "#/comment"], ["ecrire", "#/ecrire"], ["economies", "#/economies"], ["repas", "#/repas"],
+  ["apropos", "#/apropos"], ["comment", "#/comment"], ["comment-avenir", "#/comment/avenir"], ["ecrire", "#/ecrire"], ["economies", "#/economies"], ["repas", "#/repas"],
   ["recette", "#/repas/pates-thon-tomate"], ["scan", "#/scan"], ["partage", PARTAGE], ["inconnu", "#/nimportequoi"],
   ["remplir", "#/remplir"], ["remplir-guide", "#/remplir/monoprix"], ["remplir-fin", "#/remplir/houra"], ["remplir-avant", "#/remplir/carrefour"], ["recommander", "#/recommander"],
   ["magasin", "#/magasin"], ["mouvements", "#/mouvements"], ["transfert", TRANSFERT],
@@ -107,6 +107,8 @@ const SHEETS = {
   ecrire: [["autre-choix", "[data-act=wlalt]"], ["savelist", "[data-act=wlsave]"]],
   "rayon-pates": [["sort", "[data-act=sort]"], ["filters", "[data-act=filters]"]],
   scan: [["scantype", "[data-act=scantype]"]],
+  /* « À venir » : la demande d'une enseigne ou d'une ville, le signalement ouvert sur ce choix */
+  "comment-avenir": [["demander-enseigne", "#view [data-act=report][data-k=enseigne]"]],
 };
 const GROS_JS = `fetch("data/catalog.json").then((r) => r.json()).then((c) => { const b = {}; c.products.filter((p) => (p.o || []).length > 1).slice(0, 14).forEach((p) => { b[p.i] = 2; }); sessionStorage.setItem("a11yGros", JSON.stringify(b)); })`;
 const CRANS = ["0.82", "0.9", "1", "1.12", "1.25"];
@@ -254,7 +256,8 @@ async function prepare(page, rname, st) {
   if (rname === "ecrire" && st === "plein") { await page.click("[data-act=wlgo]").catch(() => {}); await page.waitForSelector("[data-act=wlalt], .banner", { timeout: 20000 }).catch(() => {}); await sleep(300); }
   if (rname === "proche") { await page.click("[data-act=pourgo]").catch(() => {}); await page.waitForFunction(() => location.hash === "#/panier", null, { timeout: 8000 }).catch(() => {}); await ready(page, "panier"); }
   if ((rname === "recherche" && st === "plein") || rname === "demande") { const i = await page.$("#q"); if (i) { await i.fill(rname === "demande" ? ASK : "lait"); await sleep(rname === "demande" ? 1200 : 600); } }
-  await page.evaluate(() => window.scrollTo(0, 0));
+  /* #/comment/avenir est mesuré là où il arrive : la section « À venir » en haut de l'écran */
+  if (rname !== "comment-avenir") await page.evaluate(() => window.scrollTo(0, 0));
 }
 /* états du gros panier (14 produits en deux exemplaires) : le tableau des prix et « Et si… » ouvert */
 const GROS_STEPS = [
