@@ -1477,7 +1477,9 @@
     return `<div class="hero"><h1>Tes courses au prix le plus bas, livraison comprise.</h1>` +
       `<p class="lede">Les mêmes produits chez Monoprix, Carrefour, Houra et Auchan, aux prix relevés sur leurs sites. Écris ta liste\u00a0: Cabas trouve chaque produit au meilleur prix et répartit tes commandes, frais compris.</p>` +
       `<a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a><p class="try">Ou essaie avec une liste toute faite</p><div class="exrow">${ex}<a class="chip" href="#/listes">Par profil${ic("chev")}</a></div>` +
-      `<p class="trust">Gratuit, sans compte, sans publicité. En Île-de-France pour l'instant. <a href="#/comment">Comment ça marche</a></p></div>`;
+      `<p class="trust">Gratuit, sans compte, sans publicité. En Île-de-France pour l'instant. <a href="#/comment">Comment ça marche</a></p>` +
+      /* ailleurs qu'à l'ancienne adresse : les courses emportées par un code (iPhone, voir #/demenage) */
+      (location.hostname === OLD_HOST ? "" : `<p class="trust">Tu avais déjà Cabas à son ancienne adresse\u00a0? <button class="act" type="button" data-act="pastecode">Coller mon code</button></p>`) + `</div>`;
   }
   VIEWS.home = () => {
     const ds = deals(8);
@@ -2344,6 +2346,7 @@
     const r = parse(h);
     if (S.route.name === "scan" && r.name !== "scan") stopScan();
     if (S.route.name === "magasin" && r.name !== "magasin") wakeOff();
+    if (S.lookTmp && r.name !== "transfert") applyLook();
     if (speaking && r.name !== S.route.name) speakStop();
     if (rec) micStop();
     S.route = r;
@@ -5365,6 +5368,7 @@
   /* taille du texte, thème, contraste renforcé et mode confort : boot.js les pose avant le premier rendu (html[data-text],
      [data-theme], [data-contrast], [data-simple]) et les repose ici à chaque changement de réglage */
   function applyLook() {
+    S.lookTmp = false;
     try { document.documentElement.style.zoom = ""; if (window.cabasLook) window.cabasLook(S.prefs); } catch (e) { /* sans effet */ }
   }
   /* « A moins / A plus » : une phrase d'exemple qui change de taille en direct, le nom du cran, cinq points */
@@ -5788,8 +5792,26 @@
     S.wl = null; S.undo = null; S._sug = null; S._ask = null; S._compose = null; S.filt = {}; DIETV.v++; RECM = null; S.facts = null; S.compose = null; S.eans = null;
     applyLook(); applyGroups(); renderChrome();
   }
+  /* après un transfert, la page que la personne ouvrait sur l'ancienne adresse (un lien d'un proche, une liste) */
+  function goAfter(to) {
+    const t = tabOf(to);
+    if (t) { S.tab = t; S.stacks[t] = [to]; navigate(to, "tab"); } else push(to);
+  }
+  /* la taille du texte, le thème, le contraste et le mode confort d'un déménagement, posés sans rien enregistrer : la
+     page d'arrivée se lit comme l'appli de la personne ; applyLook remet les réglages de ce téléphone */
+  function lookPreview(p) {
+    if (!p || typeof p !== "object") return;
+    const L = {};
+    if (ZOOMS.some(([k]) => k === String(ZOOM_OLD[p.zoom] || p.zoom))) L.zoom = String(p.zoom);
+    if (["light", "dark", "auto"].includes(p.theme)) L.theme = p.theme;
+    if (typeof p.contrast === "boolean") L.contrast = p.contrast;
+    if (typeof p.simple === "boolean") L.simple = p.simple;
+    if (!Object.keys(L).length) return;
+    S.lookTmp = true;
+    try { if (window.cabasLook) window.cabasLook(Object.assign({}, S.prefs, L)); } catch (e) { /* sans effet */ }
+  }
   /* remplace les données de l'appareil ; « Annuler » remet exactement ce qu'il y avait */
-  function applyImport(data, how) {
+  function applyImport(data, how, to) {
     const before = {};
     try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("cabas.")) before[k] = localStorage.getItem(k); } } catch (e) { /* stockage indisponible */ }
     try {
@@ -5801,6 +5823,7 @@
     S.tab = "accueil"; S.stacks = { accueil: ["#/"], rayons: ["#/rayons"], recherche: ["#/recherche"], listes: ["#/listes"], panier: ["#/panier"] };
     history.replaceState(null, "", location.pathname + "#/");
     navigate("#/", "tab");
+    if (to) goAfter(to);
     undoable(how, restore, 10000);
     return true;
   }
@@ -5825,6 +5848,7 @@
       `<button class="row" type="button" data-act="export"><span class="rt">Enregistrer une copie<small>Un fichier avec ton panier, tes listes, tes paniers commandés et tes réglages</small></span>${ic("chev", "chev")}</button>` +
       `<button class="row" type="button" data-act="import"><span class="rt">Restaurer une copie<small>Depuis un fichier enregistré par Cabas</small></span>${ic("chev", "chev")}</button>` +
       `<button class="row" type="button" data-act="xfer"><span class="rt">Envoyer vers un autre téléphone<small>Un lien à ouvrir sur l'autre téléphone, sans compte ni serveur</small></span>${ic("share", "chev")}</button>` +
+      `<button class="row" type="button" data-act="pastecode"><span class="rt">Coller mon code<small>Le code de déménagement copié dans l'ancienne appli Cabas, ou un lien de transfert</small></span>${ic("paste", "chev")}</button>` +
       `</div><input type="file" id="impIn" accept=".json,application/json" hidden><p class="gf">Tout reste sur cet appareil. Le lien contient tes données elles-mêmes\u00a0: envoie-le seulement à toi.</p>`;
   }
   /* #/transfert/<x> : ce qui arrive d'un autre téléphone, vérifié, puis remplacé seulement si tu le confirmes */
@@ -5832,7 +5856,13 @@
      clés d'une copie en fichier (DKEYS), vérifiées de la même façon, et ne remplace rien sans confirmation non plus */
   VIEWS.transfert = (r) => {
     const X = S.xfer && S.xfer.id === r.id ? S.xfer : (S.xfer = { id: r.id, st: "wait", R: null });
-    if (X.st === "wait" && !X.p) X.p = unpackState(r.id).then((o) => { X.mv = !!o && o.mv === 1; X.R = o ? importCheck(o, !X.mv) : null; X.st = X.R && X.R.ok ? "ok" : "bad"; if (S.route.name === "transfert") rerender(); });
+    if (X.st === "wait" && !X.p) X.p = unpackState(r.id).then((o) => {
+      X.mv = !!o && o.mv === 1; X.R = o ? importCheck(o, !X.mv) : null; X.st = X.R && X.R.ok ? "ok" : "bad";
+      /* un déménagement : la page demandée sur l'ancienne adresse (h), ouverte après la confirmation, et tout de suite la
+         taille du texte et le thème de la personne, sans rien enregistrer avant qu'elle confirme */
+      if (X.mv && X.st === "ok") { X.h = moveRoute(o.h); lookPreview((X.R.data || {}).prefs); }
+      if (S.route.name === "transfert") rerender();
+    });
     const R = X.R, mv = X.mv, full = !mv || moveData();
     return {
       title: "Transfert", grouped: true,
@@ -5845,9 +5875,12 @@
   };
 
   /* ---------- déménagement vers la nouvelle adresse ---------- */
-  /* Sur l'ancienne adresse, une fois redirigée par GitHub Pages, sw.js ouvre l'appli depuis le cache avec ?demenage=1
-     (moveIn) : avec des données, l'écran « Cabas a déménagé » ; sans, la nouvelle adresse tout de suite. Les données
-     partent dans le lien #/transfert, après le #, ouvert par la personne : rien ne passe par un serveur. cabas.moved
+  /* Sur l'ancienne adresse, une fois redirigée par GitHub Pages, sw.js ouvre l'appli depuis le cache avec
+     ?demenage=<jeton> (moveIn) : avec des données, l'écran « Cabas a déménagé » ; sans, la nouvelle adresse tout de suite.
+     Le marqueur ne vaut que si son jeton est celui que sw.js vient de ranger dans le cache « cabas-demenage » : une
+     adresse fabriquée avec ?demenage ouvre l'appli comme d'habitude. Les données partent dans le lien #/transfert, après
+     le #, ouvert par la personne : rien ne passe par un serveur. Sur iPhone, l'appli installée garde ses données à part
+     de Safari : elles passent par un code copié ici et collé dans la nouvelle appli (« Coller mon code »). cabas.moved
      garde l'heure du dernier envoi (sur l'ancienne adresse seulement, jamais copiée), pour ne pas renvoyer sans le
      vouloir des données plus anciennes que celles de la nouvelle adresse. */
   /* ce que l'appli écrit d'elle-même à l'ouverture (prix vus, baisses, mémoire de l'accueil) n'est pas à emporter */
@@ -5856,57 +5889,152 @@
     const d = packState().data;
     return Object.keys(d).some((k) => { const v = d[k]; return !MOVE_SKIP.includes(k) && (Array.isArray(v) ? v.length > 0 : v && typeof v === "object" ? Object.keys(v).length > 0 : !!v); });
   }
+  /* pendant les courses d'un proche, le panier est le sien : celui de la personne est mis de côté (duo.pour.alt) */
   function moveSum() {
-    const d = packState().data, n = (o) => Object.keys(o || {}).length;
-    const s = importSum({ sum: { basket: n(d.basket), lists: (d.lists || []).length, hist: (d.hist || []).length, free: n(d.free), prefs: !!d.prefs, menu: (d.menu || []).length } });
-    return s === "rien à restaurer" ? "" : s;
+    const d = packState().data, n = (o) => Object.keys(o || {}).length, P = pourOn() && d.duo && d.duo.pour, alt = (P && P.alt) || {};
+    const s = importSum({ sum: { basket: n(P ? alt.basket : d.basket), lists: (d.lists || []).length, hist: (d.hist || []).length, free: n(P ? alt.free : d.free), prefs: !!d.prefs, menu: (d.menu || []).length } });
+    const own = s === "rien à restaurer" ? "" : s;
+    return P ? (own ? own + ", et les courses " + deN(pourName()) + " en cours" : "Les courses " + deN(pourName()) + " en cours") : own;
   }
-  function moveIn() {
+  /* le # demandé, gardé pour la nouvelle adresse : une route de l'appli (pas l'accueil, le déménagement ni un transfert) */
+  function moveRoute(h) {
+    h = String(h || "");
+    if (h.length > 40000 || !/^#\/[\w\-.~%!$&'()*+,;=:@/?]+$/.test(h)) return "";
+    return ["home", "demenage", "transfert"].includes(parse(h).name) ? "" : h;
+  }
+  /* le jeton du marqueur, rangé par sw.js il y a moins de dix minutes : lu puis effacé */
+  async function moveTokenOk(t) {
     try {
-      if (!new URLSearchParams(location.search).has("demenage")) return false;
-      const h = location.hash;
-      S.moveHash = /^#\/./.test(h) && !/^#\/demenage/.test(h) ? h : "";
-      if (location.hostname === NEW_HOST) { history.replaceState(null, "", location.pathname + (h || "#/")); return false; }
+      const c = await caches.open("cabas-demenage"), r = await c.match("jeton"), j = r ? await r.json() : null;
+      const ok = !!(j && t && j.t === t && Date.now() - j.at < 10 * 60 * 1000);
+      if (ok) await c.delete("jeton");
+      return ok;
+    } catch (e) { return false; }
+  }
+  async function moveIn() {
+    try {
+      const q = new URLSearchParams(location.search);
+      if (!q.has("demenage")) return false;
+      const h = location.hash, shared = q.has("partage");
+      if (location.hostname === NEW_HOST || !(await moveTokenOk(q.get("demenage")))) {
+        /* la nouvelle adresse, ou un marqueur qui ne vient pas du service worker : l'appli s'ouvre comme d'habitude, un
+           texte partagé compris */
+        history.replaceState(null, "", location.pathname + (shared ? "?partage=1" : "") + (h || "#/"));
+        return false;
+      }
       S.moving = true;
+      S.moveHash = moveRoute(h);
+      /* un partage vers l'ancienne appli installée : le texte rejoint Ma liste en cours, qui part avec le reste ; un lien
+         de liste Cabas s'ouvrira sur la nouvelle adresse */
+      if (shared) {
+        const p = sharedParse((await sharedTake()) || {});
+        if (p.hash !== "#/ecrire") S.moveHash = p.hash;
+        else if (p.text) {
+          const d = store.get("draft", "");
+          store.set("draft", (typeof d === "string" && d.trim() ? d.replace(/\s+$/, "") + "\n" : "") + p.text);
+          S.moveShared = p.text; S.moveHash = "#/ecrire";
+        }
+      }
       if (!moveData()) { location.replace(NEW_URL + S.moveHash); return true; }
       history.replaceState(null, "", location.pathname + "#/demenage");
     } catch (e) { /* adresse illisible : l'appli s'ouvre comme d'habitude */ }
     return false;
   }
-  /* toutes les données, comme une copie en fichier, dans le lien de la nouvelle adresse */
-  function moveGo() {
+  /* toutes les données, comme une copie en fichier, et le # demandé (h) */
+  function movePack() {
     const st = packState();
     st.mv = 1;
-    packLink(st).then((x) => {
-      if (x.length > 600000) { toast("Trop de données pour un lien\u00a0: enregistre une copie en fichier, puis restaure-la sur la nouvelle adresse", { label: "Enregistrer", run: exportFile }, null, 10000); return; }
+    if (S.moveHash) st.h = S.moveHash;
+    return packLink(st);
+  }
+  const moveTooBig = () => toast("Trop de données pour un lien\u00a0: enregistre une copie en fichier, puis restaure-la sur la nouvelle adresse", { label: "Enregistrer", run: exportFile }, null, 10000);
+  function moveGo() {
+    /* hors ligne, la nouvelle adresse ne s'ouvrirait pas : rien n'est noté comme envoyé */
+    if (navigator.onLine === false) { toast("Pas de connexion\u00a0: reconnecte-toi à Internet, puis emporte tes courses"); return; }
+    movePack().then((x) => {
+      if (x.length > 600000) { moveTooBig(); return; }
       store.set("moved", new Date().toISOString());
       location.assign(NEW_URL + "#/transfert/" + x);
     });
+  }
+  /* sur iPhone, l'appli installée depuis l'ancienne adresse */
+  const iosApp = () => isIOS && standalone();
+  /* le code de déménagement : le lien #/transfert de la nouvelle adresse, préparé à l'affichage de l'écran pour que la
+     copie se fasse dans le geste (Safari refuse une copie faite après une attente) */
+  function moveCode() {
+    if (!S.moveCodeP) S.moveCodeP = movePack().then((x) => (S.moveCodeV = x.length > 600000 ? "" : NEW_URL + "#/transfert/" + x));
+    return S.moveCodeP;
+  }
+  async function moveCopy() {
+    try {
+      if (S.moveCodeV) await navigator.clipboard.writeText(S.moveCodeV);
+      else if (S.moveCodeP && S.moveCodeV === "") { moveTooBig(); return; }
+      else if (window.ClipboardItem && navigator.clipboard.write) await navigator.clipboard.write([new ClipboardItem({ "text/plain": moveCode().then((u) => { if (!u) throw new Error("trop long"); return new Blob([u], { type: "text/plain" }); }) })]);
+      else { const u = await moveCode(); if (!u) { moveTooBig(); return; } await navigator.clipboard.writeText(u); }
+    } catch (e) { toast("Copie impossible ici\u00a0: enregistre plutôt une copie en fichier, puis restaure-la dans la nouvelle appli", { label: "Enregistrer", run: exportFile }, null, 10000); return; }
+    store.set("moved", new Date().toISOString());
+    rerender();
+    toast("Code copié. Ouvre la nouvelle appli Cabas, puis touche «\u00a0Coller mon code\u00a0»", null, "check", 10000);
+  }
+  /* un texte partagé vers l'ancienne appli, après un déménagement déjà fait : copié, puis la nouvelle adresse sur Ma liste */
+  function moveShareCopy() {
+    const go = () => location.assign(NEW_URL + "#/ecrire");
+    try { navigator.clipboard.writeText(S.moveShared).then(go, go); } catch (e) { go(); }
   }
   /* l'appli restée ouverte sur l'ancienne adresse : sw.js voit les prix arriver de la nouvelle */
   function movedNote() {
     if (S.movedTold || S.moving || location.hostname === NEW_HOST) return;
     S.movedTold = true; S.moving = true;
-    toast("Cabas a déménagé sur " + NEW_HOST, { label: "Voir", run: () => push("#/demenage") }, null, 12000);
+    toast("Cabas a déménagé sur " + NEW_HOST, { label: "Voir", run: () => { S.moveHash = moveRoute(location.hash); push("#/demenage"); } }, null, 12000);
   }
   VIEWS.demenage = () => {
-    const has = moveData(), at = store.get("moved", ""), sum = has ? moveSum() : "";
+    const has = moveData(), at = store.get("moved", ""), sum = has ? moveSum() : "", ios = iosApp(), sh = S.moveShared;
+    const host = `<span class="host">${esc(NEW_HOST)}</span>`;
     const open = (cls, label) => `<button class="btn${cls}" type="button" data-act="moveopen">${label}</button>`;
-    let lead, btns;
-    if (!has) { lead = "Rien n'est enregistré ici\u00a0: ouvre simplement la nouvelle adresse."; btns = open("", `<span>Ouvrir <span class="host">${esc(NEW_HOST)}</span></span>`); }
-    else if (at) { lead = `Tu as emporté tes courses ${esc(whenFr(at))}. Si elles sont bien arrivées, continue sur la nouvelle adresse.`; btns = open("", `<span>Ouvrir <span class="host">${esc(NEW_HOST)}</span></span>`) + `<button class="btn ghost" type="button" data-act="moveok">Emporter à nouveau mes courses</button>`; }
-    else { lead = "Tes courses sont encore ici, sur l'ancienne adresse. Emporte-les en un geste."; btns = `<button class="btn" type="button" data-act="moveok">${ic("share")}<span>Emporter mes courses sur <span class="host">${esc(NEW_HOST)}</span></span></button>` + open(" ghost", "Ouvrir sans mes données"); }
+    const sent = at ? `Tu as lancé l'envoi de tes courses ${esc(whenFr(at))}. ` : "";
+    let lead, btns, steps = "";
+    if (ios && has) {
+      moveCode();
+      /* sur iPhone : trois étapes, la copie du code en bouton plein */
+      lead = (at ? `Tu as copié ton code ${esc(whenFr(at))}. Si tes courses ne sont pas dans la nouvelle appli, copie-le à nouveau. ` : "") + "Sur iPhone, la nouvelle appli garde ses courses à part\u00a0: emporte-les avec un code, en trois étapes.";
+      steps = `<ol class="steps"><li><span>Ouvre <b>Safari</b> à l'adresse <b class="host">${esc(NEW_HOST)}</b>, touche ${ic("share")} <b>Partager</b>, puis <b>Sur l'écran d'accueil</b>.</span></li>` +
+        `<li><span>Reviens ici et touche <b>Copier mon code de déménagement</b>.</span></li>` +
+        `<li><span>Ouvre la nouvelle icône Cabas et touche <b>Coller mon code</b>, sur l'accueil ou dans Réglages, Tes données.</span></li></ol>`;
+      btns = `<button class="btn" type="button" data-act="movecode">${ic("copy")}<span>Copier mon code de déménagement</span></button>`;
+    } else if (sh && at) {
+      lead = sent + "Tu viens de partager une liste vers l'ancienne adresse\u00a0: copie-la, puis colle-la dans Ma liste sur la nouvelle.";
+      btns = `<button class="btn" type="button" data-act="moveshare">${ic("copy")}<span>Copier ma liste et ouvrir ${host}</span></button><button class="btn ghost" type="button" data-act="moveok">Emporter à nouveau mes courses</button>`;
+    } else if (!has) { lead = "Rien n'est enregistré ici\u00a0: ouvre simplement la nouvelle adresse."; btns = open("", `<span>Ouvrir ${host}</span>`); }
+    else if (at) { lead = sent + "Si elles ne sont pas sur la nouvelle adresse, emporte-les à nouveau."; btns = open("", `<span>Ouvrir ${host}</span>`) + `<button class="btn ghost" type="button" data-act="moveok">Emporter à nouveau mes courses</button>`; }
+    else { lead = sh ? "Ta liste partagée est dans Ma liste\u00a0: elle part avec tes courses. Emporte-les en un geste." : "Tes courses sont encore ici, sur l'ancienne adresse. Emporte-les en un geste."; btns = `<button class="btn" type="button" data-act="moveok">${ic("share")}<span>Emporter mes courses sur ${host}</span></button>` + open(" ghost", "Ouvrir sans mes données"); }
     return {
       title: "Déménagement", grouped: true, solo: true,
       html: `<h1 class="lt">Cabas a déménagé</h1><p class="lt-sub">Sa nouvelle adresse est <b class="host">${esc(NEW_HOST)}</b>. ${lead}</p>` +
         (sum ? `<div class="banner" role="status">${ic("info")}<span><b>${at ? "Sur l'ancienne adresse" : "Ce que tu emportes"}</b>${esc(sum)}.</span></div>` : "") +
-        `<div class="pad btns" style="padding-top:16px">${btns}</div>` +
-        `<p class="gf">${has ? "Rien ne passe par un serveur\u00a0: tes données voyagent dans le lien lui-même, après le #. Sur la nouvelle adresse, tu confirmes avant qu'elles remplacent quoi que ce soit. " : ""}Pour garder Cabas sur ton écran d'accueil, installe-le depuis la nouvelle adresse.</p>` +
-        /* en secours (un iPhone garde à part les données de l'appli installée et celles de Safari) : une copie en fichier,
-           à restaurer dans les réglages de la nouvelle adresse */
+        steps + `<div class="pad btns" style="padding-top:16px">${btns}</div>` +
+        `<p class="gf">${has ? "Rien ne passe par un serveur\u00a0: tes données voyagent dans le lien lui-même, sans passer par Internet. Sur la nouvelle adresse, tu confirmes avant qu'elles remplacent quoi que ce soit. " : ""}${ios ? "" : "Pour garder Cabas sur ton écran d'accueil, installe-le depuis la nouvelle adresse."}</p>` +
+        /* en secours : une copie en fichier, à restaurer dans les réglages de la nouvelle adresse */
         (has ? `<p class="gf">Une copie en fichier se restaure aussi sur la nouvelle adresse, dans Réglages. <button class="act" type="button" data-act="export">Enregistrer une copie${ic("chev")}</button></p>` : ""),
     };
   };
+  /* « Coller mon code » (nouvelle appli, Réglages et accueil d'une première visite) : le code de déménagement copié dans
+     l'ancienne appli, ou un lien de transfert d'un autre téléphone ; il mène à #/transfert, qui vérifie tout et demande
+     la confirmation */
+  const codeOf = (t) => { const m = /#\/transfert\/([jz][A-Za-z0-9_-]{8,})/.exec(String(t || "")) || /^\s*([jz][A-Za-z0-9_-]{8,})\s*$/.exec(String(t || "")); return m ? m[1] : ""; };
+  function codeSheet() {
+    openSheet({
+      title: "Coller mon code",
+      body: `<p>Le code se copie dans l'ancienne appli Cabas, sur l'écran «\u00a0Cabas a déménagé\u00a0». Un lien de transfert envoyé d'un autre téléphone marche aussi.</p>` +
+        `<div class="field" data-field="codeIn"><label for="codeIn">Ton code</label><span class="in ta"><textarea id="codeIn" rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="codeInH"></textarea></span><small id="codeInH">Rien ne part sur Internet\u00a0: tes courses sont dans le code lui-même. Tu confirmes avant qu'elles remplacent quoi que ce soit.</small></div>`,
+      foot: (pasteOK() ? `<button class="btn tint" type="button" data-act="codepaste">${ic("paste")}Coller</button>` : "") + `<button class="btn" type="button" data-act="codego">Continuer</button>`,
+    });
+  }
+  function codeGo(t) {
+    const x = codeOf(t);
+    if (!x) { fieldError("codeIn", "Ce n'est pas un code de Cabas. Copie-le à nouveau dans l'ancienne appli."); return; }
+    closeSheet();
+    push("#/transfert/" + x);
+  }
 
   /* ---------- écouter ---------- */
   /* La liste, la répartition du panier ou ce qu'il reste à prendre en magasin, lus à voix haute par la synthèse vocale
@@ -7041,7 +7169,7 @@
     if (t.dataset.tab && !t.dataset.act) { e.preventDefault(); if (!$("#sheet").hidden) closeSheet(); switchTab(t.dataset.tab); return; }
     const act = t.dataset.act, id = t.dataset.id, k = t.dataset.k;
     /* avant le catalogue, seuls les gestes qui n'en ont pas besoin passent */
-    if (!S.ready && !["reload", "close", "back", "gosearch", "toastact", "moveok", "moveopen", "export"].includes(act)) return;
+    if (!S.ready && !["reload", "close", "back", "gosearch", "toastact", "moveok", "moveopen", "movecode", "moveshare", "export"].includes(act)) return;
     switch (act) {
       case "back": back(); break;
       case "close": closeSheet(); break;
@@ -7157,7 +7285,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": { const undo = snap("lists"); S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); undoable("Liste supprimée", undo, 5000); break; }
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports", "eans"].forEach((x) => store.del(x)); S.facts = null; S.eans = null; S.scanQ = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; S.duo = {}; S.owners = {}; S.duoIn = null; S.send = null; S.retS = null; store.del("duo"); store.del("owners"); store.del("moved"); try { if (window.caches) caches.delete("cabas-partage").catch(() => {}); } catch (e) { /* cache indisponible */ } speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports", "eans"].forEach((x) => store.del(x)); S.facts = null; S.eans = null; S.scanQ = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; S.duo = {}; S.owners = {}; S.duoIn = null; S.send = null; S.retS = null; store.del("duo"); store.del("owners"); store.del("moved"); try { if (window.caches) ["cabas-partage", "cabas-demenage"].forEach((c) => caches.delete(c).catch(() => {})); } catch (e) { /* cache indisponible */ } speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"), f = el._act; el.hidden = true; el._act = null; S.undo = null; if (f) f(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -7387,10 +7515,15 @@
         });
         break;
       }
-      case "xferok": { const X = S.xfer; if (X && X.R && X.R.ok) { S.xfer = null; applyImport(X.R.data, X.mv ? "Tes courses ont déménagé" : "Données de l'autre téléphone reprises"); } break; }
+      case "xferok": { const X = S.xfer; if (X && X.R && X.R.ok) { S.xfer = null; applyImport(X.R.data, X.mv ? "Tes courses ont déménagé" : "Données de l'autre téléphone reprises", X.h); } break; }
       case "moveok": moveGo(); break;
+      case "movecode": moveCopy(); break;
+      case "moveshare": moveShareCopy(); break;
+      case "pastecode": codeSheet(); break;
+      case "codepaste": navigator.clipboard.readText().then((tx) => { const i = $("#codeIn"); if (i) i.value = String(tx || "").trim().slice(0, 700000); codeGo(tx); }, () => toast("Le presse-papiers ne se lit pas ici\u00a0: appuie longuement dans le champ, puis Coller")); break;
+      case "codego": codeGo(($("#codeIn") || {}).value); break;
       case "moveopen": location.assign(NEW_URL + (S.moveHash || "")); break;
-      case "xferno": S.xfer = null; history.replaceState(null, "", location.pathname + "#/"); S.stacks.accueil = ["#/"]; S.tab = "accueil"; navigate("#/", "tab"); toast("Rien n'a changé"); break;
+      case "xferno": { const to = S.xfer && S.xfer.h; S.xfer = null; applyLook(); history.replaceState(null, "", location.pathname + "#/"); S.stacks.accueil = ["#/"]; S.tab = "accueil"; navigate("#/", "tab"); if (to) goAfter(to); toast("Rien n'a changé"); break; }
       case "speak": speak(speakText(k, id)); break;
       case "voice": S.prefs.voice = t.dataset.v === "slow" ? "slow" : "normal"; savePrefs(); rerenderKeep(t); if (TTS()) { speakStop(); speak("Voici la lecture " + (S.prefs.voice === "slow" ? "lente." : "normale.")); } break;
       /* liste écrite ou dictée */
@@ -8131,20 +8264,28 @@
      et ouvre ./?partage=1#/ecrire, sans rien envoyer sur le réseau ; une ancienne cible en GET (?title=&text=&url=) est
      servie par sw.js depuis le cache. Le texte devient une liste à lire, un lien de liste Cabas ouvre sa page ; l'adresse
      est nettoyée tout de suite. */
-  function sharedPick(d) {
+  function sharedParse(d) {
     const url = String(d.url || "").trim(), text = String(d.text || "").trim(), title = String(d.title || "").trim();
     const m = /#\/partage\/[A-Za-z0-9_-]+/.exec(url + " " + text);
     const hash = m && (url + " " + text).includes(APP_HOST) ? m[0] : "#/ecrire";
-    history.replaceState(null, "", location.pathname + hash);
-    return hash === "#/ecrire" ? (text || title).split("\n").filter((l) => !/^\s*https?:\/\//i.test(l)).join("\n").trim().slice(0, 4000) : "";
+    return { hash, text: hash === "#/ecrire" ? (text || title).split("\n").filter((l) => !/^\s*https?:\/\//i.test(l)).join("\n").trim().slice(0, 4000) : "" };
+  }
+  function sharedPick(d) {
+    const p = sharedParse(d);
+    history.replaceState(null, "", location.pathname + p.hash);
+    return p.text;
+  }
+  /* le texte reçu, lu puis retiré du cache */
+  async function sharedTake() {
+    try { const c = await caches.open("cabas-partage"), r = await c.match("partage"); if (r) { const d = await r.json(); await c.delete("partage"); return d; } } catch (e) { /* cache indisponible : Ma liste s'ouvre vide */ }
+    return null;
   }
   async function sharedIn() {
     try {
       const q = new URLSearchParams(location.search);
       if (q.has("partage")) {
         history.replaceState(null, "", location.pathname + "#/ecrire");
-        let d = null;
-        try { const c = await caches.open("cabas-partage"), r = await c.match("partage"); if (r) { d = await r.json(); await c.delete("partage"); } } catch (e) { /* cache indisponible : Ma liste s'ouvre vide */ }
+        const d = await sharedTake();
         return d ? sharedPick(d) : null;
       }
       if (!["title", "text", "url"].some((k) => q.has(k))) return null;
@@ -8153,7 +8294,7 @@
   }
   (async () => {
     /* l'ancienne adresse redirigée, sans données à emporter : la nouvelle adresse s'ouvre tout de suite */
-    if (moveIn()) return;
+    if (await moveIn()) return;
     const shared = await sharedIn();
     const h0 = location.hash || "#/";
     const t0 = tabOf(h0);
