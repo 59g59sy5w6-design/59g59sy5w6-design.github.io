@@ -232,7 +232,6 @@ const server = http.createServer((req, res) => {
     const ap = await page.evaluate(() => { const D = cabasDebug(); return ["94120", "75015", "75116", "92100", "93100", "78000", "91300", "13001", "123"].map((z) => { const a = D.autoPick(z, "auchan"); return a ? a.id + (a.exact ? "" : "~") : null; }); });
     const apWant = ["auchan", "auchan-alesia", "auchan-bellesfeuilles", "auchan-bellesfeuilles", "auchan", "auchan-bellesfeuilles~", "auchan-alesia~", null, null];
     if (JSON.stringify(ap) !== JSON.stringify(apWant)) problems.push(`autoPick : ${JSON.stringify(ap)} au lieu de ${JSON.stringify(apWant)}`);
-    const rets = await page.evaluate(() => fetch("data/retailers.json").then((r) => r.json()));
     const zs = rets.flatMap((r) => r.zips || []);
     if (new Set(zs).size !== zs.length || zs.some((z) => !/^\d{5}$/.test(z))) problems.push("retailers.json : codes postaux en double ou mal formés");
     for (let a = 1; a <= 20; a++) if (!zs.includes("750" + String(a).padStart(2, "0"))) problems.push(`retailers.json : Paris ${a}e sans point Auchan`);
