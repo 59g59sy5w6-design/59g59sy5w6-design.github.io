@@ -2972,6 +2972,16 @@
    "prompt": ""
   },
   {
+   "retailer": "auchan*",
+   "rayon": "salades-sandwichs",
+   "regimes": [],
+   "lot": "frais-3",
+   "host": "auchan.fr",
+   "match": "text=lentilles",
+   "url": "https://www.auchan.fr/recherche?text=lentilles",
+   "prompt": ""
+  },
+  {
    "retailer": "monoprix",
    "rayon": "traiteur-vegetal",
    "regimes": [
@@ -4978,6 +4988,36 @@
    "host": "auchan.fr",
    "match": "text=couscous%20conserve",
    "url": "https://www.auchan.fr/recherche?text=couscous%20conserve",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan*",
+   "rayon": "plats-conserve",
+   "regimes": [],
+   "lot": "epicerie-1",
+   "host": "auchan.fr",
+   "match": "text=lentilles",
+   "url": "https://www.auchan.fr/recherche?text=lentilles",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan*",
+   "rayon": "plats-conserve",
+   "regimes": [],
+   "lot": "epicerie-1",
+   "host": "auchan.fr",
+   "match": "text=pois%20chiches",
+   "url": "https://www.auchan.fr/recherche?text=pois%20chiches",
+   "prompt": ""
+  },
+  {
+   "retailer": "auchan*",
+   "rayon": "plats-conserve",
+   "regimes": [],
+   "lot": "epicerie-1",
+   "host": "auchan.fr",
+   "match": "text=haricots%20rouges",
+   "url": "https://www.auchan.fr/recherche?text=haricots%20rouges",
    "prompt": ""
   },
   {

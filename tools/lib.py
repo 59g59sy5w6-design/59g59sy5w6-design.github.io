@@ -4,7 +4,7 @@ Normalisation des noms (marque, désignation, contenance), lecture des réponses
 rayons et univers (tools/rayons.json, source unique), routage d'une page vers son enseigne et son rayon
 d'après tools/sources.json.
 """
-import datetime, json, re, unicodedata, collections, sys, os
+import datetime, json, re, unicodedata, urllib.parse, collections, sys, os
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
@@ -74,7 +74,27 @@ def key(s):
 # Une eau « avec robinet intégré » reste une eau.
 HORS_COURSES = re.compile(r'(^|\s)(radiateur|robinet d arrosage|robinet arrosage|pompe d arrosage|raccord|chauffe eau|recuperateur d eau|seche serviettes'
                           r'|distributeur mural|porte savon|lave main|meuble|etagere|tapis de bain|rideau|aspirateur|tondeuse a gazon|perceuse|visseuse'
-                          r'|echelle|carrelage|peinture|lampe|ampoule led e27 lot de 10 pro|jardiniere en bois)(\s|$)')
+                          r'|echelle|carrelage|peinture|lampe|ampoule led e27 lot de 10 pro|jardiniere en bois'
+                          # moules à gâteau et papier cuisson lus avec les moules (« moules ») ; pots, couvercles et confituriers
+                          # vides avec les confitures ; appareils pour biberons ; ciseaux à herbes ; solutions pour lentilles de contact
+                          # (« moule gâteau », « moule 18 cm », « moule 12 muffins », « moule à soufflé ») ; un beurre ou un camembert
+                          # « moulé » n'est jamais suivi d'une dimension ni d'un de ces mots
+                          r'|moules? (?:a (?:gateaux?|manque|tartes?|tartelettes|mini|cakes?|baguettes?|pain|charniere|savarin|madeleines?|quiches?'
+                          r'|patisseries?|financiers?|muffins?|cannele|souffle|quatre quarts|charlotte|kouglof|bundt|brioches?|cupcakes?|donuts?|chocolats?)'
+                          r'|en (?:papier|silicone|verre|ceramique|porcelaine)|papier|silicone|cake|gateaux?|pour air ?fryer|\d+ ?cm'
+                          r'|\d+ (?:financiers?|tartelettes?|madeleines?|muffins?|canneles?|cupcakes?|empreintes?|cavites?))|lot de \d+ moules|set de \d+ moules'
+                          # jouets, coffrets d'activités et ustensiles lus avec des rayons alimentaires (« pâté », « chocolat », « brochettes »,
+                          # « couscous », « nectar », « bébé »)
+                          r'|pates? a modeler|play ?doh|smartbox|piques? a brochettes?|saladiers?|rapes? (?:a )?legumes|rape electrique|sets? de table'
+                          r'|brochettes? (?:en )?(?:bois|bambou|inox|metal)|mini ?cuve|boites? de rangement'
+                          # jouets, figurines, vêtements et objets de décoration lus avec « poules » ou « aquarium » (une figurine
+                          # en chocolat reste une confiserie)
+                          r'|figurines?(?! (?:en )?chocolat)|peluches?(?!.*\bpour (?:chiens?|chats?|chiots?|chatons?)\b)|statuettes?|lego|minecraft|puzzles?(?! a croquer)|schleich|papo|zhu zhu|bitzee|animagic'
+                          r'|play figure|set de construction|animal miniature|chaussettes|socquettes|jupes?|blazers?|pied (?:de )?poule'
+                          r'|poule a bascule|cul de poule|poulies?'
+                          r'|couvercles? pour confitures?|confituriers?|pots? a confiture|pots? confiture en verre'
+                          r'|chauffe biberons?|sterilisateur|egouttoir|egoutte biberons?|porte biberons?|housses? de protection|cuiseur vapeur'
+                          r'|ciseaux (?:pour|a) herbes|solutions? (?:multifonctions?|pour lentilles)|lentilles de contact|lentilles souples)(\s|$)')
 
 
 def hors_courses(label):
@@ -102,9 +122,12 @@ assert len(RAYON_BY_ID) == len(RAYONS) and all(r['univers'] in UNIVERS_NAME for 
 
 # Rayons lus par une recherche ou sur une page partagée : le produit doit en être un (« œufs », pas des pâtes aux œufs ;
 # « sucre » en poudre ou en morceaux, pas un bonbon). Le texte comparé est le nom sans accents (key). Un rayon sans
-# filtre n'est jamais filtré.
+# filtre n'est jamais filtré. Un filtre au « oui » vide (rayon aux pages dédiées : eau plate, jus d'orange, papier toilette,
+# lessive liquide...) accepte tout ce que son « non » n'écarte pas (RAYON_DEDIE) ; sa recherche Auchan tient lieu de terme
+# « oui » pour départager (precision) et pour reprendre un produit écarté d'un autre rayon (build.place).
 RAYON_FILTRE = {r['id']: (r['filtre']['oui'], r['filtre']['non']) for r in RAYONS if r.get('filtre')}
 _RF = {k: (re.compile(a), re.compile(b)) for k, (a, b) in RAYON_FILTRE.items()}
+RAYON_DEDIE = {r['id'] for r in RAYONS if not (r.get('filtre') or {}).get('oui')}
 
 
 def split_alts(pattern):
@@ -153,6 +176,16 @@ def filtre_exclu(ray, label):
     """Le terme le plus long du filtre « non » du rayon qui écarte le produit (vide si rien ne l'écarte)."""
     f = _RF_ALTS.get(ray)
     return _longest(f[1], key(label)) if f else ''
+
+
+def filtre_exclus(ray, label):
+    """Tous les termes du filtre « non » du rayon présents dans le nom, du plus long au plus court."""
+    f = _RF_ALTS.get(ray)
+    if not f:
+        return []
+    k = key(label)
+    found = {m.group(0) for a in f[1] for m in a.finditer(k) if m.group(0).strip()}
+    return sorted(found, key=lambda t: (-len(t), t))
 # contenance comptée en pièces : oeuf, rouleau, couche, capsule, lavage, piece
 RAYON_UNITE = {r['id']: r['unite'] for r in RAYONS if r.get('unite')}
 # rayons aux produits frais de poids variable (fruits et légumes, viandes, poissons, fromages à la coupe)
@@ -185,11 +218,38 @@ def rayon_rank(rid):
     return 1 if r.get('regimes') else 0
 
 
+def _search_terms(r):
+    """Les recherches Auchan d'un rayon, sans accents (« liquide vaisselle », « jus d orange »)."""
+    q = r['pages'].get('auchan') or []
+    return [key(urllib.parse.unquote(x.split('text=', 1)[1])) for x in ([q] if isinstance(q, str) else q) if 'text=' in x]
+
+
+# Rayon aux pages dédiées : ses recherches tiennent lieu de terme « oui » pour départager (best_rayon)
+_DEDIE_TERMS = {rid: [re.compile(r'\b' + re.escape(t) + r'\b') for t in _search_terms(RAYON_BY_ID[rid]) if t] for rid in RAYON_DEDIE}
+
+
+def precision(ray, label):
+    """Le terme du nom qui rattache le produit au rayon : celui du filtre « oui » (filtre_match) ; pour un rayon aux pages
+    dédiées (RAYON_DEDIE), sans terme « oui », sa recherche quand le nom la contient (« liquide vaisselle »)."""
+    if ray in _DEDIE_TERMS:
+        return _longest(_DEDIE_TERMS[ray], key(label))
+    return filtre_match(ray, label)
+
+
+def covers(ray, word, label):
+    """Le rayon nomme-t-il ce mot d'exclusion ? Le terme par lequel il rattache le produit (precision : le plus long de
+    son filtre « oui », ou la recherche d'un rayon aux pages dédiées) contient le mot : « soupe » est nommé par le rayon
+    soupes, « liquide vaisselle » par le rayon vaisselle ; « pied de poule » n'est pas nommé par le rayon volaille, qui
+    ne reconnaît que « poule », ni « soupe » par un rayon qui reconnaît d'abord autre chose dans le nom."""
+    return bool(word) and word in precision(ray, label)
+
+
 def best_rayon(cands, label=''):
-    """Le rayon qui garde un produit accepté par plusieurs rayons : le plus ordinaire, puis celui dont le filtre « oui »
-    reconnaît le terme le plus précis du nom (filtre_match : « fromage blanc » bat « fromage »), puis l'ordre de
-    tools/rayons.json. Les filtres « non » doivent rendre ce départage rare."""
-    return min(cands, key=lambda rid: (rayon_rank(rid), -len(filtre_match(rid, label)), RAYON_ORDER[rid]))
+    """Le rayon qui garde un produit accepté par plusieurs rayons : le plus ordinaire, puis celui qui reconnaît le terme le
+    plus précis du nom (precision : « fromage blanc » bat « fromage » ; un rayon aux pages dédiées compte sa recherche,
+    sans quoi il perdait toujours et un liquide vaisselle lu aussi sur la recherche « vinaigre » passait aux vinaigres),
+    puis l'ordre de tools/rayons.json. Les filtres « non » doivent rendre ce départage rare."""
+    return min(cands, key=lambda rid: (rayon_rank(rid), -len(precision(rid, label)), RAYON_ORDER[rid]))
 
 
 def parse_oeufs(text):
