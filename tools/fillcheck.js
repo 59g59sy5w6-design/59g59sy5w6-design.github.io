@@ -421,7 +421,7 @@ const server = http.createServer((req, res) => {
     const mB = {}; only2(MONO).slice(0, 3).forEach((p) => { mB[p.i] = 1; }); only2(AU).slice(0, 3).forEach((p) => { mB[p.i] = 2; });
     if (hOnly) mB[hOnly.i] = 1;
     /* en magasin, les prix Auchan sont ceux de l'option choisie : ici le point de retrait de Fontenay-sous-Bois */
-    await h.evaluate(({ b, P }) => { localStorage.setItem("cabas.basket", JSON.stringify(b)); localStorage.setItem("cabas.hist", "[]"); localStorage.setItem("cabas.guide", "{}"); localStorage.setItem("cabas.prefs", JSON.stringify(P)); }, { b: mB, P: Object.assign(P2("mag"), { pick: { auchan: "auchan" } }) });
+    await h.evaluate(({ b, P }) => { localStorage.setItem("cabas.basket", JSON.stringify(b)); localStorage.setItem("cabas.hist", "[]"); localStorage.setItem("cabas.guide", "{}"); localStorage.setItem("cabas.prefs", JSON.stringify(P)); }, { b: mB, P: Object.assign(P2("mag"), { pick: { auchan: "auchan" }, budget: 500, budgetMode: "mois" }) });
     await h.goto(base + "#/panier"); await h.reload(); await hready(); await hdone(); await h.waitForTimeout(300);
     const mv = await h.evaluate(() => { const D = cabasDebug(), R = D.RES(), st = R.steps[R.K], f = st && st.full; return { mode: R.mode, ids: f ? f.orders.map((o) => o.ch.id).sort() : [], fees: f ? f.feesTotal : -1, total: f ? f.itemsTotal + f.feesTotal + (f.compTotal || 0) : 0, unc: R.M.uncovered, text: document.querySelector("#view").textContent, cta: (document.querySelector("[data-act=shopgo]") || {}).textContent || "" }; });
     if (mv.mode !== "mag" || mv.ids.join() !== "auchan,monoprix" || mv.fees !== 0) fail("tout en magasin : deux magasins sans frais attendus, " + JSON.stringify([mv.ids, mv.fees]));
@@ -448,7 +448,35 @@ const server = http.createServer((req, res) => {
     await h.click("#toast button"); await h.waitForTimeout(400);
     H = await h.evaluate(() => JSON.parse(localStorage.getItem("cabas.hist") || "[]"));
     if (H.length) fail("tout en magasin : « Annuler » laisse les courses dans l'historique");
+    /* budget du mois : avant « J'ai fait mes courses », le panier s'ajoute au mois ; après, il est dans l'historique et ne
+       compte qu'une fois (« ce panier compris »), sans « Tenir le budget » */
+    const bud = () => h.evaluate(() => { const D = cabasDebug(); return { spent: D.monthSpend().spent, lim: D.basketLimit(), text: (document.querySelector("#view .bud") || {}).textContent || "" }; });
+    await h.evaluate(() => { location.hash = "#/panier"; }); await h.waitForTimeout(500); await hdone();
+    const b0 = await bud();
+    if (b0.spent !== 0 || b0.lim !== 50000 || !/il te reste/.test(b0.text) || /ce panier compris/.test(b0.text)) fail("tout en magasin, budget du mois avant les courses : " + JSON.stringify(b0));
+    await h.evaluate(() => { location.hash = "#/magasin"; }); await h.waitForTimeout(600);
+    await h.click("[data-act=shopdone]"); await h.waitForTimeout(500);
+    await h.evaluate(() => { location.hash = "#/panier"; }); await h.waitForTimeout(500); await hdone();
+    const b1 = await bud();
+    if (b1.spent !== mv.total || b1.lim !== 50000 || !/ce panier compris/.test(b1.text) || /plus ce panier/.test(b1.text) || /budfit/.test(await h.evaluate(() => (document.querySelector("#view .bud") || {}).innerHTML || ""))) fail("tout en magasin, budget du mois après « J'ai fait mes courses » : le panier compte deux fois " + JSON.stringify(b1) + " total " + mv.total);
+    const left0 = /il te reste ([\d\s\u202f\u00a0]+,\d\d)/.exec(b0.text), left1 = /il te reste ([\d\s\u202f\u00a0]+,\d\d)/.exec(b1.text);
+    if (!left0 || !left1 || left0[1] !== left1[1]) fail(`tout en magasin, budget du mois : il restait ${left0 && left0[1]} avant les courses, ${left1 && left1[1]} après`);
     await h.evaluate(() => { location.hash = "#/economies"; }); await h.waitForTimeout(400);
+
+    /* tout en magasin, un panier qu'aucun magasin ne prend (vendu seulement en ligne chez Houra) : pas de liste pour le
+       magasin, pas de « Faire mes courses en magasin », et le mode magasin ne présente aucun produit Houra comme un achat
+       en magasin */
+    const hB = {}; only2(HOURA).slice(0, 2).forEach((p) => { hB[p.i] = 1; });
+    await h.evaluate(({ b }) => { localStorage.setItem("cabas.basket", JSON.stringify(b)); localStorage.setItem("cabas.hist", "[]"); localStorage.setItem("cabas.guide", "{}"); }, { b: hB });
+    await h.goto(base + "#/panier"); await h.reload(); await hready(); await hdone(); await h.waitForTimeout(300);
+    const nv = await h.evaluate(() => ({ sl: (document.querySelector(".sum .sl") || {}).textContent || "", go: !!document.querySelector("[data-act=shopgo]") }));
+    if (/Tout en magasin/.test(nv.sl) || nv.go) fail("tout en magasin sans magasin qui vend le panier : le chiffre du panier ou « Faire mes courses » le présente comme un total en magasin " + JSON.stringify(nv));
+    await h.evaluate(() => { location.hash = "#/remplir"; }); await h.waitForTimeout(600);
+    const rv = await h.evaluate(() => ({ t: document.querySelector("#view").textContent, go: !!document.querySelector("#view [data-act=shopgo]") }));
+    if (rv.go || !/Rien à acheter en magasin/.test(rv.t)) fail("tout en magasin sans magasin qui vend le panier : #/remplir propose une liste pour le magasin");
+    await h.evaluate(() => { location.hash = "#/magasin"; }); await h.waitForTimeout(600);
+    const sv = await h.evaluate(() => document.querySelector("#view").textContent);
+    if (/environ [^,]*chez Houra/.test(sv) || !/seulement en ligne chez Houra/.test(sv)) fail("tout en magasin, mode magasin : un produit vendu seulement en ligne chez Houra est présenté comme un achat en magasin");
     await hctx.close();
   } catch (e) { fail("drive et magasin : " + e.message.split("\n")[0]); }
 
