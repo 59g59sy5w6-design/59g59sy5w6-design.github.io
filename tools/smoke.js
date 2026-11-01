@@ -137,12 +137,14 @@ const server = http.createServer((req, res) => {
     if (!/"data\/listes\.json"/.test(fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"))) problems.push("sw.js : data/listes.json absent de DATA");
 
     /* fiche produit : Nutri-Score, allergènes et labels d'après Open Food Facts (réponse simulée), à la demande, gardés
-       sur le téléphone ; le régime (allergènes) s'en sert quand le fait est connu */
+       sur le téléphone ; le régime (allergènes) s'en sert quand le fait est connu. La fiche est ouverte par un chargement
+       neuf (about:blank d'abord) : ouverte puis rechargée, elle demanderait une première fois avant le rechargement,
+       et Playwright 1.48 (celui du robot, tools/ci.sh) voit cette demande interrompue */
     const eans = cat.products.filter((p) => p.e && (p.o || []).some((o) => !(o[3] & 2)));
     const PE = eans[0], PU = eans[1];
     offKnown = String(PE.e).replace(/^0+/, "");
     await page.evaluate(() => { localStorage.clear(); localStorage.setItem("cabas.prefs", JSON.stringify({ zip: "94120", off: { leclerc: true }, offv: 1, allergens: ["nuts"] })); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); });
-    await page.goto(base + "#/produit/" + encodeURIComponent(PE.i)); await page.reload(); await ready();
+    await page.goto("about:blank"); await page.goto(base + "#/produit/" + encodeURIComponent(PE.i)); await ready();
     await page.waitForSelector("#pfacts .nscore", { timeout: 9000 }).catch(() => problems.push("faits : le Nutri-Score n'apparaît pas sur la fiche"));
     const fx = await page.evaluate(() => { const el = document.getElementById("pfacts"); return { t: el.textContent.replace(/\s+/g, " "), ns: (el.querySelector(".nscore") || {}).getAttribute ? el.querySelector(".nscore").getAttribute("aria-label") : "", warn: !!el.querySelector(".banner.warn"), link: (el.querySelector('a[href^="https://world.openfoodfacts.org/product/"]') || {}).rel || "" }; });
     if (fx.ns !== "Nutri-Score B") problems.push("faits : Nutri-Score « " + fx.ns + " »");
@@ -163,7 +165,7 @@ const server = http.createServer((req, res) => {
     /* réglage décoché : rien n'est demandé sans un geste */
     await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("cabas.prefs")); p.facts = false; localStorage.setItem("cabas.prefs", JSON.stringify(p)); localStorage.removeItem("cabas.facts"); });
     const n0 = offReq.length;
-    await page.goto(base + "#/produit/" + encodeURIComponent(PE.i)); await page.reload(); await ready(); await page.waitForTimeout(700);
+    await page.goto("about:blank"); await page.goto(base + "#/produit/" + encodeURIComponent(PE.i)); await ready(); await page.waitForTimeout(700);
     if (offReq.length !== n0) problems.push("faits : demandés alors que le réglage est décoché");
     await page.click('#pfacts [data-act="factsget"]');
     await page.waitForSelector("#pfacts .nscore", { timeout: 9000 }).catch(() => problems.push("faits : « Voir le Nutri-Score » ne les demande pas"));
