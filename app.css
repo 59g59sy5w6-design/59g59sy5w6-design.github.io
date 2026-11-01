@@ -208,6 +208,8 @@ img { -webkit-user-drag: none; user-select: none; }
 .prose, .gf, .lede, .sn, .sheet-b > p, .empty p { max-width: 62ch; }
 .pname, .item .it b, .row .rt, .gi .gt b { hyphens: auto; overflow-wrap: anywhere; }
 .lt-sub { color: var(--ink-2); padding: 0 var(--gr) 10px var(--gx); margin-top: -4px; }
+/* une adresse (le nouveau domaine) ne se coupe pas à son trait d'union */
+.host { white-space: nowrap; }
 .pad { padding-left: var(--gx); padding-right: var(--gr); }
 .count { color: var(--ink); padding: 0 var(--gx) 12px; font-size: 0.9375rem; }
 .more { height: 1px; }

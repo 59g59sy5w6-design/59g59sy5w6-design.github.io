@@ -74,6 +74,8 @@ const DUO = "#/duo/" + linkJ({ app: "cabas", v: 1, k: "duo", t: "a11yduo2", at: 
 const RETOUR = "#/retour/" + linkJ({ app: "cabas", v: 1, k: "retour", w: "pour", t: "a11ypour1", at: new Date().toISOString(), n: "Alex", m: "J'ai pris des pommes à la place.", o: [{ r: "houra", s: "ok", d: plus(2), sl: "matin", i: [["contrex-eau-minerale-naturelle-6-x-1-l", 2, 918], ["candia-lait-1-2-ecreme-6-x-1-l", 1, 699], ["parmentier-sardines-a-l-huile-de-tournesol-135-g", 2, 398]], fe: 990 }, { r: "monoprix", s: "plan", i: [["tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l", 1, 349], ["entremont-emmental-rape-francais-160-g", 2, 498]], fe: 1520 }], c: [["carapelli-huile-d-olive-vierge-extra-classico-75-cl", 1, 1165, "auchan"]], x: [["barilla-pates-capellini-n-1-500-g", 3]] });
 const RETOUR_DUO = "#/retour/" + linkJ({ app: "cabas", v: 1, k: "retour", w: "duo", t: "a11yduo2", at: new Date().toISOString(), n: "Alex", o: [{ r: "monoprix", s: "ok", d: plus(1), sl: "soir", i: [["contrex-eau-minerale-naturelle-6-x-1-l", 2, 918], ["candia-lait-1-2-ecreme-6-x-1-l", 1, 799]], fe: 412 }], c: [], x: [], al: 2905 });
 const TRANSFERT = "#/transfert/j" + b64e(JSON.stringify({ app: "cabas", v: 1, at: new Date().toISOString(), data: { basket: LIST_ITEMS, lists: [{ id: "t1", name: "Courses", items: LIST_ITEMS }], seen: { welcome: 1 } } }));
+/* le même lien venu de l'ancienne adresse (déménagement, mv) : sur un téléphone vide, rien à remplacer */
+const TRANSFERT_MV = "#/transfert/j" + b64e(JSON.stringify({ app: "cabas", v: 1, mv: 1, at: new Date().toISOString(), data: { basket: LIST_ITEMS, lists: [{ id: "t1", name: "Courses", items: LIST_ITEMS }], seen: { welcome: 1 }, draft: "lait" } }));
 const ROUTES = [
   ["accueil", "#/"], ["rayons", "#/rayons"], ["rayon-pates", "#/rayon/pates"], ["produit", "#/produit/barilla-pates-capellini-n-1-500-g"],
   ["recherche", "#/recherche"], ["listes", "#/listes"], ["liste", "#/liste/l1"], ["suggestion", "#/suggestion"], ["panier", "#/panier"],
@@ -85,13 +87,15 @@ const ROUTES = [
   ["comparer", "#/comparer/barilla-pates-capellini-n-1-500-g/barilla-pates-spaghetti-n-5-500-g"],
   ["frais", "#/frais"], ["frais-houra", "#/frais/houra"], ["rayon-bio", "#/rayon/bio"], ["rayon-halal", "#/rayon/halal"], ["recette-semaine", "#/repas/omelette-fromage"],
   ["demande", "#/recherche"], ["pour", POUR], ["duo", DUO], ["retour", RETOUR], ["retour-duo", RETOUR_DUO],
+  /* « Cabas a déménagé » : l'ancienne adresse une fois redirigée (en local, la route s'ouvre sans la bascule) */
+  ["demenage", "#/demenage"], ["transfert-demenage", TRANSFERT_MV],
   /* en dernier : « Faire ses courses » met le téléphone dans les courses d'un proche (le panier de l'aidant mis de côté) */
   ["proche", POUR],
 ];
 /* phrase de « Demande à Cabas » tapée sur l'écran « demande » */
 const ASK = "pâtes complètes à moins de 2 € chez Houra";
 /* écrans mesurés aussi à l'état vide (première visite) */
-const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander", "magasin", "mouvements", "frais", "pour", "duo", "retour", "proche"];
+const EMPTY_TOO = ["accueil", "panier", "listes", "ecrire", "economies", "repas", "recherche", "remplir", "recommander", "magasin", "mouvements", "frais", "pour", "duo", "retour", "proche", "demenage", "transfert-demenage"];
 /* feuilles ouvertes depuis chaque écran : nom, bouton qui l'ouvre ; celles du panier demandent un gros panier
    (14 produits vendus par plusieurs enseignes, en deux exemplaires), qui atteint les minimums de commande */
 const SHEETS = {

@@ -2245,6 +2245,9 @@
       case "mouvements": return { name: "mouvements" };
       case "magasin": return { name: "magasin" };
       case "transfert": return { name: "transfert", id: seg[1] || "" };
+      /* l'écran du déménagement n'existe que sur l'ancienne adresse une fois redirigée (S.moving, voir moveIn), et en
+         local pour les tests ; avant la bascule, l'adresse tapée mène à l'accueil */
+      case "demenage": return S.moving || /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? { name: "demenage" } : { name: "home" };
       case "pour": return { name: "pour", id: seg[1] || "" };
       case "duo": return { name: "duo", id: seg[1] || "" };
       case "retour": return { name: "retour", id: seg[1] || "" };
@@ -2285,6 +2288,7 @@
       case "mouvements": return "Prix";
       case "magasin": return "Magasin";
       case "transfert": return "Transfert";
+      case "demenage": return "Déménagement";
       case "pour": return "Proche";
       case "duo": return "À deux";
       case "retour": return "Tes courses";
@@ -2412,12 +2416,12 @@
     $("#tabbar").innerHTML = tabs.map(([t, l, i]) => `<a class="tab" href="${ROOTS[t]}" data-tab="${t}"${S.tab === t ? ' aria-current="page"' : ""}${lab(t)}>${ic(i, "off")}${ic(i + "-f", "on")}<span>${l}</span>${bdg(t)}</a>`).join("");
     $("#side").innerHTML = `<a class="wordmark" href="#/" data-tab="accueil" aria-label="Cabas, accueil"><svg aria-hidden="true"><use href="#i-logo"/></svg>Cabas</a>` +
       tabs.map(([t, l, i]) => `<a class="sitem" href="${ROOTS[t]}" data-tab="${t}"${S.tab === t ? ' aria-current="page"' : ""}${lab(t)}>${ic(i, "off")}${ic(i + "-f", "on")}<span>${l}</span>${bdg(t)}</a>`).join("") +
-      `<a class="sitem" href="#/reglages"${S.route.name === "reglages" ? ' aria-current="page"' : ""}>${ic("gear")}<span>Réglages</span></a><div class="smini">${S.route.name === "panier" || S.route.name === "remplir" ? "" : miniHtml()}</div>`;
+      `<a class="sitem" href="#/reglages"${S.route.name === "reglages" ? ' aria-current="page"' : ""}>${ic("gear")}<span>Réglages</span></a><div class="smini">${["panier", "remplir", "demenage"].includes(S.route.name) ? "" : miniHtml()}</div>`;
     const dock = $("#dock"), view = $("#view");
     let dh = "";
     if (V.dock === "bar" && V.dockId) dh = `<div class="wrap">${buyCtl(V.dockId, "bar")}</div>`;
     else if (V.dockHtml) dh = `<div class="wrap">${V.dockHtml}</div>`;
-    else if (n && !["panier", "remplir", "magasin", "transfert"].includes(S.route.name)) dh = `<div class="wrap">${miniHtml()}</div>`;
+    else if (n && !["panier", "remplir", "magasin", "transfert", "demenage"].includes(S.route.name)) dh = `<div class="wrap">${miniHtml()}</div>`;
     const was = !dock.hidden;
     dock.innerHTML = dh;
     dock.hidden = !dh;
@@ -5824,16 +5828,83 @@
       `</div><input type="file" id="impIn" accept=".json,application/json" hidden><p class="gf">Tout reste sur cet appareil. Le lien contient tes données elles-mêmes\u00a0: envoie-le seulement à toi.</p>`;
   }
   /* #/transfert/<x> : ce qui arrive d'un autre téléphone, vérifié, puis remplacé seulement si tu le confirmes */
+  /* un lien de déménagement (mv, voir #/demenage) vient du même navigateur, sur l'ancienne adresse : il porte toutes les
+     clés d'une copie en fichier (DKEYS), vérifiées de la même façon, et ne remplace rien sans confirmation non plus */
   VIEWS.transfert = (r) => {
     const X = S.xfer && S.xfer.id === r.id ? S.xfer : (S.xfer = { id: r.id, st: "wait", R: null });
-    if (X.st === "wait" && !X.p) X.p = unpackState(r.id).then((o) => { X.R = o ? importCheck(o, true) : null; X.st = X.R && X.R.ok ? "ok" : "bad"; if (S.route.name === "transfert") rerender(); });
-    const R = X.R;
+    if (X.st === "wait" && !X.p) X.p = unpackState(r.id).then((o) => { X.mv = !!o && o.mv === 1; X.R = o ? importCheck(o, !X.mv) : null; X.st = X.R && X.R.ok ? "ok" : "bad"; if (S.route.name === "transfert") rerender(); });
+    const R = X.R, mv = X.mv, full = !mv || moveData();
     return {
       title: "Transfert", grouped: true,
-      html: `<h1 class="lt">Données d'un autre téléphone</h1>` + (X.st === "wait" ? `<p class="lt-sub" role="status">Lecture du lien…</p>` :
+      html: `<h1 class="lt">${mv ? "Tes courses arrivent" : "Données d'un autre téléphone"}</h1>` + (X.st === "wait" ? `<p class="lt-sub" role="status">Lecture du lien…</p>` :
         X.st === "bad" ? `<div class="empty" role="alert">${emptyArt("info")}<h2>Ce lien est illisible</h2><p>Il est incomplet ou abîmé (un message trop long peut couper un lien). Enregistre plutôt une copie en fichier sur l'autre téléphone, puis restaure-la ici.</p><a class="btn tint" href="#/">Retour à l'accueil</a></div>` :
-        `<p class="lt-sub">${R.at ? "Envoyées " + esc(whenFr(R.at)) : "Envoyées depuis Cabas"}\u00a0: ${esc(importSum(R))}.</p><div class="banner warn" role="status">${ic("info")}<span><b>Elles remplaceront celles de ce téléphone</b>Le panier, les listes, l'historique et les réglages de ce téléphone seront remplacés. Tu pourras annuler juste après.</span></div>` +
-          `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="xferok">Remplacer les données de ce téléphone</button><button class="btn ghost" type="button" data-act="xferno">Ne rien changer</button></div><p class="gf">Rien n'est passé par un serveur\u00a0: les données étaient dans le lien lui-même.</p>`),
+        `<p class="lt-sub">${mv ? "Emportées de l'ancienne adresse de Cabas" + (R.at ? " " + esc(whenFr(R.at)) : "") : R.at ? "Envoyées " + esc(whenFr(R.at)) : "Envoyées depuis Cabas"}\u00a0: ${esc(importSum(R))}.</p>` +
+          (full ? `<div class="banner warn" role="status">${ic("info")}<span><b>Elles remplaceront celles de ce téléphone</b>Le panier, les listes, l'historique et les réglages de ce téléphone seront remplacés. Tu pourras annuler juste après.</span></div>` : "") +
+          `<div class="pad btns" style="padding-top:16px"><button class="btn" type="button" data-act="xferok">${mv && !full ? "Reprendre mes courses ici" : "Remplacer les données de ce téléphone"}</button><button class="btn ghost" type="button" data-act="xferno">Ne rien changer</button></div><p class="gf">Rien n'est passé par un serveur\u00a0: les données étaient dans le lien lui-même.</p>`),
+    };
+  };
+
+  /* ---------- déménagement vers la nouvelle adresse ---------- */
+  /* Sur l'ancienne adresse, une fois redirigée par GitHub Pages, sw.js ouvre l'appli depuis le cache avec ?demenage=1
+     (moveIn) : avec des données, l'écran « Cabas a déménagé » ; sans, la nouvelle adresse tout de suite. Les données
+     partent dans le lien #/transfert, après le #, ouvert par la personne : rien ne passe par un serveur. cabas.moved
+     garde l'heure du dernier envoi (sur l'ancienne adresse seulement, jamais copiée), pour ne pas renvoyer sans le
+     vouloir des données plus anciennes que celles de la nouvelle adresse. */
+  /* ce que l'appli écrit d'elle-même à l'ouverture (prix vus, baisses, mémoire de l'accueil) n'est pas à emporter */
+  const MOVE_SKIP = ["seenAt", "seenp", "drops", "ups", "watchHits", "univ", "prepSnooze"];
+  function moveData() {
+    const d = packState().data;
+    return Object.keys(d).some((k) => { const v = d[k]; return !MOVE_SKIP.includes(k) && (Array.isArray(v) ? v.length > 0 : v && typeof v === "object" ? Object.keys(v).length > 0 : !!v); });
+  }
+  function moveSum() {
+    const d = packState().data, n = (o) => Object.keys(o || {}).length;
+    const s = importSum({ sum: { basket: n(d.basket), lists: (d.lists || []).length, hist: (d.hist || []).length, free: n(d.free), prefs: !!d.prefs, menu: (d.menu || []).length } });
+    return s === "rien à restaurer" ? "" : s;
+  }
+  function moveIn() {
+    try {
+      if (!new URLSearchParams(location.search).has("demenage")) return false;
+      const h = location.hash;
+      S.moveHash = /^#\/./.test(h) && !/^#\/demenage/.test(h) ? h : "";
+      if (location.hostname === NEW_HOST) { history.replaceState(null, "", location.pathname + (h || "#/")); return false; }
+      S.moving = true;
+      if (!moveData()) { location.replace(NEW_URL + S.moveHash); return true; }
+      history.replaceState(null, "", location.pathname + "#/demenage");
+    } catch (e) { /* adresse illisible : l'appli s'ouvre comme d'habitude */ }
+    return false;
+  }
+  /* toutes les données, comme une copie en fichier, dans le lien de la nouvelle adresse */
+  function moveGo() {
+    const st = packState();
+    st.mv = 1;
+    packLink(st).then((x) => {
+      if (x.length > 600000) { toast("Trop de données pour un lien\u00a0: enregistre une copie en fichier, puis restaure-la sur la nouvelle adresse", { label: "Enregistrer", run: exportFile }, null, 10000); return; }
+      store.set("moved", new Date().toISOString());
+      location.assign(NEW_URL + "#/transfert/" + x);
+    });
+  }
+  /* l'appli restée ouverte sur l'ancienne adresse : sw.js voit les prix arriver de la nouvelle */
+  function movedNote() {
+    if (S.movedTold || S.moving || location.hostname === NEW_HOST) return;
+    S.movedTold = true; S.moving = true;
+    toast("Cabas a déménagé sur " + NEW_HOST, { label: "Voir", run: () => push("#/demenage") }, null, 12000);
+  }
+  VIEWS.demenage = () => {
+    const has = moveData(), at = store.get("moved", ""), sum = has ? moveSum() : "";
+    const open = (cls, label) => `<button class="btn${cls}" type="button" data-act="moveopen">${label}</button>`;
+    let lead, btns;
+    if (!has) { lead = "Rien n'est enregistré ici\u00a0: ouvre simplement la nouvelle adresse."; btns = open("", `<span>Ouvrir <span class="host">${esc(NEW_HOST)}</span></span>`); }
+    else if (at) { lead = `Tu as emporté tes courses ${esc(whenFr(at))}. Si elles sont bien arrivées, continue sur la nouvelle adresse.`; btns = open("", `<span>Ouvrir <span class="host">${esc(NEW_HOST)}</span></span>`) + `<button class="btn ghost" type="button" data-act="moveok">Emporter à nouveau mes courses</button>`; }
+    else { lead = "Tes courses sont encore ici, sur l'ancienne adresse. Emporte-les en un geste."; btns = `<button class="btn" type="button" data-act="moveok">${ic("share")}<span>Emporter mes courses sur <span class="host">${esc(NEW_HOST)}</span></span></button>` + open(" ghost", "Ouvrir sans mes données"); }
+    return {
+      title: "Déménagement", grouped: true, solo: true,
+      html: `<h1 class="lt">Cabas a déménagé</h1><p class="lt-sub">Sa nouvelle adresse est <b class="host">${esc(NEW_HOST)}</b>. ${lead}</p>` +
+        (sum ? `<div class="banner" role="status">${ic("info")}<span><b>${at ? "Sur l'ancienne adresse" : "Ce que tu emportes"}</b>${esc(sum)}.</span></div>` : "") +
+        `<div class="pad btns" style="padding-top:16px">${btns}</div>` +
+        `<p class="gf">${has ? "Rien ne passe par un serveur\u00a0: tes données voyagent dans le lien lui-même, après le #. Sur la nouvelle adresse, tu confirmes avant qu'elles remplacent quoi que ce soit. " : ""}Pour garder Cabas sur ton écran d'accueil, installe-le depuis la nouvelle adresse.</p>` +
+        /* en secours (un iPhone garde à part les données de l'appli installée et celles de Safari) : une copie en fichier,
+           à restaurer dans les réglages de la nouvelle adresse */
+        (has ? `<p class="gf">Une copie en fichier se restaure aussi sur la nouvelle adresse, dans Réglages. <button class="act" type="button" data-act="export">Enregistrer une copie${ic("chev")}</button></p>` : ""),
     };
   };
 
@@ -6970,7 +7041,7 @@
     if (t.dataset.tab && !t.dataset.act) { e.preventDefault(); if (!$("#sheet").hidden) closeSheet(); switchTab(t.dataset.tab); return; }
     const act = t.dataset.act, id = t.dataset.id, k = t.dataset.k;
     /* avant le catalogue, seuls les gestes qui n'en ont pas besoin passent */
-    if (!S.ready && !["reload", "close", "back", "gosearch", "toastact"].includes(act)) return;
+    if (!S.ready && !["reload", "close", "back", "gosearch", "toastact", "moveok", "moveopen", "export"].includes(act)) return;
     switch (act) {
       case "back": back(); break;
       case "close": closeSheet(); break;
@@ -7086,7 +7157,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": { const undo = snap("lists"); S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); undoable("Liste supprimée", undo, 5000); break; }
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports", "eans"].forEach((x) => store.del(x)); S.facts = null; S.eans = null; S.scanQ = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; S.duo = {}; S.owners = {}; S.duoIn = null; S.send = null; S.retS = null; store.del("duo"); store.del("owners"); try { if (window.caches) caches.delete("cabas-partage").catch(() => {}); } catch (e) { /* cache indisponible */ } speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports", "eans"].forEach((x) => store.del(x)); S.facts = null; S.eans = null; S.scanQ = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; S.duo = {}; S.owners = {}; S.duoIn = null; S.send = null; S.retS = null; store.del("duo"); store.del("owners"); store.del("moved"); try { if (window.caches) caches.delete("cabas-partage").catch(() => {}); } catch (e) { /* cache indisponible */ } speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"), f = el._act; el.hidden = true; el._act = null; S.undo = null; if (f) f(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -7316,7 +7387,9 @@
         });
         break;
       }
-      case "xferok": { const X = S.xfer; if (X && X.R && X.R.ok) { S.xfer = null; applyImport(X.R.data, "Données de l'autre téléphone reprises"); } break; }
+      case "xferok": { const X = S.xfer; if (X && X.R && X.R.ok) { S.xfer = null; applyImport(X.R.data, X.mv ? "Tes courses ont déménagé" : "Données de l'autre téléphone reprises"); } break; }
+      case "moveok": moveGo(); break;
+      case "moveopen": location.assign(NEW_URL + (S.moveHash || "")); break;
       case "xferno": S.xfer = null; history.replaceState(null, "", location.pathname + "#/"); S.stacks.accueil = ["#/"]; S.tab = "accueil"; navigate("#/", "tab"); toast("Rien n'a changé"); break;
       case "speak": speak(speakText(k, id)); break;
       case "voice": S.prefs.voice = t.dataset.v === "slow" ? "slow" : "normal"; savePrefs(); rerenderKeep(t); if (TTS()) { speakStop(); speak("Voici la lecture " + (S.prefs.voice === "slow" ? "lente." : "normale.")); } break;
@@ -7913,6 +7986,10 @@
   document.addEventListener("input", (e) => { const f = e.target.closest && e.target.closest(".field.err"); if (f) { f.classList.remove("err"); const h = $("small", f); if (h && h.dataset.hint != null) h.innerHTML = h.dataset.hint; } });
   const APP_URL = "https://59g59sy5w6-design.github.io/";
   const APP_HOST = "59g59sy5w6-design.github.io";
+  /* déménagement (voir sw.js et #/demenage) : la nouvelle adresse de l'appli, et l'ancienne, d'où partent les données */
+  const NEW_URL = "https://cabas.mmt-advisory.com/";
+  const NEW_HOST = new URL(NEW_URL).host;
+  const OLD_HOST = "59g59sy5w6-design.github.io";
   /* ---------- images à partager (réseaux sociaux, messageries) ----------
      Une carte sobre dessinée sur un canvas : le wordmark, un gros chiffre, deux lignes, le nom de l'appli. Partagée en
      fichier quand le téléphone le permet (navigator.canShare), sinon le texte et le lien, sinon l'image se télécharge. */
@@ -8043,6 +8120,8 @@
     document.title = "Cabas";
   }
   function renderFail() {
+    /* sans catalogue, l'écran du déménagement s'affiche quand même : il ne lit que les données du téléphone */
+    if (parse(location.hash || "#/").name === "demenage") { $("#view").innerHTML = `<div class="wrap">${VIEWS.demenage().html}</div>`; return; }
     $("#view").innerHTML = `<div class="wrap"><div class="empty" role="alert">${emptyArt("info")}<h1 class="t1">Catalogue indisponible</h1><p>Le catalogue n'a pas pu être chargé. Vérifie ta connexion, puis réessaie.</p><button class="btn" type="button" data-act="reload">Réessayer</button></div></div>`;
   }
   /* hors ligne : une bannière sur l'accueil et le panier, posée sur offline et retirée sur online */
@@ -8073,10 +8152,12 @@
     } catch (e) { return null; }
   }
   (async () => {
+    /* l'ancienne adresse redirigée, sans données à emporter : la nouvelle adresse s'ouvre tout de suite */
+    if (moveIn()) return;
     const shared = await sharedIn();
     const h0 = location.hash || "#/";
     const t0 = tabOf(h0);
-    if (t0) { S.tab = t0; S.stacks[t0] = [h0]; } else { S.tab = "accueil"; S.stacks.accueil = ["#/", h0]; }
+    if (t0) { S.tab = t0; S.stacks[t0] = [h0]; } else if (h0 === "#/demenage") { S.tab = "accueil"; S.stacks.accueil = [h0]; } else { S.tab = "accueil"; S.stacks.accueil = ["#/", h0]; }
     S.cur = h0;
     renderChrome({});
     applyLook();
@@ -8103,6 +8184,7 @@
     let dataT = 0;
     const kick = () => { if (!S.ready) { dataT = setTimeout(kick, 1000); return; } dataT = 0; refreshData(); };
     navigator.serviceWorker.addEventListener("message", (e) => {
+      if (e.data && e.data.type === "moved") { movedNote(); return; }
       if (!e.data || e.data.type !== "data") return;
       if (/history/.test(e.data.path)) { histP = null; HIST = null; histDone = false; }
       clearTimeout(dataT); dataT = setTimeout(kick, 400);
