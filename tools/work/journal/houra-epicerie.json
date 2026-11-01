@@ -1,7 +1,7 @@
 {
  "cible": "houra-epicerie",
- "debut": "2026-10-31T15:26:38.975Z",
- "fin": "2026-10-31T15:41:05.359Z",
+ "debut": "2026-11-01T03:26:52.260Z",
+ "fin": "2026-11-01T03:42:19.566Z",
  "only": [
   "houra"
  ],
@@ -87,7 +87,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « semoule|polenta|flocons de pomme de terre » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « semoule|polenta|flocons de pomme de terre » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -106,7 +106,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « legumes secs en conserve » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « legumes secs en conserve » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -164,7 +164,7 @@
    "url": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-poissons-pates-foie-gras-B1557080-1.html",
    "final": "https://www.houra.fr/catalogue/epicerie-salee/conserves-de-poissons-pates-foie-gras-B1557080-1.html",
    "status": 200,
-   "products": 84,
+   "products": 85,
    "error": null,
    "title": "Conserves de poissons, pâtés, foie gras : achat en ligne – Houra.fr"
   },
@@ -194,7 +194,7 @@
    "url": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons/soupe-bouteille-refermable-conserve-B1557094-1.html",
    "final": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons/soupe-bouteille-refermable-conserve-B1557094-1.html",
    "status": 200,
-   "products": 47,
+   "products": 46,
    "error": null,
    "title": "Soupes en bouteille, refermables et conserves en livraison à domicile - houra.fr"
   },
@@ -204,7 +204,7 @@
    "url": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons-B1557093-1.html",
    "final": "https://www.houra.fr/catalogue/epicerie-salee/soupes-potages-et-croutons-B1557093-1.html",
    "status": 200,
-   "products": 192,
+   "products": 193,
    "error": null,
    "title": "Soupes, potages et croûtons en livraison Houra"
   },
@@ -285,7 +285,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « cuisine du monde|produits du monde|sauces du monde » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « cuisine du monde|produits du monde|sauces du monde » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -343,7 +343,7 @@
    "url": "https://www.houra.fr/catalogue/epicerie-salee/aperitif-chips-antipasti-tartinable-B1557050-1.html",
    "final": "https://www.houra.fr/catalogue/epicerie-salee/aperitif-chips-antipasti-tartinable-B1557050-1.html",
    "status": 200,
-   "products": 131,
+   "products": 192,
    "error": null,
    "title": "Apéritif chips : tartinables, antipasti et snacks Houra"
   },
@@ -374,7 +374,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « cafe en grains? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « cafe en grains? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -383,7 +383,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « capsules? compatibles? nespresso|^capsules?|dosettes? senseo|^dosettes? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « capsules? compatibles? nespresso|^capsules?|dosettes? senseo|^dosettes? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -402,7 +402,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « ^thes?( |$)|thes? vert » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « ^thes?( |$)|thes? vert » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -411,7 +411,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « ^infusions? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « ^infusions? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -439,7 +439,7 @@
    "url": "https://www.houra.fr/catalogue/epicerie-sucree/biscotte-cereales-barre-de-cereales-B1557650-1.html",
    "final": "https://www.houra.fr/catalogue/epicerie-sucree/biscotte-cereales-barre-de-cereales-B1557650-1.html",
    "status": 200,
-   "products": 199,
+   "products": 200,
    "error": null,
    "title": "Biscottes, Céréales & Barres de Céréales Livraison Houra"
   },
@@ -499,7 +499,7 @@
    "url": "https://www.houra.fr/catalogue/epicerie-sucree/biscuits/emballages-indivuiduels-B1557696-1.html",
    "final": "https://www.houra.fr/catalogue/epicerie-sucree/biscuits/emballages-indivuiduels-B1557696-1.html",
    "status": 200,
-   "products": 170,
+   "products": 86,
    "error": null,
    "title": "Biscuits et goûters en emballage individuel en livraison à domicile - houra.fr"
   },
@@ -520,7 +520,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « madeleines?, cakes? et crepes?|crepes?|gaufres? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « madeleines?, cakes? et crepes?|crepes?|gaufres? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -539,7 +539,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « tablettes? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « tablettes? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -548,7 +548,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « chocolats? et confiseries|rochers?|bouchees?|barres? chocolatees? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « chocolats? et confiseries|rochers?|bouchees?|barres? chocolatees? » sur https://www.houra.fr/catalogue/epicerie-sucree-B4000035-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Chocolat de Noël | Café, Thé | Confiture, Miel | Biscotte, Céréale | Sucre, Farine | Chocolat, Confiserie | Madeleine, Cake | Biscuit | Compote, Fruit au Sirop | Epicerie Fine | Confiture Anti-gaspi solidaire | Biscuits Normand authentiques | Miel d'Abbaye, Solidaire | Je fais un don | J'y vais | J'en veux | biscuits et gâteaux moelleux | pâte à tartiner onctueuse ou une confiture fruitée | céréales et barres de céréales | desserts sucrés | sucre, farine et chocolat pâtissier | sans sucre | fruits secs | sélection de boissons chaudes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -576,7 +576,7 @@
    "url": "https://www.houra.fr/catalogue/epicerie-sucree/compote-fruit-au-sirop-creme-dessert-B1557642-1.html",
    "final": "https://www.houra.fr/catalogue/epicerie-sucree/compote-fruit-au-sirop-creme-dessert-B1557642-1.html",
    "status": 200,
-   "products": 147,
+   "products": 71,
    "error": null,
    "title": "Compotes, fruits au sirop et crèmes dessert en livraison à domicile - houra.fr"
   },
@@ -706,7 +706,7 @@
    "url": "https://www.houra.fr/catalogue/boisson-lait/jus-de-fruits-B1557244-1.html",
    "final": "https://www.houra.fr/catalogue/boisson-lait/jus-de-fruits-B1557244-1.html",
    "status": 200,
-   "products": 128,
+   "products": 86,
    "error": null,
    "title": "Jus de fruits en livraison à domicile - houra.fr"
   },
@@ -716,7 +716,7 @@
    "url": "https://www.houra.fr/catalogue/boisson-lait/sirop-B1557228-1.html",
    "final": "https://www.houra.fr/catalogue/boisson-lait/sirop-B1557228-1.html",
    "status": 200,
-   "products": 102,
+   "products": 133,
    "error": null,
    "title": "Sirop en livraison à domicile - houra.fr"
   },
@@ -786,7 +786,7 @@
    "url": "https://www.houra.fr/catalogue/boisson-lait/boissons-vegetales-B1557236-1.html",
    "final": "https://www.houra.fr/catalogue/boisson-lait/boissons-vegetales-B1557236-1.html",
    "status": 200,
-   "products": 173,
+   "products": 191,
    "error": null,
    "title": "Boissons végétales en livraison à domicile - houra.fr"
   },
@@ -806,7 +806,7 @@
    "url": "https://www.houra.fr/catalogue/boisson-lait/bieres-et-cidres-B1557266-1.html",
    "final": "https://www.houra.fr/catalogue/boisson-lait/bieres-et-cidres-B1557266-1.html",
    "status": 200,
-   "products": 157,
+   "products": 198,
    "error": null,
    "title": "Bières et cidres en livraison à domicile - houra.fr"
   },
@@ -826,7 +826,7 @@
    "url": "https://www.houra.fr/catalogue/boisson/cave-a-bieres/biere-francaise-B1489234-1.html",
    "final": "https://www.houra.fr/catalogue/boisson-lait/cave-a-bieres-B1557272-1.html",
    "status": 200,
-   "products": 87,
+   "products": 120,
    "error": null,
    "title": "Cave à bières en livraison à domicile - houra.fr"
   },
@@ -836,7 +836,7 @@
    "url": "https://www.houra.fr/catalogue/boisson/cave-a-bieres-B1480734-1.html",
    "final": "https://www.houra.fr/catalogue/boisson-lait/cave-a-bieres-B1557272-1.html",
    "status": 200,
-   "products": 87,
+   "products": 120,
    "error": null,
    "title": "Cave à bières en livraison à domicile - houra.fr"
   },
@@ -867,7 +867,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « ^cidres? » sur https://www.houra.fr/catalogue/boisson-lait-B4000005-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Eaux | Sirop | Boissons énergisantes | Sodas | Jus de fruits | Jus de fruits frais | Lait | Boissons végétales | Bières , cidres | Apéritif, Digestifs | Jus et soupes Bio | Sirop artisanal naturel | Bières artisanales d'IDF | Lait, Équitable, Local | Bières artisanales parisiennes | Jus de fruits du terroir | Eau gazeuse Corse | Liqueurs et sirops du terroir | Eau minérale de Savoie | Boisson & Lait | nouveautés du rayon | offres spéciales | eaux en bouteille | eaux plates | eaux pétillantes | eaux aromatisées | variantes bullées subtilement parfumées | sirop de menthe | grenadine | orange-citron | Lait de vache | eaux en petits formats | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « ^cidres? » sur https://www.houra.fr/catalogue/boisson-lait-B4000005-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Eaux | Sirop | Boissons énergisantes | Sodas | Jus de fruits | Jus de fruits frais | Lait | Boissons végétales | Bières , cidres | Apéritif, Digestifs | Jus et soupes Bio | Sirop artisanal naturel | Bières artisanales d'IDF | Lait, Équitable, Local | Bières artisanales parisiennes | Jus de fruits du terroir | Eau gazeuse Corse | Liqueurs et sirops du terroir | Eau minérale de Savoie | Boisson & Lait | nouveautés du rayon | offres spéciales | eaux en bouteille | eaux plates | eaux pétillantes | eaux aromatisées | variantes bullées subtilement parfumées | sirop de menthe | grenadine | orange-citron | Lait de vache | eaux en petits formats | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -876,7 +876,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « vins? rouges? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « vins? rouges? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -885,7 +885,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « vins? blancs? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « vins? blancs? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -894,7 +894,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « vins? roses? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « vins? roses? » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -903,7 +903,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « champagne » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « champagne » sur https://www.houra.fr/catalogue/fontaines-a-vins-B1421165-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Boisson, Lait | Bières , cidres | Bières Blondes | Bières Brunes, Ambrées | Bières Blanches, aromatisés | Bières IPA | Bière d'Abbayes, Trappistes | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -911,7 +911,7 @@
    "url": "https://www.houra.fr/catalogue/boisson-lait/alcools-aperitifs-et-digestifs-B1557205-1.html",
    "final": "https://www.houra.fr/catalogue/boisson-lait/alcools-aperitifs-et-digestifs-B1557205-1.html",
    "status": 200,
-   "products": 200,
+   "products": 198,
    "error": null,
    "title": "Alcools, apéritifs et digestifs en livraison à domicile - houra.fr"
   },
@@ -939,7 +939,7 @@
     "^riz|riz,|riz et|feculent|riz, pates"
    ],
    "text": "Pâtes, Riz, Céréales",
-   "at": "2026-10-31T15:27:26.688Z"
+   "at": "2026-11-01T03:27:44.486Z"
   },
   {
    "retailer": "houra",
@@ -953,7 +953,7 @@
     "conserves? de poissons?|poissons? en conserve"
    ],
    "text": "Conserves de Poissons, Pâtés",
-   "at": "2026-10-31T15:28:58.325Z"
+   "at": "2026-11-01T03:29:20.326Z"
   },
   {
    "retailer": "houra",
@@ -967,7 +967,7 @@
     "^plats? cuisines?"
    ],
    "text": "Plats Cuisinés",
-   "at": "2026-10-31T15:29:23.376Z"
+   "at": "2026-11-01T03:29:45.503Z"
   },
   {
    "retailer": "houra",
@@ -981,7 +981,7 @@
     "soupes?, potages?|^soupes?"
    ],
    "text": "Soupes, Potages",
-   "at": "2026-10-31T15:29:48.622Z"
+   "at": "2026-11-01T03:30:14.425Z"
   },
   {
    "retailer": "houra",
@@ -995,7 +995,7 @@
     "^huiles?( |,|$)|huile et|huiles,"
    ],
    "text": "huiles et herbes d'exception",
-   "at": "2026-10-31T15:30:16.090Z"
+   "at": "2026-11-01T03:30:41.534Z"
   },
   {
    "retailer": "houra",
@@ -1009,7 +1009,7 @@
     "vinaigre|vinaigrette|assaisonnement"
    ],
    "text": "Assaisonnements, Condiments",
-   "at": "2026-10-31T15:30:18.978Z"
+   "at": "2026-11-01T03:30:44.756Z"
   },
   {
    "retailer": "houra",
@@ -1023,7 +1023,7 @@
     "^chips"
    ],
    "text": "chips croustillantes",
-   "at": "2026-10-31T15:31:41.445Z"
+   "at": "2026-11-01T03:32:15.176Z"
   },
   {
    "retailer": "houra",
@@ -1037,7 +1037,7 @@
     "aperitif, chips|^aperitif"
    ],
    "text": "Apéritif, Chips",
-   "at": "2026-10-31T15:32:20.283Z"
+   "at": "2026-11-01T03:32:58.467Z"
   },
   {
    "retailer": "houra",
@@ -1051,14 +1051,14 @@
     "compotes?"
    ],
    "text": "Compote, Fruit au Sirop",
-   "at": "2026-10-31T15:35:36.034Z"
+   "at": "2026-11-01T03:36:23.018Z"
   }
  ],
  "bilan": {
   "houra": {
    "pages": 93,
    "lues": 77,
-   "produits": 5603
+   "produits": 5618
   }
  }
 }
