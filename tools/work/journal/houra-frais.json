@@ -1,7 +1,7 @@
 {
  "cible": "houra-frais",
- "debut": "2026-10-31T15:26:39.989Z",
- "fin": "2026-10-31T15:38:34.011Z",
+ "debut": "2026-11-01T03:27:01.084Z",
+ "fin": "2026-11-01T03:39:28.086Z",
  "only": [
   "houra"
  ],
@@ -16,7 +16,7 @@
    "url": "https://www.houra.fr/catalogue/fruits-et-legumes/fruits-B1557897-1.html",
    "final": "https://www.houra.fr/catalogue/fruits-et-legumes/fruits-B1557897-1.html",
    "status": 200,
-   "products": 37,
+   "products": 36,
    "error": null,
    "title": "Fruits Frais en Ligne : Livraison à Domicile de Saison Houra"
   },
@@ -26,7 +26,7 @@
    "url": "https://www.houra.fr/catalogue/fruits-et-legumes/pomme-et-poire-B1557901-1.html",
    "final": "https://www.houra.fr/catalogue/fruits-et-legumes/pomme-et-poire-B1557901-1.html",
    "status": 200,
-   "products": 26,
+   "products": 25,
    "error": null,
    "title": "Pommes et poires en livraison à domicile - houra.fr"
   },
@@ -36,7 +36,7 @@
    "url": "https://www.houra.fr/catalogue/fruits-et-legumes/agrume-B1557898-1.html",
    "final": "https://www.houra.fr/catalogue/fruits-et-legumes/agrume-B1557898-1.html",
    "status": 200,
-   "products": 10,
+   "products": 9,
    "error": null,
    "title": "Agrumes en livraison à domicile - houra.fr"
   },
@@ -46,7 +46,7 @@
    "url": "https://www.houra.fr/catalogue/fruits-et-legumes/legumes/tomate-B1557914-1.html",
    "final": "https://www.houra.fr/catalogue/fruits-et-legumes/legumes/tomate-B1557914-1.html",
    "status": 200,
-   "products": 12,
+   "products": 13,
    "error": null,
    "title": "Tomates en livraison à domicile - houra.fr"
   },
@@ -87,7 +87,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « salades? et herbes|^salades?$|herbes aromatiques » sur https://www.houra.fr/catalogue/fruits-et-legumes-B4000059-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits et Légumes Bio | Fruits | Légumes | De Saison | Origine France | Fruits secs | Fleurs, Plantes | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Légumes d'Ile-de-France | produits fruits et légumes | arrivages récents | offres en cours | produits certifiés bio | de saison | fruits | agrumes éclatants | pommes et poires | exotiques | fruits rouges | grappes de raisin | fruits à noyau d'été | colis de fruits | légumes | tomates mûres | pommes de terre | aromates indispensables | variétés exotiques | légumes d'été | légumes d'hiver | colis légumes | fruits secs | plantes décoratives ou aromatiques | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « salades? et herbes|^salades?$|herbes aromatiques » sur https://www.houra.fr/catalogue/fruits-et-legumes-B4000059-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits et Légumes Bio | Fruits | Légumes | De Saison | Origine France | Fruits secs | Fleurs, Plantes | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Légumes d'Ile-de-France | produits fruits et légumes | arrivages récents | offres en cours | produits certifiés bio | de saison | fruits | agrumes éclatants | pommes et poires | exotiques | fruits rouges | grappes de raisin | fruits à noyau d'été | colis de fruits | légumes | tomates mûres | pommes de terre | aromates indispensables | variétés exotiques | légumes d'été | légumes d'hiver | colis légumes | fruits secs | plantes décoratives ou aromatiques | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -96,7 +96,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « fruits secs|cacahu|graines » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « fruits secs|cacahu|graines » sur https://www.houra.fr/catalogue/epicerie-salee-B4000002-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, Chips | Conserves de Poissons, Pâtés | Soupes, Potages | Conserves de légumes | Pâtes, Riz, Céréales | Sauces | Assaisonnements, Condiments | Plats Cuisinés | Epicerie Fine | Je fais un don | Jus et soupes Bio | Canard du Terroir Sud-Ouest | Producteur des Yvelines | nouveautés | promotions | le thon en conserve | les maquereaux | les pâtes | les riz | les sauces tomate, pesto ou ketchup | , les conserves de légumes | les huiles | les herbes et aromates | soupes et potages | produits salés à grignoter | chips croustillantes | feuilletés pour l'apéritif | olives, antipasti | plats cuisinés express | barquettes individuelles | sachets micro-ondables | boxes de pâtes | raviolis | cassoulets | paëllas, couscous et autres chilis | repas minceur | haute teneur en protéines | épicerie fine salée | foie gras | truffes | sauces culinaires | huiles et herbes d'exception | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -115,7 +115,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « boeuf|^bœuf » sur https://www.houra.fr/catalogue/le-marche-B4000200-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits | Légumes | Boucherie | Volaille, Lapin | Poissonnerie | Charcuterie | Crèmerie | Fromage à la coupe | Pain | La manufacture des desserts | Canard du Terroir Sud-Ouest | Charcuterie Bio traditionnelle | Porc du Bassin Parisien | Maître Fromager Affineur | Pain au Naturel, Bio | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Laiterie Engagée Ile de France | Légumes d'Ile-de-France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | Le Canard des Landes | L'expert du Saumon Fumé | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « boeuf|^bœuf » sur https://www.houra.fr/catalogue/le-marche-B4000200-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits | Légumes | Boucherie | Volaille, Lapin | Poissonnerie | Charcuterie | Crèmerie | Fromage à la coupe | Pain | La manufacture des desserts | Canard du Terroir Sud-Ouest | Charcuterie Bio traditionnelle | Porc du Bassin Parisien | Maître Fromager Affineur | Pain au Naturel, Bio | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Laiterie Engagée Ile de France | Légumes d'Ile-de-France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | Le Canard des Landes | L'expert du Saumon Fumé | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -123,7 +123,7 @@
    "url": "https://www.houra.fr/catalogue/nos-producteurs/le-porc-francilin-B1560206-1.html",
    "final": "https://www.houra.fr/catalogue/nos-producteurs/le-porc-francilin-B1560206-1.html",
    "status": 200,
-   "products": 18,
+   "products": 15,
    "error": null,
    "title": "Le Porc Francilin, Le cochon du bassin Parisien – Houra.fr"
   },
@@ -144,7 +144,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « ^agneau » sur https://www.houra.fr/catalogue/le-marche-B4000200-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits | Légumes | Boucherie | Volaille, Lapin | Poissonnerie | Charcuterie | Crèmerie | Fromage à la coupe | Pain | La manufacture des desserts | Canard du Terroir Sud-Ouest | Charcuterie Bio traditionnelle | Porc du Bassin Parisien | Maître Fromager Affineur | Pain au Naturel, Bio | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Laiterie Engagée Ile de France | Légumes d'Ile-de-France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | Le Canard des Landes | L'expert du Saumon Fumé | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « ^agneau » sur https://www.houra.fr/catalogue/le-marche-B4000200-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits | Légumes | Boucherie | Volaille, Lapin | Poissonnerie | Charcuterie | Crèmerie | Fromage à la coupe | Pain | La manufacture des desserts | Canard du Terroir Sud-Ouest | Charcuterie Bio traditionnelle | Porc du Bassin Parisien | Maître Fromager Affineur | Pain au Naturel, Bio | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Laiterie Engagée Ile de France | Légumes d'Ile-de-France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | Le Canard des Landes | L'expert du Saumon Fumé | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -162,7 +162,7 @@
    "url": "https://www.houra.fr/catalogue/le-marche/volaille-lapin-du-marche-B1558021-1.html",
    "final": "https://www.houra.fr/catalogue/le-marche/volaille-lapin-du-marche-B1558021-1.html",
    "status": 200,
-   "products": 44,
+   "products": 47,
    "error": null,
    "title": "Volaille et Lapin du Marché : Qualité Fermière Houra"
   },
@@ -173,7 +173,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « hach » sur https://www.houra.fr/catalogue/le-marche-B4000200-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits | Légumes | Boucherie | Volaille, Lapin | Poissonnerie | Charcuterie | Crèmerie | Fromage à la coupe | Pain | La manufacture des desserts | Canard du Terroir Sud-Ouest | Charcuterie Bio traditionnelle | Porc du Bassin Parisien | Maître Fromager Affineur | Pain au Naturel, Bio | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Laiterie Engagée Ile de France | Légumes d'Ile-de-France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | Le Canard des Landes | L'expert du Saumon Fumé | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « hach » sur https://www.houra.fr/catalogue/le-marche-B4000200-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits | Légumes | Boucherie | Volaille, Lapin | Poissonnerie | Charcuterie | Crèmerie | Fromage à la coupe | Pain | La manufacture des desserts | Canard du Terroir Sud-Ouest | Charcuterie Bio traditionnelle | Porc du Bassin Parisien | Maître Fromager Affineur | Pain au Naturel, Bio | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Laiterie Engagée Ile de France | Légumes d'Ile-de-France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | Le Canard des Landes | L'expert du Saumon Fumé | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -191,7 +191,7 @@
    "url": "https://www.houra.fr/catalogue/le-marche/boucherie/barbecue-B1491788-1.html",
    "final": "https://www.houra.fr/catalogue/boucherie/grillades-et-saucisses-de-boucherie-B1557514-1.html",
    "status": 200,
-   "products": 43,
+   "products": 41,
    "error": null,
    "title": "Grillades et saucisses de boucherie en livraison à domicile - houra.fr"
   },
@@ -201,7 +201,7 @@
    "url": "https://www.houra.fr/catalogue/le-marche/poissonnerie/poissons-frais-B1553668-1.html",
    "final": "https://www.houra.fr/catalogue/le-marche/poissonnerie-du-marche-B1558022-1.html",
    "status": 200,
-   "products": 39,
+   "products": 41,
    "error": null,
    "title": "Poissonnerie en ligne : Poisson frais et Fruits de mer Houra"
   },
@@ -211,7 +211,7 @@
    "url": "https://www.houra.fr/catalogue/le-marche/poissonnerie-du-marche-B1558022-1.html",
    "final": "https://www.houra.fr/catalogue/le-marche/poissonnerie-du-marche-B1558022-1.html",
    "status": 200,
-   "products": 39,
+   "products": 41,
    "error": null,
    "title": "Poissonnerie en ligne : Poisson frais et Fruits de mer Houra"
   },
@@ -221,7 +221,7 @@
    "url": "https://www.houra.fr/catalogue/poisson-traiteur-de-la-mer-B4000022-1.html",
    "final": "https://www.houra.fr/catalogue/poisson-traiteur-de-la-mer-B4000022-1.html",
    "status": 200,
-   "products": 27,
+   "products": 24,
    "error": null,
    "title": "Poisson et traiteur de la mer en livraison à domicile - houra.fr"
   },
@@ -312,7 +312,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « yaourts? (aux )?fruits|aromatis » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « yaourts? (aux )?fruits|aromatis » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -331,7 +331,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « desserts? frais » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « desserts? frais » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -339,7 +339,7 @@
    "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/beurre-et-margarine-B1556973-1.html",
    "final": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/beurre-et-margarine-B1556973-1.html",
    "status": 200,
-   "products": 159,
+   "products": 107,
    "error": null,
    "title": "Beurre et margarine en livraison à domicile - houra.fr"
   },
@@ -349,7 +349,7 @@
    "url": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/creme-fraiche-et-sauces-B1556951-1.html",
    "final": "https://www.houra.fr/catalogue/produits-laitiers-oeufs/creme-fraiche-et-sauces-B1556951-1.html",
    "status": 200,
-   "products": 116,
+   "products": 105,
    "error": null,
    "title": "Crème fraîche et sauces en livraison à domicile - houra.fr"
   },
@@ -369,7 +369,7 @@
    "url": "https://www.houra.fr/catalogue/produits-laitiers-et-oeufs/oeufs/oeufs-label-rouge-B1556948-1.html",
    "final": "https://www.houra.fr/catalogue/produits-laitiers-et-oeufs/oeufs/oeufs-label-rouge-B1556948-1.html",
    "status": 200,
-   "products": 12,
+   "products": 13,
    "error": null,
    "title": "Oeufs Label Rouge en livraison à domicile - houra.fr"
   },
@@ -410,7 +410,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « emmental|comte|pates? pressees? » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « emmental|comte|pates? pressees? » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -439,7 +439,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « tartiner|portions?|enfants? » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « tartiner|portions?|enfants? » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -448,7 +448,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « mozzarella|cuisiner|raclette|tranches » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « mozzarella|cuisiner|raclette|tranches » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -536,7 +536,7 @@
    "url": "https://www.houra.fr/catalogue/charcuterie-traiteur/aperitif/charcuterie-B1558093-1.html",
    "final": "https://www.houra.fr/catalogue/charcuterie-traiteur/aperitif/charcuterie-B1558093-1.html",
    "status": 200,
-   "products": 46,
+   "products": 45,
    "error": null,
    "title": "Charcuterie pour apéritif en livraison à domicile - houra.fr"
   },
@@ -547,7 +547,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « ^aperitif » sur https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Traiteur, Charcuterie | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « ^aperitif » sur https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Traiteur, Charcuterie | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -556,7 +556,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « plats? cuisines? frais|^plats? cuisines?$ » sur https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Traiteur, Charcuterie | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « plats? cuisines? frais|^plats? cuisines?$ » sur https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Traiteur, Charcuterie | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -564,7 +564,7 @@
    "url": "https://www.houra.fr/catalogue/traiteur-charcuterie/pizzas-quiches-et-crepes-traiteur-B1557491-1.html",
    "final": "https://www.houra.fr/catalogue/traiteur-charcuterie/pizzas-quiches-et-crepes-traiteur-B1557491-1.html",
    "status": 200,
-   "products": 71,
+   "products": 69,
    "error": null,
    "title": "Pizzas, quiches et crêpes traiteur en livraison à domicile - houra.fr"
   },
@@ -595,7 +595,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « salades? traiteur|sandwich » sur https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Traiteur, Charcuterie | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « salades? traiteur|sandwich » sur https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Traiteur, Charcuterie | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -604,7 +604,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « vegetarien|vegetal » sur https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Traiteur, Charcuterie | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « vegetarien|vegetal » sur https://www.houra.fr/catalogue/traiteur-charcuterie/voir-les-produits-traiteur-charcuterie-B1559613-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Traiteur, Charcuterie | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -612,7 +612,7 @@
    "url": "https://www.houra.fr/catalogue/le-marche/pain-du-marche-B1558026-1.html",
    "final": "https://www.houra.fr/catalogue/le-marche/pain-du-marche-B1558026-1.html",
    "status": 200,
-   "products": 11,
+   "products": 13,
    "error": null,
    "title": "Pain du Marché : Baguettes et Pains Frais en Livraison Houra"
   },
@@ -623,7 +623,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « pain de mie|burger » sur https://www.houra.fr/catalogue/le-marche-B4000200-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits | Légumes | Boucherie | Volaille, Lapin | Poissonnerie | Charcuterie | Crèmerie | Fromage à la coupe | Pain | La manufacture des desserts | Canard du Terroir Sud-Ouest | Charcuterie Bio traditionnelle | Porc du Bassin Parisien | Maître Fromager Affineur | Pain au Naturel, Bio | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Laiterie Engagée Ile de France | Légumes d'Ile-de-France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | Le Canard des Landes | L'expert du Saumon Fumé | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « pain de mie|burger » sur https://www.houra.fr/catalogue/le-marche-B4000200-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Fruits | Légumes | Boucherie | Volaille, Lapin | Poissonnerie | Charcuterie | Crèmerie | Fromage à la coupe | Pain | La manufacture des desserts | Canard du Terroir Sud-Ouest | Charcuterie Bio traditionnelle | Porc du Bassin Parisien | Maître Fromager Affineur | Pain au Naturel, Bio | Légume Nature Prêt à Cuisiner | Pomme de Terre, Val d'Oise | Laiterie Engagée Ile de France | Légumes d'Ile-de-France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | Le Canard des Landes | L'expert du Saumon Fumé | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -642,7 +642,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « patisseries?|desserts? patissiers? » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « patisseries?|desserts? patissiers? » sur https://www.houra.fr/catalogue/produits-laitiers-oeufs-B4000000-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Yaourt, Fromage Blanc | Dessert | Compote et dessert fruitier | Fromage | Beurre, Margarine | Crème fraiche, sauce | Oeufs | Lait | Boisson végétale | La manufacture des desserts | Maître Fromager Affineur | Lait, Équitable, Local | Laiterie Engagée Ile de France | La Ferme de la Tremblaye | Yaourts Fermiers Naturels | La Passion de la Qualité | Origine Directe des Terroirs | yaourts classiques ou à partager | végétales au soja ou à l amande | formules bien être pour les plus actifs | desserts laitiers | flan traditionnel | crème dessert au chocolat | mousses gourmandes | recettes sans lactose ou végétales | fromages | fromages frais italiens | variétés au lait de chèvre ou de brebis | formules râpées pratiques pour vos gratins | de crèmes fraîches et sauces | beurres doux ou salés | oeufs de différentes filières | compotes aux fruits | laits classiques ou sans lactose | boissons végétales au riz, à l avoine ou au soja | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -710,7 +710,7 @@
    "url": "https://www.houra.fr/catalogue/surgeles/plats-cuisines-et-vegetariens-surgeles-B1557174-1.html",
    "final": "https://www.houra.fr/catalogue/surgeles/plats-cuisines-et-vegetariens-surgeles-B1557174-1.html",
    "status": 200,
-   "products": 102,
+   "products": 84,
    "error": null,
    "title": "Plats cuisinés et végétariens surgelés Houra"
   },
@@ -741,7 +741,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « plats? cuisines? du monde » sur https://www.houra.fr/catalogue/surgeles-B4000003-1.html ; liens : 004530produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, entrée, snacking | Pizza, quiche | Cuisine du Monde | Plat cuisiné | Frites, pommes de terre | Légume | Viande, volaille | Poisson, crustacés | Pain, pâtisserie et fruit | Glace, sorbet | Glaces Artisanales Provençales | catégories de quiches surgelées | pizzas au fromage | pizzas royales au poulet et à la bolognaise | pizzas aux légumes et au poisson | sélection de pizzas bio | glaces en bâtonnets, grands et petits formats | cônes glacés croustillants | pots de glace individuels ou à partager | sorbets en bac aux saveurs fruitées | bacs de crème glacée onctueuse | glaces amusantes pour enfants | glaces bio | desserts glacés et mochis | barres glacées gourmandes | plats cuisinés individuels | plats à partager | plats végétariens surgelés | burgers et snacking végétariens | pains et pâtes surgelés | pâtisseries à partager | pâtisseries individuelles | fruits surgelés | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « plats? cuisines? du monde » sur https://www.houra.fr/catalogue/surgeles-B4000003-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, entrée, snacking | Pizza, quiche | Cuisine du Monde | Plat cuisiné | Frites, pommes de terre | Légume | Viande, volaille | Poisson, crustacés | Pain, pâtisserie et fruit | Glace, sorbet | Glaces Artisanales Provençales | catégories de quiches surgelées | pizzas au fromage | pizzas royales au poulet et à la bolognaise | pizzas aux légumes et au poisson | sélection de pizzas bio | glaces en bâtonnets, grands et petits formats | cônes glacés croustillants | pots de glace individuels ou à partager | sorbets en bac aux saveurs fruitées | bacs de crème glacée onctueuse | glaces amusantes pour enfants | glaces bio | desserts glacés et mochis | barres glacées gourmandes | plats cuisinés individuels | plats à partager | plats végétariens surgelés | burgers et snacking végétariens | pains et pâtes surgelés | pâtisseries à partager | pâtisseries individuelles | fruits surgelés | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -749,7 +749,7 @@
    "url": "https://www.houra.fr/catalogue/surgeles/poissons-et-crustaces-surgeles-B1557193-1.html",
    "final": "https://www.houra.fr/catalogue/surgeles/poissons-et-crustaces-surgeles-B1557193-1.html",
    "status": 200,
-   "products": 91,
+   "products": 85,
    "error": null,
    "title": "Poissons et crustacés surgelés en livraison à domicile - houra.fr"
   },
@@ -769,7 +769,7 @@
    "url": "https://www.houra.fr/catalogue/surgeles/viandes-et-volailles-surgelees-B1557186-1.html",
    "final": "https://www.houra.fr/catalogue/surgeles/viandes-et-volailles-surgelees-B1557186-1.html",
    "status": 200,
-   "products": 95,
+   "products": 84,
    "error": null,
    "title": "Viandes et volailles surgelées en livraison Houra"
   },
@@ -780,7 +780,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « viandes? et volailles? » sur https://www.houra.fr/catalogue/surgeles-B4000003-1.html ; liens : 004518produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, entrée, snacking | Pizza, quiche | Cuisine du Monde | Plat cuisiné | Frites, pommes de terre | Légume | Viande, volaille | Poisson, crustacés | Pain, pâtisserie et fruit | Glace, sorbet | Glaces Artisanales Provençales | catégories de quiches surgelées | pizzas au fromage | pizzas royales au poulet et à la bolognaise | pizzas aux légumes et au poisson | sélection de pizzas bio | glaces en bâtonnets, grands et petits formats | cônes glacés croustillants | pots de glace individuels ou à partager | sorbets en bac aux saveurs fruitées | bacs de crème glacée onctueuse | glaces amusantes pour enfants | glaces bio | desserts glacés et mochis | barres glacées gourmandes | plats cuisinés individuels | plats à partager | plats végétariens surgelés | burgers et snacking végétariens | pains et pâtes surgelés | pâtisseries à partager | pâtisseries individuelles | fruits surgelés | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « viandes? et volailles? » sur https://www.houra.fr/catalogue/surgeles-B4000003-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Apéritif, entrée, snacking | Pizza, quiche | Cuisine du Monde | Plat cuisiné | Frites, pommes de terre | Légume | Viande, volaille | Poisson, crustacés | Pain, pâtisserie et fruit | Glace, sorbet | Glaces Artisanales Provençales | catégories de quiches surgelées | pizzas au fromage | pizzas royales au poulet et à la bolognaise | pizzas aux légumes et au poisson | sélection de pizzas bio | glaces en bâtonnets, grands et petits formats | cônes glacés croustillants | pots de glace individuels ou à partager | sorbets en bac aux saveurs fruitées | bacs de crème glacée onctueuse | glaces amusantes pour enfants | glaces bio | desserts glacés et mochis | barres glacées gourmandes | plats cuisinés individuels | plats à partager | plats végétariens surgelés | burgers et snacking végétariens | pains et pâtes surgelés | pâtisseries à partager | pâtisseries individuelles | fruits surgelés | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -846,7 +846,7 @@
     "^legumes$|^legumes "
    ],
    "text": "Légumes",
-   "at": "2026-10-31T15:27:25.386Z"
+   "at": "2026-11-01T03:27:49.536Z"
   },
   {
    "retailer": "houra",
@@ -860,7 +860,7 @@
     "pommes? de terre|legumes? racines?"
    ],
    "text": "Pomme de Terre, Val d'Oise",
-   "at": "2026-10-31T15:27:40.437Z"
+   "at": "2026-11-01T03:28:02.929Z"
   },
   {
    "retailer": "houra",
@@ -874,7 +874,7 @@
     "^porc"
    ],
    "text": "Porc du Bassin Parisien",
-   "at": "2026-10-31T15:28:09.888Z"
+   "at": "2026-11-01T03:28:31.411Z"
   },
   {
    "retailer": "houra",
@@ -888,7 +888,7 @@
     "^volaille"
    ],
    "text": "Volaille, Lapin",
-   "at": "2026-10-31T15:28:43.944Z"
+   "at": "2026-11-01T03:29:06.831Z"
   },
   {
    "retailer": "houra",
@@ -902,7 +902,7 @@
     "poissonnerie"
    ],
    "text": "Poissonnerie",
-   "at": "2026-10-31T15:29:27.271Z"
+   "at": "2026-11-01T03:29:53.508Z"
   },
   {
    "retailer": "houra",
@@ -916,7 +916,7 @@
     "traiteur de la mer|produits de la mer|saumon fume"
    ],
    "text": "Poisson, Traiteur de la mer",
-   "at": "2026-10-31T15:29:39.596Z"
+   "at": "2026-11-01T03:30:06.004Z"
   },
   {
    "retailer": "houra",
@@ -930,7 +930,7 @@
     "^creme fraiche|^cremes?( |$)"
    ],
    "text": "Crème fraiche, sauce",
-   "at": "2026-10-31T15:31:24.996Z"
+   "at": "2026-11-01T03:31:52.631Z"
   },
   {
    "retailer": "houra",
@@ -944,7 +944,7 @@
     "camembert|pates? molles?|^fromages$"
    ],
    "text": "fromages",
-   "at": "2026-10-31T15:32:17.580Z"
+   "at": "2026-11-01T03:32:42.383Z"
   },
   {
    "retailer": "houra",
@@ -958,7 +958,7 @@
     "saucisson"
    ],
    "text": "Saucisson, chorizo",
-   "at": "2026-10-31T15:33:39.079Z"
+   "at": "2026-11-01T03:34:10.460Z"
   },
   {
    "retailer": "houra",
@@ -972,7 +972,7 @@
     "lardons?"
    ],
    "text": "Lardon, poitrine, bacon",
-   "at": "2026-10-31T15:33:53.200Z"
+   "at": "2026-11-01T03:34:24.047Z"
   },
   {
    "retailer": "houra",
@@ -986,7 +986,7 @@
     "knack|saucisses? (a cuire|cuite)|boudin"
    ],
    "text": "Knack, saucisse, boudin",
-   "at": "2026-10-31T15:34:04.701Z"
+   "at": "2026-11-01T03:34:38.920Z"
   },
   {
    "retailer": "houra",
@@ -1000,7 +1000,7 @@
     "pates? et rillettes|rillettes|foie gras"
    ],
    "text": "Foie gras",
-   "at": "2026-10-31T15:34:18.048Z"
+   "at": "2026-11-01T03:34:51.889Z"
   },
   {
    "retailer": "houra",
@@ -1014,7 +1014,7 @@
     "pain et boulangerie|^pains?( |$)"
    ],
    "text": "Pain",
-   "at": "2026-10-31T15:35:18.890Z"
+   "at": "2026-11-01T03:35:49.997Z"
   },
   {
    "retailer": "houra",
@@ -1028,7 +1028,7 @@
     "viennoiserie|brioche|pain au lait"
    ],
    "text": "Pain, Viennoiserie",
-   "at": "2026-10-31T15:35:32.550Z"
+   "at": "2026-11-01T03:36:03.814Z"
   },
   {
    "retailer": "houra",
@@ -1042,7 +1042,7 @@
     "glaces? et sorbets?|^glaces?( |$)"
    ],
    "text": "Glaces Artisanales Provençales",
-   "at": "2026-10-31T15:35:47.376Z"
+   "at": "2026-11-01T03:36:18.426Z"
   },
   {
    "retailer": "houra",
@@ -1056,7 +1056,7 @@
     "frites"
    ],
    "text": "Frites, pommes de terre",
-   "at": "2026-10-31T15:36:15.927Z"
+   "at": "2026-11-01T03:36:52.146Z"
   },
   {
    "retailer": "houra",
@@ -1070,7 +1070,7 @@
     "pizzas?"
    ],
    "text": "Pizza, quiche",
-   "at": "2026-10-31T15:36:34.737Z"
+   "at": "2026-11-01T03:37:14.748Z"
   },
   {
    "retailer": "houra",
@@ -1084,7 +1084,7 @@
     "aperitifs? et snacks?|^aperitif"
    ],
    "text": "Apéritif, entrée, snacking",
-   "at": "2026-10-31T15:37:46.619Z"
+   "at": "2026-11-01T03:38:32.207Z"
   },
   {
    "retailer": "houra",
@@ -1098,14 +1098,14 @@
     "pains?, patisseries?|patisseries? et|fruits surgeles"
    ],
    "text": "Pain, pâtisserie et fruit",
-   "at": "2026-10-31T15:38:24.516Z"
+   "at": "2026-11-01T03:39:19.851Z"
   }
  ],
  "bilan": {
   "houra": {
    "pages": 84,
    "lues": 65,
-   "produits": 3050
+   "produits": 2949
   }
  }
 }
