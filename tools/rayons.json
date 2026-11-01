@@ -1987,7 +1987,7 @@
   },
   {
    "id": "semoule-cereales",
-   "nom": "Semoule, boulgour, quinoa, purées et polenta",
+   "nom": "Semoule, couscous, boulgour, quinoa, purées et polenta",
    "univers": "epicerie-salee",
    "icone": "bag",
    "regimes": [],
@@ -2014,14 +2014,15 @@
     "auchan": [
      "text=semoule",
      "text=quinoa",
-     "text=pur%C3%A9e%20mousseline"
+     "text=pur%C3%A9e%20mousseline",
+     "text=couscous"
     ]
    },
    "filtre": {
-    "oui": "semoule|couscous|boulgour|quinoa|epeautre|ble|polenta|puree|flocon|mousseline|orge|sarrasin|millet|lentilles corail|avoine|cereales|taboule|freekeh|graine|pomme de terre",
-    "non": "conserve|surgel|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|petit dejeuner|barre|biscuit|\\blait\\b|yaourt|dessert|sucre|chocolat|muesli|\\bpains?\\b|galette de riz|chips|plat cuisine|poulet|boeuf|legumes cuisines|sauce|compote|soupe|bebe|infantile|riz\\b(?! .*quinoa)|pates|\\bcup\\b|cantonais|paella"
+    "oui": "semoule|couscous|boulgour|quinoa|epeautre|ble|polenta|puree|flocon|mousseline|orge|sarrasin|millet|avoine|cereales|freekeh|graine|pomme de terre",
+    "non": "conserve|surgel|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|petit dejeuner|barre|biscuit|\\blait\\b|yaourt|dessert|sucre|chocolat|muesli|\\bpains?\\b|galette de riz|chips|plat cuisine|poulet|boeuf|legumes cuisines|sauce|compote|soupe|bebe|infantile|riz\\b(?! .*quinoa)|pates|\\bcup\\b|cantonais|paella|lentille|pois chiche|taboule|brick|saladier|couscous (?:aux|au|royal|garni|legumes?|merguez|poulet|boeuf|boulettes?|oriental)\\b|couscous a la (?!semoule)|(?:bol|assiette) (?:de )?couscous|a la (?:marocaine|tunisienne|algerienne)|legumes? pour|pour couscous|epices? (?:pour |a |de |du )?couscous|melange d epices|assaisonnement|bouillon|ras el|raz el|hanout"
    },
-   "note": "Sans les riz ni les pâtes ; la page Carrefour « pâtes, riz et féculents » est lue avec filtre."
+   "note": "Sans les riz ni les pâtes ; la page Carrefour « pâtes, riz et féculents » est lue avec filtre. Semoules, couscous et boulgour nature, graines parfumées comprises ; les plats de couscous, le taboulé, les épices et les feuilles de brick vont au rayon oriental, les lentilles et les pois chiches au rayon légumes secs. La recherche Auchan « couscous » est partagée avec le rayon oriental (filtres)."
   },
   {
    "id": "legumes-secs",
@@ -2057,9 +2058,9 @@
    },
    "filtre": {
     "oui": "lentille|pois chiche|haricot (rouge|blanc|noir|\\bsecs?\\b|coco|mungo|pinto|lingot|azuki)|flageolet|feve|pois casse|pois cass|legume sec|legumineuse|mogette|cocos|edamame|haricots secs|soja",
-    "non": "surgel|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|plat cuisine|cassoulet|chili con|soupe|veloute|puree|salade composee|chips|biscuit|haricot vert|petit pois|pates|houmous|tartinable|bebe|boisson|\\blait\\b|sauce|tofu|steak"
+    "non": "surgel|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|plat cuisine|cassoulet|chili con|soupe|veloute|puree|salade composee|chips|biscuit|haricot vert|petit pois|pates|houmous|tartinable|bebe|boisson|\\blait\\b|sauce|tofu|steak|falafel|couscous (?:aux|au|royal)\\b|avec couscous"
    },
-   "note": "Secs et en conserve : contenances différentes, donc produits distincts dans le rapprochement."
+   "note": "Secs et en conserve : contenances différentes, donc produits distincts dans le rapprochement. Les falafels et les plats de couscous vont au rayon oriental."
   },
   {
    "id": "tomates",
@@ -5197,10 +5198,10 @@
     ]
    },
    "filtre": {
-    "oui": "oriental|orient|maghreb|maroc|marocain|tunisien|algerien|libanais|liban|turc|turquie|grec|grecque|israel|couscous|semoule|harissa|tajine|chorba|harira|merguez|ras el hanout|chermoula|zaatar|sumac|houmous|falafel|taboule|boulgour|pois chiche|feve|dattes|datte|loukoum|halva|halwa|baklava|corne de gazelle|makroud|pate de datte|eau de fleur d oranger|fleur d oranger|eau de rose|the a la menthe|menthe nanah|fruits secs orientaux|amande|pistache|olives|huile d argan|citron confit|tahina|tehina|feta|tzatziki|dolma|feuille de vigne|pita|msemen|batbout|pain libanais|labneh|ayran|chawarma|kebab|durum|zahra|samia|le phare du cap bon|dari|tipiak couscous|al wadi|cortas|cedar",
-    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|pates italiennes|spaghetti|riz basmati(?! .*oriental)|nouille asiatique|sauce soja|nuoc mam|curry indien|lait de coco|tortilla|tacos|salsa|guacamole|biere\\b|vin\\b(?! .*(liban|maroc|grec))|dentifrice|shampoing|gel douche|lessive|nettoyant|bebe|infantile|semoule de ble fine ordinaire(?! .*oriental)|olives ordinaires(?! .*(grec|oriental|maroc))|pois chiches en conserve ordinaire(?! .*(oriental|houmous))"
+    "oui": "oriental|orient|maghreb|maroc|marocain|tunisien|algerien|libanais|liban|turc|turquie|grec|grecque|israel|couscous|semoule|harissa|tajine|chorba|harira|merguez|ras el hanout|chermoula|zaatar|sumac|houmous|falafel|taboule|boulgour|pois chiche|feve|dattes|datte|loukoum|halva|halwa|baklava|corne de gazelle|makroud|pate de datte|eau de fleur d oranger|fleur d oranger|eau de rose|the a la menthe|menthe nanah|fruits secs orientaux|amande|pistache|olives|huile d argan|citron confit|tahina|tehina|feta|tzatziki|dolma|feuille de vigne|brick|pita|msemen|batbout|pain libanais|labneh|ayran|chawarma|kebab|durum|zahra|samia|le phare du cap bon|dari|tipiak couscous|al wadi|cortas|cedar",
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|pates italiennes|spaghetti|riz basmati(?! .*oriental)|nouille asiatique|sauce soja|nuoc mam|curry indien|lait de coco|tortilla|tacos|salsa|guacamole|biere\\b|vin\\b(?! .*(liban|maroc|grec))|dentifrice|shampoing|gel douche|lessive|nettoyant|bebe|infantile|semoule de ble fine ordinaire(?! .*oriental)|olives ordinaires(?! .*(grec|oriental|maroc))|pois chiches en conserve ordinaire(?! .*(oriental|houmous))|^(?!.*(?:royal|garni|merguez|poulet|boeuf|agneau|volaille|viande|boulettes?|legumes?|assiette|\\bplats?\\b|marocaine?|tunisienne?|algerienne?|orientale?|libanaise?|berbere|falafels?|taboule|houmous|kit|preparation|traiteur|lunch|bowl|epices? (?:pour |a |de |du )?couscous|melange d epices|ras el|raz el|hanout|assaisonnement|bouillon|harissa|tajine|chorba|harira|curry|sauce|halal|vermicelles?|pates|brick|gateau|dessert|patisserie|\\bmois\\b|bebe|soupe|salade|facon|cuisine)).*(?:semoule|couscous|boulgour|boulghour|pois chiches?|\\bfeves?\\b|lentilles?)"
    },
-   "note": "Houra : la page « couscous, paëlla et cuisine du monde en conserve » sert aux trois rayons du monde (filtres) ; les produits non reconnus par un filtre restent dans « plats cuisinés en conserve »."
+   "note": "Houra : la page « couscous, paëlla et cuisine du monde en conserve » sert aux trois rayons du monde (filtres) ; les produits non reconnus par un filtre restent dans « plats cuisinés en conserve ». Semoules, couscous et boulgour nature vont au rayon « semoule, couscous, boulgour », pois chiches, fèves et lentilles telles quelles au rayon « lentilles, pois chiches et légumes secs » : le filtre « non » les écarte quand rien ne dit un plat, une épice ou une préparation. La recherche Auchan « couscous » sert aussi le rayon semoule."
   }
  ]
 }

@@ -4439,6 +4439,16 @@
    "prompt": ""
   },
   {
+   "retailer": "auchan*",
+   "rayon": "semoule-cereales",
+   "regimes": [],
+   "lot": "epicerie-1",
+   "host": "auchan.fr",
+   "match": "text=couscous",
+   "url": "https://www.auchan.fr/recherche?text=couscous",
+   "prompt": ""
+  },
+  {
    "retailer": "monoprix",
    "rayon": "legumes-secs",
    "regimes": [],

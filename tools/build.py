@@ -62,8 +62,10 @@ def page_key(url):
 def place(label, rays, old=None):
     """Rayon d'un produit lu sur une page servant les rayons rays : les rayons filtrés qui l'acceptent, sinon le rayon
     sans filtre ; à défaut, et seulement avec old (produit repris d'un relevé précédent, lu dans le rayon old, qu'un
-    filtre resserré écarte), un rayon filtré du même univers qui l'accepte, de préférence celui dont le filtre « oui »
-    porte le mot qui l'a écarté (« capsule » exclu du café désigne le rayon capsules). None quand aucun rayon ne le prend."""
+    filtre resserré écarte), le rayon filtré dont le filtre « oui » porte le mot qui l'a écarté (« capsule » exclu du
+    café désigne le rayon capsules), d'abord dans l'univers de old puis dans les autres (une semoule nature écartée du
+    rayon oriental va au rayon semoule), sinon un rayon filtré du même univers qui l'accepte. None quand aucun rayon ne
+    le prend."""
     ok = [r for r in rays if r in lib.RAYON_FILTRE and not lib.hors_rayon(r, label)]
     if not ok:
         ok = [r for r in rays if r not in lib.RAYON_FILTRE]
@@ -71,8 +73,10 @@ def place(label, rays, old=None):
         univers = lib.RAYON_BY_ID[old]['univers']
         ok = [r['id'] for r in lib.RAYONS if r['univers'] == univers and r['id'] in lib.RAYON_FILTRE and not lib.hors_rayon(r['id'], label)]
         exclu = lib.filtre_exclu(old, label)
-        named = [r for r in ok if exclu and lib.filtre_match(r, exclu)]
-        ok = named or ok
+        if exclu:
+            named = [r for r in ok if lib.filtre_match(r, exclu)] or [
+                r['id'] for r in lib.RAYONS if r['id'] in lib.RAYON_FILTRE and lib.filtre_match(r['id'], exclu) and not lib.hors_rayon(r['id'], label)]
+            ok = named or ok
     return lib.best_rayon(ok, label) if ok else None
 
 
@@ -329,8 +333,13 @@ for it in prev:
         carried.append(dict(it, carried=True))
 items += carried
 
-# produit repris : son rayon suit les règles du jour (page partagée, filtres), comme s'il venait d'être lu ; un filtre
-# resserré l'envoie dans le rayon du même univers qui l'accepte (fromage blanc lu sous « yaourts »), sinon l'écarte
+# produit repris : son rayon suit les règles du jour (page partagée, filtres), comme s'il venait d'être relu. L'état ne
+# garde que la dernière page où il a été lu (src) ; lu ce jour-là sur plusieurs pages (« semoule » et « couscous »), il est
+# resté dans le rayon le plus ordinaire (lib.best_rayon), gardé dans ray. Les deux comptent donc : le rayon de sa page,
+# rangé comme à la lecture (place sur une page partagée), et le rayon gardé ; best_rayon départage ceux dont le filtre
+# l'accepte encore. Avec la page seule, chaque relevé d'un autre magasin le faisait passer au rayon de sa dernière page
+# (une semoule au rayon oriental, des céréales au rayon bébé), ou l'écartait. Un filtre resserré qui l'écarte des deux
+# l'envoie dans le rayon qui l'accepte (place avec old : fromage blanc lu sous « yaourts »), sinon l'écarte.
 moved = collections.Counter()
 kept = []
 for it in items:
@@ -338,8 +347,11 @@ for it in items:
         if it['ray'] in lib.RAYON_BY_ID:
             kept.append(it)
         continue
-    rays = [ry for rt, ry in lib.routes(it['src']) if rt == it['ret']] or [it['ray']]
-    ray = place(route_label(it), rays, it['ray'])
+    label = route_label(it)
+    rays = [ry for rt, ry in lib.routes(it['src']) if rt == it['ret']]
+    page = (rays[0] if len(rays) == 1 else place(label, rays)) if rays else None
+    ok = [r for r in dict.fromkeys((page, it['ray'])) if r and not lib.hors_rayon(r, full_label(it))]
+    ray = lib.best_rayon(ok, label) if ok else place(label, rays or [it['ray']], it['ray'])
     if ray is None:
         continue
     if ray != it['ray']:
