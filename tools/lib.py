@@ -94,6 +94,8 @@ HORS_COURSES = re.compile(r'(^|\s)(radiateur|robinet d arrosage|robinet arrosage
                           r'|poule a bascule|cul de poule|poulies?'
                           r'|couvercles? pour confitures?|confituriers?|pots? a confiture|pots? confiture en verre'
                           r'|chauffe biberons?|sterilisateur|egouttoir|egoutte biberons?|porte biberons?|housses? de protection|cuiseur vapeur'
+                          # appareils, colle et motifs à repasser lus avec « biberon » et « bébé » (la colle à bois en « biberon »)
+                          r'|preparateur de biberons|mixeur cuiseur|colle (?:a )?bois|thermocollants?|decor thermo'
                           r'|ciseaux (?:pour|a) herbes|solutions? (?:multifonctions?|pour lentilles)|lentilles de contact|lentilles souples)(\s|$)')
 
 
@@ -125,9 +127,16 @@ assert len(RAYON_BY_ID) == len(RAYONS) and all(r['univers'] in UNIVERS_NAME for 
 # filtre n'est jamais filtré. Un filtre au « oui » vide (rayon aux pages dédiées : eau plate, jus d'orange, papier toilette,
 # lessive liquide...) accepte tout ce que son « non » n'écarte pas (RAYON_DEDIE) ; sa recherche Auchan tient lieu de terme
 # « oui » pour départager (precision) et pour reprendre un produit écarté d'un autre rayon (build.place).
-RAYON_FILTRE = {r['id']: (r['filtre']['oui'], r['filtre']['non']) for r in RAYONS if r.get('filtre')}
+# Un filtre peut aussi dire où va ce qu'il écarte (« vers » : [[expression, rayon, rayon...], ...]) : un plat cuisiné lu sur la
+# recherche « bœuf » va aux plats cuisinés frais, sinon surgelés, sinon en conserve, le premier de ces rayons qui l'accepte
+# (vers_rayon, pour un produit déjà rangé que le filtre écarte : build.place). Chaque expression « vers » écarte aussi le
+# produit du rayon, comme le « non », auquel elle est ajoutée.
+RAYON_VERS = {r['id']: [(re.compile(v[0]), v[1:]) for v in r['filtre'].get('vers') or []] for r in RAYONS if r.get('filtre')}
+RAYON_FILTRE = {r['id']: (r['filtre']['oui'], '|'.join(x for x in [r['filtre']['non']] + [v[0] for v in r['filtre'].get('vers') or []] if x))
+                for r in RAYONS if r.get('filtre')}
 _RF = {k: (re.compile(a), re.compile(b)) for k, (a, b) in RAYON_FILTRE.items()}
 RAYON_DEDIE = {r['id'] for r in RAYONS if not (r.get('filtre') or {}).get('oui')}
+assert all(d in RAYON_BY_ID and d != k for k, vs in RAYON_VERS.items() for _, ds in vs for d in ds), "vers : rayon inconnu"
 
 
 def split_alts(pattern):
@@ -207,6 +216,32 @@ def hors_rayon(ray, label):
         return False
     k = key(label)
     return not f[0].search(k) or bool(f[1].search(k))
+
+
+def vers_rayon(ray, label, check=None):
+    """Le rayon où envoyer un produit que le filtre de ray écarte par une de ses expressions « vers » : pour la première
+    expression présente dans le nom (label, ou check, le nom sans la marque), le premier rayon nommé qui accepte le
+    produit sous ses deux noms ; None sinon."""
+    names = [key(x) for x in (label, check) if x is not None]
+    for rx, dests in RAYON_VERS.get(ray, ()):
+        if any(rx.search(k) for k in names):
+            for d in dests:
+                if not any(hors_rayon(d, x) for x in (label, check) if x is not None):
+                    return d
+    return None
+
+
+def place_de_marche(ret, url):
+    """Article d'un vendeur partenaire de la place de marché, dont la livraison n'est pas celle de l'enseigne (ni le
+    retrait, ni la livraison des courses) : chez Carrefour, « ?s=1234 » dans le lien ; chez Auchan, un code produit qui
+    n'est pas une référence Auchan (« /pr-C1881280 ») mais l'identifiant d'une offre de vendeur (« /pr-174cb6db-c802-... »,
+    cages, aquariums, rasoirs et brosses à dents électriques, biberons, moustiquaires...)."""
+    u = str(url or '')
+    if ret == 'carrefour':
+        return bool(re.search(r'[?&]s=\d', u))
+    if ret.startswith('auchan'):
+        return '/pr-' in u and not re.search(r'/pr-C\d+(?:[/?#]|$)', u)
+    return False
 
 
 def rayon_rank(rid):
@@ -863,6 +898,9 @@ SYN = [
     (r'\bpommes? de terre\b', 'pommedeterre'), (r'\bpois chiches?\b', 'poischiche'), (r'\bsans alcool\b', 'sansalcool'),
     (r'\bgazeuses?\b', 'gazeuse'), (r'\bpetillantes?\b', 'gazeuse'), (r'\bsurgelees?\b', 'surgele'), (r'\bfraiches?\b', 'fraiche'),
     (r'\bentieres?\b', 'entier'), (r'\bnoires?\b', 'noir'),
+    # « lait » et « blanc » sont faibles (lait, yaourts, fromages) : un chocolat au lait et un chocolat blanc restent deux
+    # parfums (« Céréales cœur chocolat blanc » n'est pas « Céréales cœur au chocolat au lait »)
+    (r'\bchocolat (?:au )?lait\b', 'chocolatlait'), (r'\bchocolat blanc\b', 'chocolatblanc'),
 ]
 
 

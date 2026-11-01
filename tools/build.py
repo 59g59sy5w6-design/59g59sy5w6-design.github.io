@@ -59,7 +59,7 @@ def page_key(url):
     return (url or "").rstrip("/")
 
 
-def place(label, rays, old=None):
+def place(label, rays, old=None, check=None):
     """Rayon d'un produit lu sur une page servant les rayons rays : les rayons filtrés qui l'acceptent, sinon le rayon
     aux pages dédiées (lib.RAYON_DEDIE : sans filtre, ou filtre au « oui » vide) que son « non » n'écarte pas ; à défaut,
     et seulement avec old (produit déjà rangé dans le rayon old au relevé précédent, qu'un filtre resserré écarte), le
@@ -68,14 +68,24 @@ def place(label, rays, old=None):
     rayon vaisselle, mais « pied de poule » ne désigne pas le rayon volaille), du plus long au plus court, d'abord dans
     l'univers de old puis dans les autres ; sinon un rayon filtré du même univers qui l'accepte. Un rayon aux pages
     dédiées, qui accepte tout ce que son « non » n'écarte pas, ne reprend un produit que si sa recherche est dans le nom.
-    None quand aucun rayon ne le prend."""
-    ok = [r for r in rays if r in lib.RAYON_FILTRE and r not in lib.RAYON_DEDIE and not lib.hors_rayon(r, label)]
+    Avant les mots d'exclusion, le rayon que nomme une expression « vers » du filtre de old, puis de ceux de rays
+    (lib.vers_rayon : un plat cuisiné écarté du rayon bœuf va aux plats cuisinés frais, sinon surgelés, sinon en conserve).
+    Avec check (le nom sans la marque d'un produit repris, celui du filtre final), le rayon doit accepter les deux noms :
+    sans quoi un rayon qui ne reconnaît le produit que par sa marque (« Oriental Viandes ») le prenait, puis le filtre final
+    l'écartait. None quand aucun rayon ne le prend."""
+    def refuse(r):
+        return lib.hors_rayon(r, label) or (check is not None and lib.hors_rayon(r, check))
+    ok = [r for r in rays if r in lib.RAYON_FILTRE and r not in lib.RAYON_DEDIE and not refuse(r)]
     if not ok:
-        ok = [r for r in rays if r in lib.RAYON_DEDIE and not lib.hors_rayon(r, label)]
+        ok = [r for r in rays if r in lib.RAYON_DEDIE and not refuse(r)]
     if not ok and old:
+        for r in dict.fromkeys([old] + list(rays)):
+            dest = lib.vers_rayon(r, label, check)
+            if dest:
+                return dest
         univers = lib.RAYON_BY_ID[old]['univers']
         def taker(r):
-            if r == old or lib.hors_rayon(r, label):
+            if r == old or refuse(r):
                 return False
             return bool(lib.precision(r, label)) if r in lib.RAYON_DEDIE else r in lib.RAYON_FILTRE
         takers = [r['id'] for r in lib.RAYONS if taker(r['id'])]
@@ -134,6 +144,8 @@ F = list(latest.values())
 
 prev_path = os.path.join(lib.STATE, "items.json")
 prev = json.load(open(prev_path, encoding="utf-8")) if os.path.exists(prev_path) else []
+# articles des vendeurs de la place de marché gardés par un relevé d'avant la règle (lib.place_de_marche) : pas repris
+prev = [it for it in prev if not lib.place_de_marche(it["ret"], it.get("url"))]
 prev_by_page = collections.defaultdict(list)
 for it in prev:
     prev_by_page[page_key(it["src"])].append(it)
@@ -158,10 +170,11 @@ for f in F:
         label = it.get("name") or it.get("title")
         if not isinstance(price, (int, float)) or price <= 0 or not label:
             continue
-        # page partagée par plusieurs rayons : le rayon filtré qui accepte le produit, sinon le rayon sans filtre
-        ray = rays[0] if len(rays) == 1 else place(label, rays)
-        if ray is None:
-            continue
+        # page partagée par plusieurs rayons : le rayon filtré qui accepte le produit, sinon le rayon sans filtre ; à défaut,
+        # le premier rayon de la page, comme sur une page d'un seul rayon : un produit connu de l'état que les filtres ont
+        # envoyé dans un autre rayon (câpres au vinaigre lues avec les vinaigres et les moutardes) y reste (son rayon
+        # d'avant, plus bas), un produit inconnu est écarté par le filtre final ; sans quoi sa relecture le faisait disparaître
+        ray = rays[0] if len(rays) == 1 else (place(label, rays) or rays[0])
         good.append({"ret": ret, "ray": ray, "src": f["url"], "ts": f["ts"], "pos": pos, **it})
     # contrôle de qualité : une lecture nettement moins complète que la précédente est écartée,
     # et la page garde les produits du relevé précédent
@@ -198,7 +211,7 @@ for r in raw:
             href = str(r['url'])[len('https://www.carrefour.fr'):]
         path = href.split('?')[0].split('#')[0]
         # « ?s=1234 » : article d'un vendeur partenaire de la place de marché, pas une commande Carrefour
-        if re.search(r'[?&]s=\d', href):
+        if lib.place_de_marche(ret, href):
             continue
         url = ('https://www.carrefour.fr' + path) if path else None
         m = re.search(r'(\d{8,14})$', path)
@@ -246,7 +259,11 @@ for r in raw:
                     label, fmt = lab.strip(), tail.strip()
             rid = (re.search(r'/(\d+)/?$', url or '') or [None, key(name)])[1]
         elif ret.startswith('auchan'):
-            rid = (re.search(r'/pr-(C?\d+)', url or '') or [None, key(name)])[1]
+            # offre d'un vendeur de la place de marché (« /pr-174cb6db-... ») : livrée à part, pas une course Auchan ; son
+            # code n'est pas une référence Auchan, et sa tête (« 174 ») donnait le même identifiant à des articles différents
+            if lib.place_de_marche(ret, url):
+                continue
+            rid = (re.search(r'/pr-(C\d+)', url or '') or [None, key(name)])[1]
         else:
             rid = (re.search(r'(MPX_\d+)', url or '') or [None, key(name)])[1]
         if not brand:
@@ -362,15 +379,18 @@ for it in items:
     rays = [ry for rt, ry in lib.routes(it['src']) if rt == it['ret']]
     if it.get('carried'):
         old = it['ray']
-        page = (rays[0] if len(rays) == 1 else place(label, rays)) if rays else None
+        page = (rays[0] if len(rays) == 1 else place(label, rays, check=full_label(it))) if rays else None
     else:
         prev_it = prev_by_rid.get(it['rid'])
         if not lib.hors_rayon(it['ray'], full_label(it)) or not prev_it or prev_it['ray'] not in lib.RAYON_BY_ID:
             kept.append(it)
             continue
         old, page = prev_it['ray'], it['ray']
-    ok = [r for r in dict.fromkeys((page, old)) if r and not lib.hors_rayon(r, full_label(it))]
-    ray = lib.best_rayon(ok, label) if ok else place(label, rays or [old], old)
+    # le rayon que nomme le filtre de old pour ce qu'il écarte (« vers ») compte comme old : un délice de dinde lu aussi sur
+    # la recherche « halal » va au rayon jambon blanc et blanc de volaille, plus ordinaire, avec ses lectures des autres magasins
+    cands = [page, old] + ([lib.vers_rayon(old, label, full_label(it))] if lib.hors_rayon(old, full_label(it)) else [])
+    ok = [r for r in dict.fromkeys(cands) if r and not lib.hors_rayon(r, full_label(it))]
+    ray = lib.best_rayon(ok, label) if ok else place(label, rays or [old], old, full_label(it))
     if ray is None:
         continue
     regimes = set(it.get('regimes') or [])
