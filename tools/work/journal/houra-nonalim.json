@@ -1,7 +1,7 @@
 {
  "cible": "houra-nonalim",
- "debut": "2026-11-01T03:27:57.725Z",
- "fin": "2026-11-01T03:37:39.440Z",
+ "debut": "2026-11-01T09:35:41.416Z",
+ "fin": "2026-11-01T09:44:59.083Z",
  "only": [
   "houra"
  ],
@@ -36,7 +36,7 @@
    "url": "https://www.houra.fr/catalogue/bebe/laits-infantiles-biberons-tetines-B1557800-1.html",
    "final": "https://www.houra.fr/catalogue/bebe/laits-infantiles-biberons-tetines-B1557800-1.html",
    "status": 200,
-   "products": 74,
+   "products": 67,
    "error": null,
    "title": "Laits infantiles, biberons et tétines pour bébé en livraison à domicile - houra.fr"
   },
@@ -76,7 +76,7 @@
    "url": "https://www.houra.fr/catalogue/bebe/desserts-lactes-et-aux-fruits-pour-bebe-B1557834-1.html",
    "final": "https://www.houra.fr/catalogue/bebe/desserts-lactes-et-aux-fruits-pour-bebe-B1557834-1.html",
    "status": 200,
-   "products": 126,
+   "products": 132,
    "error": null,
    "title": "Desserts lactés et aux fruits pour bébé en livraison à domicile - houra.fr"
   },
@@ -106,7 +106,7 @@
    "url": "https://www.houra.fr/catalogue/hygiene-beaute/gel-douche-B1557304-1.html",
    "final": "https://www.houra.fr/catalogue/hygiene-beaute/gel-douche-B1557304-1.html",
    "status": 200,
-   "products": 97,
+   "products": 159,
    "error": null,
    "title": "Gel douche en livraison à domicile - houra.fr"
   },
@@ -147,7 +147,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « ^deodorants? » sur https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout et papier toilette | Mouchoir, Coton | Soin du corps | Soin du visage | Soin des cheveux | Hygiène féminine | Hygiène dentaire | Homme | Textile | Petite Pharmacie | Produit du quotidien recharge | Entretien, zéro déchet, local | soins corporels nourrissants | formules pour visage exigeant | capillaire adaptés à votre nature de cheveux | serviettes discrètes | tampons absorbants | culottes menstruelles lavables | gels de toilette intime | protections contre l'incontinence | crèmes hydratantes pour visage | gommages exfoliants | soins ciblés pour le contour des yeux | rasoirs visage | shampooings doux | après-shampooings | huiles capillaires | brosses à dents classiques | électriques | dentifrices spécialisés | bain de bouche rafraîchissant | articles de soin comme les cotons et mouchoirs | textiles du quotidien | pharmacie de première nécessité | pansements, désinfectants | tests de grossesse | solutions contre les moustiques | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « ^deodorants? » sur https://www.houra.fr/catalogue/hygiene-beaute-B4000007-1.html ; liens : 004576produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout et papier toilette | Mouchoir, Coton | Soin du corps | Soin du visage | Soin des cheveux | Hygiène féminine | Hygiène dentaire | Homme | Textile | Petite Pharmacie | Produit du quotidien recharge | Entretien, zéro déchet, local | soins corporels nourrissants | formules pour visage exigeant | capillaire adaptés à votre nature de cheveux | serviettes discrètes | tampons absorbants | culottes menstruelles lavables | gels de toilette intime | protections contre l'incontinence | crèmes hydratantes pour visage | gommages exfoliants | soins ciblés pour le contour des yeux | rasoirs visage | shampooings doux | après-shampooings | huiles capillaires | brosses à dents classiques | électriques | dentifrices spécialisés | bain de bouche rafraîchissant | articles de soin comme les cotons et mouchoirs | textiles du quotidien | pharmacie de première nécessité | pansements, désinfectants | tests de grossesse | solutions contre les moustiques | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -165,7 +165,7 @@
    "url": "https://www.houra.fr/catalogue/hygiene-beaute/dentifrice-B1557321-1.html",
    "final": "https://www.houra.fr/catalogue/hygiene-beaute/dentifrice-B1557321-1.html",
    "status": 200,
-   "products": 149,
+   "products": 154,
    "error": null,
    "title": "Dentifrice en livraison à domicile - houra.fr"
   },
@@ -175,7 +175,7 @@
    "url": "https://www.houra.fr/catalogue/hygiene-et-beaute/dentifrice-brosse-a-dents/dentifrices-B1450934-1.html",
    "final": "https://www.houra.fr/catalogue/hygiene-beaute/dentifrice-B1557321-1.html",
    "status": 200,
-   "products": 88,
+   "products": 154,
    "error": null,
    "title": "Dentifrice en livraison à domicile - houra.fr"
   },
@@ -185,7 +185,7 @@
    "url": "https://www.houra.fr/catalogue/hygiene-beaute/produits-d-epilation-et-de-rasage-B1557303-1.html",
    "final": "https://www.houra.fr/catalogue/hygiene-beaute/produits-d-epilation-et-de-rasage-B1557303-1.html",
    "status": 200,
-   "products": 88,
+   "products": 127,
    "error": null,
    "title": "Produits d'épilation et de rasage en livraison à domicile - houra.fr"
   },
@@ -195,7 +195,7 @@
    "url": "https://www.houra.fr/catalogue/hygiene-beaute/hygiene-feminine-B1557287-1.html",
    "final": "https://www.houra.fr/catalogue/hygiene-beaute/hygiene-feminine-B1557287-1.html",
    "status": 200,
-   "products": 191,
+   "products": 135,
    "error": null,
    "title": "Hygiène féminine : protections et soins du quotidien – Houra.fr"
   },
@@ -215,7 +215,7 @@
    "url": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-corps-B1557299-1.html",
    "final": "https://www.houra.fr/catalogue/hygiene-beaute/soin-du-corps-B1557299-1.html",
    "status": 200,
-   "products": 176,
+   "products": 197,
    "error": null,
    "title": "Soin du corps : gels douche, crèmes, déodorants Houra"
   },
@@ -265,7 +265,7 @@
    "url": "https://www.houra.fr/catalogue/entretien/lessive-liquide-B1557353-1.html",
    "final": "https://www.houra.fr/catalogue/entretien/lessive-liquide-B1557353-1.html",
    "status": 200,
-   "products": 95,
+   "products": 79,
    "error": null,
    "title": "Lessive liquide en livraison à domicile - houra.fr"
   },
@@ -275,7 +275,7 @@
    "url": "https://www.houra.fr/catalogue/entretien/lessive-pour-le-linge-B1557346-1.html",
    "final": "https://www.houra.fr/catalogue/entretien/lessive-pour-le-linge-B1557346-1.html",
    "status": 200,
-   "products": 122,
+   "products": 191,
    "error": null,
    "title": "Lessive pour le linge : liquide, poudre, capsules Houra"
   },
@@ -306,7 +306,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « ^vaisselle$|lave vaisselle|^vaisselle  » sur https://www.houra.fr/catalogue/entretien-B4000008-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout, Papier toilette | Lessive | Soin du linge | Produit nettoyant | Nettoyant vaisselle | Entretien chaussure | Désodorisant, bougie | Accessoire ménager | Sac Poubelle | Insecticide | Produit du quotidien recharge | Entretien, zéro déchet, local | références fraîchement arrivées | meilleures offres du moment | lessive | formules liquides | poudres concentrées | capsules prêtes à l'emploi | adoucissants parfumés | essuie-tout et papier toilette | essuie-tout absorbants | papier toilette confortable | papier toilette humide | nettoyants pour toutes surfaces | nettoyage de la cuisine | formules pour la salle de bain | produits spécial vitres | désinfections en profondeur | solutions écologiques | bons plans exclusifs | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « ^vaisselle$|lave vaisselle|^vaisselle  » sur https://www.houra.fr/catalogue/entretien-B4000008-1.html ; liens : 004576produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout, Papier toilette | Lessive | Soin du linge | Produit nettoyant | Nettoyant vaisselle | Entretien chaussure | Désodorisant, bougie | Accessoire ménager | Sac Poubelle | Insecticide | Produit du quotidien recharge | Entretien, zéro déchet, local | références fraîchement arrivées | meilleures offres du moment | lessive | formules liquides | poudres concentrées | capsules prêtes à l'emploi | adoucissants parfumés | essuie-tout et papier toilette | essuie-tout absorbants | papier toilette confortable | papier toilette humide | nettoyants pour toutes surfaces | nettoyage de la cuisine | formules pour la salle de bain | produits spécial vitres | désinfections en profondeur | solutions écologiques | bons plans exclusifs | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -354,7 +354,7 @@
    "url": "https://www.houra.fr/catalogue/entretien/wc-et-canalisation-B1557392-1.html",
    "final": "https://www.houra.fr/catalogue/entretien/wc-et-canalisation-B1557392-1.html",
    "status": 200,
-   "products": 101,
+   "products": 145,
    "error": null,
    "title": "Produits nettoyants pour WC et canalisations en livraison à domicile - houra.fr"
   },
@@ -384,7 +384,7 @@
    "url": "https://www.houra.fr/catalogue/entretien/sacs-poubelle-B1557361-1.html",
    "final": "https://www.houra.fr/catalogue/entretien/sacs-poubelle-B1557361-1.html",
    "status": 200,
-   "products": 117,
+   "products": 108,
    "error": null,
    "title": "Sacs poubelle en ligne Livraison à domicile - Houra"
   },
@@ -395,7 +395,7 @@
    "final": null,
    "status": 0,
    "products": 0,
-   "error": "aucun lien « conservation|congelation|aluminium » sur https://www.houra.fr/catalogue/entretien-B4000008-1.html ; liens : 004568produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout, Papier toilette | Lessive | Soin du linge | Produit nettoyant | Nettoyant vaisselle | Entretien chaussure | Désodorisant, bougie | Accessoire ménager | Sac Poubelle | Insecticide | Produit du quotidien recharge | Entretien, zéro déchet, local | références fraîchement arrivées | meilleures offres du moment | lessive | formules liquides | poudres concentrées | capsules prêtes à l'emploi | adoucissants parfumés | essuie-tout et papier toilette | essuie-tout absorbants | papier toilette confortable | papier toilette humide | nettoyants pour toutes surfaces | nettoyage de la cuisine | formules pour la salle de bain | produits spécial vitres | désinfections en profondeur | solutions écologiques | bons plans exclusifs | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
+   "error": "aucun lien « conservation|congelation|aluminium » sur https://www.houra.fr/catalogue/entretien-B4000008-1.html ; liens : 004576produits collectés pour les | Le Marché | Promotions | Anti-Gaspi | Cave | Bio | Banque alimentaire | Nos Producteurs | ESPACE PROS | Tout voir | Essuie-tout, Papier toilette | Lessive | Soin du linge | Produit nettoyant | Nettoyant vaisselle | Entretien chaussure | Désodorisant, bougie | Accessoire ménager | Sac Poubelle | Insecticide | Produit du quotidien recharge | Entretien, zéro déchet, local | références fraîchement arrivées | meilleures offres du moment | lessive | formules liquides | poudres concentrées | capsules prêtes à l'emploi | adoucissants parfumés | essuie-tout et papier toilette | essuie-tout absorbants | papier toilette confortable | papier toilette humide | nettoyants pour toutes surfaces | nettoyage de la cuisine | formules pour la salle de bain | produits spécial vitres | désinfections en profondeur | solutions écologiques | bons plans exclusifs | Les marques Auchan | Espace Pros | Nouveautés | Fruits et légumes | Boucherie | Poisson, Traiteur de la mer | Produits Laitiers, Oeufs | Traiteur, Charcuterie | Pain, Viennoiserie | Surgelés | Boisson, Lait | La Cave | Epicerie sucrée | Epicerie salée | Bébé | Animaux | Hygiène, Beauté | Entretien | Maison, Loisirs | Monde, Casher, Halal | Régimes alimentaires | Produits Locaux, Régionaux | Je choisis, j'agis | Nos Belles Marques"
   },
   {
    "retailer": "houra",
@@ -423,7 +423,7 @@
    "url": "https://www.houra.fr/catalogue/animaux/chats-B1423845-1.html",
    "final": "https://www.houra.fr/catalogue/animaux/produits-pour-chats-B1557533-1.html",
    "status": 200,
-   "products": 189,
+   "products": 84,
    "error": null,
    "title": "Produits pour chats en livraison à domicile - houra.fr"
   },
@@ -531,7 +531,7 @@
     "laits? infantiles?|1er age"
    ],
    "text": "Laits Infantiles, Biberons",
-   "at": "2026-11-01T03:28:22.522Z"
+   "at": "2026-11-01T09:36:02.835Z"
   },
   {
    "retailer": "houra",
@@ -545,7 +545,7 @@
     "repas et petits pots|^repas|petits? pots?"
    ],
    "text": "Repas du Midi",
-   "at": "2026-11-01T03:28:55.467Z"
+   "at": "2026-11-01T09:36:35.624Z"
   },
   {
    "retailer": "houra",
@@ -559,7 +559,7 @@
     "desserts? bebe|diversification|^desserts?"
    ],
    "text": "Desserts pour Bébé",
-   "at": "2026-11-01T03:29:10.789Z"
+   "at": "2026-11-01T09:36:50.422Z"
   },
   {
    "retailer": "houra",
@@ -573,7 +573,7 @@
     "couches? et lingettes?|^couches?"
    ],
    "text": "Couches",
-   "at": "2026-11-01T03:29:23.994Z"
+   "at": "2026-11-01T09:37:05.910Z"
   },
   {
    "retailer": "houra",
@@ -587,7 +587,7 @@
     "hygiene feminine"
    ],
    "text": "Hygiène féminine",
-   "at": "2026-11-01T03:31:15.964Z"
+   "at": "2026-11-01T09:39:03.658Z"
   },
   {
    "retailer": "houra",
@@ -601,7 +601,7 @@
     "soin du visage|^visage"
    ],
    "text": "Soin du visage",
-   "at": "2026-11-01T03:31:59.321Z"
+   "at": "2026-11-01T09:39:43.809Z"
   },
   {
    "retailer": "houra",
@@ -615,7 +615,7 @@
     "mouchoirs?|cotons?"
    ],
    "text": "Mouchoir, Coton",
-   "at": "2026-11-01T03:32:27.841Z"
+   "at": "2026-11-01T09:40:11.800Z"
   },
   {
    "retailer": "houra",
@@ -629,7 +629,7 @@
     "^lessives?$|^lessives? "
    ],
    "text": "Lessive",
-   "at": "2026-11-01T03:33:10.932Z"
+   "at": "2026-11-01T09:40:45.808Z"
   },
   {
    "retailer": "houra",
@@ -643,7 +643,7 @@
     "^adoucissants?"
    ],
    "text": "adoucissants parfumés",
-   "at": "2026-11-01T03:33:25.389Z"
+   "at": "2026-11-01T09:41:02.615Z"
   },
   {
    "retailer": "houra",
@@ -657,7 +657,7 @@
     "sacs? poubelle|accessoires? de menage|eponges?"
    ],
    "text": "Sac Poubelle",
-   "at": "2026-11-01T03:35:04.268Z"
+   "at": "2026-11-01T09:42:36.068Z"
   },
   {
    "retailer": "houra",
@@ -671,7 +671,7 @@
     "^desodorisants?|^insecticides?"
    ],
    "text": "Insecticide",
-   "at": "2026-11-01T03:35:27.160Z"
+   "at": "2026-11-01T09:42:53.382Z"
   },
   {
    "retailer": "houra",
@@ -685,7 +685,7 @@
     "^chiens?$|patees? pour chien|friandises? pour chien"
    ],
    "text": "Chiens",
-   "at": "2026-11-01T03:37:01.481Z"
+   "at": "2026-11-01T09:44:25.379Z"
   },
   {
    "retailer": "houra",
@@ -699,14 +699,14 @@
     "^oiseaux?|^rongeurs?|^poissons?"
    ],
    "text": "Oiseaux, Rongeurs, Poissons",
-   "at": "2026-11-01T03:37:15.467Z"
+   "at": "2026-11-01T09:44:40.993Z"
   }
  ],
  "bilan": {
   "houra": {
    "pages": 51,
    "lues": 46,
-   "produits": 3856
+   "produits": 3975
   }
  }
 }
