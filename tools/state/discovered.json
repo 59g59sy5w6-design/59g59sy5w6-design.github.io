@@ -11,7 +11,7 @@
    "laits? infantiles?|1er age"
   ],
   "text": "Laits Infantiles, Biberons",
-  "at": "2026-10-31T15:27:02.090Z"
+  "at": "2026-11-01T09:36:02.835Z"
  },
  {
   "retailer": "houra",
@@ -25,7 +25,7 @@
    "repas et petits pots|^repas|petits? pots?"
   ],
   "text": "Repas du Midi",
-  "at": "2026-10-31T15:27:35.035Z"
+  "at": "2026-11-01T09:36:35.624Z"
  },
  {
   "retailer": "houra",
@@ -39,7 +39,7 @@
    "desserts? bebe|diversification|^desserts?"
   ],
   "text": "Desserts pour Bébé",
-  "at": "2026-10-31T15:27:49.797Z"
+  "at": "2026-11-01T09:36:50.422Z"
  },
  {
   "retailer": "houra",
@@ -53,7 +53,7 @@
    "couches? et lingettes?|^couches?"
   ],
   "text": "Couches",
-  "at": "2026-10-31T15:28:02.367Z"
+  "at": "2026-11-01T09:37:05.910Z"
  },
  {
   "retailer": "houra",
@@ -67,7 +67,7 @@
    "hygiene feminine"
   ],
   "text": "Hygiène féminine",
-  "at": "2026-10-31T15:29:48.496Z"
+  "at": "2026-11-01T09:39:03.658Z"
  },
  {
   "retailer": "houra",
@@ -81,7 +81,7 @@
    "soin du visage|^visage"
   ],
   "text": "Soin du visage",
-  "at": "2026-10-31T15:30:26.912Z"
+  "at": "2026-11-01T09:39:43.809Z"
  },
  {
   "retailer": "houra",
@@ -95,7 +95,7 @@
    "mouchoirs?|cotons?"
   ],
   "text": "Mouchoir, Coton",
-  "at": "2026-10-31T15:30:49.996Z"
+  "at": "2026-11-01T09:40:11.800Z"
  },
  {
   "retailer": "houra",
@@ -109,7 +109,7 @@
    "^lessives?$|^lessives? "
   ],
   "text": "Lessive",
-  "at": "2026-10-31T15:31:26.927Z"
+  "at": "2026-11-01T09:40:45.808Z"
  },
  {
   "retailer": "houra",
@@ -123,7 +123,7 @@
    "^adoucissants?"
   ],
   "text": "adoucissants parfumés",
-  "at": "2026-10-31T15:31:39.481Z"
+  "at": "2026-11-01T09:41:02.615Z"
  },
  {
   "retailer": "houra",
@@ -137,7 +137,7 @@
    "sacs? poubelle|accessoires? de menage|eponges?"
   ],
   "text": "Sac Poubelle",
-  "at": "2026-10-31T15:33:16.068Z"
+  "at": "2026-11-01T09:42:36.068Z"
  },
  {
   "retailer": "houra",
@@ -151,7 +151,7 @@
    "^desodorisants?|^insecticides?"
   ],
   "text": "Insecticide",
-  "at": "2026-10-31T15:33:32.532Z"
+  "at": "2026-11-01T09:42:53.382Z"
  },
  {
   "retailer": "houra",
@@ -165,7 +165,7 @@
    "^chiens?$|patees? pour chien|friandises? pour chien"
   ],
   "text": "Chiens",
-  "at": "2026-10-31T15:35:07.296Z"
+  "at": "2026-11-01T09:44:25.379Z"
  },
  {
   "retailer": "houra",
@@ -179,7 +179,7 @@
    "^oiseaux?|^rongeurs?|^poissons?"
   ],
   "text": "Oiseaux, Rongeurs, Poissons",
-  "at": "2026-10-31T15:35:20.943Z"
+  "at": "2026-11-01T09:44:40.993Z"
  },
  {
   "retailer": "houra",
