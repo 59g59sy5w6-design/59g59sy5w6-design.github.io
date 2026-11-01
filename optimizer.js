@@ -277,6 +277,42 @@ function* subsetsOfSize(chans, k) {
   if (k > 0) yield* rec(0);
 }
 
+/* ---------- les quatre façons de faire ses courses (prefs.comp de app.js) ----------
+   « mix » : livré ou retiré, et en magasin si c'est moins cher (commandes en ligne selon le choix de chaque enseigne,
+   complétées en magasin) ; « liv » : tout livré ; « drive » : tout en drive ou en point de retrait ; « mag » : tout en
+   magasin (aucune commande en ligne, ni minimum ni frais, chaque magasin en plus coûte lambda comme une commande en plus). */
+const HOWS = ["mix", "liv", "drive", "mag"];
+const isRetrait = (m) => ((m && m.channel) || {}).mode === "retrait";
+/* L'option d'un groupe d'enseigne (Auchan : les retraits et les livraisons de plusieurs secteurs) pour une façon.
+   ms : les options du groupe (data/retailers.json), id : celle choisie dans les réglages, liv et drv : les choix faits
+   pour « tout livré » et « tout en drive ». Tout livré : un retrait laisse place à sa livraison à domicile (champ
+   livraison, sinon le choix liv) ; tout en drive : une livraison laisse place au retrait de son secteur (celui dont le
+   champ livraison la nomme, sinon le choix drv). Le choix des réglages n'est jamais changé : en revenant à une autre
+   façon, on le retrouve. Un groupe sans l'option voulue garde son choix, que howChans écarte ensuite. */
+function howPick(ms, id, how, liv, drv) {
+  const r = ms.find((m) => m.id === id) || ms[0];
+  if (!r) return null;
+  if (how === "liv" && isRetrait(r)) {
+    const alt = [(liv || {})[r.id], r.livraison].find((x) => ms.some((m) => m.id === x && !isRetrait(m)));
+    return alt || (ms.find((m) => !isRetrait(m)) || r).id;
+  }
+  if (how === "drive" && !isRetrait(r)) {
+    const sec = ms.find((m) => isRetrait(m) && m.livraison === r.id);
+    const alt = [(drv || {})[r.id], sec && sec.id].find((x) => ms.some((m) => m.id === x && isRetrait(m)));
+    return alt || (ms.find(isRetrait) || r).id;
+  }
+  return r.id;
+}
+/* Les canaux d'une façon, à partir des options retenues et activées (une par groupe) : rets [{ id, P, pickup, magasin,
+   simulated }]. Tout en drive : les retraits seulement. Tout en magasin : les enseignes qui ont des magasins, jamais à
+   des prix simulés, sans minimum ni frais (mag). L'achat en magasin pour compléter les commandes (store, compOn) n'existe
+   que dans la première façon. */
+function howChans(rets, how) {
+  const keep = rets.filter((r) => (how === "drive" ? r.pickup : how === "mag" ? r.magasin && !r.simulated : true));
+  const chans = keep.map((r) => (how === "mag" ? { id: r.id, store: { retailer: r.id }, mag: true, P: { min: 0, fixed: 0, tiers: [{ from: 0, fee: 0 }] } } : { id: r.id, store: { retailer: r.id }, P: r.P }));
+  return { chans, store: keep.map((r) => how === "mix" && !!r.magasin && !r.simulated), compOn: how === "mix" };
+}
+
 /* Modèle du panier, en centimes, à partir de ses lignes { id, q, opts, no } :
    - opts[0] est le produit, les suivants les équivalents que la personne accepte (panier souple) ; opts[j].at[ci] vaut
      { cost, sim } quand l'enseigne ci le vend (cost : prix de la quantité de la ligne), sinon null ;
@@ -295,7 +331,8 @@ function buildModel(src, chans, store, compOn) {
       let b = null;
       x.opts.forEach((op, j) => {
         const a = op.at[ci];
-        if (!a || !(a.cost > 0) || (j > 0 && a.sim)) return;
+        /* en magasin (tout en magasin, chans[ci].mag), jamais un prix simulé, pas même celui du produit lui-même */
+        if (!a || !(a.cost > 0) || ((j > 0 || chans[ci].mag) && a.sim)) return;
         if (!b || a.cost < b.cost) b = { cost: a.cost, alt: j ? op.id : null };
         if (store[ci] && !a.sim && (!c || a.cost < c.cost)) c = { cost: a.cost, ret: chans[ci].id, alt: j ? op.id : null };
       });

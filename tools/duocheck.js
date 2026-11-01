@@ -156,6 +156,29 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     check(/Budget de Camille b 90/.test(await text(B, ".bud")), "pour : le budget du proche n'est pas dit « " + (await text(B, ".bud")) + " »");
     check(/Courses de Camille/.test(await text(B, "#tabbar")) || true, "");
     await over(B, "panier du proche"); await shot(B, "3-aidant-panier-proche");
+    /* tout en magasin pendant ses courses : « J'ai fait mes courses », puis le retour dit au proche que ses courses en
+       magasin sont faites (jamais « pas commandées », ni « à acheter en magasin »), et l'accueil de l'aidant aussi ; puis
+       la façon du proche et ses courses reviennent comme avant */
+    {
+      const c0 = await B.evaluate(() => { const d = cabasDebug(), c = d.S.prefs.comp; d.S.prefs.comp = "mag"; return c === undefined ? null : c; });
+      await go(B, "#/"); await go(B, "#/panier"); await settled(B);
+      if (check(await B.evaluate(() => { const R = cabasDebug().RES(); return R.mode === "mag" && !!(R.steps[R.K] || {}).full; }), "pour, tout en magasin : pas de répartition en magasin")) {
+        await go(B, "#/magasin");
+        await B.click("[data-act=shopdone]"); await B.waitForTimeout(300);
+        const Rm = await B.evaluate(() => { const d = cabasDebug(), R = d.retourPour(""); return R && { R, url: "#/retour/" + d.linkOf(R) }; });
+        check(Rm && Rm.R.h === "mag" && !!Rm.R.ms && !Rm.R.o.length && Rm.R.c.length > 0, "pour, tout en magasin : le retour ne dit pas que les courses en magasin sont faites " + JSON.stringify(Rm && { h: Rm.R.h, ms: Rm.R.ms, o: Rm.R.o.length, c: Rm.R.c.length }));
+        await go(B, "#/");
+        check(/Ses courses en magasin sont faites/.test(await text(B, "#view")) && !/Toutes ses commandes sont notées/.test(await text(B, "#view")), "pour, tout en magasin : l'accueil parle de commandes notées « " + (await text(B, "#view")).slice(0, 200) + " »");
+        if (Rm) {
+          await go(A, Rm.url); await A.waitForTimeout(400);
+          const rt = await text(A, "#view");
+          check(/Tes courses ont été faites en magasin/.test(rt) && /Acheté en magasin/.test(rt) && !/pas commandées|À acheter en magasin|Total, frais compris|ces commandes/.test(rt), "pour, tout en magasin : le proche lit « " + rt.slice(0, 300) + " »");
+          await go(A, "#/");
+        }
+      }
+      await B.evaluate((c0) => { const d = cabasDebug(); delete d.S.guide.shop; localStorage.setItem("cabas.guide", JSON.stringify(d.S.guide)); if (c0 === null) delete d.S.prefs.comp; else d.S.prefs.comp = c0; localStorage.setItem("cabas.prefs", JSON.stringify(d.S.prefs)); }, c0);
+      await go(B, "#/"); await go(B, "#/panier"); await settled(B);
+    }
     /* le remplissage : chaque commande, produit par produit, puis « J'ai passé cette commande » et le créneau */
     await B.click("[data-act=fillgo]");
     await B.waitForTimeout(400); await ready(B);
@@ -265,6 +288,36 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     if (X.aMe != null) check(X.txt.includes("Ta liste seule : " + money(X.aMe)), `duo : ta liste seule ${money(X.aMe)} absente « ${X.txt.slice(0, 300)} »`);
     if (X.aOt != null) check(X.txt.includes("La liste de Sam seule : " + money(X.aOt)), `duo : sa liste seule ${money(X.aOt)} absente`);
     if (X.aMe != null && X.aOt != null && X.aMe + X.aOt - X.total >= 1) check(X.txt.includes("À deux, la commande coûte " + money(X.aMe + X.aOt - X.total) + " de moins"), "duo : économie de la commande commune absente ou fausse");
+    /* les parts dans les autres façons : la somme des parts fait toujours le total ; tout en magasin, sans frais, et
+       « Envoyer sa part » parle d'achats en magasin (pas de commande) ; tout en drive, des retraits seulement */
+    for (const hw of ["mag", "drive"]) {
+      await B.evaluate((hw) => { cabasDebug().S.prefs.comp = hw; }, hw);
+      await go(B, "#/"); await go(B, "#/panier"); await settled(B);
+      await B.waitForFunction(() => !/Calcul de ce que chacun/.test((document.querySelector("#duo") || {}).textContent || ""), null, { timeout: 30000 }).catch(() => {});
+      const Y = await B.evaluate(() => {
+        const d = cabasDebug(), R = d.RES(), st = R.steps[R.K], r = st && st.full;
+        if (!r) return { mode: R.mode };
+        const sp = d.splitOf(r), ret = d.retourDuo("");
+        return { mode: R.mode, total: r.itemsTotal + r.feesTotal + (r.compTotal || 0), sum: sp.me.total + sp.other.total, fees: sp.me.fee + sp.other.fee, other: sp.other.total, mag: r.orders.every((o) => o.ch.mag), pick: r.orders.every((o) => (d.S.allMap.get(o.ch.id).channel || {}).mode === "retrait"), o: ret ? ret.o.length : -1, c: ret ? ret.c : [], txt: document.querySelector("#duo").textContent.replace(/[ \t\n]+/g, " ") };
+      });
+      if (!check(Y.total != null && Y.mode === hw, `duo, ${hw} : pas de répartition de tout le panier (${Y.mode})`)) continue;
+      check(Y.sum === Y.total, `duo, ${hw} : somme des parts ${Y.sum} au lieu du total ${Y.total}`);
+      check(Y.txt.includes("Ta part" + money(Y.total - Y.other)), `duo, ${hw} : ta part n'est pas affichée « ${Y.txt.slice(0, 160)} »`);
+      if (hw === "mag") {
+        check(Y.fees === 0 && Y.mag, "duo, tout en magasin : des frais dans les parts");
+        check(Y.o === 0 && Y.c.length > 0 && Y.c.reduce((a, z) => a + z[2], 0) === Y.other, "duo, tout en magasin : sa part envoyée n'est pas faite d'achats en magasin " + JSON.stringify([Y.o, Y.c]));
+        /* sa part lue chez lui : en magasin, jamais « livraison comprise » ni « commande en ligne » */
+        const ru = await B.evaluate(() => { const d = cabasDebug(), R = d.retourDuo(""); return R ? "#/retour/" + d.linkOf(R) : ""; });
+        if (check(!!ru, "duo, tout en magasin : pas de part à envoyer")) {
+          await go(B, ru); await B.waitForTimeout(300);
+          const rt = await text(B, "#view");
+          check(/Ta part des courses en magasin/.test(rt) && /Ta part, en magasin/.test(rt) && !/livraison comprise|commande en ligne :|Ta part de la commande/.test(rt), "duo, tout en magasin : sa part se lit comme une commande en ligne « " + rt.slice(0, 300) + " »");
+          await go(B, "#/panier"); await settled(B);
+        }
+      } else check(Y.pick, "duo, tout en drive : une commande n'est pas un retrait");
+    }
+    await B.evaluate(() => { delete cabasDebug().S.prefs.comp; });
+    await go(B, "#/"); await go(B, "#/panier"); await settled(B);
     /* le budget par panier se compare à ta part, pas à toute la commande */
     await B.evaluate(() => { cabasDebug().S.prefs.budget = 300; });
     await go(B, "#/"); await go(B, "#/panier"); await settled(B);

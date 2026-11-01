@@ -4,7 +4,9 @@
 // le focus à la recherche et « + » sur une carte ajoute un exemplaire.
 // Puis le panier intelligent, avec la promesse « le total affiché est celui qu'on obtient, livraison comprise » :
 // tableau du panier (une colonne par enseigne, le prix pris coché, défilement au clavier), épingler et exclure depuis
-// la ligne, Et si (le total d'un scénario est celui du panier une fois appliqué, « Annuler » le défait), panier souple
+// la ligne, Et si (le total d'un scénario est celui du panier une fois appliqué, « Annuler » le défait), les quatre façons
+// de faire ses courses (le total annoncé par chacune est celui du panier une fois choisie, drive et magasin compris,
+// produits hors de la façon nommés, et les autres façons dans « Et si »), panier souple
 // (jamais plus cher, l'équivalent est celui de « Remplir mes paniers »), Compléter malin (le total annoncé est celui
 // du panier après l'ajout), budget du mois (total payé saisi compté à part) et « Tenir le budget ». Enfin « Écouter »
 // (synthèse vocale remplacée par un témoin) : la répartition lue en français (montants en euros, frais, chaque
@@ -365,6 +367,56 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
       }
     }
 
+    step = "quatre façons";
+    /* les quatre façons de faire ses courses : le total que chacune annonce dans le panier est celui que le panier affiche
+       une fois qu'on la choisit (le focus reste sur le choix) ; tout en drive ne prend que des retraits, tout en magasin
+       ni frais ni minimum et le dit ; un produit qu'une façon ne prend pas est nommé, avec l'enseigne qui le vend */
+    const hw = await sp.evaluate(() => [...document.querySelectorAll('[data-act="how"][role="radio"]')].map((b) => b.dataset.v));
+    if (hw.join() !== "mix,liv,drive,mag") fail("quatre façons : le choix n'a pas les quatre options : " + hw.join());
+    await sp.waitForFunction(() => ![...document.querySelectorAll("[data-howt]")].some((e) => /Calcul/.test(e.textContent)), null, { timeout: 30000 }).catch(() => fail("quatre façons : les totaux des façons n'arrivent pas"));
+    for (const h of ["drive", "mag", "liv", "mix"]) {
+      const ann = await sp.evaluate((h) => document.querySelector(`[data-act="how"][role="radio"][data-v="${h}"] small`).textContent, h);
+      await tap(sp, `[data-act="how"][role="radio"][data-v="${h}"]`); await settle(sp);
+      const st = await sp.evaluate(() => {
+        const D = cabasDebug(), R = D.RES(), s = R.steps[R.K], f = s && s.full, a = document.activeElement;
+        return { mode: R.mode, total: D.cartTotal(), on: (document.querySelector('[data-act="how"][aria-checked="true"]') || {}).dataset.v, focus: a && a.dataset ? a.dataset.v : "", lines: R.M.lines.length, unc: R.M.uncovered.length,
+          kinds: f ? f.orders.map((o) => ({ id: o.ch.id, pick: (D.S.allMap.get(o.ch.id).channel || {}).mode === "retrait", mag: !!o.ch.mag, fee: o.fee, min: o.ch.P.min, sim: !!D.S.allMap.get(o.ch.id).simulated })) : [], comp: f ? (f.completed || []).length : 0,
+          miss: [...document.querySelectorAll("#view h2.gh")].map((e) => e.textContent), notes: [...document.querySelectorAll(".item .it small")].map((e) => e.textContent).filter((t) => /seulement/.test(t)), text: document.querySelector("#view").textContent };
+      }, null);
+      info.push(`${h} ${ann}`);
+      if (st.mode !== h || st.on !== h) fail(`quatre façons : ${h} choisi, le panier montre ${st.mode} (coché : ${st.on})`);
+      if (st.focus !== h) fail(`quatre façons : après le choix de ${h}, le focus n'est plus sur le choix (${st.focus})`);
+      const m = /^(\d[\d\s\u202f\u00a0]*,\d\d\u00a0€), /.exec(ann);
+      if (m) {
+        if (st.total == null || eurC(st.total) !== m[1]) fail(`quatre façons : ${h} annonçait ${m[1]}, le panier fait ${st.total == null ? "rien" : eurC(st.total)}`);
+        if ((await shown(sp)) !== m[1]) fail(`quatre façons : ${h}, le chiffre du panier n'est pas ${m[1]}`);
+      }
+      if (/sans \d+\s?produit/.test(ann) !== st.unc > 0) fail(`quatre façons : ${h} annonce « ${ann} » mais ${st.unc} produits hors de la façon`);
+      if (st.unc && !st.miss.some((t) => /^Pas en /.test(t))) fail(`quatre façons : ${h}, les produits hors de la façon ne sont pas nommés (${st.miss.join(" | ")})`);
+      if (st.unc && st.notes.length < st.unc) fail(`quatre façons : ${h}, un produit hors de la façon ne dit pas où il se vend`);
+      if (h === "drive" && st.kinds.some((k) => !k.pick)) fail("tout en drive : une commande n'est pas un retrait " + JSON.stringify(st.kinds));
+      if (h === "drive" && !/Le retrait n'existe dans Cabas que chez Auchan/.test(st.text)) fail("tout en drive : le panier ne dit pas où le retrait existe");
+      if (h === "mag" && st.kinds.some((k) => !k.mag || k.fee || k.min || k.sim)) fail("tout en magasin : frais, minimum ou prix simulés " + JSON.stringify(st.kinds));
+      if (h === "mag" && !/en magasin, le prix peut être différent/.test(st.text)) fail("tout en magasin : le panier ne dit pas que le prix peut être différent en magasin");
+      if ((h === "liv" || h === "drive" || h === "mag") && st.comp) fail(`${h} : des produits à acheter en magasin pour compléter`);
+    }
+    /* « Et si » propose les autres façons ; « Appliquer » donne le total annoncé, « Annuler » rend la façon d'avant */
+    await sp.evaluate(() => { const d = document.querySelector("details.wif"); if (d && d.open) d.open = false; });
+    await tap(sp, "details.wif > summary"); await sp.waitForTimeout(300);
+    await sp.waitForFunction(() => document.querySelector("#wif") && !/Calcul/.test(document.querySelector("#wif").textContent) && document.querySelectorAll("#wif [data-w=how]").length === 3, null, { timeout: 30000 }).catch(async () => fail("Et si : les trois autres façons ne sont pas proposées : " + (await sp.evaluate(() => (document.querySelector("#wif") || {}).textContent))));
+    const ho = await sp.evaluate(() => [...document.querySelectorAll("#wif [data-act=wifgo][data-w=how]")].map((b) => ({ v: b.dataset.v, ok: !b.disabled, val: b.closest(".wifr").querySelector(".val").textContent })));
+    const hx = ho.find((x) => x.ok);
+    if (!hx) fail("Et si : aucune autre façon applicable " + JSON.stringify(ho));
+    else {
+      await tap(sp, `#wif [data-act=wifgo][data-w=how][data-v="${hx.v}"]`); await settle(sp);
+      const t5 = await total(sp), m5 = await sp.evaluate(() => cabasDebug().RES().mode);
+      info.push(`Et si ${hx.v} ${hx.val}`);
+      if (m5 !== hx.v || eurC(t5) !== hx.val) fail(`Et si : « ${hx.v} » annonçait ${hx.val}, le panier fait ${eurC(t5)} en ${m5}`);
+      await tap(sp, "#toast button"); await settle(sp);
+      if ((await sp.evaluate(() => cabasDebug().RES().mode)) !== "mix") fail("Et si : « Annuler » ne rend pas la façon d'avant");
+    }
+    await sp.evaluate(() => { const d = document.querySelector("details.wif"); if (d) d.open = false; cabasDebug().S.wifOpen = false; });
+
     step = "panier souple";
     /* panier souple : tout cocher ne fait jamais monter le total ; un équivalent pris est le produit que « Remplir mes
        paniers » ouvre, et l'instantané compte le même total, frais compris */
@@ -429,6 +481,108 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
   }
   await sctx.close();
 
+  /* ---------- la façon choisie et le panier : épingle, « Passer à », écoute ----------
+     Une épingle sur une enseigne hors de la façon (Houra tout en magasin, Monoprix tout en drive) est dite ignorée, jamais
+     « Toujours chez … » sous un produit pris ailleurs. « Passer à » ne propose qu'une façon qui prend tout le panier (ou,
+     à défaut, qui laisse moins de produits et le dit), jamais d'aller-retour d'une façon à l'autre. « Écouter » dit la
+     façon, les produits qu'elle ne prend pas, « en magasin, sans frais » ou le retrait, jamais « livraison offerte ». */
+  const wctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
+  await wctx.addInitScript(() => {
+    const synth = { getVoices: () => [{ lang: "fr-FR", name: "fr", localService: true }], speak() {}, cancel() {} };
+    Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true });
+    window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+  });
+  const wp = await wctx.newPage();
+  wp.on("pageerror", (e) => fail("erreur JS (façon choisie) : " + e.message));
+  wp.on("console", (m) => { if (m.type() === "error") fail("console (façon choisie) : " + m.text()); });
+  try {
+    step = "façon choisie";
+    const RI = (id) => cat.rets.indexOf(id), at = (p, r) => (p.o || []).some((o) => o[0] === RI(r) && o[1] > 0 && !(o[3] & 2));
+    const onlyAt = (r) => cat.products.filter((p) => (p.o || []).length === 1 && at(p, r));
+    const setW = async (b, prefs) => {
+      await wp.goto(base + "#/"); await ready(wp);
+      await wp.evaluate(({ b, prefs }) => { localStorage.clear(); localStorage.setItem("cabas.basket", JSON.stringify(b)); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); localStorage.setItem("cabas.prefs", JSON.stringify(prefs)); }, { b, prefs });
+      await wp.goto(base + "#/panier"); await wp.reload(); await ready(wp); await settle(wp);
+    };
+    const W0 = { zip: "94120", off: { leclerc: true }, offv: 1, pick: { auchan: "auchan" }, pickManual: { auchan: 1 } };
+    /* épingle hors de la façon */
+    const pinCases = [
+      ["mag", "houra", cat.products.find((p) => at(p, "houra") && (at(p, "monoprix") || at(p, "carrefour") || at(p, "auchan")))],
+      ["drive", "monoprix", cat.products.find((p) => at(p, "monoprix") && at(p, "auchan"))],
+    ];
+    for (const [h, g, p] of pinCases) {
+      if (!p) { fail(`épingle ${h} : pas de produit d'essai`); continue; }
+      await setW({ [p.i]: 1 }, Object.assign({}, W0, { comp: h, pin: { [p.i]: g } }));
+      const r = await wp.evaluate(() => { const R = cabasDebug().RES(), f = (R.steps[R.K] || {}).full; return { mode: R.mode, at: f ? f.orders.map((o) => o.ch.id) : [], notes: [...document.querySelectorAll(".item .inote")].map((e) => e.textContent) }; });
+      if (r.mode !== h || r.at.some((x) => x === g)) fail(`épingle ${h} : répartition inattendue ${JSON.stringify(r)}`);
+      if (r.notes.some((t) => /^Toujours chez/.test(t)) || !r.notes.some((t) => new RegExp("qui ne le vend pas en " + (h === "mag" ? "magasin" : "drive")).test(t))) fail(`épingle sur ${g} ${h === "mag" ? "tout en magasin" : "tout en drive"} : la ligne dit « ${r.notes.join(" | ")} »`);
+      await tap(wp, ".item [data-act=itemopt]"); await wp.waitForTimeout(400);
+      const sh = await wp.evaluate(() => document.getElementById("sheet").textContent);
+      if (!new RegExp("qui ne le vend pas en " + (h === "mag" ? "magasin" : "drive")).test(sh)) fail(`épingle ${h} : « Où le prendre » ne dit pas que l'épingle est ignorée`);
+      await wp.keyboard.press("Escape"); await wp.waitForTimeout(200);
+    }
+    /* « Passer à » : quatre produits vendus seulement par Houra (assez pour son minimum), un seulement au retrait Auchan
+       de Fontenay-sous-Bois */
+    const hos = onlyAt("houra").filter((p) => p.o[0][1] >= 1600 && p.o[0][1] <= 3500).slice(0, 4), fo = onlyAt("auchan")[0];
+    if (hos.length < 4 || !fo) fail("Passer à : pas de produits d'essai");
+    else {
+      const b = {}; hos.forEach((p) => { b[p.i] = 1; }); b[fo.i] = 1;
+      await setW(b, Object.assign({}, W0, { comp: "drive" }));
+      const seen = [];
+      for (const h of ["drive", "liv", "mag", "mix"]) {
+        if (h !== "drive") { await tap(wp, `[data-act="how"][role="radio"][data-v="${h}"]`); await settle(wp); }
+        const r = await wp.evaluate(() => {
+          const R = cabasDebug().RES(), unc = (x) => R.by[x].M.uncovered;
+          return { mode: R.mode, unc: Object.fromEntries(["mix", "liv", "drive", "mag"].map((x) => [x, unc(x)])), to: [...new Set([...document.querySelectorAll('#view button[data-act="how"]:not([role])')].map((e) => e.dataset.v))], text: document.querySelector("#view").textContent, sl: (document.querySelector(".sum .sl") || {}).textContent || "" };
+        });
+        seen.push(`${h} -> ${r.to.join(",") || "rien"}`);
+        if (r.unc[h].length && !/^Meilleure option pour \d+ produits? sur 5/.test(r.sl)) fail(`Passer à : ${h} ne prend pas tout le panier, le titre dit « ${r.sl} »`);
+        for (const v of r.to) {
+          const lost = r.unc[v].filter((id) => !r.unc[h].includes(id));
+          if (r.unc[h].some((id) => r.unc[v].includes(id)) || (lost.length && r.unc[v].length >= r.unc[h].length)) fail(`Passer à : depuis ${h}, « ${v} » ne prend pas les produits ou en perd ${JSON.stringify(lost)}`);
+          if (lost.length && !/mais pas/.test(r.text)) fail(`Passer à : depuis ${h}, « ${v} » perd des produits sans le dire`);
+        }
+        if (h === "drive" && r.to.join() !== "mix") fail(`Passer à : tout en drive devrait proposer « Livré ou retiré… », qui prend tout, pas ${r.to.join()}`);
+        if (h === "liv" && r.to.join() !== "mix") fail(`Passer à : tout livré devrait proposer « Livré ou retiré… », pas ${r.to.join()}`);
+        /* un seul produit hors de la façon : « ne peut pas le prendre », et son prix relevé là où il se vend, jamais « – » */
+        if (h === "liv" && (!/Ta façon de faire tes courses ne peut pas le prendre/.test(r.text) || (await wp.evaluate(() => [...document.querySelectorAll(".item [data-act=itemopt]")].some((b) => /^–/.test(b.textContent.trim())))))) fail("tout livré : le produit vendu seulement au retrait n'a pas de prix, ou la phrase n'est pas accordée");
+        if (h === "mix" && r.to.length) fail("Passer à : « Livré ou retiré… » prend tout le panier et propose quand même " + r.to.join());
+        /* écouter dit les produits que la façon ne prend pas */
+        const said = await wp.evaluate(() => cabasDebug().speakText("panier"));
+        if (/&#|&amp;|&quot;/.test(said)) fail("écouter : du HTML échappé dans le texte lu « " + said.slice(0, 200) + " »");
+        if (h === "drive" && (!/tout en drive/.test(said) || !/sans 4 produits pas en drive/.test(said) || !/Pas en drive : /.test(said) || /livraison offerte/.test(said))) fail("écouter tout en drive : « " + said.slice(0, 260) + " »");
+        if (h === "mag" && (!/tout en magasin/.test(said) || !/en magasin, sans frais/.test(said) || /livraison offerte/.test(said) || !/Pas en magasin : /.test(said))) fail("écouter tout en magasin : « " + said.slice(0, 260) + " »");
+        if (h === "liv" && (!/sans 1 produit pas en livraison/.test(said) || !/Pas en livraison : /.test(said))) fail("écouter tout livré : « " + said.slice(0, 260) + " »");
+      }
+      info.push("Passer à : " + seen.join(" ; "));
+    }
+    /* une ligne libre « en magasin » le reste : tout en drive l'ignore (« peu importe l'enseigne »), le choix revient avec
+       une façon qui passe par le magasin */
+    if (fo) {
+      await setW({ [fo.i]: 1 }, Object.assign({}, W0, { comp: true }));
+      await wp.evaluate(() => { const d = cabasDebug(); d.S.free = { fmag: { t: "Bougies d'anniversaire", q: 1, ret: "mag", at: new Date().toISOString() } }; localStorage.setItem("cabas.free", JSON.stringify(d.S.free)); location.hash = "#/"; });
+      await wp.waitForTimeout(300); await wp.evaluate(() => { location.hash = "#/panier"; }); await settle(wp);
+      const fl = () => wp.evaluate(() => ({ ret: (cabasDebug().S.free.fmag || {}).ret, t: [...document.querySelectorAll(".item.free small")].map((e) => e.textContent).join(" | ") }));
+      const f0 = await fl();
+      await tap(wp, '[data-act="how"][role="radio"][data-v="drive"]'); await settle(wp);
+      const f1 = await fl();
+      await tap(wp, '[data-act="how"][role="radio"][data-v="mix"]'); await settle(wp);
+      const f2 = await fl();
+      if (!/en magasin/.test(f0.t) || f1.ret !== "mag" || !/peu importe l'enseigne/.test(f1.t) || f2.ret !== "mag" || !/en magasin/.test(f2.t)) fail("ligne libre en magasin : le choix est perdu en passant par tout en drive " + JSON.stringify([f0, f1, f2]));
+    }
+    /* mode magasin, tout en magasin : « Écouter ce qu'il reste » dit magasin par magasin */
+    const mon = onlyAt("monoprix")[0];
+    if (mon && fo) {
+      await setW({ [mon.i]: 1, [fo.i]: 1 }, Object.assign({}, W0, { comp: "mag" }));
+      await wp.evaluate(() => { location.hash = "#/magasin"; }); await wp.waitForTimeout(700);
+      const said = await wp.evaluate(() => cabasDebug().speakText("magasin"));
+      if (!/Chez Monoprix, 1 produit\./.test(said) || !/Chez Auchan[^,]*, 1 produit\./.test(said)) fail("écouter le mode magasin, tout en magasin : magasin par magasin attendu « " + said.slice(0, 200) + " »");
+    }
+  } catch (e) {
+    fail(`façon choisie interrompu (${step}) : ` + e.message.split("\n")[0]);
+  }
+  await wctx.close();
+
   /* ---------- écouter : speechSynthesis remplacé par un témoin qui garde ce qui est dit ---------- */
   const vctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
   await vctx.addInitScript(() => {
@@ -476,5 +630,5 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
   server.close();
   if (info.length) console.log(info.join("\n"));
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, panier souple, Compléter malin, budget du mois, tenir le budget), écouter : aucun problème.");
+  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, quatre façons, panier souple, Compléter malin, budget du mois, tenir le budget), écouter : aucun problème.");
 })();

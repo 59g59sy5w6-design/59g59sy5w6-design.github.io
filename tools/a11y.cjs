@@ -89,6 +89,8 @@ const ROUTES = [
   ["demande", "#/recherche"], ["pour", POUR], ["duo", DUO], ["retour", RETOUR], ["retour-duo", RETOUR_DUO],
   /* « Cabas a déménagé » : l'ancienne adresse une fois redirigée (en local, la route s'ouvre sans la bascule) */
   ["demenage", "#/demenage"], ["transfert-demenage", TRANSFERT_MV],
+  /* les autres façons de faire ses courses (prefs.comp, posé par prepare) : tout en drive, tout en magasin */
+  ["panier-drive", "#/panier"], ["magasin-magasin", "#/magasin"], ["remplir-magasin", "#/remplir"], ["panier-magasin", "#/panier"], ["reglages-magasin", "#/reglages"],
   /* en dernier : « Faire ses courses » met le téléphone dans les courses d'un proche (le panier de l'aidant mis de côté) */
   ["proche", POUR],
 ];
@@ -255,12 +257,19 @@ const FOCUS_JS = `(() => { const el = document.activeElement; if (!el || el === 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function ready(page, route) {
   await page.waitForFunction(() => !document.querySelector("#view .sk") && document.querySelector("#view .wrap > *"), null, { timeout: 25000 }).catch(() => {});
-  if (route === "panier") await page.waitForFunction(() => !document.querySelector(".sum.loading"), null, { timeout: 25000 }).catch(() => {});
+  if (/^panier/.test(route)) await page.waitForFunction(() => !document.querySelector(".sum.loading") && (!window.cabasDebug || cabasDebug().RES().otherDone), null, { timeout: 25000 }).catch(() => {});
   if (route === "accueil") await page.waitForFunction(() => !document.querySelector("#recrail"), null, { timeout: 15000 }).catch(() => {});
   await sleep(320);
 }
 /* écrans qui demandent un geste avant la mesure : Ma liste cherchée, une recherche, une demande en phrase */
+/* la façon de faire ses courses d'un écran : « -drive », « -magasin » dans son nom, sinon la première (true) */
+const howOfRoute = (r) => (/-drive$/.test(r) ? "drive" : /-magasin$/.test(r) ? "mag" : true);
 async function prepare(page, rname, st) {
+  /* une autre façon que celle de l'écran d'avant : posée, puis l'écran est redessiné (aller-retour par l'accueil) */
+  const changed = await page.evaluate((w) => { const D = window.cabasDebug && cabasDebug(); if (!D) return false; const cur = D.S.prefs.comp === undefined ? true : D.S.prefs.comp; if (cur === w) return false; D.S.prefs.comp = w; return true; }, howOfRoute(rname));
+  /* « Remplir mes paniers » tout en magasin : sans remplissage en ligne en cours (l'instantané de l'audit est mis de côté) */
+  const unsnap = rname === "remplir-magasin" && (await page.evaluate(() => { const D = window.cabasDebug && cabasDebug(); if (!D || !D.S.guide.snap) return false; D.S.guide = Object.assign({}, D.S.guide, { snap: null }); return true; }));
+  if (changed || unsnap) { const h = await page.evaluate(() => location.hash); await page.evaluate(() => { location.hash = "#/"; }); await sleep(250); await page.evaluate((x) => { location.hash = x; }, h); await ready(page, rname); }
   if (rname === "ecrire" && st === "plein") { await page.click("[data-act=wlgo]").catch(() => {}); await page.waitForSelector("[data-act=wlalt], .banner", { timeout: 20000 }).catch(() => {}); await sleep(300); }
   if (rname === "proche") { await page.click("[data-act=pourgo]").catch(() => {}); await page.waitForFunction(() => location.hash === "#/panier", null, { timeout: 8000 }).catch(() => {}); await ready(page, "panier"); }
   if ((rname === "recherche" && st === "plein") || rname === "demande") { const i = await page.$("#q"); if (i) { await i.fill(rname === "demande" ? ASK : "lait"); await sleep(rname === "demande" ? 1200 : 600); } }
