@@ -4,7 +4,9 @@
 // le focus à la recherche et « + » sur une carte ajoute un exemplaire.
 // Puis le panier intelligent, avec la promesse « le total affiché est celui qu'on obtient, livraison comprise » :
 // tableau du panier (une colonne par enseigne, le prix pris coché, défilement au clavier), épingler et exclure depuis
-// la ligne, Et si (le total d'un scénario est celui du panier une fois appliqué, « Annuler » le défait), panier souple
+// la ligne, Et si (le total d'un scénario est celui du panier une fois appliqué, « Annuler » le défait), les quatre façons
+// de faire ses courses (le total annoncé par chacune est celui du panier une fois choisie, drive et magasin compris,
+// produits hors de la façon nommés, et les autres façons dans « Et si »), panier souple
 // (jamais plus cher, l'équivalent est celui de « Remplir mes paniers »), Compléter malin (le total annoncé est celui
 // du panier après l'ajout), budget du mois (total payé saisi compté à part) et « Tenir le budget ». Enfin « Écouter »
 // (synthèse vocale remplacée par un témoin) : la répartition lue en français (montants en euros, frais, chaque
@@ -365,6 +367,56 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
       }
     }
 
+    step = "quatre façons";
+    /* les quatre façons de faire ses courses : le total que chacune annonce dans le panier est celui que le panier affiche
+       une fois qu'on la choisit (le focus reste sur le choix) ; tout en drive ne prend que des retraits, tout en magasin
+       ni frais ni minimum et le dit ; un produit qu'une façon ne prend pas est nommé, avec l'enseigne qui le vend */
+    const hw = await sp.evaluate(() => [...document.querySelectorAll('[data-act="how"][role="radio"]')].map((b) => b.dataset.v));
+    if (hw.join() !== "mix,liv,drive,mag") fail("quatre façons : le choix n'a pas les quatre options : " + hw.join());
+    await sp.waitForFunction(() => ![...document.querySelectorAll("[data-howt]")].some((e) => /Calcul/.test(e.textContent)), null, { timeout: 30000 }).catch(() => fail("quatre façons : les totaux des façons n'arrivent pas"));
+    for (const h of ["drive", "mag", "liv", "mix"]) {
+      const ann = await sp.evaluate((h) => document.querySelector(`[data-act="how"][role="radio"][data-v="${h}"] small`).textContent, h);
+      await tap(sp, `[data-act="how"][role="radio"][data-v="${h}"]`); await settle(sp);
+      const st = await sp.evaluate(() => {
+        const D = cabasDebug(), R = D.RES(), s = R.steps[R.K], f = s && s.full, a = document.activeElement;
+        return { mode: R.mode, total: D.cartTotal(), on: (document.querySelector('[data-act="how"][aria-checked="true"]') || {}).dataset.v, focus: a && a.dataset ? a.dataset.v : "", lines: R.M.lines.length, unc: R.M.uncovered.length,
+          kinds: f ? f.orders.map((o) => ({ id: o.ch.id, pick: (D.S.allMap.get(o.ch.id).channel || {}).mode === "retrait", mag: !!o.ch.mag, fee: o.fee, min: o.ch.P.min, sim: !!D.S.allMap.get(o.ch.id).simulated })) : [], comp: f ? (f.completed || []).length : 0,
+          miss: [...document.querySelectorAll("#view h2.gh")].map((e) => e.textContent), notes: [...document.querySelectorAll(".item .it small")].map((e) => e.textContent).filter((t) => /seulement/.test(t)), text: document.querySelector("#view").textContent };
+      }, null);
+      info.push(`${h} ${ann}`);
+      if (st.mode !== h || st.on !== h) fail(`quatre façons : ${h} choisi, le panier montre ${st.mode} (coché : ${st.on})`);
+      if (st.focus !== h) fail(`quatre façons : après le choix de ${h}, le focus n'est plus sur le choix (${st.focus})`);
+      const m = /^(\d[\d\s\u202f\u00a0]*,\d\d\u00a0€), /.exec(ann);
+      if (m) {
+        if (st.total == null || eurC(st.total) !== m[1]) fail(`quatre façons : ${h} annonçait ${m[1]}, le panier fait ${st.total == null ? "rien" : eurC(st.total)}`);
+        if ((await shown(sp)) !== m[1]) fail(`quatre façons : ${h}, le chiffre du panier n'est pas ${m[1]}`);
+      }
+      if (/sans \d+\s?produit/.test(ann) !== st.unc > 0) fail(`quatre façons : ${h} annonce « ${ann} » mais ${st.unc} produits hors de la façon`);
+      if (st.unc && !st.miss.some((t) => /^Pas en /.test(t))) fail(`quatre façons : ${h}, les produits hors de la façon ne sont pas nommés (${st.miss.join(" | ")})`);
+      if (st.unc && st.notes.length < st.unc) fail(`quatre façons : ${h}, un produit hors de la façon ne dit pas où il se vend`);
+      if (h === "drive" && st.kinds.some((k) => !k.pick)) fail("tout en drive : une commande n'est pas un retrait " + JSON.stringify(st.kinds));
+      if (h === "drive" && !/Le retrait n'existe dans Cabas que chez Auchan/.test(st.text)) fail("tout en drive : le panier ne dit pas où le retrait existe");
+      if (h === "mag" && st.kinds.some((k) => !k.mag || k.fee || k.min || k.sim)) fail("tout en magasin : frais, minimum ou prix simulés " + JSON.stringify(st.kinds));
+      if (h === "mag" && !/en magasin, le prix peut être différent/.test(st.text)) fail("tout en magasin : le panier ne dit pas que le prix peut être différent en magasin");
+      if ((h === "liv" || h === "drive" || h === "mag") && st.comp) fail(`${h} : des produits à acheter en magasin pour compléter`);
+    }
+    /* « Et si » propose les autres façons ; « Appliquer » donne le total annoncé, « Annuler » rend la façon d'avant */
+    await sp.evaluate(() => { const d = document.querySelector("details.wif"); if (d && d.open) d.open = false; });
+    await tap(sp, "details.wif > summary"); await sp.waitForTimeout(300);
+    await sp.waitForFunction(() => document.querySelector("#wif") && !/Calcul/.test(document.querySelector("#wif").textContent) && document.querySelectorAll("#wif [data-w=how]").length === 3, null, { timeout: 30000 }).catch(async () => fail("Et si : les trois autres façons ne sont pas proposées : " + (await sp.evaluate(() => (document.querySelector("#wif") || {}).textContent))));
+    const ho = await sp.evaluate(() => [...document.querySelectorAll("#wif [data-act=wifgo][data-w=how]")].map((b) => ({ v: b.dataset.v, ok: !b.disabled, val: b.closest(".wifr").querySelector(".val").textContent })));
+    const hx = ho.find((x) => x.ok);
+    if (!hx) fail("Et si : aucune autre façon applicable " + JSON.stringify(ho));
+    else {
+      await tap(sp, `#wif [data-act=wifgo][data-w=how][data-v="${hx.v}"]`); await settle(sp);
+      const t5 = await total(sp), m5 = await sp.evaluate(() => cabasDebug().RES().mode);
+      info.push(`Et si ${hx.v} ${hx.val}`);
+      if (m5 !== hx.v || eurC(t5) !== hx.val) fail(`Et si : « ${hx.v} » annonçait ${hx.val}, le panier fait ${eurC(t5)} en ${m5}`);
+      await tap(sp, "#toast button"); await settle(sp);
+      if ((await sp.evaluate(() => cabasDebug().RES().mode)) !== "mix") fail("Et si : « Annuler » ne rend pas la façon d'avant");
+    }
+    await sp.evaluate(() => { const d = document.querySelector("details.wif"); if (d) d.open = false; cabasDebug().S.wifOpen = false; });
+
     step = "panier souple";
     /* panier souple : tout cocher ne fait jamais monter le total ; un équivalent pris est le produit que « Remplir mes
        paniers » ouvre, et l'instantané compte le même total, frais compris */
@@ -476,5 +528,5 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
   server.close();
   if (info.length) console.log(info.join("\n"));
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, panier souple, Compléter malin, budget du mois, tenir le budget), écouter : aucun problème.");
+  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, quatre façons, panier souple, Compléter malin, budget du mois, tenir le budget), écouter : aucun problème.");
 })();

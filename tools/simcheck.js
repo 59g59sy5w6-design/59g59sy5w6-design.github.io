@@ -3,7 +3,8 @@
 // « estimation avec des prix simulés » ; les lignes de « Et si » qui passent par E.Leclerc, et « Ta répartition », disent
 // « prix simulés » ; « Pas trouvé » chez E.Leclerc signale chaque équivalent simulé et l'effet sur la commande ; le panier
 // commandé garde le drapeau sim dans cabas.hist, et le budget du mois, « Tes économies » et « Tes dépenses » ne disent
-// pas « aux prix relevés » pour lui. Aucun site d'enseigne n'est chargé. Code de sortie 1 en cas de problème.
+// pas « aux prix relevés » pour lui ; tout en drive, le drive E.Leclerc est dit simulé, et tout en magasin ne le prend
+// jamais. Aucun site d'enseigne n'est chargé. Code de sortie 1 en cas de problème.
 // Usage : node tools/simcheck.js
 const http = require("http");
 const fs = require("fs");
@@ -107,11 +108,29 @@ const server = http.createServer((req, res) => {
     await go("#/mouvements"); await ready(); await page.waitForTimeout(1500);
     const dep = await page.evaluate(() => { const h = [...document.querySelectorAll("#view h2")].find((x) => /Tes dépenses/.test(x.textContent)); let n = h && h.nextElementSibling; while (n && n.tagName !== "P") n = n.nextElementSibling; return n ? n.textContent : ""; });
     if (!/prix simulés/.test(dep)) fail("tes dépenses : « " + dep + " »");
+
+    /* tout en drive : le drive E.Leclerc, aux prix simulés, le dit (titre du total, choix de la façon, commande) ; tout en
+       magasin ne le prend jamais, et son total ne parle pas de prix simulés */
+    await page.evaluate(() => { const D = cabasDebug(); D.S.guide = { ck: {}, done: {}, when: {} }; D.S.prefs.comp = "drive"; });
+    await go("#/"); await go("#/panier"); await ready(); await done(); await page.waitForTimeout(400);
+    const dv = await page.evaluate(() => {
+      const D = cabasDebug(), R = D.RES(), st = R.steps[R.K], f = st && (st.full || st.partial);
+      const how = (h) => { const e = document.querySelector(`[data-howt="${h}"]`); return e ? e.textContent : ""; };
+      return { mode: R.mode, ids: f ? f.orders.map((o) => o.ch.id) : [], sl: (document.querySelector(".sum .sl") || {}).textContent || "", drive: how("drive"), mag: how("mag"), magChans: R.by.mag.M.chans.map((c) => c.id), sec: [...document.querySelectorAll("#view .order")].filter((o) => /E\.Leclerc/.test(o.textContent)).map((o) => o.textContent.replace(/\s+/g, " ")) };
+    });
+    if (dv.mode !== "drive" || !dv.ids.includes("leclerc-drive")) fail("tout en drive : la répartition ne passe pas par le drive E.Leclerc " + JSON.stringify(dv.ids));
+    else {
+      if (!/prix simulés/.test(dv.sl)) fail("tout en drive : le total ne dit pas « prix simulés » : " + dv.sl);
+      if (!/prix simulés/.test(dv.drive)) fail("tout en drive : le choix de la façon ne dit pas « prix simulés » : " + dv.drive);
+      if (!dv.sec.length || dv.sec.some((t) => !/simulés/.test(t))) fail("tout en drive : la commande E.Leclerc ne dit pas « simulés »");
+    }
+    if (dv.magChans.some((id) => /leclerc/.test(id))) fail("tout en magasin : E.Leclerc, aux prix simulés, est compté en magasin");
+    if (/simulés/.test(dv.mag)) fail("tout en magasin : le total parle de prix simulés : " + dv.mag);
   } catch (e) {
     fail("parcours interrompu : " + e.message.split("\n")[0]);
   }
   await browser.close();
   server.close();
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Prix simulés : dits dans la liste copiée, le texte partagé, Et si, Pas trouvé, l'historique, le budget du mois, tes économies et tes dépenses.");
+  console.log("Prix simulés : dits dans la liste copiée, le texte partagé, Et si, Pas trouvé, l'historique, le budget du mois, tes économies, tes dépenses et tout en drive ; jamais en magasin.");
 })();

@@ -71,6 +71,10 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     /* codes-barres appris : un code en chiffres et un produit du catalogue, rien d'autre */
     const EC = await A.evaluate(() => cabasDebug().importCheck({ app: "cabas", v: 1, data: { eans: { "2000000000015": { id: "candia-lait-1-2-ecreme-6-x-1-l", at: "2026-10-01" }, "abc": { id: "candia-lait-1-2-ecreme-6-x-1-l" }, "2000000000022": { id: "zz-inconnu" }, "2000000000039": "x" } } }).data.eans);
     if (JSON.stringify(EC) !== '{"2000000000015":{"id":"candia-lait-1-2-ecreme-6-x-1-l","at":"2026-10-01"}}') fail("importCheck : codes-barres appris mal filtrés " + JSON.stringify(EC));
+    /* la façon de faire ses courses : true ou false des anciennes versions repris tels quels, « drive » et « mag » gardés,
+       une valeur inconnue écartée ; le choix du retrait pour tout en drive (drv) gardé */
+    const HW = await A.evaluate(() => { const D = cabasDebug(), c = (v) => D.importCheck({ app: "cabas", v: 1, data: { prefs: { comp: v, drv: { "auchan-livraison-perreux": "auchan" } } } }).data.prefs; return [true, false, "drive", "mag", "liv", "tout", 3].map((v) => { const p = c(v); return [p.comp === undefined ? "absent" : p.comp, JSON.stringify(p.drv)]; }); });
+    if (JSON.stringify(HW.map((x) => x[0])) !== JSON.stringify([true, false, "drive", "mag", false, "absent", "absent"]) || HW.some((x) => x[1] !== '{"auchan-livraison-perreux":"auchan"}')) fail("importCheck : façon de faire ses courses mal reprise " + JSON.stringify(HW));
     if (P.data.prefs.shopDay !== 6 || P.data.lists[0].template !== true) fail("packState : prefs.shopDay ou lists[].template perdus");
     /* 2. une copie en fichier, depuis les réglages */
     await A.evaluate(() => { location.hash = "#/reglages"; }); await A.waitForTimeout(500);

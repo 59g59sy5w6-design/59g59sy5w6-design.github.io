@@ -1,5 +1,6 @@
 importScripts("optimizer.js");
-/* modes : les réglages « Sans achat en magasin » à calculer, dans l'ordre, chacun avec son modèle ({ mode, M }).
+/* modes : les façons de faire ses courses à calculer (mix, liv, drive, mag : optimizer.js, HOWS), dans l'ordre, celle
+   choisie d'abord, chacune avec son modèle ({ mode, M }) ; chaque étape porte sa façon (mode).
    Les anciennes versions de l'appli envoyaient un seul modèle (M) et, pour chaque réglage, sa limite (compMax).
    kind « jobs » : calculs d'appoint (Et si, Compléter malin, budget), chacun { key, M, K } ; la réponse donne, sous
    la même clé, la meilleure répartition de tout le panier en K commandes au plus (bestAt). */

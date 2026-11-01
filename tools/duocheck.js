@@ -265,6 +265,28 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     if (X.aMe != null) check(X.txt.includes("Ta liste seule : " + money(X.aMe)), `duo : ta liste seule ${money(X.aMe)} absente « ${X.txt.slice(0, 300)} »`);
     if (X.aOt != null) check(X.txt.includes("La liste de Sam seule : " + money(X.aOt)), `duo : sa liste seule ${money(X.aOt)} absente`);
     if (X.aMe != null && X.aOt != null && X.aMe + X.aOt - X.total >= 1) check(X.txt.includes("À deux, la commande coûte " + money(X.aMe + X.aOt - X.total) + " de moins"), "duo : économie de la commande commune absente ou fausse");
+    /* les parts dans les autres façons : la somme des parts fait toujours le total ; tout en magasin, sans frais, et
+       « Envoyer sa part » parle d'achats en magasin (pas de commande) ; tout en drive, des retraits seulement */
+    for (const hw of ["mag", "drive"]) {
+      await B.evaluate((hw) => { cabasDebug().S.prefs.comp = hw; }, hw);
+      await go(B, "#/"); await go(B, "#/panier"); await settled(B);
+      await B.waitForFunction(() => !/Calcul de ce que chacun/.test((document.querySelector("#duo") || {}).textContent || ""), null, { timeout: 30000 }).catch(() => {});
+      const Y = await B.evaluate(() => {
+        const d = cabasDebug(), R = d.RES(), st = R.steps[R.K], r = st && st.full;
+        if (!r) return { mode: R.mode };
+        const sp = d.splitOf(r), ret = d.retourDuo("");
+        return { mode: R.mode, total: r.itemsTotal + r.feesTotal + (r.compTotal || 0), sum: sp.me.total + sp.other.total, fees: sp.me.fee + sp.other.fee, other: sp.other.total, mag: r.orders.every((o) => o.ch.mag), pick: r.orders.every((o) => (d.S.allMap.get(o.ch.id).channel || {}).mode === "retrait"), o: ret ? ret.o.length : -1, c: ret ? ret.c : [], txt: document.querySelector("#duo").textContent.replace(/[ \t\n]+/g, " ") };
+      });
+      if (!check(Y.total != null && Y.mode === hw, `duo, ${hw} : pas de répartition de tout le panier (${Y.mode})`)) continue;
+      check(Y.sum === Y.total, `duo, ${hw} : somme des parts ${Y.sum} au lieu du total ${Y.total}`);
+      check(Y.txt.includes("Ta part" + money(Y.total - Y.other)), `duo, ${hw} : ta part n'est pas affichée « ${Y.txt.slice(0, 160)} »`);
+      if (hw === "mag") {
+        check(Y.fees === 0 && Y.mag, "duo, tout en magasin : des frais dans les parts");
+        check(Y.o === 0 && Y.c.length > 0 && Y.c.reduce((a, z) => a + z[2], 0) === Y.other, "duo, tout en magasin : sa part envoyée n'est pas faite d'achats en magasin " + JSON.stringify([Y.o, Y.c]));
+      } else check(Y.pick, "duo, tout en drive : une commande n'est pas un retrait");
+    }
+    await B.evaluate(() => { delete cabasDebug().S.prefs.comp; });
+    await go(B, "#/"); await go(B, "#/panier"); await settled(B);
     /* le budget par panier se compare à ta part, pas à toute la commande */
     await B.evaluate(() => { cabasDebug().S.prefs.budget = 300; });
     await go(B, "#/"); await go(B, "#/panier"); await settled(B);
