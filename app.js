@@ -828,7 +828,7 @@
     if (budget && tot() > budget) {
       /* le format le plus petit du vivier de chaque ligne (moins cher en tout, pas au kilo) */
       for (const r of rows) {
-        const alt = (r.M.pool || []).map(([id, n1]) => { const p = S.prods.get(id), b = p && bestReal(p); return b && dOk(p) ? { id, n: n1, c: Math.round(b.price * 100) * n1 } : null; }).filter(Boolean).sort((a, b) => a.c - b.c)[0];
+        const alt = (r.M.pool || []).filter((e) => !e[2]).map(([id, n1]) => { const p = S.prods.get(id), b = p && bestReal(p); return b && dOk(p) ? { id, n: n1, c: Math.round(b.price * 100) * n1 } : null; }).filter(Boolean).sort((a, b) => a.c - b.c)[0];
         if (alt && alt.c < r.c) { r.id = alt.id; r.n = alt.n; r.c = alt.c; small = true; }
       }
       for (let i = rows.length - 1; i >= 0 && tot() > budget; i--) if (rows[i].opt) dropped.unshift(rows.splice(i, 1)[0]);
@@ -2511,8 +2511,11 @@
     if (!size && (m = s.match(/^(.+?)\s+(\d+(?:[.,]\d+)?)\s*(kg|g|l|cl|ml)$/i))) { size = sizeOfU(parseFloat(m[2].replace(",", ".")), m[3]); s = m[1]; given = true; }
     /* « petits pots » : le mot reste (les petits pots pour bébé), pas « 2 pots de yaourt » */
     const toks = norm(s).split(" ").filter((t, i, a) => t && (!STOP.has(t) || (/^pots?$/.test(t) && /^petits?$/.test(a[i - 1] || ""))));
+    /* t : le produit tel qu'écrit, sans quantité ni emballage (« 2 paquets de pâtes » : pâtes), pour le redire */
+    const tw = s.trim().split(/\s+/);
+    while (tw.length > 1 && STOP.has(norm(tw[0]))) tw.shift();
     /* nGiven : une quantité ou une contenance a été écrite ; sinon la quantité habituelle s'applique (usualQty) */
-    return { raw: String(raw).trim(), q: toks.join(" "), n: Math.max(1, Math.min(99, n || 1)), size, nGiven: given };
+    return { raw: String(raw).trim(), q: toks.join(" "), t: tw.join(" ").replace(/^[dl]['’]\s*/i, ""), n: Math.max(1, Math.min(99, n || 1)), size, nGiven: given };
   }
   const valOf = (p) => { const b = best(p); if (!b) return 1e12; const u = perUnit(p, b.price); return u == null ? b.price * 1000 : u; };
   const byVal = (a, b) => valOf(a) - valOf(b);
@@ -2596,10 +2599,11 @@
   const HOME = { chocolat: "chocolat-tablettes", gateau: "gateaux", cookie: "biscuits-chocolat", vanille: "aide-patisserie", cacao: "chocolat-poudre" };
   /* dans ce rayon, ces mots disent le produit ordinaire et ne sont pas une variante (une pâte à tartiner est aux
      noisettes et au cacao, le saumon du traiteur est fumé, le chocolat de tous les jours est noir, la bière sans alcool
-     blonde) */
-  const RAY_PLAIN = { "pate-a-tartiner": ["noisette", "cacao", "chocolat"], "traiteur-mer": ["fume"], "chocolat-tablettes": ["noir"], "cidres-sans-alcool": ["blonde", "blond"] };
-  /* dans ce rayon, ces mots valent le mot demandé : un jambon supérieur, de Paris ou cuit est un jambon blanc */
-  const RAY_SAME = { "jambon-blanc": { blanc: ["superieur", "paris", "cuit"] } };
+     blonde, le thé noir, le saucisson sec) */
+  const RAY_PLAIN = { "pate-a-tartiner": ["noisette", "cacao", "chocolat"], "traiteur-mer": ["fume"], "chocolat-tablettes": ["noir"], "cidres-sans-alcool": ["blonde", "blond"], the: ["noir"], saucisson: ["sec"] };
+  /* dans ce rayon, ces mots valent le mot demandé : un jambon supérieur, de Paris ou cuit est un jambon blanc, des
+     tablettes ou des capsules pour lave-vaisselle sont des pastilles */
+  const RAY_SAME = { "jambon-blanc": { blanc: ["superieur", "paris", "cuit"] }, "lave-vaisselle": { pastille: ["tablette", "capsule"] } };
   const raySame = (p, t, has) => ((RAY_SAME[p.r] || {})[t] || []).some(has);
   /* un mélange de plusieurs produits de base (« 4 fromages dont mimolette », « 3 céréales ») n'est pas le produit ordinaire */
   const MIX = /\b(\d+|deux|trois|quatre|cinq|six) (fromages|cereales|legumes|fruits|varietes|saveurs)\b|\bdont\b/;
@@ -2611,6 +2615,8 @@
   const lowFat = (p) => {
     /* une crème fraîche à moins de 25 % de matière grasse est une crème légère */
     if (p.r === "creme") return /\b([3-9]|1[0-9]|2[0-4]) ?(mg|m g)\b/.test(norm(p.name));
+    /* un fromage blanc ou un yaourt à 0 % de matière grasse est un produit allégé */
+    if (p.r === "fromage-blanc" || p.r === "yaourts") return /(^|[^\d.,])0(?:[.,]0+)?\s*%/.test(p.name);
     if (p.r !== "beurre") return false;
     const n = norm(p.name);
     if (/\b(1[0-9]|[2-6][0-9]|7[0-4]) ?(mg|m g)\b/.test(n)) return true;
@@ -2631,8 +2637,14 @@
   /* le mot est dans le produit lui-même, ou ce que le produit dit en vaut le sens (une baguette est un pain, un jambon
      supérieur un jambon blanc) */
   const ownTok = (p, t) => ownHas(p, t) || (KIND[t] || []).some((k) => ownHas(p, k)) || raySame(p, t, (k) => ownHas(p, k));
+  /* mots qui nomment un univers sans être dans le nom des produits */
+  const UNIVW = { menager: "entretien", menagere: "entretien", menage: "entretien" };
   /* rayons à part : un produit pour bébé, surgelé, en conserve ou glacé n'est pas le produit ordinaire du même nom */
   const QUAL = new Set(["bebe", "infantile", "surgele", "surgelee", "conserve", "glace", "repas"]);
+  /* univers des produits frais */
+  const FRESHU = new Set(["fruits-legumes", "viandes-poissons", "cremerie", "charcuterie-traiteur", "pain-patisserie"]);
+  /* surgelé ou en conserve, d'après le nom de son rayon (« Légumes surgelés », « Légumes en conserve ») */
+  const formOf = (p) => { const rs = rayStrong(p.r); return rs.has("surgele") || rs.has("surgelee") ? "surgelé" : rs.has("conserve") ? "en conserve" : ""; };
   /* rayons dont ce mot est le premier produit nommé (« Poulet, dinde et volailles » pour « poulet ») */
   const PRIM = {};
   const primaryRays = (t) => PRIM[t] || (PRIM[t] = S.rayons.filter((r) => !r.virtuel && rayStrongInfo(r.id).first === t));
@@ -2666,12 +2678,28 @@
   };
   function matchLine(L) {
     /* wn : le nombre écrit (« tomates pelées x2 »), pour dire quand le plan le change */
-    const out = { raw: L.raw, q: L.q, n: L.n, nGiven: !!L.nGiven, wn: L.size ? 0 : L.n, cands: [], avail: 0, pick: null };
+    const out = { raw: L.raw, q: L.q, t: L.t || L.raw, n: L.n, nGiven: !!L.nGiven, wn: L.size ? 0 : L.n, cands: [], avail: 0, pick: null };
     if (!L.q) return out;
     /* « lait d'amande », « lait de soja » : des boissons végétales, de leur nom légal */
-    const q = L.q.replace(/\blait (amande|avoine|soja|riz|noisette|epeautre)s?\b/g, "boisson $1");
-    const toks = mToks(q);
-    const sc = searchScored(q).filter((x) => strongHit(x[1], toks));
+    let q = L.q.replace(/\blait (amande|avoine|soja|riz|noisette|epeautre)s?\b/g, "boisson $1");
+    let sc0 = searchScored(q);
+    /* un mot qu'aucun produit ne porte mais qui nomme un univers (« lingettes ménagères », « éponges ménage ») : le
+       reste de la ligne, dans cet univers */
+    const qw = q.split(" ").filter(Boolean), uw = qw.filter((w) => UNIVW[stem(w)]);
+    if (!sc0.length && uw.length && uw.length < qw.length) {
+      const u = UNIVW[stem(uw[0])];
+      q = qw.filter((w) => !UNIVW[stem(w)]).join(" ");
+      sc0 = searchScored(q).filter((x) => (rayon(x[1].r) || {}).u === u);
+    }
+    /* RAY_SAME : dans ce rayon, un autre mot vaut celui de la ligne, dès la recherche (« pastilles lave-vaisselle » :
+       les tablettes du rayon lave-vaisselle) */
+    const qn = q.split(" ").filter(Boolean);
+    for (const r of Object.keys(RAY_SAME)) qn.forEach((w, i) => (RAY_SAME[r][stem(w)] || []).forEach((k) => { const seen = new Set(sc0.map((x) => x[1])); searchScored(qn.map((x, j) => (j === i ? k : x)).join(" ")).forEach((x) => { if (x[1].r === r && !seen.has(x[1])) sc0.push(x); }); }));
+    /* un mot au masculin vaut le même au féminin, et l'inverse, quand seuls les produits trouvés portent l'autre forme
+       (« surgelés frites », « pizza surgelé » : le rayon dit « surgelées ») */
+    const gen = (t) => (t.length < 5 || t.includes("_") ? "" : /ee$/.test(t) ? t.slice(0, -1) : /e$/.test(t) ? t + "e" : "");
+    const toks = mToks(q).map((t) => { const g = gen(t); return g && g.length >= 5 && !sc0.some((x) => allW(x[1]).has(t)) && sc0.some((x) => allW(x[1]).has(g)) ? g : t; });
+    const sc = sc0.filter((x) => strongHit(x[1], toks));
     if (!sc.length) return out;
     /* prix relevés seulement (repas) : le choix ne s'appuie jamais sur un prix simulé */
     const pb = L.real ? bestReal : best, valOf = (p) => { const b = pb(p); if (!b) return 1e12; const u = perUnit(p, b.price); return u == null ? b.price * 1000 : u; }, byVal = (a, b) => valOf(a) - valOf(b);
@@ -2688,7 +2716,8 @@
     if (tm) { const tre = new RegExp(`\\btaille ${tm[1]}\\b`), ta = rel.filter((p) => tre.test(norm(p.name))); if (sells(ta)) rel = ta; }
     /* le mot exact plutôt qu'un début de mot (« thon », pas « Thonon ») ; le rayon qui porte ce nom d'abord (« huile » :
        le rayon Huile, pas des sardines à l'huile) ; puis les résultats les plus pertinents */
-    const exact = rel.filter((p) => { const st = allW(p); return toks.every((t) => st.has(t)); });
+    /* RAY_SAME : dans ce rayon, le mot du produit vaut celui de la ligne (des tablettes pour « pastilles lave-vaisselle ») */
+    const exact = rel.filter((p) => { const st = allW(p); return toks.every((t) => st.has(t) || raySame(p, t, (k) => st.has(k))); });
     if (exact.length) rel = exact;
     else {
       /* aucun produit n'a le mot entier : un début de mot ne vaut que pour une abréviation (« choco », « camemb »), pas
@@ -2700,7 +2729,7 @@
     /* chaque mot désigne le produit lui-même, pas un ingrédient (« lentilles corail », pas des tranches végétales aux
        lentilles corail), quand certains produits le font */
     const wq = weakQ(L.raw), sToks = toks.filter((t) => !wq.has(t));
-    const strongAll = rel.filter((p) => { const st = strongW(p); return sToks.every((t) => st.has(t)); });
+    const strongAll = rel.filter((p) => { const st = strongW(p); return sToks.every((t) => st.has(t) || raySame(p, t, (k) => st.has(k))); });
     if (strongAll.length) rel = strongAll;
     /* tous les mots de la ligne dans le produit lui-même, pas seulement dans le nom de son rayon : des capsules de
        chocolat rangées avec les capsules de café ne sont pas des « capsules café », un nettoyant vitres n'est pas un
@@ -2718,7 +2747,7 @@
     /* « jus d'orange » n'est pas une boisson au jus, « papier toilette » n'est pas des lingettes : un mot qui change la
        nature du produit l'écarte, sauf si on l'a écrit (au masculin ou au féminin : « viande hachée », « steak haché ») */
     const written = (w) => toks.includes(w) || toks.includes(w + "e") || (/e$/.test(w) && toks.includes(w.slice(0, -1)));
-    const dn = NOTSAME.filter((w) => !written(w)), light = ["leger", "legere", "allege", "allegee", "light"].some((w) => toks.includes(w));
+    const dn = NOTSAME.filter((w) => !written(w)), light = ["leger", "legere", "allege", "allegee", "light"].some((w) => toks.includes(w)) || /(^|[^\d.,])0\s*%/.test(L.raw || "");
     /* « boisson au jus » et « nectar » ne valent que pour les jus : un cola est, de son nom légal, une « boisson gazeuse » */
     /* le mot doit être dans le produit lui-même : le rayon « Beurre et margarine » n'écarte pas le beurre */
     const noDown = rel.filter((p) => !dn.some((w) => ownHas(p, w) && (/^jus/.test(p.r) || !JUICE_ONLY.has(w))) && (light || !lowFat(p)));
@@ -2748,14 +2777,25 @@
     /* le produit frais d'abord : « tomates », « pommes », « citron », « salade » sont des fruits et légumes quand il y en
        a, qui le disent en tête de leur nom, pas une conserve, une purée, un jus ou une salade composée ; sauf quand un
        rayon ordinaire porte ce nom en premier (« poulet » : le rayon de la volaille, pas un plat rangé avec les légumes) */
+    /* un ingrédient ajouté au nom (« Ail aux herbes aromatiques », « à l'huile ») : une préparation, pas le produit frais */
+    const qset = new Set(toks), added = (p) => { const nt = norm(p.name).split(" ").filter(Boolean); return nt.some((w, i) => { const at = w === "a" && (nt[i + 1] === "la" || nt[i + 1] === "l") ? i + 2 : ING.has(w) && w !== "sans" && w !== "avec" ? i + 1 : -1; if (at < 0 || at >= nt.length) return false; const t = stem(nt[at]); return !qset.has(t) && !NEUTRAL.has(t) && !/^\d/.test(t); }); };
     const freshOk = sToks.length && sToks.every((t) => primaryRays(t).every((r) => r.u === "fruits-legumes" || qual(r.id)));
-    const isFresh = (p) => (rayon(p.r) || {}).u === "fruits-legumes" && sToks.every((t) => ownPre(p, t));
+    const isFresh = (p) => (rayon(p.r) || {}).u === "fruits-legumes" && sToks.every((t) => ownPre(p, t)) && !added(p);
     const fresh0 = freshOk ? rel.filter((p) => isFresh(p) && leadPos(p, sToks[0]) === 0) : [];
     /* le nom d'un producteur peut précéder celui du produit (« Ferme de Vaulerand Pomme de terre ») */
     const fresh = fresh0.length ? fresh0.concat(rel.filter((p) => !fresh0.includes(p) && isFresh(p) && capLead(p, sToks[0]))) : [];
-    /* le même légume surgelé ou en conserve, rangé dans un rayon qui ne le nomme pas (« Haricots verts extra-fins »
-       des légumes surgelés), le vaut ; pas un rayon qui lui est propre (« Tomates en conserve ») */
-    if (sells(fresh)) rel = fresh.concat(rel.filter((p) => !fresh.includes(p) && ["surgele", "surgelee", "conserve"].some((w) => rayStrong(p.r).has(w)) && !toks.some((t) => rayStrong(p.r).has(t)) && sToks.every((t) => ownPre(p, t)) && leadPos(p, sToks[0]) === 0));
+    /* le frais seul quand tes enseignes en vendent : le même légume surgelé ou en conserve (« Courgettes en rondelles »
+       des légumes surgelés), rangé dans un rayon qui ne le nomme pas, ne vient qu'à défaut : au vivier, pour une
+       enseigne qui ne vend pas le frais (fbRel) ; pas un rayon qui lui est propre (« Tomates en conserve ») */
+    let fbRel = [];
+    if (sells(fresh)) { fbRel = rel.filter((p) => !fresh.includes(p) && formOf(p) && !toks.some((t) => rayStrong(p.r).has(t)) && sToks.every((t) => ownPre(p, t)) && leadPos(p, sToks[0]) === 0 && !added(p)); rel = fresh; }
+    /* surgelé ou en conserve sans que la ligne le demande : la ligne le dit (freshNote) ; freshMiss quand aucun produit
+       vendu n'est le produit lui-même, frais (univers frais, hors d'un rayon surgelé ou en conserve : pas de l'ail
+       semoule des épices ni un couscous de maïs ; son nom le dit en tête, ou après « de », sans ingrédient ajouté :
+       « Carottes râpées », « Dos de cabillaud » ; pas un mélange pour pot-au-feu, des lentilles carottes, de l'ail aux
+       herbes ni un fromage à tartiner ail et fines herbes) */
+    const named = (p) => { const k = leadPos(p, sToks[0]); if (k === 0) return true; if (k !== 1) return false; const nt = norm(p.name).split(" ").filter(Boolean).map(stem), i = nt.findIndex((w) => w.startsWith(sToks[0])); return i > 1 && DEW.has(nt[i - 1]); };
+    if (!toks.some((t) => QUAL.has(t))) { out.fq = sToks; out.freshMiss = !rel.some((p) => pb(p) && FRESHU.has((rayon(p.r) || {}).u) && !formOf(p) && sToks.every((t) => ownPre(p, t)) && named(p) && !added(p)); }
     /* le rayon de tous les jours de ce mot, quand la ligne ne dit que lui (« chocolat », « chocolat au lait », « gâteaux ») */
     const home = sToks.length === 1 && HOME[sToks[0]];
     const homeSet = home ? rel.filter((p) => p.r === home) : [];
@@ -2871,11 +2911,17 @@
       const uc = {};
       plain.forEach((p) => { if (sz(p)) uc[p.qty.u] = (uc[p.qty.u] || 0) + 1; });
       const um = Object.keys(uc).sort((a, b) => uc[b] - uc[a])[0];
-      const szs = plain.filter((p) => sz(p) && p.qty.u === um).map(sz).sort((a, b) => a - b), med = szs.length ? szs[Math.floor(szs.length / 2)] : 0;
+      /* la médiane sur les contenances écrites : une courgette ou un kiwi à la pièce (contenance estimée) ne la tirent
+         pas vers le bas */
+      const wr = plain.some((p) => sz(p) && p.qty.u === um && !p.approx);
+      const szs = plain.filter((p) => sz(p) && p.qty.u === um && (!wr || !p.approx)).map(sz).sort((a, b) => a - b), med = szs.length ? szs[Math.floor(szs.length / 2)] : 0;
       const capOk = (p) => !med || !sz(p) || p.qty.u !== um || sz(p) <= med * 3;
       const brands = {};
       plain.forEach((p) => { const k = keyS(p); (brands[k] || (brands[k] = new Set())).add(idx(p)._b); });
-      let common = plain.filter((p) => brands[keyS(p)].size >= 2 && capOk(p));
+      /* fruits et légumes, sans marque et au poids : chaque format de deux fois la médiane au plus est courant (le
+         kilo de courgettes ou de tomates, le filet de kiwis), l'un pas plus que l'autre */
+      const loose = (p) => p.frais && (rayon(p.r) || {}).u === "fruits-legumes" && (!med || !sz(p) || p.qty.u !== um || sz(p) <= med * 2);
+      let common = plain.filter((p) => (brands[keyS(p)].size >= 2 && capOk(p)) || loose(p));
       const byRet = new Map();
       plain.forEach((p) => { const b = pb(p); if (!b || (med && sz(p) && p.qty.u === um && sz(p) >= med * 2) || (common.length && !sz(p))) return; const c = byRet.get(b.ret); if (!c || valOf(p) < valOf(c)) byRet.set(b.ret, p); });
       byRet.forEach((p) => { if (!common.includes(p)) common.push(p); });
@@ -2919,13 +2965,20 @@
     /* les autres formats de la variante la plus simple (repas : le paquet qui suffit pour la recette) */
     out.alts = plain.slice(0, 40).map((p) => p.id);
     pool.set(pick.id, n);
-    out.pool = [...pool.entries()];
+    /* à défaut du frais : le même légume surgelé ou en conserve, la variante la plus simple, en quantité équivalente,
+       marqué pour que le plan ne le prenne que chez une enseigne qui ne vend aucun produit frais du vivier */
+    const fb = new Set();
+    if (fbRel.length && !out.usual && pick.qty && sz(pick)) {
+      const fbs = fbRel.filter((p) => pb(p) && !ingExtra(p, qs)), mx = fbs.length ? Math.min(...fbs.map(extra)) : 0;
+      fbs.forEach((p) => { const q = extra(p) === mx && !pool.has(p.id) ? fit(p, sz(pick) * n, pick.qty.u) : 0; if (q) { pool.set(p.id, q); fb.add(p.id); } });
+    }
+    out.pool = [...pool.entries()].map(([id, q]) => (fb.has(id) ? [id, q, 1] : [id, q]));
     return out;
   }
   /* La liste entière, livraison comprise : pour chaque ensemble d'une à trois enseignes, chaque ligne prend le produit
      du vivier le moins cher dans ces enseignes ; une enseigne dont la commande n'atteint pas son minimum disqualifie
      l'ensemble ; frais de livraison et de service comptés. Renvoie le meilleur plan : lignes couvertes, puis total. */
-  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, sameForm, eansAll, eanLearned, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, recordFill, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems, composeMenu, ghIssueUrl, ghBody, scrub, watchCheck, watchHits, factsOf, factsFetch, allergHit, cmpVerdict, recFits, splitOf, duoAlone, duoRead, retRead, retourPour, retourDuo, sendPayload, linkOf, cleanName, cleanNote, pourOn, ownSplit });
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, sameForm, eansAll, eanLearned, listPlan, matchLine, freshNote, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, recordFill, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems, composeMenu, ghIssueUrl, ghBody, scrub, watchCheck, watchHits, factsOf, factsFetch, allergHit, cmpVerdict, recFits, splitOf, duoAlone, duoRead, retRead, retourPour, retourDuo, sendPayload, linkOf, cleanName, cleanNote, pourOn, ownSplit });
   /* jeu d'essai (tests) : un petit catalogue v2 ajouté au catalogue chargé, rayons et produits compris */
   function mergeCatalog(extra) {
     const c = unpack(extra), seen = new Set(S.list.map((p) => p.id));
@@ -2950,11 +3003,13 @@
         const by = sub.map(() => null);
         /* quantités du vivier, multipliées si la quantité de la ligne a été changée à la main (plus ou moins) */
         const base = (x.pool.find(([id]) => id === x.pick) || [null, x.n])[1], mult = base ? x.n / base : 1;
-        for (const [id, n1] of x.pool) {
+        /* le surgelé ou la conserve d'un légume (troisième champ du vivier) seulement chez une enseigne sans le frais */
+        const prim = sub.map(() => false);
+        for (const [id, n1, fb] of x.pool.filter((e) => !e[2]).concat(x.pool.filter((e) => e[2]))) {
           const p = S.prods.get(id);
           if (!p) continue;
           const n = Math.max(1, Math.round(n1 * mult));
-          sub.forEach((ci, j) => { const o = p.offers[chans[ci].id]; if (o && o.price > 0 && !o.sim) { const c = Math.round(o.price * 100) * n; if (!by[j] || c < by[j].c) by[j] = { id, n, c }; } });
+          sub.forEach((ci, j) => { const o = p.offers[chans[ci].id]; if (o && o.price > 0 && !o.sim && !(fb && prim[j])) { if (!fb) prim[j] = true; const c = Math.round(o.price * 100) * n; if (!by[j] || c < by[j].c) by[j] = { id, n, c }; } });
         }
         let j0 = -1;
         by.forEach((b, j) => { if (b && (j0 < 0 || b.c < by[j0].c)) j0 = j; });
@@ -3028,6 +3083,15 @@
     }
     return out;
   }
+  /* le produit pris est surgelé ou en conserve sans que la ligne le demande : la ligne le dit, avec « Pas de … en frais
+     dans tes enseignes » quand elles n'en vendent pas de frais ; sauf quand son rayon nomme ce qu'on demande (« thon » :
+     le rayon du thon en conserve, « frites » : celui des frites surgelées) */
+  function freshNote(x, p) {
+    const f = x && x.fq && p ? formOf(p) : "";
+    if (!f || x.fq.every((t) => rayStrong(p.r).has(t))) return "";
+    const t = x.t || x.raw;
+    return x.freshMiss ? `Pas ${/^[aeiouyàâéèêëîïôûœ]/i.test(t) ? "d'" : "de "}«\u00a0${t}\u00a0» en frais dans tes enseignes\u00a0: ce produit est ${f}.` : `Ce produit est ${f}.`;
+  }
   const wlStep = (x, i) => `<div class="stepper soft"><button type="button" data-act="wldec" data-i="${i}" aria-label="${x.n > 1 ? "Un de moins" : "Retirer"}">${ic(x.n > 1 ? "minus" : "trash")}</button><span>${x.n}</span><button type="button" data-act="wlinc" data-i="${i}" aria-label="Un de plus">${ic("plus")}</button></div>`;
   /* une ligne de Ma liste : produit trouvé (avec son choix habituel ou sa quantité habituelle), ligne libre gardée, ou
      ligne sans produit (correction proposée, « Garder quand même », « Chercher ») ; data-rm permet le glisser pour retirer */
@@ -3064,6 +3128,8 @@
     /* « tomates pelées x2 » devenu une seule boîte plus grande : la ligne le dit */
     if (x.planned && x.nGiven && x.wn > 1 && x.n !== x.wn) note += `<small>${x.n}\u00a0×\u00a0${esc(p.format)} au lieu des ${x.wn} écrits\u00a0: à peu près la même quantité, pour la commande la moins chère.</small>`;
     if (x.dietMiss) note += `<small>Rien pour ton régime (${esc(dietWhy())}) sous «\u00a0${esc(x.q)}\u00a0»\u00a0: voici sans ce filtre.</small>`;
+    const fn = freshNote(x, p);
+    if (fn) note += `<small>${esc(fn)}</small>`;
     return `<div class="item wli" data-rm="l:${i}"><a class="thumb" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 56)}</a><div class="it"><span class="wq">${esc(x.raw)}</span><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${u ? ", " + esc(u) : ""}${b ? ", chez " + esc(retName(b.ret)) + (b.sim ? " (simulé)" : "") : ""}${x.usual ? ", ton choix habituel" : ""}</small>${note}<div class="acts">${acts}</div></div><div class="ir"><span class="lp">${b ? eurC(Math.round(b.price * 100) * x.n) : "–"}</span>${wlStep(x, i)}</div></div>`;
   }
   VIEWS.ecrire = () => {
@@ -3407,7 +3473,14 @@
      relevés, jamais sur un prix simulé. */
   /* variantes qui ne valent que dans un rayon : une bière forte n'est pas la bière de tous les jours, alors qu'une
      moutarde forte est la moutarde ordinaire */
-  const RAY_VARIANT = { bieres: ["forte", "fort"], cafe: ["grain", "soluble"], "legumes-surgeles": ["cuit", "cuite"], "chocolat-tablettes": ["blanc"] };
+  const RAY_VARIANT = { bieres: ["forte", "fort"], cafe: ["grain", "soluble"], "legumes-surgeles": ["cuit", "cuite"], "chocolat-tablettes": ["blanc"],
+    /* le thé de tous les jours est un thé noir en sachets : vert, blanc, oolong, gunpowder, earl grey, jasmin, chaï,
+       instantané, glacé ou en vrac se demandent */
+    the: ["vert", "blanc", "oolong", "gunpowder", "sencha", "jasmin", "earl", "lady", "bergamote", "chai", "rooibo", "instantane", "glace", "vrac"],
+    /* un nettoyant ou des lingettes pour une seule surface (vitres, sols, meubles, parquet) ne sont pas ceux de tous les jours */
+    "nettoyants-menagers": ["vitre", "sol", "meuble", "parquet", "optique", "inox", "four", "serpilliere"],
+    /* les céréales du petit-déjeuner : des flocons d'avoine, un muesli ou un granola se demandent */
+    cereales: ["avoine", "flocon", "porridge", "muesli", "granola"] };
   const VARIANT = new Set("zero light sucre stevia max cherry vanille citron fraise peche menthe framboise mangue pamplemousse grenade cerise aromatisee decafeine decaf bio lactose croissance vitamine omega chocolat pepite nappee noisette amande caramel gluten complet complete integrale magnesium humide sensitive hypoallergenique couleur noir marseille brebi chevre soja coco vegetal grec grecque bifidu calcium graine melange isio friture roux cassonade canne morceau fluide sarrasin mais pois tournesol colza olive arachide noix sesame pepins avocat lin fondue cru fume sec dinde poulet volaille halal casher chaton chiot junior senior sterilise capsule poudre feuille recharge culotte pants blonde ambree brune blanche ipa alcool rose fruits epice epices piment sale paprika barbecue fluor blancheur sensible antipelliculaire gras secs normaux homme femme bebe enfant kid electrique precuit precuite mini mure myrtille multicereale vegetau vegetarien sel speculoos latte matcha boulgour quinoa chute cacahuete croute cappuccino macchiato tete foie canard lapin panache panachee".split(" ").map(stem));
   const ATTR = new Set(("gazeuse petillante bulle plate aromatisee citron fraise peche menthe framboise mangue pamplemousse grenade cerise vanille " +
     "zero light sucre stevia max cherry pulpe concentre presse orange sanguine multifruit agrume " +
@@ -3438,6 +3511,8 @@
     const juice = /^jus/.test(p.r);
     nt.forEach((t, i) => { if (juice && t === "sucre" && nt[i - 1] === "san" && /^ajoute/.test(nt[i + 1] || "")) return; if (ATTR.has(t) || (RAY_VARIANT[p.r] || []).includes(t)) w.add(nt[i - 1] === "san" ? "sans " + t : t); });
     if ((p.tags || []).includes("Bio")) w.add("bio");
+    /* « P'tits saucissons » : un petit format, comme « mini » */
+    if (/\bp['’]tits\b/i.test(p.name)) w.add("mini");
     /* un beurre à moins de 75 % de matière grasse n'est pas l'équivalent d'un beurre ordinaire */
     if (lowFat(p)) w.add("allege");
     return (p._sig = [...w].sort().join(" "));
@@ -5902,7 +5977,8 @@
     const same = v && p.qty.u === g.u;
     const used = same ? (b.price * need) / v : b.price;
     /* ingrédient qui ne correspond pas au régime (aucun produit conforme) : la recette le dit, elle reste ouvrable */
-    return { g, need, p, b, n, used, buy: b.price * n, bad: !!m.dietMiss };
+    /* surgelé ou en conserve sans que la recette le demande : la ligne le dit, comme dans Ma liste */
+    return { g, need, p, b, n, used, buy: b.price * n, bad: !!m.dietMiss, fresh: freshNote({ fq: m.fq, freshMiss: m.freshMiss, t: g.q.replace(/^oeufs$/, "œufs") }, p) };
   }
   /* un ingrédient vraiment hors régime : un mot d'exclusion (viande, porc, alcool), un allergène connu, ou une étiquette
      qui manque (végan, sans gluten, halal...) quand la recette ne suit pas ce régime par nature ; du riz sans étiquette
@@ -5971,7 +6047,7 @@
     const line = (x) => {
       const q = k === 1 ? x.g.t : fmtNeed(x.need, x.g.u) + (x.g.u === "pc" ? " " + x.g.q.replace(/^oeufs$/, "œufs") : " de " + x.g.q);
       if (!x.p) return `<div class="row th"><span class="thumb q">${ic("search")}</span><span class="rt">${esc(q)}<small>${x.off ? "Pas vendu par tes enseignes" : "Pas encore dans Cabas"}</small></span></div>`;
-      return `<a class="row th" href="${hp(x.p.id)}"><span class="thumb">${img(x.p, 48)}</span><span class="rt">${esc(q)}<small>${esc(x.p.brand + " " + x.p.name)}, ${esc(x.p.format)}, ${eur(x.b.price)} chez ${esc(retName(x.b.ret))}${x.n > 1 ? `, ${x.n} à acheter` : ""}${recBad(rc, x) ? ". Pas pour ton régime, d'après ce que l'enseigne indique" : ""}</small></span><span class="val num">${eur(x.used)}</span></a>`;
+      return `<a class="row th" href="${hp(x.p.id)}"><span class="thumb">${img(x.p, 48)}</span><span class="rt">${esc(q)}<small>${esc(x.p.brand + " " + x.p.name)}, ${esc(x.p.format)}, ${eur(x.b.price)} chez ${esc(retName(x.b.ret))}${x.n > 1 ? `, ${x.n} à acheter` : ""}${recBad(rc, x) ? ". Pas pour ton régime, d'après ce que l'enseigne indique" : ""}${x.fresh ? ". " + esc(x.fresh.replace(/\.$/, "")) : ""}</small></span><span class="val num">${eur(x.used)}</span></a>`;
     };
     return {
       title: rc.name, grouped: true,

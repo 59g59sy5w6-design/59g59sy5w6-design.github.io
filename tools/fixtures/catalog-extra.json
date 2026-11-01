@@ -1098,6 +1098,171 @@
     375,
     "g"
    ]
+  },
+  {
+   "i": "fx-carottes-1-kg",
+   "b": "Sans marque",
+   "n": "Carottes",
+   "f": "1 kg",
+   "r": "pommes-de-terre",
+   "k": "net",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     149,
+     303,
+     0
+    ],
+    [
+     2,
+     129,
+     303,
+     0
+    ],
+    [
+     6,
+     119,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    1000,
+    "g"
+   ],
+   "fr": 1
+  },
+  {
+   "i": "fx-carottes-bio-500-g",
+   "b": "Sans marque",
+   "n": "Carottes bio",
+   "f": "500 g",
+   "r": "pommes-de-terre",
+   "k": "net",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     139,
+     303,
+     0
+    ],
+    [
+     6,
+     135,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    500,
+    "g"
+   ],
+   "g": [
+    "Bio"
+   ],
+   "d": [
+    "bio"
+   ],
+   "fr": 1
+  },
+  {
+   "i": "fx-ail-blanc-250-g",
+   "b": "Sans marque",
+   "n": "Ail blanc",
+   "f": "250 g",
+   "r": "pommes-de-terre",
+   "k": "net",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     229,
+     303,
+     0
+    ],
+    [
+     2,
+     199,
+     303,
+     0
+    ],
+    [
+     6,
+     189,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    250,
+    "g"
+   ],
+   "fr": 1
+  },
+  {
+   "i": "fx-ail-violet-la-piece",
+   "b": "Sans marque",
+   "n": "Ail violet",
+   "f": "la pièce",
+   "r": "pommes-de-terre",
+   "k": "net",
+   "t": "nb",
+   "o": [
+    [
+     2,
+     89,
+     303,
+     0
+    ],
+    [
+     6,
+     85,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    60,
+    "g"
+   ],
+   "ap": 1,
+   "fr": 1
+  },
+  {
+   "i": "fx-courgettes-1-kg",
+   "b": "Sans marque",
+   "n": "Courgettes",
+   "f": "1 kg",
+   "r": "legumes",
+   "k": "net",
+   "t": "nb",
+   "o": [
+    [
+     0,
+     259,
+     303,
+     0
+    ],
+    [
+     2,
+     239,
+     303,
+     0
+    ],
+    [
+     6,
+     229,
+     303,
+     0
+    ]
+   ],
+   "q": [
+    1000,
+    "g"
+   ],
+   "fr": 1
   }
  ]
 }

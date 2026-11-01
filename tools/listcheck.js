@@ -1,13 +1,16 @@
 // Vérification de Ma liste : plus de soixante lignes du quotidien (lait, pommes, tomates, steak haché, café, thé, carottes,
 // citron, pain de mie...) et les lignes de la vérification finale (viande hachée, pâte à pizza, chocolat au lait, capsules café,
-// pâté, cabillaud, oranges, jambon blanc… ; « piles » ne trouve rien) dont chaque choix est le produit ordinaire attendu
-// (rayon et mots du nom, jamais un identifiant), lignes de « La semaine » qui font avec les frais le total de la carte du plan,
+// pâté, cabillaud, oranges, jambon blanc… ; « piles » ne trouve rien) et celles du 1er novembre 2026 (courgettes fraîches, thé
+// noir, « surgelés frites », « lingettes ménagères », « pastilles lave-vaisselle », quarante lignes de plus), plus de cent
+// quarante en tout, dont chaque choix est le produit ordinaire attendu (rayon et mots du nom, jamais un identifiant) ; un
+// produit surgelé ou en conserve qui le dit sur sa ligne (« Pas de « carottes » en frais dans tes enseignes ») ; lignes de « La semaine » qui font avec les frais le total de la carte du plan,
 // « coca 6 x 1,5 l » (six bouteilles de 1,5 L) ; choix habituel mémorisé (repris d'office, ou signalé quand il est plus de 15 % plus cher,
 // « Garder le mien »), quantité habituelle d'après les paniers commandés (« × 2, comme d'habitude », « Toujours 1 »),
 // usualQty sur un historique fixe, orthographe (« spagetti x2 » trouve un spaghetti, « zzzz » reste sans suggestion,
 // « Tu voulais dire… ? Oui »), lignes libres (« Garder quand même », panier, texte partagé, liste partagée), puis, avec le
 // jeu d'essai tools/fixtures/catalog-extra.json ajouté au catalogue relevé, les mots des nouvelles catégories (jambon, camembert,
-// lessive capsules, couches, croquettes chat, vin rouge…) et « Mon régime » (rayon filtré, chip, Ma liste, réglages,
+// lessive capsules, couches, croquettes chat, vin rouge… ; carottes, ail et courgettes frais pris à la place de la conserve
+// et du surgelé) et « Mon régime » (rayon filtré, chip, Ma liste, réglages,
 // dietOk sur 30 libellés, repas) ; « Colle ton panier » (cleanPaste sur les paniers collés de tools/fixtures/paniers-
 // colles.json : site sur plusieurs lignes, courriel en colonnes, ticket de caisse, message à cases, quantités seules ;
 // une liste écrite ressort telle quelle ; dans Ma liste, le montant collé est dit « d'après ce que tu as collé » et
@@ -116,7 +119,7 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
       ["mayonnaise", /^mayonnaise-ketchup$/, /mayonnaise/],
       ["ketchup", /^mayonnaise-ketchup$/, /ketchup/],
       ["café", /^cafe$/, /cafe/, /grain|soluble|capsule|dosette/],
-      ["thé", /^the$/, /\bthe\b/, /glace|whisky/],
+      ["thé", /^the$/, /\bthe noir\b|\bthe\b(?!.*\b(vert|blanc|oolong)\b)/, /glace|whisky|vert|gunpowder|earl|grey|aromatise|jasmin|menthe|citron|vrac|instantane|latte|chai/],
       ["chocolat en poudre", /^chocolat-poudre$/, /chocolat|cacao/],
       ["céréales", /^cereales$/, null, /barre|bebe|mois/],
       ["confiture", /^confitures$/, /confiture/],
@@ -206,6 +209,93 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     });
     const piles = ord[ORDINARY.length];
     if (piles.r && (!/\bpiles?\b/.test(piles.name) || /glace/.test(piles.name))) fail(`« piles » : « ${piles.shown} » au lieu d'aucun produit`);
+    /* lignes de la vérification du 1er novembre 2026 : le reste des 82 lignes du quotidien et quarante de plus (fruits et
+       légumes frais, produits frais, petit-déjeuner, hygiène, bébé, entretien), plus « surgelés frites » (un autre ordre
+       de mots, « surgelés » au masculin quand le rayon dit « surgelées »), « lingettes ménagères » (un mot qui nomme
+       l'univers de l'entretien), « pastilles lave-vaisselle » (des tablettes). Le frais d'abord : « courgettes » sont des
+       courgettes fraîches, pas des rondelles surgelées ; « thé » un thé noir, pas un thé vert, aromatisé ou en vrac */
+    const MORE = [
+      ["courgettes", /^(legumes|legumes-surgeles|conserves-legumes)$/, /courgette/, /provencale|poelee|farcie|gratin|ratatouille|rondelle|soupe/],
+      ["ail", /./, /\bail\b/, /herbe|fromage|saucisson|semoule|poudre|crevette|persil|confit/],
+      ["saucisson", /^saucisson$/, /saucisson/, /trio|mini|p tits|petits|baton|noix|noisette|beaufort|chorizo|fuet|tranch/],
+      ["camembert", /^fromages(-pate-molle)?$/, /camembert/, /\bbrie\b|pane|aperitif/],
+      ["thon", /^thon$/, /thon/, /tomate|catalane|sauce|salade|emiette.*sauce|rillettes/],
+      ["sardines", /^conserves$/, /sardine/, /tomate|piment|citron|rillettes/],
+      ["frites", /^frites$/, /frite/, /poulet|sauce|epice|assaisonnement|potatoes|four|patate douce/],
+      ["frites surgelées", /^frites$/, /frite/, /poulet|sauce|potatoes|patate douce/],
+      ["surgelés frites", /^frites$/, /frite/, /poulet|sauce|potatoes|patate douce/],
+      ["pizza", /^pizzas/, /pizza/, /pate a pizza|pate pizza/],
+      ["pizza surgelé", /^pizzas-surgelees$/, /pizza/],
+      ["lingettes ménagères", /^nettoyants-menagers$/, /lingette/, /vitre|\bsols?\b|meuble|parquet|optique|bebe/],
+      ["lingettes désinfectantes", /^nettoyants-menagers$/, /lingette.*desinfect/],
+      ["pastilles lave-vaisselle", /^lave-vaisselle$/, /pastille|tablette/, /cycle court|citron|\bgel\b|liquide|\bsel\b|poudre/, 15],
+      ["poireaux", /^legumes$/, /poireau/, /soupe|veloute|fondue|emince|surgel/],
+      ["concombre", /^legumes$/, /concombre/, /tzatziki|salade/],
+      ["poivrons", /^legumes$/, /poivron/, /grille|farci|marine|conserve/],
+      ["champignons", /^legumes$/, /champignon/, /emince|poelee|persill|conserve/],
+      ["brocoli", /^legumes$/, /brocoli/, /fleurette.*surgel|puree|soupe/],
+      ["haricots verts", /^(legumes|legumes-surgeles|conserves-legumes)$/, /haricot.*vert/, /provencale|beurre|poelee|puree|bebe/],
+      ["épinards", /^(legumes|salades-herbes|legumes-surgeles)$/, /epinard/, /creme|puree|veloute|galette/],
+      ["avocat", /^(legumes|fruits)$/, /avocat/, /guacamole|huile/],
+      ["kiwis", /^fruits$/, /kiwi/, /sec|seche|jus|confiture/, 6],
+      ["clémentines", /^fruits$/, /clementine/, /jus|sirop|confiture/],
+      ["poires", /^fruits$/, /poire/, /sirop|compote|jus|conserve/, 4],
+      ["raisin", /^fruits$/, /raisin/, /\bsecs?\b/],
+      ["aubergines", /^legumes$/, /aubergine/, /grillee|caviar|farcie/],
+      ["tomates", /^legumes$/, /tomate/, /sechee|puree|concentre|sauce|cerise/, 4],
+      ["lait demi-écrémé", /^lait$/, /demi/, /croissance|chocolat|vegetal/],
+      ["yaourts aux fruits", /^yaourts-fruits$/, /yaourt/, /(^| )0( mg)?( |$)|proteine|skyr|bebe/],
+      ["fromage blanc", /^fromage-blanc$/, /fromage blanc/, /(^| )0( mg)?( |$)|stracciatella|vanille|fruit|skyr/],
+      ["petits suisses", /^fromage-blanc$/, /suisse/, /fruit|aromatise/],
+      ["mozzarella", /^fromages/, /mozzarella/, /rapee?|pizza|tomate|bufala/],
+      ["comté", /^fromages/, /comte/, /rape|tranche/],
+      ["crème liquide", /^creme$/, /creme/, /dessert|vanille|chantilly|soja|vegetal|(^| )(1[0-9]|[3-9])( |$)/],
+      ["jambon cru", /^jambon-cru$/, /jambon/, /blanc|dinde|poulet/],
+      ["café moulu", /^cafe$/, /moulu/, /grain|soluble|capsule|dosette|decafeine/],
+      ["thé noir", /^the$/, /\bthe\b/, /vert|earl|grey|aromatise|citron|fruit|vanille|peche|menthe|vrac|chai/],
+      ["thé vert", /^the$/, /vert/, /menthe|citron|jasmin|gingembre|fraise|framboise|peche|mangue|vrac|gunpowder|matcha|aromatise/],
+      ["céréales", /^cereales$/, null, /barre|bebe|mois|avoine|flocon|porridge|muesli|granola/],
+      ["muesli", /^cereales$/, /muesli/],
+      ["brioche", /^viennoiseries$/, /brioche/, /chocolat|pepite|sucre perle/],
+      ["jus de pomme", /^jus-autres$/, /pomme/, /nectar|boisson|mangue|cassis|framboise/],
+      ["savon", /^(gel-douche|savons?)$/, /savon/, /lessive|vaisselle/],
+      ["coton-tiges", /^mouchoirs-cotons$/, /coton/],
+      ["rasoirs", /^rasage$/, /rasoir/, /electrique|tondeuse/],
+      ["serviettes hygiéniques", /^hygiene-feminine$/, /serviette/, /lavable|culotte/],
+      ["petits pots", /^repas-bebe$/, /pot/],
+      ["lait infantile", /^lait-infantile$/, /lait/],
+      ["lingettes bébé", /^(couches|toilette-bebe)$/, /lingette/],
+      ["eau de javel", /^nettoyants-menagers$/, /javel/, /sans javel/],
+      ["nettoyant sol", /^nettoyants-menagers$/, /\bsols?\b/],
+      ["nettoyant vitres", /^nettoyants-menagers$/, /vitre/],
+      ["papier aluminium", /^conservation$/, /alu/],
+      ["film alimentaire", /^conservation$/, /film/],
+    ];
+    const more = await page.evaluate((T) => { const D = cabasDebug(), P = D.S.prods, nm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/œ/g, "oe").replace(/[^a-z0-9]+/g, " ");
+      return T.map((t) => { const M = D.matchLine(D.parseLine(t)), p = M.pick && P.get(M.pick), b = p && D.best(p); return p ? { t, r: p.r, name: nm(p.brand + " " + p.name), shown: p.brand + " " + p.name, unit: b ? D.perUnit(p, b.price) : null } : { t, r: null }; }); }, MORE.map((x) => x[0]));
+    MORE.forEach(([t, ray, want, not, maxU], i) => {
+      const d = more[i];
+      if (!d.r) { fail(`« ${t} » : aucun produit`); return; }
+      if (!ray.test(d.r) || (want && !want.test(d.name)) || (not && not.test(d.name))) fail(`« ${t} » : « ${d.shown} » (rayon ${d.r}) n'est pas le produit ordinaire attendu`);
+      if (maxU && d.unit != null && d.unit > maxU) fail(`« ${t} » : « ${d.shown} » à ${d.unit.toFixed(2)} € le kilo, un format ordinaire moins cher est vendu`);
+    });
+    if (DAILY.length + ORDINARY.length + MORE.length < 140) fail("lignes vérifiées : moins de cent quarante");
+    /* surgelé ou en conserve sans que la ligne le demande : la ligne le dit (« Pas de « carottes » en frais dans tes
+       enseignes : ce produit est en conserve »), jamais caché ; pas pour « thon » ni « frites », dont le rayon le dit */
+    {
+      const FT = ["carottes", "ail", "courgettes", "haricots verts", "épinards", "petits pois", "cabillaud", "thon", "frites"];
+      const fl = await runList(FT.join("\n"), { prefs: PREFS });
+      const rows = await page.$$eval(".item.wli", (els) => els.map((e) => e.textContent.replace(/\s+/g, " ")));
+      const info = await page.evaluate(() => { const D = cabasDebug(); return D.S.wl.lines.map((x) => { const p = D.S.prods.get(x.pick); return p ? { r: p.r, u: (D.S.rayMap.get(p.r) || {}).u, rn: (D.S.rayMap.get(p.r) || {}).name } : null; }); });
+      FT.forEach((t, i) => {
+        const x = info[i], row = rows[i] || "", said = /ce produit est (surgelé|en conserve)/i.test(row);
+        if (!x) { fail(`« ${t} » : aucun produit`); return; }
+        const form = /surgel|conserve/i.test(x.rn || ""), named = /thon|frites/.test(t);
+        if (form && !named && !said) fail(`« ${t} » : « ${row.slice(0, 120)} » ne dit pas que le produit est surgelé ou en conserve`);
+        if ((!form || named) && said) fail(`« ${t} » : la ligne dit surgelé ou en conserve pour un produit de « ${x.rn} »`);
+      });
+      if (fl.some((x) => !x.pick)) fail("frais, surgelé ou conserve : une ligne sans produit " + JSON.stringify(fl.filter((x) => !x.pick).map((x) => x.raw)));
+    }
     /* une ligne dont la phrase entière est un produit d'un rayon (« viande hachée », « pâte à pizza ») reste une seule
        ligne, jamais découpée en « viande » et « hachée » */
     const whole = await page.evaluate(() => cabasDebug().readList("viande hachée\npâte à pizza").map((x) => x.raw));
@@ -405,6 +495,10 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     const got = await page.evaluate((qs) => { const D = cabasDebug(); return D.readList(qs.join("\n")).map((x) => { const p = x.pick && D.S.prods.get(x.pick); return { raw: x.raw, r: p ? p.r : null, name: p ? p.name : null, n: x.n }; }); }, WORDS.map((w) => w[0]));
     WORDS.forEach(([q, r, re], i) => { const g = got[i]; if (!g || g.r !== r || !re.test(g.name || "")) fail(`Ma liste « ${q} » : attendu rayon ${r} et ${re}, obtenu ${g ? g.r + " / " + g.name : "rien"}`); });
     if (got[6] && got[6].n !== 1) fail("« bière blonde x6 » : un pack de 6 attendu en quantité 1, obtenu " + got[6].n);
+    /* le frais d'abord, dès que le catalogue en a : les carottes, l'ail et les courgettes frais du jeu d'essai sont pris
+       à la place de la conserve et du surgelé, sans « Pas de … en frais » */
+    const fr = await page.evaluate(() => { const D = cabasDebug(); return D.readList("carottes\nail\ncourgettes\n2 kg de carottes").map((x) => { const p = x.pick && D.S.prods.get(x.pick); return { raw: x.raw, u: p ? (D.S.rayMap.get(p.r) || {}).u : null, name: p ? p.name : null, miss: !!x.freshMiss, pool: (x.pool || []).length }; }); });
+    fr.forEach((x) => { if (x.u !== "fruits-legumes" || x.miss || !/carotte|ail|courgette/i.test(x.name || "")) fail(`le frais d'abord, « ${x.raw} » : ${x.name} (${x.u})${x.miss ? ", dit sans frais" : ""}`); });
     const top = await page.evaluate(() => { const D = cabasDebug(); return ["vin rouge", "croquettes chat", "jambon"].map((q) => { const r = D.searchScored(q)[0]; return r ? r[1].r : null; }); });
     if (top[0] !== "vin-rouge" || top[1] !== "croquettes-chat" || !/jambon/.test(top[2] || "")) fail("recherche : premiers résultats " + JSON.stringify(top));
     /* « Mon régime » halal : le rayon jambon ne montre que les produits étiquetés, la chip se décoche, Ma liste suit */
@@ -415,12 +509,17 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     const halalCards = () => page.evaluate(() => { const D = cabasDebug(); return [...document.querySelectorAll("#view .card a.cover")].map((a) => decodeURIComponent(a.getAttribute("href").split("/").pop())).map((id) => D.dietOk(D.S.prods.get(id))); });
     let shown = await halalCards(), cards = shown.length;
     if (!cards || shown.some((ok) => !ok)) fail(`régime halal : ${cards} cartes dans le rayon jambon, ${shown.filter((ok) => !ok).length} non conformes`);
-    if (!/correspond.*ton régime/.test(await page.locator("#view .count").textContent().catch(() => ""))) fail("régime halal : le nombre de produits conformes n'est pas dit");
+    /* la grille affiche 16 cartes puis 24 de plus au défilement : les nombres comparés sont ceux que la page dit (produits
+       conformes, produits du rayon), pas les cartes affichées */
+    const said = await page.locator("#view .count").textContent().catch(() => ""), nFit = +((/(\d+)\s*produits? correspond/.exec(said) || [])[1] || 0);
+    if (!/correspond.*ton régime/.test(said)) fail("régime halal : le nombre de produits conformes n'est pas dit");
+    const nAll = +((/^(\d+)\s*produits?/.exec(await page.locator("#view .lt-sub").textContent().catch(() => "")) || [])[1] || 0);
+    if (!nFit || nFit >= nAll) fail(`régime halal : ${nFit} produits conformes sur ${nAll} dans le rayon jambon`);
     const dchip = page.locator('[data-act="quick"][data-q="diet"]');
     if ((await dchip.getAttribute("aria-pressed")) !== "true") fail("régime : la chip « Mon régime » n'est pas pressée par défaut");
     await dchip.click(); await page.waitForTimeout(300);
-    const all = await page.locator("#view .card").count();
-    if (all <= cards) fail(`régime halal décoché : ${all} cartes, plus de ${cards} attendues`);
+    const all = await page.locator("#view .card").count(), still = await page.locator("#view .count").count();
+    if (still || all < Math.min(16, nAll) || (cards < 16 && all <= cards)) fail(`régime halal décoché : ${all} cartes${still ? ", le filtre du régime est encore dit" : ""}, tout le rayon (${nAll} produits) attendu`);
     const dl = await page.evaluate(() => { const D = cabasDebug(); return D.readList("jambon\ncamembert").map((x) => ({ pick: x.pick, miss: !!x.dietMiss })); });
     if (!dl[0] || !/halal/.test(dl[0].pick) || dl[0].miss) fail("régime halal, Ma liste « jambon » : " + JSON.stringify(dl[0]));
     if (!dl[1] || !dl[1].pick || !dl[1].miss) fail("régime halal, Ma liste « camembert » : le repli sans filtre n'est pas signalé : " + JSON.stringify(dl[1]));
