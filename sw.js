@@ -1,6 +1,6 @@
 /* Cabas hors ligne : l'appli et le dernier relevé de prix restent disponibles sans réseau.
    Changer VERSION à chaque mise en ligne pour que les téléphones récupèrent les nouveaux fichiers. */
-const VERSION = "cabas-2026-11-01-11";
+const VERSION = "cabas-2026-11-01-12";
 /* l'appli : toujours rechargée du réseau à l'installation d'une version */
 const SHELL = [
   "./", "index.html", "app.css", "boot.js", "app.js", "packs.js", "scan.js", "optimizer.js", "worker.js", "manifest.webmanifest",
@@ -18,12 +18,19 @@ const SHARE = "cabas-partage";
 const SHARE_KEYS = ["title", "text", "url"];
 /* déménagement : l'appli passe de l'ancienne adresse à https://cabas.mmt-advisory.com. Le navigateur garde les données
    (panier, listes, réglages) par adresse : quand GitHub Pages redirige l'ancienne adresse vers la nouvelle, la page de
-   l'appli n'est pas suivie, elle s'ouvre depuis le cache sur l'ancienne adresse, avec ses données (./?demenage=1), et
-   l'appli propose de les emporter dans un lien (#/demenage, puis #/transfert sur la nouvelle adresse). Ailleurs (la
+   l'appli n'est pas suivie, elle s'ouvre depuis le cache sur l'ancienne adresse, avec ses données (./?demenage=<jeton>),
+   et l'appli propose de les emporter dans un lien (#/demenage, puis #/transfert sur la nouvelle adresse). Ailleurs (la
    nouvelle adresse, localhost), rien ne change. */
 const OLD_HOST = "59g59sy5w6-design.github.io";
 const NEW_ORIGIN = "https://cabas.mmt-advisory.com";
 const MOVING = self.location.host === OLD_HOST;
+/* le marqueur ?demenage ne vaut que s'il vient d'ici : un jeton tiré au sort, rangé dans ce cache (lu puis effacé par la
+   page), valable dix minutes ; une adresse fabriquée avec ?demenage s'ouvre sans lui. « vu » note que l'ancienne adresse
+   a déjà mené à la nouvelle (un partage vers l'ancienne appli passe alors par le déménagement). */
+const MOVE = "cabas-demenage";
+const TOKEN_MS = 10 * 60 * 1000;
+/* caches gardés d'une version à l'autre */
+const KEEP = [SHARE, MOVE];
 /* sur l'ancienne adresse redirigée, une réponse venue de la nouvelle est rendue comme venue d'ici (même contenu, sans
    son adresse d'arrivée) : la règle de contenu de la page refuserait sinon les prix arrivés d'une autre adresse, et
    l'appli restée sur l'ancienne adresse continue de marcher, prix à jour compris. Avant la bascule, rien ne change. */
@@ -37,7 +44,7 @@ self.addEventListener("install", (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(VERSION);
     await c.addAll(SHELL.map((f) => new Request(f, { cache: "reload" })));
-    const old = (await caches.keys()).filter((k) => k !== VERSION && k !== SHARE);
+    const old = (await caches.keys()).filter((k) => k !== VERSION && !KEEP.includes(k));
     for (const f of DATA) {
       let hit = null;
       for (const k of old) { hit = await (await caches.open(k)).match(f); if (hit) break; }
@@ -52,7 +59,7 @@ self.addEventListener("install", (e) => {
   })());
 });
 self.addEventListener("activate", (e) => {
-  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== SHARE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && !KEEP.includes(k)).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 const sameVersion = (a, b) => {
@@ -72,7 +79,7 @@ async function serveData(e, req, url) {
   const hit = await c.match(key);
   const net = fetch(req).then(async (res) => {
     /* l'ancienne adresse redirige déjà vers la nouvelle : l'appli ouverte le dit */
-    if (fromNew(res)) { await tellClients(url.pathname, "moved"); res = await here(res); }
+    if (fromNew(res)) { await seen(); await tellClients(url.pathname, "moved"); res = await here(res); }
     if (res.ok) {
       const changed = !hit || !sameVersion(hit, res);
       await c.put(key, res.clone());
@@ -80,7 +87,9 @@ async function serveData(e, req, url) {
     }
     return res;
   });
-  try { e.waitUntil(net.catch(() => {})); } catch (err) { /* navigateur qui refuse un waitUntil tardif : la revérification se fait quand même */ }
+  /* réseau en échec sur l'ancienne adresse : hors ligne, ou redirection vers http (certificat de la nouvelle adresse pas
+     encore prêt) que la page en https ne peut pas suivre ; l'appli ouverte est prévenue dès que la nouvelle adresse répond */
+  try { e.waitUntil(net.catch(() => (MOVING ? movedProbe() : null))); } catch (err) { /* navigateur qui refuse un waitUntil tardif : la revérification se fait quand même */ }
   if (url.searchParams.has("fresh")) return net.catch(() => hit || Response.error());
   if (hit) return hit;
   return net.catch(() => Response.error());
@@ -89,7 +98,11 @@ async function shareIn(req) {
   const d = {};
   try { const f = await req.formData(); for (const k of SHARE_KEYS) d[k] = String(f.get(k) || "").slice(0, 8000); } catch (err) { /* formulaire illisible : Ma liste s'ouvre vide */ }
   await (await caches.open(SHARE)).put("partage", new Response(JSON.stringify(d), { headers: { "Content-Type": "application/json" } }));
-  return Response.redirect(new URL("./?partage=1#/ecrire", self.registration.scope).href, 303);
+  /* l'ancienne appli installée, une fois l'adresse redirigée : le texte reste ici et passe par le déménagement (sans
+     aucun appel réseau avant la bascule : la page de l'appli n'est redemandée que si le déménagement a déjà été vu) */
+  let to = "./?partage=1#/ecrire";
+  if (MOVING && (await wasSeen()) && (await moveState(new URL("./", self.registration.scope).href)) === "oui") to = "./?demenage=" + (await moveToken()) + "&partage=1#/ecrire";
+  return Response.redirect(new URL(to, self.registration.scope).href, 303);
 }
 /* la page de l'appli sans toucher au réseau : pour une adresse qui porte un texte partagé (ancienne cible en GET) ou
    le marqueur du déménagement */
@@ -99,29 +112,75 @@ async function shell() {
 }
 /* une page de l'appli (la racine ou index.html), pas un autre fichier ouvert dans un onglet */
 const appPage = (url) => { const root = new URL(self.registration.scope).pathname; return url.pathname === root || url.pathname === root + "index.html"; };
-/* la page de l'appli redirigée par l'ancienne adresse. Une redirection opaque ne dit pas où elle mène : la même adresse
-   est redemandée en CORS, sans cookie ni cache (GitHub Pages répond Access-Control-Allow-Origin: *), et l'adresse
-   d'arrivée est lue. Vers la nouvelle adresse, ou vers une arrivée illisible (certificat pas encore prêt, redirection
-   en http), l'appli s'ouvre depuis le cache avec le marqueur ; le # de l'adresse demandée est gardé par le navigateur.
-   Vers une autre adresse, ou sans copie de l'appli en cache, la redirection est suivie comme avant. */
+const NOSTORE = { method: "HEAD", mode: "cors", credentials: "omit", cache: "no-store" };
+/* là où mène une adresse, redemandée en CORS, sans cookie ni cache (GitHub Pages répond Access-Control-Allow-Origin: *
+   sur ses pages, pas sur ses redirections, que le navigateur suit sans le demander) : l'origine d'arrivée, "" sans
+   redirection, "?" illisible (redirection vers http refusée depuis une page en https, certificat pas prêt, hors ligne) */
+const arrival = (u) => fetch(u, NOSTORE).then((r) => (r.redirected ? new URL(r.url).origin : ""), () => "?");
+/* la nouvelle adresse répond elle-même, en https, avec un certificat valide */
+const newReady = () => fetch(NEW_ORIGIN + "/manifest.webmanifest", NOSTORE).then((r) => r.ok, () => false);
+/* l'ancienne adresse mène-t-elle à la nouvelle ? "oui" ; "attente" quand l'arrivée est illisible et que la nouvelle
+   adresse ne répond pas encore en https (pendant que GitHub prépare son certificat, la redirection va vers http) :
+   l'appli continue alors de marcher ici, depuis le cache ; "non" pour une autre adresse */
+async function moveState(u, res) {
+  const to = res && res.redirected ? new URL(res.url).origin : await arrival(u);
+  if (to === NEW_ORIGIN) return "oui";
+  if (to !== "?" && to !== NEW_ORIGIN.replace(/^https:/, "http:")) return "non";
+  return (await newReady()) ? "oui" : "attente";
+}
+async function seen() { await (await caches.open(MOVE)).put("vu", new Response(String(Date.now()))); }
+const wasSeen = async () => !!(await (await caches.open(MOVE)).match("vu"));
+async function moveToken() {
+  const b = crypto.getRandomValues(new Uint8Array(16)), t = Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+  await seen();
+  await (await caches.open(MOVE)).put("jeton", new Response(JSON.stringify({ t, at: Date.now() }), { headers: { "Content-Type": "application/json" } }));
+  return t;
+}
+async function tokenOk(t) {
+  try { const r = await (await caches.open(MOVE)).match("jeton"), j = r ? await r.json() : null; return !!(j && t && j.t === t && Date.now() - j.at < TOKEN_MS); } catch (err) { return false; }
+}
+/* une adresse qui porte ?demenage : servie depuis le cache avec son jeton ; sans jeton valable, la même adresse sans le
+   marqueur (le # est gardé par le navigateur) */
+async function markIn(url) {
+  if (await tokenOk(url.searchParams.get("demenage"))) return shell();
+  const u = new URL(url.href);
+  u.searchParams.delete("demenage");
+  return Response.redirect(u.href, 302);
+}
+/* réseau en échec pour un fichier de prix : la page de l'appli est redemandée, une seule fois pour plusieurs fichiers
+   en échec ensemble (hors ligne, à l'ouverture) */
+let probing = null, probeAt = 0;
+function movedProbe() {
+  if (probing || Date.now() - probeAt < 5000) return probing;
+  probeAt = Date.now();
+  probing = moveState(new URL("./", self.registration.scope).href).then((st) => (st === "oui" ? tellClients("", "moved") : null)).finally(() => { probing = null; probeAt = Date.now(); });
+  return probing;
+}
+/* la page de l'appli redirigée par l'ancienne adresse (une redirection opaque ne dit pas où elle mène) : vers la nouvelle
+   adresse qui répond, l'appli s'ouvre depuis le cache avec le marqueur et son jeton ; tant que la nouvelle adresse ne
+   répond pas en https, depuis le cache sans marqueur ; vers une autre adresse, ou sans copie de l'appli en cache, la
+   redirection est suivie comme avant. Le # de l'adresse demandée est gardé par le navigateur. */
 async function moved(req, res) {
-  let to = res.redirected ? new URL(res.url).origin : "";
-  if (res.type === "opaqueredirect") to = await fetch(req.url, { method: "HEAD", mode: "cors", credentials: "omit", cache: "no-store" }).then((r) => (r.redirected ? new URL(r.url).origin : ""), () => "?");
-  if (to !== NEW_ORIGIN && to !== "?") return res;
-  if (!(await caches.match("index.html"))) return res;
-  return Response.redirect(new URL("./?demenage=1", self.registration.scope).href, 302);
+  const st = await moveState(req.url, res);
+  if (st === "non") return res;
+  const copy = await caches.match("index.html");
+  if (!copy) return res;
+  if (st === "attente") return copy;
+  return Response.redirect(new URL("./?demenage=" + (await moveToken()), self.registration.scope).href, 302);
 }
 self.addEventListener("fetch", (e) => {
   const req = e.request, url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (req.method === "POST" && req.mode === "navigate") { e.respondWith(shareIn(req)); return; }
   if (req.method !== "GET") return;
-  if (req.mode === "navigate" && SHARE_KEYS.concat("partage", "demenage").some((k) => url.searchParams.has(k))) { e.respondWith(shell()); return; }
+  if (req.mode === "navigate" && url.searchParams.has("demenage")) { e.respondWith(markIn(url)); return; }
+  if (req.mode === "navigate" && SHARE_KEYS.concat("partage").some((k) => url.searchParams.has(k))) { e.respondWith(shell()); return; }
   if (req.mode === "navigate") {
-    /* seule une page reçue entière remplace la copie de l'appli : jamais une redirection ni une page d'erreur */
+    /* seule la page de l'appli reçue entière remplace sa copie : jamais une redirection, une page d'erreur ni un autre
+       fichier ouvert dans un onglet (robots.txt, un fichier de prix) */
     e.respondWith(fetch(req).then((res) => {
       if (MOVING && (res.type === "opaqueredirect" || res.redirected) && appPage(url)) return moved(req, res);
-      if (res.ok) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put("index.html", copy)); }
+      if (res.ok && appPage(url)) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put("index.html", copy)); }
       return res;
     }).catch(() => caches.match("index.html")));
     return;

@@ -4,7 +4,7 @@ Tes courses au prix le plus bas, livraison comprise.
 
 Cabas est une application web gratuite, sans compte et sans publicité, qui compare les prix des courses chez Monoprix, Carrefour, Houra et Auchan (Île-de-France) et répartit le panier entre les enseignes pour payer le moins cher, minimums de commande et frais de livraison compris.
 
-Elle s'ouvre à l'adresse https://cabas.mmt-advisory.com et s'installe sur l'écran d'accueil du téléphone. L'ancienne adresse y mène, et l'appli propose d'y emporter le panier, les listes et les réglages gardés à l'ancienne adresse, par un lien qui ne passe par aucun serveur.
+Elle s'ouvre à l'adresse https://cabas.mmt-advisory.com et s'installe sur l'écran d'accueil du téléphone. L'ancienne adresse y mène, et l'appli propose d'y emporter le panier, les listes et les réglages gardés à l'ancienne adresse, par un lien qui ne passe par aucun serveur (sur iPhone, où l'appli installée garde ses données à part, par un code copié dans l'ancienne appli et collé dans la nouvelle).
 
 ## Ce qu'elle fait
 
