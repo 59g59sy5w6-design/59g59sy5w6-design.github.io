@@ -11,7 +11,7 @@
    "laits? infantiles?|1er age"
   ],
   "text": "Laits Infantiles, Biberons",
-  "at": "2026-11-01T09:36:02.835Z"
+  "at": "2026-10-31T15:27:02.090Z"
  },
  {
   "retailer": "houra",
@@ -25,7 +25,7 @@
    "repas et petits pots|^repas|petits? pots?"
   ],
   "text": "Repas du Midi",
-  "at": "2026-11-01T09:36:35.624Z"
+  "at": "2026-10-31T15:27:35.035Z"
  },
  {
   "retailer": "houra",
@@ -39,7 +39,7 @@
    "desserts? bebe|diversification|^desserts?"
   ],
   "text": "Desserts pour Bébé",
-  "at": "2026-11-01T09:36:50.422Z"
+  "at": "2026-10-31T15:27:49.797Z"
  },
  {
   "retailer": "houra",
@@ -53,7 +53,7 @@
    "couches? et lingettes?|^couches?"
   ],
   "text": "Couches",
-  "at": "2026-11-01T09:37:05.910Z"
+  "at": "2026-10-31T15:28:02.367Z"
  },
  {
   "retailer": "houra",
@@ -67,7 +67,7 @@
    "hygiene feminine"
   ],
   "text": "Hygiène féminine",
-  "at": "2026-11-01T09:39:03.658Z"
+  "at": "2026-10-31T15:29:48.496Z"
  },
  {
   "retailer": "houra",
@@ -81,7 +81,7 @@
    "soin du visage|^visage"
   ],
   "text": "Soin du visage",
-  "at": "2026-11-01T09:39:43.809Z"
+  "at": "2026-10-31T15:30:26.912Z"
  },
  {
   "retailer": "houra",
@@ -95,7 +95,7 @@
    "mouchoirs?|cotons?"
   ],
   "text": "Mouchoir, Coton",
-  "at": "2026-11-01T09:40:11.800Z"
+  "at": "2026-10-31T15:30:49.996Z"
  },
  {
   "retailer": "houra",
@@ -109,7 +109,7 @@
    "^lessives?$|^lessives? "
   ],
   "text": "Lessive",
-  "at": "2026-11-01T09:40:45.808Z"
+  "at": "2026-10-31T15:31:26.927Z"
  },
  {
   "retailer": "houra",
@@ -123,7 +123,7 @@
    "^adoucissants?"
   ],
   "text": "adoucissants parfumés",
-  "at": "2026-11-01T09:41:02.615Z"
+  "at": "2026-10-31T15:31:39.481Z"
  },
  {
   "retailer": "houra",
@@ -137,7 +137,7 @@
    "sacs? poubelle|accessoires? de menage|eponges?"
   ],
   "text": "Sac Poubelle",
-  "at": "2026-11-01T09:42:36.068Z"
+  "at": "2026-10-31T15:33:16.068Z"
  },
  {
   "retailer": "houra",
@@ -151,7 +151,7 @@
    "^desodorisants?|^insecticides?"
   ],
   "text": "Insecticide",
-  "at": "2026-11-01T09:42:53.382Z"
+  "at": "2026-10-31T15:33:32.532Z"
  },
  {
   "retailer": "houra",
@@ -165,7 +165,7 @@
    "^chiens?$|patees? pour chien|friandises? pour chien"
   ],
   "text": "Chiens",
-  "at": "2026-11-01T09:44:25.379Z"
+  "at": "2026-10-31T15:35:07.296Z"
  },
  {
   "retailer": "houra",
@@ -179,7 +179,7 @@
    "^oiseaux?|^rongeurs?|^poissons?"
   ],
   "text": "Oiseaux, Rongeurs, Poissons",
-  "at": "2026-11-01T09:44:40.993Z"
+  "at": "2026-10-31T15:35:20.943Z"
  },
  {
   "retailer": "houra",
@@ -193,7 +193,7 @@
    "^legumes$|^legumes "
   ],
   "text": "Légumes",
-  "at": "2026-10-31T15:27:25.386Z"
+  "at": "2026-11-01T09:36:25.411Z"
  },
  {
   "retailer": "houra",
@@ -207,7 +207,7 @@
    "pommes? de terre|legumes? racines?"
   ],
   "text": "Pomme de Terre, Val d'Oise",
-  "at": "2026-10-31T15:27:40.437Z"
+  "at": "2026-11-01T09:36:38.121Z"
  },
  {
   "retailer": "houra",
@@ -221,7 +221,7 @@
    "^porc"
   ],
   "text": "Porc du Bassin Parisien",
-  "at": "2026-10-31T15:28:09.888Z"
+  "at": "2026-11-01T09:37:07.480Z"
  },
  {
   "retailer": "houra",
@@ -235,7 +235,7 @@
    "^volaille"
   ],
   "text": "Volaille, Lapin",
-  "at": "2026-10-31T15:28:43.944Z"
+  "at": "2026-11-01T09:37:40.270Z"
  },
  {
   "retailer": "houra",
@@ -249,7 +249,7 @@
    "poissonnerie"
   ],
   "text": "Poissonnerie",
-  "at": "2026-10-31T15:29:27.271Z"
+  "at": "2026-11-01T09:38:25.306Z"
  },
  {
   "retailer": "houra",
@@ -263,7 +263,7 @@
    "traiteur de la mer|produits de la mer|saumon fume"
   ],
   "text": "Poisson, Traiteur de la mer",
-  "at": "2026-10-31T15:29:39.596Z"
+  "at": "2026-11-01T09:38:38.541Z"
  },
  {
   "retailer": "houra",
@@ -277,7 +277,7 @@
    "^creme fraiche|^cremes?( |$)"
   ],
   "text": "Crème fraiche, sauce",
-  "at": "2026-10-31T15:31:24.996Z"
+  "at": "2026-11-01T09:40:30.176Z"
  },
  {
   "retailer": "houra",
@@ -291,7 +291,7 @@
    "camembert|pates? molles?|^fromages$"
   ],
   "text": "fromages",
-  "at": "2026-10-31T15:32:17.580Z"
+  "at": "2026-11-01T09:41:18.891Z"
  },
  {
   "retailer": "houra",
@@ -305,7 +305,7 @@
    "saucisson"
   ],
   "text": "Saucisson, chorizo",
-  "at": "2026-10-31T15:33:39.079Z"
+  "at": "2026-11-01T09:42:40.671Z"
  },
  {
   "retailer": "houra",
@@ -319,7 +319,7 @@
    "lardons?"
   ],
   "text": "Lardon, poitrine, bacon",
-  "at": "2026-10-31T15:33:53.200Z"
+  "at": "2026-11-01T09:42:53.533Z"
  },
  {
   "retailer": "houra",
@@ -333,7 +333,7 @@
    "knack|saucisses? (a cuire|cuite)|boudin"
   ],
   "text": "Knack, saucisse, boudin",
-  "at": "2026-10-31T15:34:04.701Z"
+  "at": "2026-11-01T09:43:06.697Z"
  },
  {
   "retailer": "houra",
@@ -347,7 +347,7 @@
    "pates? et rillettes|rillettes|foie gras"
   ],
   "text": "Foie gras",
-  "at": "2026-10-31T15:34:18.048Z"
+  "at": "2026-11-01T09:43:19.314Z"
  },
  {
   "retailer": "houra",
@@ -361,7 +361,7 @@
    "pain et boulangerie|^pains?( |$)"
   ],
   "text": "Pain",
-  "at": "2026-10-31T15:35:18.890Z"
+  "at": "2026-11-01T09:44:20.329Z"
  },
  {
   "retailer": "houra",
@@ -375,7 +375,7 @@
    "viennoiserie|brioche|pain au lait"
   ],
   "text": "Pain, Viennoiserie",
-  "at": "2026-10-31T15:35:32.550Z"
+  "at": "2026-11-01T09:44:34.317Z"
  },
  {
   "retailer": "houra",
@@ -389,7 +389,7 @@
    "glaces? et sorbets?|^glaces?( |$)"
   ],
   "text": "Glaces Artisanales Provençales",
-  "at": "2026-10-31T15:35:47.376Z"
+  "at": "2026-11-01T09:44:49.022Z"
  },
  {
   "retailer": "houra",
@@ -403,7 +403,7 @@
    "frites"
   ],
   "text": "Frites, pommes de terre",
-  "at": "2026-10-31T15:36:15.927Z"
+  "at": "2026-11-01T09:45:19.709Z"
  },
  {
   "retailer": "houra",
@@ -417,7 +417,7 @@
    "pizzas?"
   ],
   "text": "Pizza, quiche",
-  "at": "2026-10-31T15:36:34.737Z"
+  "at": "2026-11-01T09:45:43.658Z"
  },
  {
   "retailer": "houra",
@@ -431,7 +431,7 @@
    "aperitifs? et snacks?|^aperitif"
   ],
   "text": "Apéritif, entrée, snacking",
-  "at": "2026-10-31T15:37:46.619Z"
+  "at": "2026-11-01T09:46:56.817Z"
  },
  {
   "retailer": "houra",
@@ -445,7 +445,7 @@
    "pains?, patisseries?|patisseries? et|fruits surgeles"
   ],
   "text": "Pain, pâtisserie et fruit",
-  "at": "2026-10-31T15:38:24.516Z"
+  "at": "2026-11-01T09:47:34.276Z"
  },
  {
   "retailer": "houra",
