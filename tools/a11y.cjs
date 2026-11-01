@@ -228,6 +228,14 @@ const MEASURE_JS = `(() => {
     const full = [...document.querySelectorAll(".btn:not(.tint):not(.ghost):not(.plain):not(.danger), .dock .mini:not(.soft)")].filter((b) => { if (!vis(b)) return false; const r = b.getBoundingClientRect(); return r.top < vh && r.bottom > 0; });
     if (full.length > 1) out.push({ cat: "bouton plein", msg: full.length + " boutons pleins visibles : " + full.map((b) => "« " + txt(b) + " »").join(", ") });
   }
+  /* 10 : l'action que la page met dans le dock se voit, à toutes les largeurs (sur grand écran, le dock est caché sauf
+     pour les vues qui le demandent : une action qui n'existe que là serait introuvable) */
+  if (!sheetOpen) {
+    const dock = document.getElementById("dock");
+    /* la même action ailleurs, visible (le mini panier de la barre latérale, la barre d'achat de la fiche) suffit */
+    const twin = (b) => [...document.querySelectorAll("#view a, #view button, #side a, #side button")].some((o) => vis(o) && (b.dataset.act ? o.dataset.act === b.dataset.act && (o.dataset.id || "") === (b.dataset.id || "") : b.getAttribute("href") && o.getAttribute("href") === b.getAttribute("href")));
+    if (dock && !dock.hidden) for (const b of dock.querySelectorAll("button, a")) if (!vis(b) && !twin(b)) out.push({ cat: "action cachée", msg: "action du dock invisible : « " + txt(b) + " » " + sig(b) });
+  }
   return out;
 })()`;
 

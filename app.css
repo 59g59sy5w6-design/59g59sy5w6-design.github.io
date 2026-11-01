@@ -606,6 +606,7 @@ a.hcard:active, button.hcard:active { background: var(--fill); }
 .banner .bacts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .banner .bacts .btn.sm { margin-top: 0; grid-column: auto; }
 .note { white-space: pre-line; overflow-wrap: anywhere; }
+.banner .bmot { display: block; margin-top: 8px; }
 .order.duo .of .ln:first-child { margin-top: 0; }
 .banner.warn .ic { color: var(--warn); }
 /* budget : ce qu'il reste ou le dépassement, une barre, puis « Tenir le budget » et « Modifier » */

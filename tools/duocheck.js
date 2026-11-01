@@ -104,7 +104,8 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     check(payload && payload.k === "pour" && payload.i.length === 8 && payload.f.length === 1 && payload.j === plus(2) && payload.b === 90, "envoi : contenu du lien " + JSON.stringify(payload).slice(0, 200));
     check(JSON.stringify(payload.d) === '["gluten"]' && JSON.stringify(payload.a) === '["peanuts"]', "envoi : régime ou allergènes absents du lien");
     check(payload.e && payload.e.comp === false && payload.e.off.leclerc === true && payload.e.pick.auchan === "auchan-livraison-paris14", "envoi : enseignes du proche absentes du lien");
-    check(!/94|adresse|zip/i.test(JSON.stringify(payload)), "envoi : le lien contient un code postal ou une adresse");
+    /* l'heure d'envoi et le jeton, tirés au hasard, peuvent contenir « 94 » : ils ne comptent pas */
+    check(!/94|adresse|zip/i.test(JSON.stringify(Object.assign({}, payload, { at: "", t: "" }))), "envoi : le lien contient un code postal ou une adresse");
 
     /* ---------- 2. l'aidant ouvre le lien et fait ses courses à part ---------- */
     await load(B, { basket: AIDANT, seen: { welcome: 1, first: { monoprix: 1, carrefour: 1, houra: 1, auchan: 1 } }, prefs: { off: { leclerc: true }, offv: 1, zip: "75011" }, hist: [{ d: plus(-9), t: 6400, s: 200, n: 4, items: AIDANT, o: [{ rid: "houra", name: "Houra", pick: false, t: 6400, items: AIDANT }], when: [] }] }, hashOf(s1.url));
@@ -132,6 +133,26 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     await B.waitForFunction(() => location.hash === "#/panier");
     await settled(B);
     check(/Les courses de Camille b/.test(await text(B, ".banner.pour")), "pour : pas de bandeau sur le panier");
+    /* son mot reste sous les yeux pendant ses courses, et sa liste se rouvre */
+    check(/Bananes pas trop mûres/.test(await text(B, ".banner.pour")) && (await B.$('.banner.pour a[href^="#/pour/j"]')), "pour : le mot du proche ou « Revoir sa liste » manquent au bandeau du panier");
+    /* ton code postal ne choisit pas son Auchan, et un envoi pendant ses courses porte tes réglages, pas les siens */
+    await go(B, "#/reglages");
+    check(!(await B.$("#view [data-act=zip]")) && !(await B.$("#view [data-act=pickauto]")), "pour : le code postal de l'aidant reste proposé pendant les courses du proche");
+    await go(B, "#/listes");
+    await B.evaluate(() => { const d = cabasDebug(); d.S.lists.push({ id: "lmoi", name: "Mes courses à moi", items: { "barilla-pates-spaghetti-n-5-500-g": 2 }, at: new Date().toISOString() }); });
+    await B.click("#view [data-act=duosend][data-k=pour]");
+    await B.waitForSelector("#sendN");
+    check(!(await B.$("#sheet [data-act=senddiet]")), "pour : « Joindre mon régime » propose le régime du proche à l'aidant");
+    await B.click("[data-act=sendok]");
+    await B.waitForTimeout(300);
+    { const sh = await lastShare(B), P2 = sh && (await B.evaluate((u) => cabasDebug().unpackState(u.split("#/pour/")[1]), sh.url)), mine = await B.evaluate(() => cabasDebug().S.duo.pour.alt.prefs);
+      check(P2 && !P2.d && !P2.a && P2.e && P2.e.comp !== false && JSON.stringify(P2.e.pick) === JSON.stringify(mine.pick || {}) && JSON.stringify(P2.e.off) === JSON.stringify(mine.off || {}), "pour : un envoi de l'aidant pendant les courses du proche porte le régime ou les enseignes du proche " + JSON.stringify(P2 && { d: P2.d, a: P2.a, e: P2.e })); }
+    await B.evaluate(() => { const d = cabasDebug(); d.S.lists = d.S.lists.filter((L) => L.id !== "lmoi"); });
+    /* pendant ses courses, la carte d'arrivée de ta commande n'écrit pas dans son jeu de courses */
+    await go(B, "#/");
+    check(!/Ta commande Houra est arrivée/.test(await text(B, "#view")), "pour : la carte d'arrivée de la commande de l'aidant s'affiche pendant les courses du proche");
+    await go(B, "#/panier");
+    await settled(B);
     check(/Budget de Camille b 90/.test(await text(B, ".bud")), "pour : le budget du proche n'est pas dit « " + (await text(B, ".bud")) + " »");
     check(/Courses de Camille/.test(await text(B, "#tabbar")) || true, "");
     await over(B, "panier du proche"); await shot(B, "3-aidant-panier-proche");
@@ -170,6 +191,7 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     if (!check(s2 && /#\/retour\/j/.test(s2.url || ""), "retour : aucun lien partagé")) throw new Error("arrêt");
     const R = await B.evaluate((u) => cabasDebug().unpackState(u.split("#/retour/")[1]), s2.url);
     check(R && R.w === "pour" && R.t === payload.t && R.n === "Alex" && R.o.length === orders.length && R.o.every((o) => o.s === "ok" && o.d === plus(2) && o.sl === "matin"), "retour : contenu " + JSON.stringify(R).slice(0, 300));
+    check(R && JSON.stringify(R.f) === JSON.stringify([["Bougies d'anniversaire", 1]]), "retour : la ligne libre du proche n'y est pas " + JSON.stringify(R && R.f));
     const snapTot = await B.evaluate(() => { const d = cabasDebug(); const s = d.S.guide.snap; return s.orders.reduce((a, o) => a + d.ordState(o).tot, 0); });
     check(sheetTot === snapTot, `retour : total de la feuille ${sheetTot} au lieu de ${snapTot}`);
     /* revenir à ses courses : le panier de l'aidant revient à l'identique */
@@ -180,7 +202,9 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     check(JSON.stringify(sb.basket) === JSON.stringify(AIDANT) && sb.prefs.comp !== false && !sb.prefs.budget && !(sb.prefs.diet || {}).gluten && sb.prefs.zip === "75011", "retour à mes courses : panier ou réglages de l'aidant pas rendus " + JSON.stringify(sb.prefs));
     check(sb.duo.pour && !sb.duo.pour.on && JSON.stringify(sb.duo.pour.alt.basket) === JSON.stringify(PROCHE), "retour à mes courses : les courses du proche ne sont pas gardées");
     await go(B, "#/");
-    check(/Les courses de Camille b t'attendent/.test(await text(B, "#view")), "accueil : pas de carte pour reprendre les courses du proche");
+    /* le retour envoyé, toutes les commandes passées : la carte dit les courses terminées, à revoir ou à oublier */
+    const hv = await text(B, "#view");
+    check(/Courses de Camille b terminées/.test(hv) && (await B.$("#view [data-act=pourforget]")) && (await B.$("#view [data-act=pourgo]")), "accueil : les courses du proche finies ne sont pas dites terminées, ou rien pour les oublier « " + hv.slice(0, 200) + " »");
 
     /* ---------- 3. le proche lit le retour ---------- */
     await go(A, hashOf(s2.url));
@@ -189,6 +213,8 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     check(eurOf(await text(A, ".sum .st .sr")) === snapTot, "retour lu : total différent de celui de l'aidant");
     check(/Envoyé par Alex/.test(av) && /en réponse à ta liste/.test(av) && /pommes à la place/.test(av), "retour lu : envoyeur, réponse ou mot absents");
     check(/livraison/.test(av) && /matin/.test(av), "retour lu : créneau absent");
+    check(/Bougies d'anniversaire/.test(av) && /hors des commandes de Cabas/.test(av), "retour lu : la ligne libre du proche n'est pas dite");
+    check(/Ton panier contient encore/.test(av) && (await A.$("#view .banner [data-act=clear]")), "retour lu : rien ne dit au proche que son panier contient encore ses courses");
     await over(A, "retour"); await shot(A, "6-proche-retour");
     await A.click("[data-act=retok]");
     await A.waitForTimeout(200);
@@ -207,7 +233,7 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     await A.waitForTimeout(300);
     const s3 = await lastShare(A);
     if (!check(s3 && /#\/duo\/j/.test(s3.url || ""), "duo : aucun lien partagé")) throw new Error("arrêt");
-    await load(B, { basket: MINE, seen: { welcome: 1 }, prefs: { off: { leclerc: true }, offv: 1 }, duo: { me: "Alex" } }, hashOf(s3.url));
+    await load(B, { basket: MINE, seen: { welcome: 1, first: { monoprix: 1, carrefour: 1, houra: 1, auchan: 1 } }, prefs: { off: { leclerc: true }, offv: 1 }, duo: { me: "Alex" } }, hashOf(s3.url));
     check(/La liste de Sam/.test(await text(B, "#view h1")), "duo : titre « " + (await text(B, "#view h1")) + " »");
     await B.click("[data-act=duojoin]");
     await B.waitForFunction(() => location.hash === "#/panier");
@@ -235,6 +261,33 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     if (X.aMe != null) check(X.txt.includes("Ta liste seule : " + money(X.aMe)), `duo : ta liste seule ${money(X.aMe)} absente « ${X.txt.slice(0, 300)} »`);
     if (X.aOt != null) check(X.txt.includes("La liste de Sam seule : " + money(X.aOt)), `duo : sa liste seule ${money(X.aOt)} absente`);
     if (X.aMe != null && X.aOt != null && X.aMe + X.aOt - X.total >= 1) check(X.txt.includes("À deux, la commande coûte " + money(X.aMe + X.aOt - X.total) + " de moins"), "duo : économie de la commande commune absente ou fausse");
+    /* le budget par panier se compare à ta part, pas à toute la commande */
+    await B.evaluate(() => { cabasDebug().S.prefs.budget = 300; });
+    await go(B, "#/"); await go(B, "#/panier"); await settled(B);
+    check((await text(B, ".bud")).includes("il reste " + money(30000 - X.me.total) + " sur ta part"), "duo : le budget ne se compare pas à ta part « " + (await text(B, ".bud")) + " »");
+    await B.evaluate(() => { delete cabasDebug().S.prefs.budget; });
+    await go(B, "#/"); await go(B, "#/panier"); await settled(B);
+    /* un exemplaire ajouté depuis ce téléphone sur une ligne toute à Sam est à toi ; le partage se règle pas à pas */
+    const TROP = "tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l";
+    await B.click(`#view [data-act=inc][data-id="${TROP}"]`);
+    await B.waitForTimeout(250);
+    sb = await all(B);
+    check(sb.basket[TROP] === 5 && sb.owners[TROP] === 4, "duo : l'exemplaire ajouté par l'aidant est compté à Sam " + JSON.stringify([sb.basket[TROP], sb.owners[TROP]]));
+    await B.click(`#view [data-act=itemopt][data-id="${TROP}"]`);
+    await B.waitForSelector("#sheet [data-act=itemown]");
+    check(await B.evaluate(() => [...document.querySelectorAll("#sheet .opt[data-act=itemown]")].some((b) => /Partagé/.test(b.textContent) && b.getAttribute("aria-checked") === "true")), "duo : la ligne partagée n'est pas dite « Partagé »");
+    await B.click(`#sheet [data-act=itemown][data-v="5"]`);
+    check(await B.evaluate(() => [...document.querySelectorAll("#sheet .opt[data-act=itemown]")].some((b) => /Partagé/.test(b.textContent))), "duo : l'option « Partagé » disparaît après « À Sam »");
+    check(/À Sam/.test(await toastText(B)), "duo : changer à qui est un produit ne propose pas « Annuler »");
+    await B.click("#toast [data-act=toastact]");
+    await B.waitForTimeout(250);
+    check((await all(B)).owners[TROP] === 4, "duo : « Annuler » ne rend pas le partage");
+    await B.keyboard.press("Escape");
+    await B.click(`#view [data-act=dec][data-id="${TROP}"]`);
+    await B.waitForTimeout(250);
+    sb = await all(B);
+    check(sb.basket[TROP] === 4 && sb.owners[TROP] === 4, "duo : retirer ton exemplaire change la part de Sam " + JSON.stringify([sb.basket[TROP], sb.owners[TROP]]));
+    await settled(B);
     const rows = await B.evaluate(() => [...document.querySelectorAll("#view .item .inote")].map((e) => e.textContent));
     check(rows.some((t) => /^À Sam$/.test(t)) && rows.some((t) => /^\d+ à toi, \d+ à Sam$/.test(t)), "duo : lignes sans « À Sam » ou « 5 à toi, 2 à Sam » " + JSON.stringify(rows));
     await over(B, "panier à deux"); await shot(B, "7-duo-panier");
@@ -258,6 +311,70 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     check(eurOf(await text(A, ".sum .st .sr")) === X.other.total, "part lue : montant différent de sa part");
     if (X.aOt != null) check((await text(A, ".sum")).includes("Ta liste seule : " + money(X.aOt)), "part lue : économie absente « " + (await text(A, ".sum")) + " »");
     await shot(A, "8-duo-part");
+    /* ---------- 4 bis. la part envoyée suit ce qui est vraiment commandé ---------- */
+    /* Remplir mes paniers : le jus d'orange de Sam laissé de côté, sa Contrex remplacée par un équivalent, ses sardines à
+       acheter en magasin ; sa part, son retour et l'historique de l'aidant suivent l'instantané, pas la répartition */
+    await go(B, "#/panier"); await settled(B);
+    await B.click("[data-act=fillgo]");
+    await B.waitForTimeout(400); await ready(B);
+    const SARD = "parmentier-sardines-a-l-huile-de-tournesol-135-g", CONTREX = "contrex-eau-minerale-naturelle-6-x-1-l";
+    const snapO = () => B.evaluate(() => cabasDebug().S.guide.snap.orders.map((o) => ({ rid: o.rid, items: o.items.filter((x) => !x.st).map((x) => x.id) })));
+    const missOn = async (pid) => {
+      const o = (await snapO()).find((y) => y.items.includes(pid));
+      if (!o) return false;
+      await go(B, "#/remplir/" + o.rid);
+      await B.evaluate(({ rid, idx }) => { const b = document.createElement("button"); b.dataset.act = "fillat"; b.dataset.id = rid; b.dataset.v = idx; document.querySelector("#view").appendChild(b); b.click(); }, { rid: o.rid, idx: o.items.indexOf(pid) });
+      await B.waitForTimeout(250);
+      await B.click("#view [data-act=fillmiss]");
+      await B.waitForSelector("#sheet [data-act=fillskip]");
+      return o.rid;
+    };
+    check(await missOn(TROP), "remplir à deux : le jus d'orange de Sam n'est dans aucune commande");
+    await B.click("#sheet [data-act=fillskip]");
+    await B.waitForTimeout(300);
+    sb = await all(B);
+    check(!(sb.todo || []).some((t) => t.id === TROP), "remplir à deux : le produit de Sam laissé de côté part dans le prochain panier de l'aidant " + JSON.stringify(sb.todo));
+    let eqId = null;
+    if (await missOn(CONTREX)) {
+      const eq = await B.$("#sheet [data-act=fillequiv]");
+      if (eq) { eqId = await eq.evaluate((b) => b.dataset.e); await eq.click(); await B.waitForTimeout(300); } else await B.keyboard.press("Escape");
+    }
+    if (eqId) { sb = await all(B); check(sb.owners[eqId] === 5 && !sb.owners[CONTREX], "remplir à deux : l'équivalent pris pour la Contrex de Sam n'est pas à Sam " + JSON.stringify(sb.owners)); }
+    for (const o of await snapO()) {
+      await go(B, "#/remplir/" + o.rid);
+      for (let i = 0; i < 20; i++) { const b = await B.$("#view .fbtns [data-act=fillck][aria-pressed=false]"); if (!b) break; await b.click(); await B.waitForTimeout(100); }
+      const d = await B.$("#dock [data-act=filldone]"); if (d) { await d.click(); await B.waitForTimeout(200); }
+    }
+    /* la part attendue, refaite ici depuis l'instantané : les exemplaires de Sam (ow) de chaque ligne commandée */
+    const EXP = await B.evaluate(() => {
+      const d = cabasDebug(), s = d.S.guide.snap;
+      let ot = 0, all = 0; const ids = new Set();
+      const cut = (x) => { const k = Math.min(x.q, x.ow || 0); return !k ? 0 : k >= x.q ? x.cost : Math.round((x.cost * k) / x.q); };
+      for (const o of s.orders) {
+        const st = d.ordState(o); let so = 0;
+        for (const x of st.L) { const c = cut(x); if (x.ow) ids.add(x.id); so += c; }
+        ot += so + (st.sub > 0 ? Math.round((st.fee * so) / st.sub) : 0); all += st.tot;
+      }
+      for (const x of s.comp) { ot += cut(x); all += x.cost; }
+      return { ot, all, ids: [...ids], mag: s.comp.map((x) => x.id) };
+    });
+    sb = await all(B);
+    const HL = sb.hist[sb.hist.length - 1] || {};
+    check(HL.t === EXP.all - EXP.ot && !(HL.items || {})[TROP] && !(HL.items || {})[SARD] && !(eqId && (HL.items || {})[eqId]) && (HL.items || {})["candia-lait-1-2-ecreme-6-x-1-l"] === 5, "remplir à deux : l'historique de l'aidant compte la part de Sam " + JSON.stringify({ t: HL.t, exp: EXP.all - EXP.ot, items: HL.items }));
+    await go(B, "#/remplir");
+    await B.click("#view [data-act=duoback]");
+    await B.waitForSelector("#retM");
+    await B.click("[data-act=retsend]");
+    await B.waitForTimeout(300);
+    const s5 = await lastShare(B);
+    const R5 = s5 && (await B.evaluate(async (u) => { const d = cabasDebug(), o = await d.unpackState(u.split("#/retour/")[1]); return { o, r: d.retRead(o) }; }, s5.url));
+    if (check(R5 && R5.r, "remplir à deux : aucun lien de part après le remplissage")) {
+      check(R5.r.tot === EXP.ot && s5.text.includes(money(EXP.ot)), `remplir à deux : la part envoyée ${R5.r.tot} n'est pas celle de ce qui est commandé ${EXP.ot}`);
+      check(!R5.o.o.some((y) => y.i.some((z) => z[0] === TROP)) && R5.o.x.some((z) => z[0] === TROP && z[1] === 4), "remplir à deux : le jus laissé de côté est facturé à Sam, ou pas dit manquant " + JSON.stringify({ o: R5.o.o, x: R5.o.x }));
+      if (EXP.mag.includes(SARD)) check(R5.o.c.some((z) => z[0] === SARD && z[1] === 6), "remplir à deux : les sardines de Sam à acheter en magasin manquent à sa part " + JSON.stringify(R5.o.c));
+      check(R5.o.o.every((y) => y.s === "ok"), "remplir à deux : les commandes passées ne sont pas dites commandées");
+      if (eqId) check(R5.o.o.some((y) => y.i.some((z) => z[0] === eqId && z[1] === 5)), "remplir à deux : l'équivalent pris pour Sam n'est pas dans sa part");
+    }
     /* retirer la liste de l'autre : ses produits sortent, les miens restent */
     await go(B, "#/panier");
     await B.click("#duo [data-act=duodrop]");
@@ -271,6 +388,37 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     const simv = await text(A, "#view");
     check(/Ta part, livraison comprise, prix simulés/.test(simv) && /Prix simulés, pas relevés/.test(simv) && /selon la simulation/.test(simv), "retour E.Leclerc : prix simulés pas dits « " + simv.slice(0, 300) + " »");
     check(eurOf(await text(A, ".sum .st .sr")) === 1898, "retour E.Leclerc : total refait faux");
+
+    /* sur ordinateur, le proche écrit sa liste et la met au panier : « Ajouter au panier » de Ma liste se voit à 1 280 px */
+    {
+      const ctxD = await browser.newContext({ viewport: { width: 1280, height: 800 }, serviceWorkers: "block", locale: "fr-FR", timezoneId: "Europe/Paris" });
+      await ctxD.route((url) => !String(url).startsWith(origin), (r) => { outside.push(String(r.request().url())); r.abort(); });
+      const Dk = await ctxD.newPage();
+      Dk.on("pageerror", (e) => fail("erreur JS (ordinateur) : " + e.message));
+      await load(Dk, { seen: { welcome: 1 }, prefs: { off: { leclerc: true }, offv: 1 } }, "#/ecrire");
+      await Dk.fill("#wlIn", "lait, pâtes, café");
+      await Dk.click("[data-act=wlgo]");
+      await Dk.waitForSelector("[data-act=wlalt]", { timeout: 20000 }).catch(() => {});
+      const vis = await Dk.evaluate(() => [...document.querySelectorAll("[data-act=wladd]")].some((b) => b.getClientRects().length > 0 && getComputedStyle(b).visibility !== "hidden"));
+      if (check(vis, "Ma liste à 1 280 px : « Ajouter au panier » est invisible")) {
+        await Dk.click("[data-act=wladd]");
+        await Dk.waitForTimeout(300);
+        check(Object.keys((await all(Dk)).basket || {}).length >= 3, "Ma liste à 1 280 px : la liste n'arrive pas au panier");
+      }
+      await ctxD.close();
+    }
+
+    /* une liste reçue dont le meilleur prix est simulé (E.Leclerc activé) : le total approché le dit */
+    await A.evaluate(() => { const d = cabasDebug(); d.S.prefs.off = {}; });
+    const simIds = await A.evaluate(() => { const d = cabasDebug(); return [...d.S.prods.values()].filter((p) => { const b = d.best(p); return b && b.sim; }).slice(0, 3).map((p) => p.id); });
+    if (check(simIds.length === 3, "jeu d'essai : aucun produit au meilleur prix simulé")) {
+      for (const k of ["pour", "duo"]) {
+        await go(A, `#/${k}/j` + b64({ app: "cabas", v: 1, k, t: "simu000" + k.length, n: "Lou", i: simIds.map((id) => [id, 2]) }));
+        await A.waitForFunction(() => !/Lecture du lien/.test(document.querySelector("#view").textContent), null, { timeout: 5000 }).catch(() => {});
+        check(/au meilleur prix, avec des prix simulés/.test(await text(A, "#view .lt-sub")), `#/${k} : le total approché compte des prix simulés sans le dire « ${await text(A, "#view .lt-sub")} »`);
+      }
+    }
+    await A.evaluate(() => { const d = cabasDebug(); d.S.prefs.off = { leclerc: true }; });
 
     /* ---------- 5. liens abîmés ou hostiles ---------- */
     const before = JSON.stringify(await all(B));
@@ -329,7 +477,7 @@ const AIDANT = { "barilla-pates-spaghetti-n-5-500-g": 2, "candia-lait-1-2-ecreme
     sb = await all(B);
     check(!sb.duo && !sb.owners, "effacer mes données : cabas.duo ou cabas.owners restent");
     check(!outside.length, "réseau : des requêtes sont parties ailleurs que vers le site : " + outside.slice(0, 3).join(", "));
-  } catch (e) { fail("arrêt : " + String(e).split("\n")[0]); }
+  } catch (e) { fail("arrêt : " + String(e).split("\n")[0]); if (process.env.DEBUG) console.log(e.stack); }
   await browser.close();
   server.close();
   if (problems.length) { console.log(problems.length + " problème" + (problems.length > 1 ? "s" : "") + " :\n- " + problems.join("\n- ")); process.exit(1); }

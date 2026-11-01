@@ -312,11 +312,12 @@ function buildModel(src, chans, store, compOn) {
   return M;
 }
 /* La meilleure répartition de tout le panier en K commandes au plus, résumée (Et si, Compléter malin) : son total
-   (articles, frais, achats en magasin), ses commandes ; sinon celle qui laisse le moins de produits de côté. */
+   (articles, frais, achats en magasin), ses commandes (avec le coût de chaque ligne, pour la part de chacun d'une
+   commande à deux) ; sinon celle qui laisse le moins de produits de côté. */
 function bestAt(M, K, lambda, ms) {
   let last = null;
   if (M.lines.length && M.chans.length) runAll(M, Math.max(1, Math.min(K, M.chans.length)), lambda, (m) => { if (!m.done) last = m; }, ms);
-  const brief = (r) => r && { total: r.itemsTotal + r.feesTotal + (r.compTotal || 0), score: r.score, fees: r.feesTotal, orders: r.orders.map((o) => ({ id: o.ch.id, sub: o.sub, fee: o.fee, n: o.items.length })), comp: (r.completed || []).length, skipped: (r.skipped || []).length, alts: r.orders.reduce((a, o) => a + o.items.filter((x) => x.alt).length, 0) + (r.completed || []).filter((x) => x.alt).length };
+  const brief = (r) => r && { total: r.itemsTotal + r.feesTotal + (r.compTotal || 0), score: r.score, fees: r.feesTotal, orders: r.orders.map((o) => ({ id: o.ch.id, sub: o.sub, fee: o.fee, n: o.items.length, it: o.items.map((x) => [x.l.id, x.l.q, x.cost]) })), ci: (r.completed || []).map((x) => [x.l.id, x.l.q, x.cost]), comp: (r.completed || []).length, skipped: (r.skipped || []).length, alts: r.orders.reduce((a, o) => a + o.items.filter((x) => x.alt).length, 0) + (r.completed || []).filter((x) => x.alt).length };
   return { full: last ? brief(last.full) : null, partial: last ? brief(last.partial) : null, truncated: !!(last && last.truncated), lines: M.lines.length, uncovered: M.uncovered.length };
 }
 
