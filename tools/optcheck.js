@@ -9,6 +9,10 @@
 // canaux de chaque façon (en drive, les retraits seuls ; en magasin, les enseignes qui ont des magasins, jamais à prix
 // simulés, sans minimum ni frais), produits qu'une façon ne peut pas prendre, répartition exacte pour chaque nombre de
 // commandes ou de magasins au plus, avec et sans coût d'une commande ou d'un magasin en plus.
+// Tout en magasin, le seuil d'un magasin de plus (M.lambda, posé par app.js comme lamOf) : sur les enseignes réelles et
+// sur des paniers à quatre magasins, la répartition minimise le total plus le seuil par magasin en plus (essai de toutes
+// les répartitions), à score égal avec le plus de magasins (« au moins ») ; le total ne compte jamais le seuil ; un
+// magasin de plus laissé de côté ferait gagner moins que le seuil, le dernier magasin retenu fait gagner au moins le seuil.
 // Usage : node tools/optcheck.js [nombre de paniers]
 const fs = require("fs");
 const path = require("path");
@@ -268,6 +272,55 @@ function bruteAll(src, chans, store, compOn, lambda) {
 }
 let hBad = 0, hTested = 0, hMag = 0, hDrive = 0, hMiss = 0, hMagMulti = 0, hNoChan = 0;
 const hFail = (msg) => { hBad++; if (hBad <= 10) console.log("écart : " + msg); };
+/* tout en magasin, toutes les répartitions (ni minimum ni frais) : pour K magasins au plus, le meilleur total plus le seuil
+   par magasin en plus (score), le plus et le moins de magasins en plus à ce score (eMax, eMin) et le meilleur total sans
+   le seuil (T0) ;
+   chaque ligne, chez chaque magasin permis, au moins cher du produit et de ses équivalents relevés */
+function bruteMag(src, m, lam) {
+  const rows = src.map((x) => { const o = []; for (let c = 0; c < m; c++) { let b = null; if (!x.no.includes(c)) x.opts.forEach((op) => { const a = op.at[c]; if (a && a.cost > 0 && !a.sim && (b == null || a.cost < b)) b = a.cost; }); o.push(b); } return o; }).filter((o) => o.some((v) => v != null));
+  const w = Array.from({ length: m + 1 }, () => ({ score: Infinity, eMax: -1, eMin: Infinity, T0: Infinity }));
+  const idx = rows.map(() => 0), opt = rows.map((o) => o.map((v, c) => (v == null ? -1 : c)).filter((c) => c >= 0));
+  if (!rows.length) return w;
+  for (;;) {
+    let T = 0, mask = 0;
+    rows.forEach((o, i) => { const c = opt[i][idx[i]]; T += o[c]; mask |= 1 << c; });
+    let used = 0; for (let c = 0; c < m; c++) if (mask & (1 << c)) used++;
+    for (let K = used; K <= m; K++) {
+      const sc = T + lam * (used - 1), x = w[K];
+      if (sc < x.score) { x.score = sc; x.eMax = x.eMin = used - 1; } else if (sc === x.score) { x.eMax = Math.max(x.eMax, used - 1); x.eMin = Math.min(x.eMin, used - 1); }
+      if (T < x.T0) x.T0 = T;
+    }
+    let s2 = 0;
+    while (s2 < idx.length) { idx[s2]++; if (idx[s2] < opt[s2].length) break; idx[s2] = 0; s2++; }
+    if (s2 >= idx.length) break;
+  }
+  return w;
+}
+let mTested = 0, mKeep = 0, mMore = 0, mTie = 0;
+function checkMag(M, src, seuil, label) {
+  const m = M.chans.length;
+  /* comme lamOf dans app.js : un millième de centime de moins que le seuil ; le lambda de l'appel est ignoré */
+  const M2 = Object.assign({}, M, { lambda: seuil > 0 ? seuil - 0.001 : 0 });
+  const got = steps(M2, 999999), w = bruteMag(src, m, seuil);
+  for (let K = 1; K <= m; K++) {
+    mTested++;
+    const r = got[K], want = w[K];
+    if (!r) { if (want.score !== Infinity) hFail(`${label}, seuil ${seuil}, ${K} au plus : aucune répartition, minimum ${want.score}`); continue; }
+    const T = r.itemsTotal + r.feesTotal + (r.compTotal || 0), e = r.orders.length - 1;
+    if (r.feesTotal || r.compTotal || T !== r.orders.reduce((a, o) => a + o.sub, 0)) hFail(`${label} : frais, achats pour compléter ou total qui n'est pas la somme des magasins`);
+    if (!near(T + seuil * e, want.score)) hFail(`${label}, seuil ${seuil}, ${K} au plus : total ${T} et ${e} magasins en plus, score ${T + seuil * e} au lieu de ${want.score}`);
+    /* à gain égal au seuil, le magasin de plus est retenu ; sans seuil, à total égal, le moins de magasins */
+    const eWant = seuil > 0 ? want.eMax : want.eMin;
+    if (e !== eWant) hFail(`${label}, seuil ${seuil}, ${K} au plus : ${e} magasins en plus au lieu de ${eWant}`);
+    if (e === want.eMax && near(T + seuil * e, want.score) && w[K].eMax > 0 && e > 0 && w[e].T0 - T === seuil) mTie++;
+    /* le total affiché (bestAt, comme le panier) ne compte jamais le seuil */
+    const b = O.bestAt(M2, K, 0, 5000);
+    if (!b.full || b.full.total !== T) hFail(`${label}, seuil ${seuil}, ${K} au plus : total affiché ${b.full && b.full.total} au lieu de ${T}`);
+    /* la règle dite par le panier (magNote) : un magasin de plus ferait gagner moins que le seuil ; le dernier retenu au moins le seuil */
+    if (e + 2 <= K) { const g = T - w[e + 2].T0; if (seuil > 0 ? !(g < seuil) : g > 0) hFail(`${label}, seuil ${seuil} : un magasin de plus ferait gagner ${g}, il aurait dû être retenu`); if (g > 0) mMore++; }
+    if (e >= 1) { const g = w[e].T0 - T; if (w[e].T0 !== Infinity && (seuil > 0 ? !(g >= seuil) : !(g >= 1))) hFail(`${label}, seuil ${seuil} : le dernier magasin retenu fait gagner ${g}, moins que le seuil`); mKeep++; }
+  }
+}
 const N3 = Math.max(60, Math.round(N / 2));
 for (let t = 0; t < N3; t++) {
   /* réglages tirés au hasard : options choisies, enseignes désactivées, choix faits pour tout livré et tout en drive */
@@ -333,7 +386,26 @@ for (let t = 0; t < N3; t++) {
         if (how === "liv" && (r.completed || []).length) hFail(`tout livré : achat en magasin, panier ${t}`);
       }
     }
+    /* tout en magasin : le seuil d'un magasin de plus, 5 € par défaut, et un seuil tiré au hasard */
+    if (how === "mag") for (const seuil of [500, pickInt(1, 900)]) checkMag(M, src, seuil, `tout en magasin, panier ${t}`);
   }
+}
+/* tout en magasin à quatre magasins, prix proches pour que le seuil départage souvent ; des égalités exactes au seuil */
+for (let t = 0; t < N3; t++) {
+  const m = 4, n = pickInt(2, 6);
+  const chans = Array.from({ length: m }, (_, c) => ({ id: "m" + c, store: { retailer: "m" + c }, mag: true, P: { min: 0, fixed: 0, tiers: [{ from: 0, fee: 0 }] } }));
+  const seuil = [500, 500, 100, pickInt(1, 700), 0][t % 5];
+  const src = Array.from({ length: n }, (_, l) => {
+    const base = pickInt(150, 1500), at = chans.map(() => (rnd() < 0.7 ? { cost: Math.max(1, base + pickInt(-180, 180)), sim: rnd() < 0.08 } : null));
+    const opts = [{ id: "q" + l, at }];
+    if (rnd() < 0.25) opts.push({ id: "q" + l + "e", at: chans.map(() => (rnd() < 0.5 ? { cost: Math.max(1, base + pickInt(-200, 120)), sim: rnd() < 0.1 } : null)) });
+    const no = rnd() < 0.15 ? [pickInt(0, m - 1)] : [];
+    return { id: "q" + l, q: 1, opts, no };
+  });
+  /* une égalité exacte : la ligne 0 coûte exactement le seuil de plus ailleurs que chez m1, seule chez m1 */
+  if (seuil > 0 && t % 3 === 0) { src[0].opts = [{ id: "q0", at: chans.map((_, c) => ({ cost: c === 1 ? 1000 : 1000 + seuil, sim: false })) }]; src[0].no = []; }
+  const M = O.buildModel(src, chans, chans.map(() => false), false);
+  if (M.lines.length) checkMag(M, src, seuil, `quatre magasins, panier ${t}`);
 }
 /* un prix simulé chez une enseigne qui a des magasins ne compte jamais en magasin, même pour le produit lui-même */
 {
@@ -341,6 +413,7 @@ for (let t = 0; t < N3; t++) {
   const M = O.buildModel([{ id: "x", q: 1, opts: [{ id: "x", at: [{ cost: 100, sim: true }] }], no: [] }, { id: "y", q: 1, opts: [{ id: "y", at: [{ cost: 200, sim: false }] }], no: [] }], ch, [false], false);
   if (M.uncovered.join() !== "x" || M.lines.length !== 1) hFail("tout en magasin : un prix simulé a été compté");
 }
+console.log(`Seuil d'un magasin de plus : ${mTested} cas, ${mKeep} magasins retenus au-delà du seuil, ${mMore} magasins de plus laissés sous le seuil, ${mTie} égalités au seuil retenues.`);
 console.log(`Quatre façons : ${hTested} cas (${hMag} en magasin dont ${hMagMulti} dans plusieurs magasins, ${hDrive} en drive, ${hMiss} produits hors de leur façon, ${hNoChan} façons sans enseigne), ${hBad} écart${hBad > 1 ? "s" : ""}.`);
 console.log(`Panier intelligent : ${sTested} cas (${pinned} épingles tirées, ${alts} équivalents pris, ${flexWins} fois le panier souple moins cher), ${topups} « Compléter malin », ${sans} « Et si : sans », ${sBad} écart${sBad > 1 ? "s" : ""}.`);
 process.exit(bad || sBad || hBad ? 1 : 0);

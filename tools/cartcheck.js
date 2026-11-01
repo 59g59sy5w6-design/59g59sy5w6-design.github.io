@@ -11,6 +11,8 @@
 // du panier après l'ajout), budget du mois (total payé saisi compté à part) et « Tenir le budget ». Enfin « Écouter »
 // (synthèse vocale remplacée par un témoin) : la répartition lue en français (montants en euros, frais, chaque
 // commande), le bouton qui devient « Arrêter la lecture », la lecture lente des réglages (prefs.voice), Ma liste.
+// Et, tout en magasin, le seuil d'un magasin de plus : un seul magasin sous le seuil, deux au-delà ou tout juste égal,
+// ce qu'un magasin de plus ferait gagner (ou fait gagner) dit et lu, jamais dans le total, réglage gardé, copié, effacé.
 // Code de sortie 1 en cas de problème.
 // Usage : node tools/cartcheck.js
 const http = require("http");
@@ -626,9 +628,93 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     fail("écouter interrompu : " + e.message.split("\n")[0]);
   }
   await vctx.close();
+
+  /* ---------- tout en magasin : le seuil d'un magasin de plus ----------
+     un panier de deux produits où un deuxième magasin ferait gagner un peu : sous le seuil (5 € par défaut), un seul
+     magasin, et le panier dit combien un deuxième ferait gagner ; seuil réglé juste sous ce gain, ou tout juste égal
+     (« au moins »), deux magasins, et le panier dit ce que le deuxième fait gagner ; le seuil n'entre jamais dans le
+     total ; les autres façons ne le comptent pas ; le réglage est repris par une copie et remis par « Effacer mes données » */
+  const mctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
+  const mp = await mctx.newPage();
+  mp.on("pageerror", (e) => fail("erreur JS (seuil d'un magasin) : " + e.message));
+  mp.on("console", (m) => { if (m.type() === "error") fail("console (seuil d'un magasin) : " + m.text()); });
+  try {
+    await mp.goto(base + "#/"); await ready(mp);
+    await mp.evaluate(() => { localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); localStorage.setItem("cabas.prefs", JSON.stringify({ zip: "94120", off: { leclerc: true }, comp: "mag", maxOrders: 3, offv: 1 })); });
+    await mp.reload(); await ready(mp);
+    /* A : bien moins cher chez X que partout ailleurs ; B : le moins cher chez Y, de 0,20 € à 3 € de moins que chez X */
+    const pair = await mp.evaluate(() => {
+      const D = cabasDebug(), chans = D.chansOf(D.retsFor("mag"), "mag").map((c) => c.id);
+      const at = (p, r) => { const o = p.offers[r]; return o && o.price > 0 && !o.sim ? Math.round(o.price * 100) : null; };
+      const ps = D.S.list.filter((p) => chans.filter((r) => at(p, r)).length >= 2);
+      for (const B of ps) for (const X of chans) for (const Y of chans) {
+        if (X === Y || !at(B, X) || !at(B, Y)) continue;
+        const g = at(B, X) - at(B, Y);
+        if (g < 20 || g > 300 || chans.some((r) => r !== Y && at(B, r) && at(B, r) <= at(B, Y))) continue;
+        const A = ps.find((p) => p.id !== B.id && at(p, X) && chans.every((r) => r === X || !at(p, r) || at(p, r) - at(p, X) > 600));
+        if (A) return { A: A.id, B: B.id, X, Y, g, one: at(A, X) + at(B, X) };
+      }
+      return null;
+    });
+    if (!pair) fail("seuil d'un magasin : aucun panier d'essai trouvé dans le catalogue");
+    else {
+      info.push(`seuil d'un magasin : ${pair.B} ${eurC(pair.g)} de moins chez ${pair.Y} que chez ${pair.X}`);
+      await mp.evaluate((p) => localStorage.setItem("cabas.basket", JSON.stringify({ [p.A]: 1, [p.B]: 1 })), pair);
+      await mp.reload(); await ready(mp);
+      const look = async () => {
+        await mp.evaluate(() => { location.hash = "#/panier"; });
+        await mp.waitForFunction(() => { const D = cabasDebug(), R = D.RES(); return R.done && R.mode === "mag" && document.querySelector(".sum .st"); }, null, { timeout: 30000 });
+        await mp.waitForTimeout(300);
+        return mp.evaluate(() => {
+          const D = cabasDebug(), R = D.RES(), f = R.steps[R.K].full;
+          return { n: f.orders.length, total: D.cartTotal(), subs: f.orders.reduce((a, o) => a + o.sub, 0), text: document.querySelector(".sum").textContent, shown: (document.querySelector(".sum .st .sr") || {}).textContent, say: D.speakText("panier"), seuil: D.magSeuil() };
+        });
+      };
+      /* 1. seuil par défaut : 5 € */
+      let r = await look();
+      const more = `Un deuxième magasin ferait gagner ${eurC(pair.g)}\u00a0: Cabas garde un seul magasin`;
+      if (r.seuil !== 500) fail(`seuil d'un magasin : ${r.seuil} centimes par défaut au lieu de 500`);
+      if (r.n !== 1 || r.total !== pair.one) fail(`seuil d'un magasin : ${r.n} magasins, ${r.total} au lieu d'un seul magasin à ${pair.one}`);
+      if (!r.text.includes(more) || !/n'est retenu que s'il fait gagner au moins 5\u00a0€/.test(r.text)) fail("seuil d'un magasin : le panier ne dit pas ce qu'un deuxième magasin ferait gagner : « " + r.text.slice(0, 400) + " »");
+      if (r.shown !== eurC(r.total) || r.total !== r.subs) fail(`seuil d'un magasin : total affiché ${r.shown}, ${r.total}, somme des magasins ${r.subs} : le seuil ne doit pas y entrer`);
+      if (!/Un deuxième magasin ferait gagner \d+ euros?/.test(r.say)) fail("seuil d'un magasin : « Écouter » ne le dit pas : « " + r.say.slice(-200) + " »");
+      if (/minimums d'achat et la livraison/.test(r.text)) fail("seuil d'un magasin : le panier parle de minimums et de livraison en magasin");
+      /* 2. réglé juste sous le gain, dans les réglages (à côté de « Magasins au plus ») : deux magasins */
+      await mp.evaluate(() => { location.hash = "#/reglages"; }); await mp.waitForTimeout(400);
+      await mp.evaluate(() => { const d = document.querySelector("details.adv"); if (d) d.open = true; });
+      const near = await mp.evaluate(() => { const i = document.querySelector("#maggain"), k = document.querySelector("#maxkL"); return i && k ? { v: i.value, after: !!(k.compareDocumentPosition(i) & Node.DOCUMENT_POSITION_FOLLOWING) } : null; });
+      if (!near || near.v !== "5" || !near.after) fail("seuil d'un magasin : le champ des réglages manque, n'est pas à 5 ou pas après « Magasins au plus » " + JSON.stringify(near));
+      const below = ((pair.g - 1) / 100).toLocaleString("fr-FR");
+      await mp.fill("#maggain", below); await mp.press("#maggain", "Enter"); await mp.waitForTimeout(200);
+      if (((await stored(mp, "prefs")) || {}).magGain !== (pair.g - 1) / 100) fail("seuil d'un magasin : le réglage n'est pas gardé " + JSON.stringify((await stored(mp, "prefs")).magGain));
+      r = await look();
+      if (r.n !== 2 || r.total !== pair.one - pair.g) fail(`seuil d'un magasin à ${below} € : ${r.n} magasins, ${r.total} au lieu de deux à ${pair.one - pair.g}`);
+      if (!r.text.includes(`Le deuxième magasin fait gagner ${eurC(pair.g)}, au moins les ${(pair.g - 1) % 100 ? eurC(pair.g - 1) : (pair.g - 1) / 100 + "\u00a0€"} demandés pour un magasin de plus`)) fail("seuil d'un magasin : le panier ne dit pas ce que le deuxième magasin fait gagner : « " + r.text.slice(0, 400) + " »");
+      if (r.shown !== eurC(r.total) || r.total !== r.subs) fail("seuil d'un magasin : le seuil est entré dans le total");
+      /* 3. tout juste égal au gain : retenu (« au moins ») */
+      await mp.evaluate((g) => { const pr = JSON.parse(localStorage.getItem("cabas.prefs")); pr.magGain = g / 100; localStorage.setItem("cabas.prefs", JSON.stringify(pr)); }, pair.g);
+      await mp.reload(); await ready(mp); r = await look();
+      if (r.n !== 2) fail(`seuil d'un magasin égal au gain (${eurC(pair.g)}) : ${r.n} magasin au lieu de deux`);
+      /* 4. les autres façons ne le comptent pas ; une copie le reprend, borné ; « Effacer mes données » le remet à 5 € */
+      const o = await mp.evaluate(() => {
+        const D = cabasDebug(), R = D.RES();
+        const ok = D.importCheck({ app: "cabas", v: 1, data: { prefs: { magGain: 2.5 } } }), bad = D.importCheck({ app: "cabas", v: 1, data: { prefs: { magGain: 80 } } });
+        return { lam: ["mix", "liv", "drive"].map((h) => R.by[h].M.lambda), kept: ok.data.prefs && ok.data.prefs.magGain, bad: bad.data.prefs && bad.data.prefs.magGain };
+      });
+      if (o.lam.some((x) => x !== 0)) fail("seuil d'un magasin : compté dans une autre façon " + JSON.stringify(o.lam));
+      if (o.kept !== 2.5 || o.bad !== undefined) fail(`seuil d'un magasin : copie restaurée ${o.kept}, hors bornes ${o.bad}`);
+      await mp.evaluate(() => { location.hash = "#/reglages"; }); await mp.waitForTimeout(400);
+      await tap(mp, '[data-act="reset"]'); await mp.waitForTimeout(300); await tap(mp, '#sheet [data-act="resetok"]'); await mp.waitForTimeout(400);
+      const after = await mp.evaluate(() => cabasDebug().S.prefs.magGain);
+      if (after !== 5) fail(`seuil d'un magasin : « Effacer mes données » le laisse à ${after}`);
+    }
+  } catch (e) {
+    fail("seuil d'un magasin interrompu : " + e.message.split("\n")[0]);
+  }
+  await mctx.close();
   await browser.close();
   server.close();
   if (info.length) console.log(info.join("\n"));
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }
-  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, quatre façons, panier souple, Compléter malin, budget du mois, tenir le budget), écouter : aucun problème.");
+  console.log("Annuler, glissement et clavier, panier intelligent (tableau, épingler, exclure, Et si, quatre façons, panier souple, Compléter malin, budget du mois, tenir le budget), écouter, seuil d'un magasin de plus : aucun problème.");
 })();

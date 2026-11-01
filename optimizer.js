@@ -280,7 +280,9 @@ function* subsetsOfSize(chans, k) {
 /* ---------- les quatre façons de faire ses courses (prefs.comp de app.js) ----------
    « mix » : livré ou retiré, et en magasin si c'est moins cher (commandes en ligne selon le choix de chaque enseigne,
    complétées en magasin) ; « liv » : tout livré ; « drive » : tout en drive ou en point de retrait ; « mag » : tout en
-   magasin (aucune commande en ligne, ni minimum ni frais, chaque magasin en plus coûte lambda comme une commande en plus). */
+   magasin (aucune commande en ligne, ni minimum ni frais ; chaque magasin en plus coûte lambda dans le score : app.js y
+   met le seuil d'un magasin de plus, M.lambda, pour qu'un magasin de plus ne soit retenu que s'il fait gagner au moins
+   ce seuil). */
 const HOWS = ["mix", "liv", "drive", "mag"];
 const isRetrait = (m) => ((m && m.channel) || {}).mode === "retrait";
 /* L'option d'un groupe d'enseigne (Auchan : les retraits et les livraisons de plusieurs secteurs) pour une façon.
@@ -364,6 +366,10 @@ function bestAt(M, K, lambda, ms) {
    « full » est cumulé d'une taille à l'autre : pour le même panier, plus de commandes autorisées ne donne jamais un
    total plus élevé. Les petites tailles passent d'abord : si le temps manque, seules les grandes sont écourtées. */
 function runAll(M, Kmax, lambda, report, budgetMs) {
+  /* un modèle qui porte son propre coût d'une commande ou d'un magasin en plus (M.lambda, posé par app.js pour chaque
+     façon : tout en magasin, le seuil d'un magasin de plus) l'emporte sur celui de l'appel ; le panier exact (M.exact)
+     reçoit le même. Ce coût entre dans le score, jamais dans le total (itemsTotal + feesTotal + compTotal). */
+  if (M.lambda != null) lambda = M.lambda;
   if (M.exact && M.exact.lines.length === M.lines.length) return runBoth(M, Kmax, lambda, report, budgetMs);
   return runOne(M, Kmax, lambda, report, budgetMs);
 }
