@@ -191,6 +191,8 @@
     for (const id of Object.keys(S.basket)) { const p = S.prods.get(id); const b = p && best(p); if (b) t += b.price * S.basket[id]; }
     return t;
   }
+  /* le sous-total compte-t-il un prix simulé d'E.Leclerc ? (dit à côté de chaque chiffre qui l'affiche) */
+  const subSim = () => Object.keys(S.basket).some((id) => { const p = S.prods.get(id), b = p && best(p); return !!(b && b.sim); });
   const img = (p, w) => `<img src="${Packs.url(p)}" alt="" width="${w || 240}" height="${w || 240}" decoding="async"${w && w < 100 ? "" : ' loading="lazy"'}>`;
 
   /* heure de la dernière vérification des prix, par enseigne (data/status.json, écrit par le robot de relevé) */
@@ -870,7 +872,9 @@
     const cut = C.dropped.length ? `<p class="hint">Pour tenir ton budget, sans\u00a0: ${esc(joinEt(C.dropped.map((r) => r.t.replace(/\s*x\d+$/i, ""))))}.${C.small ? " Et le plus petit format de chaque produit." : ""}</p>` : C.small ? `<p class="hint">Pour tenir ton budget, le plus petit format de chaque produit.</p>` : "";
     const dm = C.miss.filter((x) => x.diet).map((x) => x.t), am = C.miss.filter((x) => !x.diet).map((x) => x.t);
     const miss = (dm.length ? `<p class="hint">Aucun produit indiqué ${esc(joinEt(ASK_DIETS.filter(([k]) => A.diet[k]).map(([, , l]) => "«\u00a0" + l + "\u00a0»")))} par les enseignes pour\u00a0: ${esc(joinEt(dm))}.</p>` : "") + (am.length ? `<p class="hint">Pas encore relevé dans tes enseignes\u00a0: ${esc(joinEt(am))}.</p>` : "");
-    const liv = plan && !plan.short ? `<p class="hint">Livrée seule\u00a0: ${eurC(plan.total)} frais compris, ${plan.orders.length === 1 ? "chez " + esc(retName(plan.orders[0].ch)) : esc(plural(plan.orders.length, "commande", "commandes"))}.</p>` : `<p class="hint">Seule, cette liste n'atteint pas le minimum de commande des enseignes\u00a0: ajoute-la à ton panier de la semaine, ou achète-la en magasin.</p>`;
+    /* la liste seule, dans la façon choisie, comme la carte de Ma liste : jamais un total qui laisse des produits sans le dire */
+    const H = how(), part = plan && plan.covered < plan.n;
+    const liv = plan && !plan.short ? `<p class="hint">Cette liste seule\u00a0: ${part ? plan.covered + " produits sur " + plan.n + ", " : ""}${eurC(plan.total)} ${fwHow()}, ${plan.orders.length === 1 ? (H === "mag" ? "en un magasin, " : "") + "chez " + esc(retName(plan.orders[0].ch)) : ordN(H, plan.orders.length)}${H === "mag" ? ", sans frais" : ""}.${part ? " Les autres produits ne sont pas pris de cette façon\u00a0: le panier dit où les trouver." : ""}${H === "mag" ? " " + MAG_NOTE : ""}</p>` : `<p class="hint">Seule, cette liste n'atteint pas le minimum de commande des enseignes\u00a0: ajoute-la à ton panier de la semaine, ou achète-la en magasin.</p>`;
     return `<section class="hcard col compose" aria-label="${esc(meal)}"><b>${esc(meal)}${A.meal ? ", pour " + plural(C.ppl, "personne", "personnes") : ""}</b><small>${plural(C.rows.length, "produit", "produits")}, ${eurC(C.total)} au meilleur prix relevé de chaque produit, hors livraison</small>` +
       `<div class="crows">${C.rows.map((r) => { const p = S.prods.get(r.id); return `<a class="crow" href="${hp(p.id)}"><span class="thumb">${img(p, 40)}</span><span class="ct"><b>${r.n > 1 ? r.n + "\u00a0× " : ""}${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}, chez ${esc(retName(bestReal(p).ret))}</small></span><span class="cp">${eurC(r.c)}</span></a>`; }).join("")}</div>` +
       bud + cut + miss + liv +
@@ -2079,13 +2083,13 @@
       /* la façon choisie n'a aucune enseigne (pas de drive, pas de magasin parmi tes enseignes) ou ne prend aucun produit
          du panier : le dire, et proposer celle qui les prend */
       const hy = howFor2(notHere, h);
-      side = `<div class="sum"><p class="sl">Au meilleur prix en ligne, hors frais</p><div class="st">${px(subtotal())}</div><p class="sh2">${plural(count(), "article", "articles")}, sans total pour «\u00a0${esc(HOW_NAME[h])}\u00a0»</p>` +
+      side = `<div class="sum"><p class="sl">Au meilleur prix en ligne, hors frais${subSim() ? ", prix simulés" : ""}</p><div class="st">${px(subtotal())}</div><p class="sh2">${plural(count(), "article", "articles")}, sans total pour «\u00a0${esc(HOW_NAME[h])}\u00a0»</p>` +
         `<p class="sn">${!M.chans.length ? (h === "drive" ? `Aucune de tes enseignes ne propose le retrait. Le retrait n'existe dans Cabas que chez ${esc(driveNames())} pour l'instant\u00a0: active ${/E\.Leclerc/.test(driveNames()) ? "Auchan ou E.Leclerc" : "Auchan"} dans les <a href="#/reglages">réglages</a>, ou choisis une autre façon.` : h === "mag" ? `Aucune de tes enseignes n'a de magasin aux prix relevés. Active ${esc(magNames())} dans les <a href="#/reglages">réglages</a>, ou choisis une autre façon.` : `Aucune enseigne n'est activée. Choisis tes enseignes dans les <a href="#/reglages">réglages</a>.`) : `${esc(HOW_NAME[h])} ne prend aucun produit de ton panier.`}</p>` +
         (hy ? `${hy.lost.length ? `<p class="sn">${howFor2Text(hy, notHere.length).trim()}</p>` : ""}<div class="btns" style="margin-top:12px"><button class="btn tint" type="button" data-act="how" data-v="${hy.h}">Passer à «\u00a0${esc(HOW_NAME[hy.h])}\u00a0»</button></div>` : "") + howRow() + `</div>` + duoBox(null, false);
       const rest = ids.filter((id) => !notHere.includes(id) && !offOnly.includes(id) && !blocked.includes(id));
       main = (rest.length ? `<div class="order">${plainItems(rest)}</div>` : "") + uncovered;
     } else if (!st && !res.done) {
-      side = `<div class="sum loading"><p class="sl">Calcul de la meilleure répartition…</p><div class="st">${px(subtotal())}</div><p class="sh2">${plural(count(), "article", "articles")}</p>${seg}</div>`;
+      side = `<div class="sum loading"><p class="sl">Calcul de la meilleure répartition…</p><div class="st">${px(subtotal())}</div><p class="sh2">${plural(count(), "article", "articles")}${subSim() ? ", prix simulés" : ""}</p>${seg}</div>`;
       main = `<div class="order">${plainItems(ids)}</div>`;
     } else if (bst) {
       const money = fullTotal(bst), complete = !!st.full;
@@ -2120,9 +2124,14 @@
       if (complete && sp && sp.key === JSON.stringify(S.basket) && sp.total - money >= 1) save = (save ? save + ". " : "") + `${eurC(sp.total - money)} de moins grâce aux remplacements`;
       /* un magasin de plus laissé de côté : ce qu'il ferait gagner, la règle, le geste qui met le seuil à « Dès le premier
          centime » (avec « Annuler ») et le lien vers le réglage */
-      const magBox = mn && mn.kind === "more" ? `<p class="sn" id="magmore">${magNoteText(mn, eurC)}. ${magRuleText(eurC)}. <a href="#/reglages/magasin">Changer ce montant</a></p><div class="btns" style="margin-top:10px"><button class="btn sm tint" type="button" data-act="magall">Aller quand même dans le magasin le moins cher pour chaque produit</button></div>` : "";
+      /* le geste met le seuil à zéro : chaque produit va dans son magasin le moins cher seulement si « Magasins au plus »
+         permet tous les magasins de la façon ; sinon le libellé dit la limite */
+      const nStores = M.chans.filter((c) => !c.skip).length, allK = K >= nStores;
+      const magBox = mn && mn.kind === "more" ? `<p class="sn" id="magmore">${magNoteText(mn, eurC)}. ${magRuleText(eurC)}. <a href="#/reglages/magasin">Changer ce montant</a></p><div class="btns" style="margin-top:10px"><button class="btn sm tint" type="button" data-act="magall" data-k="${allK ? "" : K}">${allK ? "Aller quand même dans le magasin le moins cher pour chaque produit" : `Aller dans un magasin de plus dès qu'il fait gagner quelque chose, ${K} au plus`}</button></div>` : "";
       const more = mn && mn.kind === "more" ? "" : complete && k < K ? `Au-delà ${k === 1 ? (mag ? "d'un magasin" : "d'une commande") : "de " + k + " " + ordW(h, 2)}, le total ne baisse plus.` : "";
-      const notCheapest = bst.orders.some((o) => o.items.some((x) => { const b = best(S.prods.get(x.l.id)); return b && b.ret !== o.ch.id && b.price * 100 * x.l.q < x.cost - 0.5; }));
+      /* un produit pris ailleurs que là où il est le moins cher, parmi les seules enseignes de la façon choisie (le modèle M :
+         jamais Houra ni un prix simulé en magasin, jamais Monoprix en drive) */
+      const notCheapest = bst.orders.some((o) => o.items.some((x) => { const offs = (M.offers || [])[x.l.n] || []; return offs.some((of) => !(M.chans[of.c] || {}).skip && of.cost < x.cost - 0.5); }));
       /* des produits hors de la façon (pas en drive, pas en magasin) : le titre dit pour combien de produits du panier */
       const nOf = M.lines.length + notHere.length, nIn = M.lines.length - skipped.length;
       const forN = `Meilleure option pour ${nIn} ${nIn > 1 ? "produits" : "produit"} sur ${nOf}`;
@@ -2197,7 +2206,7 @@
 
       const gm = singles.length ? singles.map((x) => ({ s: x, gap: x.ch.P.min - x.sub })).filter((x) => x.gap > 0).sort((x, y) => x.gap - y.gap)[0] : null;
       const topBtn = gm ? `<button class="btn tint" type="button" data-act="topup" data-id="${esc(gm.s.ch.id)}">${ic("plus")}Compléter pour ${eurC(gm.gap)}</button>` : "";
-      side = `<div class="sum"><p class="sl">Panier trop petit pour une ${h === "drive" ? "commande en drive" : "livraison"}</p><div class="st">${px(subtotal())}</div><p class="sn">Chaque enseigne demande un minimum d'achat.${hint}</p>${store}<div class="btns" style="margin-top:12px">${topBtn}<a class="btn ${topBtn ? "ghost" : "tint"}" href="#/ecrire">${ic("pen")}Compléter ma liste</a></div>${seg}${howRow()}</div>` + duoBox(null, false);
+      side = `<div class="sum"><p class="sl">Panier trop petit pour une ${h === "drive" ? "commande en drive" : "livraison"}${subSim() ? ", prix simulés" : ""}</p><div class="st">${px(subtotal())}</div><p class="sn">Chaque enseigne demande un minimum d'achat.${hint}</p>${store}<div class="btns" style="margin-top:12px">${topBtn}<a class="btn ${topBtn ? "ghost" : "tint"}" href="#/ecrire">${ic("pen")}Compléter ma liste</a></div>${seg}${howRow()}</div>` + duoBox(null, false);
       main = `<div class="order">${plainItems(ids.filter((id) => !M.uncovered.includes(id)))}</div>` + uncovered;
     }
     return {
@@ -2637,7 +2646,7 @@
     /* le total du panier, livraison comprise, quand la répartition de ce panier est calculée ; sinon les produits seuls,
        et c'est dit. Les lignes libres ne comptent pas dans la pastille : elles n'ont pas de prix relevé */
     const tot = RES.by && RES.done && RES.base === cartBase() && RES.mode === how() ? cartTotal() : null;
-    const sim = tot != null ? simIn((RES.steps[RES.K] || {}).full) : Object.keys(S.basket).some((id) => { const b = S.prods.has(id) && best(S.prods.get(id)); return b && b.sim; });
+    const sim = tot != null ? simIn((RES.steps[RES.K] || {}).full) : subSim();
     const sub = [(tot != null ? fwHow().replace(/^./, (c) => c.toUpperCase()) : "Produits, hors livraison") + (sim ? ", prix simulés" : ""), nf ? "+ " + plural(nf, "ligne libre", "lignes libres") : ""].filter(Boolean).join(", ");
     return `<a class="mini" href="#/panier" data-tab="panier"><span class="mn">${n}</span><span class="ml">${pourOn() ? "Courses " + esc(deN(pourName())) : "Voir le panier"}<small>${sub}</small></span><span class="mp">${tot != null ? eurC(tot) : eur(subtotal())}</span></a>`;
   }
@@ -4066,6 +4075,9 @@
       orders: bst.orders.map((o) => ({ rid: o.ch.id, P: o.ch.P, items: merge(o.items.map((x) => it(x.alt ? { id: x.alt, q: x.l.q } : x.l, x.cost, x.l.id)), (x) => x.id) })),
       comp: merge((bst.completed || []).map((x) => Object.assign(it(x.alt ? { id: x.alt, q: x.l.q } : x.l, x.cost, x.l.id), { ret: x.ret })), (x) => x.ret + "|" + x.id),
       skipped: (bst.skipped || []).map((x) => it(x.l, 0)),
+      /* les produits que la façon choisie ne peut pas prendre (pas en drive, pas en magasin) : dans aucune commande, dits
+         au proche et à l'autre personne comme ce qui manque */
+      unc: ((res.M && res.M.uncovered) || []).filter((id) => S.basket[id] > 0).map((id) => it({ id, q: S.basket[id] }, 0)),
     };
   }
   const snapOf = () => (S.guide && S.guide.snap) || null;
@@ -5096,7 +5108,7 @@
     });
     const mag = { ot: [], me: [] }, skip = { ot: [], me: [] };
     for (const x of magOf(s)) { const y = part(x); if (y.k) mag.ot.push([x.id, y.k, y.c, x.ret]); if (y.me) mag.me.push(y.me); }
-    for (const x of s.skipped.concat(...s.orders.map((o) => o.items.filter((z) => z.st === "skip")))) { const y = part(x); if (y.k) skip.ot.push([x.id, y.k]); if (y.me) skip.me.push(y.me); }
+    for (const x of s.skipped.concat(s.unc || [], ...s.orders.map((o) => o.items.filter((z) => z.st === "skip")))) { const y = part(x); if (y.k) skip.ot.push([x.id, y.k]); if (y.me) skip.me.push(y.me); }
     return { orders, mag, skip };
   }
   /* la valeur d'un ow dans l'instantané suit « À qui est ce produit » pendant le remplissage */
@@ -5518,7 +5530,7 @@
     const shop = pv && RES.mode === "mag";
     const o = shop ? [] : s.orders.map((x) => { const st = ordState(x, pv), w = W[x.rid] || {}, ok = !pv && st.done; return { r: x.rid, s: ok ? "ok" : !pv && st.drop ? "no" : "plan", d: ok ? w.d || "" : "", sl: ok ? w.s || "" : "", i: st.L.map((y) => [y.id, y.q, y.cost]), fe: st.fee }; }).filter((y) => y.i.length);
     const c = (shop ? s.orders.flatMap((x) => x.items.map((y) => Object.assign({}, y, { ret: x.rid }))) : magOf(s)).map((y) => [y.id, y.q, y.cost, y.ret]);
-    const x = s.skipped.concat(...s.orders.map((y) => y.items.filter((z) => z.st === "skip"))).map((y) => [y.id, y.q]);
+    const x = s.skipped.concat(s.unc || [], ...s.orders.map((y) => y.items.filter((z) => z.st === "skip"))).map((y) => [y.id, y.q]);
     const R = { app: "cabas", v: 1, k: "retour", w: "pour", at: new Date().toISOString(), t: P.t || "", n: S.duo.me || "", m: note || "", o, c, x }, f = retFree(false);
     if (f.length) R.f = f;
     if (shop) { R.h = "mag"; if (shopDone() && S.guide.shop.at) R.ms = S.guide.shop.at; }
@@ -5539,6 +5551,8 @@
       const res = cartResult(), st = res.steps[res.K], r = st && st.full;
       if (!r) return null;
       const sp = splitOf(r);
+      /* ses produits que la façon choisie ne peut pas prendre : dans aucune commande, dits comme ce qui manque */
+      x = ((res.M && res.M.uncovered) || []).map((id) => [id, Math.min(S.basket[id] | 0, (S.owners || {})[id] | 0)]).filter((z) => z[1] > 0);
       /* tout en magasin : sa part est faite d'achats en magasin, sans frais */
       if (res.mode === "mag") { o = []; c = sp.orders.flatMap((y) => y.other.lines.map((z) => [z[0], z[1], z[2], y.rid])); mag = true; }
       else {
@@ -5918,7 +5932,9 @@
        seulement en ligne le dit (« seulement en ligne chez Houra »), sans prix, jamais comme un achat en magasin */
     const mg = how() === "mag", shopsOn = mg ? retsFor("mag").filter((r) => !S.prefs.off[offKey(r)]) : [];
     const bestOf = (p) => { if (!mg) return best(p); let b = null; for (const r of shopsOn) { const o = p.offers[r.id]; if (o && o.price > 0 && !o.sim && (!b || o.price < b.price)) b = Object.assign({ ret: r.id }, o); } return b; };
-    const out = Object.keys(S.basket).filter((id) => S.basket[id] > 0 && S.prods.has(id)).map((id) => { const b = bestOf(S.prods.get(id)); return { id, q: S.basket[id], cost: b ? Math.round(b.price * 100) * S.basket[id] : 0, ret: b ? b.ret : "", sim: !!(b && b.sim), nomag: mg && !b ? missWhy(id, "mag") || "pas vendu en magasin" : "" }; });
+    /* tout en magasin : un produit que la répartition prend reste dans son magasin et à son prix, comme « Par magasin » */
+    const rep = mg ? new Map(storeMag().map((x) => [x.id, x])) : null;
+    const out = Object.keys(S.basket).filter((id) => S.basket[id] > 0 && S.prods.has(id)).map((id) => { const y = rep && rep.get(id); if (y) return { id, q: S.basket[id], cost: y.cost, ret: y.ret, sim: false }; const b = bestOf(S.prods.get(id)); return { id, q: S.basket[id], cost: b ? Math.round(b.price * 100) * S.basket[id] : 0, ret: b ? b.ret : "", sim: !!(b && b.sim), nomag: mg && !b ? missWhy(id, "mag") || "pas vendu en magasin" : "" }; });
     return out.concat(freeList().map((f) => ({ fid: f.fid, t: f.t, q: f.q, free: true })));
   }
   /* « À acheter en magasin » d'office quand la répartition en a, sinon tout le panier */
@@ -7590,7 +7606,7 @@
       case "magall": {
         const back = snap("prefs");
         S.prefs.magGain = 0; savePrefs(); rerender();
-        undoable("Chaque produit dans le magasin où il est le moins cher", back);
+        undoable(t.dataset.k ? `Un magasin de plus dès qu'il fait gagner quelque chose, ${t.dataset.k} au plus` : "Chaque produit dans le magasin où il est le moins cher", back);
         break;
       }
       case "clear": confirmSheet("Vider le panier\u00a0?", "Tous les produits du panier seront retirés.", "Vider le panier", "clearok"); break;
