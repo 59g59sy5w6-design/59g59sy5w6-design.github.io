@@ -1,5 +1,5 @@
 {
- "note": "Rayons Cabas, source unique de tools/lib.py (RAYONS, UNIVERS, RAYON_FILTRE, RAYON_UNITE) et de la clé pages de tools/sources.json (python3 tools/gen_sources.py). Un rayon = une catégorie fine, lue sur une page par enseigne ; l'ordre du fichier est l'ordre d'affichage. pages.<enseigne> : Monoprix, URL de catégorie avec ?sortBy=favorite ; Carrefour, page /r/... ou /boutique/... ; Houra, URL -1.html ou {from, find} pour une page que le robot trouve depuis une page d'univers ; Auchan, requête text=... de /recherche, une chaîne ou une liste, lue dans chaque magasin et zone de tools/sources.json (magasins). Une enseigne absente : pas d'équivalent relevé (voir note). filtre : regex oui/non sur le nom sans accents (key), pour toutes les enseignes ; obligatoire quand la page est partagée avec un autre rayon, les listes non doivent alors se compléter. frais : produits au poids variable ou à la pièce (tolérance de contrôle 25 %, reprise 7 jours, contenance estimée PIECE_WEIGHT). unite : contenance comptée en pièces (oeuf, rouleau, couche, capsule, lavage, piece). regimes : étiquettes garanties par les pages du rayon ; les autres sont déduites du nom et de la marque (regimes_of_name). icone : forme de l'illustration (k du catalogue) pour les nouveaux rayons.",
+ "note": "Rayons Cabas, source unique de tools/lib.py (RAYONS, UNIVERS, RAYON_FILTRE, RAYON_UNITE) et de la clé pages de tools/sources.json (python3 tools/gen_sources.py). Un rayon = une catégorie fine, lue sur une page par enseigne ; l'ordre du fichier est l'ordre d'affichage. pages.<enseigne> : Monoprix, URL de catégorie avec ?sortBy=favorite ; Carrefour, page /r/... ou /boutique/... ; Houra, URL -1.html ou {from, find} pour une page que le robot trouve depuis une page d'univers ; Auchan, requête text=... de /recherche, une chaîne ou une liste, lue dans chaque magasin et zone de tools/sources.json (magasins). Une enseigne absente : pas d'équivalent relevé (voir note). filtre : regex oui/non sur le nom sans accents (key), pour toutes les enseignes ; obligatoire quand la page est partagée avec un autre rayon (les listes non doivent alors se compléter) ou lue par une recherche Auchan ; un oui vide (rayon aux pages dédiées) laisse passer tout ce que le non n'écarte pas, et sa recherche Auchan départage. frais : produits au poids variable ou à la pièce (tolérance de contrôle 25 %, reprise 7 jours, contenance estimée PIECE_WEIGHT). unite : contenance comptée en pièces (oeuf, rouleau, couche, capsule, lavage, piece). regimes : étiquettes garanties par les pages du rayon ; les autres sont déduites du nom et de la marque (regimes_of_name). icone : forme de l'illustration (k du catalogue) pour les nouveaux rayons.",
  "univers": [
   {
    "id": "fruits-legumes",
@@ -216,7 +216,7 @@
    },
    "filtre": {
     "oui": "salade|laitue|batavia|\\broquette\\b|\\bmache\\b|epinard|crudite|\\brapee?s?\\b|herbe|basilic|persil|coriandre|menthe|ciboulette|thym|aneth|mesclun|jeunes pousses|endive",
-    "non": "conserve|surgel|sauce|vinaigrette|soupe|\\bsecs?\\b|deshydrat|epice|traiteur|repas|sandwich|pates|\\briz\\b|poulet|\\bthon|lentilles?|pois chiches?|lyonnaise|boulgour|quinoa|taboule"
+    "non": "conserve|surgel|sauce|vinaigrette|soupe|\\bsecs?\\b|deshydrat|epice|traiteur|repas|sandwich|pates|\\briz\\b|poulet|\\bthon|lentilles?|pois chiches?|lyonnaise|boulgour|quinoa|taboule|boisson"
    }
   },
   {
@@ -449,7 +449,7 @@
    },
    "filtre": {
     "oui": "saucisse|merguez|chipolata|brochette|grillade|marine|barbecue|farce|crepinette|paupiette",
-    "non": "surgel|conserve|knack|francfort|strasbourg|sauce|chips|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|cocktail|\\bsecs?\\b|\\bseche"
+    "non": "surgel|conserve|knack|francfort|strasbourg|sauce|chips|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|cocktail|\\bsecs?\\b|\\bseche|\\bpiques?\\b|\\bbambou\\b|\\binox\\b|\\ben bois\\b|\\d+ ?cm\\b"
    }
   },
   {
@@ -512,7 +512,7 @@
    },
    "filtre": {
     "oui": "crevette|gambas|langoustine|homard|crabe|tourteau|\\bmoules?\\b|huitre|\\bcoquilles?\\b|saint jacques|bulot|palourde|\\bcoques?\\b|calamar|encornet|seiche|poulpe|fruits de mer|langouste",
-    "non": "surgel|conserve|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|sauce|soupe|pates|pizza|chips|plat cuisine|salade|sandwich|tarama|beurre|bouillon"
+    "non": "surgel|conserve|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|sauce|soupe|pates|pizza|chips|plat cuisine|salade|sandwich|tarama|beurre|bouillon|\\d+ ?cm\\b|silicone|\\bgateaux?\\b|souffle|quatre quarts|\\bmuffins?\\b|perfect ?bake|\\bpyrex\\b|bouchees vapeur|dim sum"
    }
   },
   {
@@ -741,7 +741,7 @@
    },
    "filtre": {
     "oui": "creme dessert|\\bmousse|liegeois|\\bflans?\\b|riz au lait|semoule au lait|ile flottante|creme aux oeufs|creme brulee|tiramisu|panna cotta|dessert|clafoutis|compote|profiterole|\\beclairs?\\b|baba",
-    "non": "yaourt nature|fromage blanc|\\bglaces?\\b|surgel|biscuit|\\bpoudre|preparation|bebe|a preparer|sachet"
+    "non": "yaourt nature|fromage blanc|\\bglaces?\\b|surgel|biscuit|\\bpoudre|preparation|bebe|a preparer|sachet|\\bdes \\d+ ?mois\\b"
    }
   },
   {
@@ -856,7 +856,11 @@
     ],
     "auchan": "text=fromage%20r%C3%A2p%C3%A9"
    },
-   "note": "Rayon existant."
+   "note": "Rayon existant.",
+   "filtre": {
+    "oui": "",
+    "non": "\\bpieds?\\b|exfoli|callosites?|ceramique|\\belectrique\\b|\\binox\\b|\\brapes? a (?:pieds|fromage|legumes|main)\\b|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot"
+   }
   },
   {
    "id": "fromages-pate-molle",
@@ -890,7 +894,7 @@
     ]
    },
    "filtre": {
-    "oui": "camembert|\\bbrie\\b|coulommiers|munster|reblochon|pont l eveque|maroilles|livarot|epoisses|mont d or|vacherin|roquefort|\\bbleu|fourme|gorgonzola|saint nectaire|saint marcellin|chaource|neufchatel|saint felicien|langres|fromage",
+    "oui": "camembert|\\bbrie\\b|coulommiers|munster|reblochon|pont l eveque|maroilles|livarot|epoisses|mont d or|vacherin|roquefort|\\bbleu|fourme|gorgonzola|saint nectaire|saint marcellin|chaource|neufchatel|saint felicien|langres|\\bfromage(?=s?\\b)",
     "non": "\\brapee?s?\\b|tartiner|fondu|portion|enfant|chevre|brebis|emmental|comte|gouda|mozzarella|feta|raclette|tranche|surgel|sauce|chips|biscuit|tarte|pizza|quiche"
    }
   },
@@ -1048,7 +1052,11 @@
     ],
     "auchan": "text=fromage%20%C3%A0%20la%20coupe"
    },
-   "note": "Prix au kilo ou à la pièce de poids variable."
+   "note": "Prix au kilo ou à la pièce de poids variable.",
+   "filtre": {
+    "oui": "",
+    "non": "\\bpieds?\\b|exfoli|callosites?|ceramique|\\belectrique\\b|\\binox\\b|\\brapes? a (?:pieds|fromage|legumes|main)\\b|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot"
+   }
   },
   {
    "id": "jambon-blanc",
@@ -1076,7 +1084,7 @@
    },
    "filtre": {
     "oui": "jambon|blanc de poulet|blanc de dinde|roti de porc|epaule|jambonneau|filet de poulet|dinde|poulet",
-    "non": "\\bcru|\\bsecs?\\b|serrano|parme|bayonne|surgel|pizza|sandwich|pates|quiche|croque|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|chips|conserve|\\bfumee?s?\\b(?! .*cuit)|salade composee|\\bdes de"
+    "non": "\\bcru|\\bsecs?\\b|serrano|\\bparme\\b|bayonne|surgel|pizza|sandwich|pates|quiche|croque|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|chips|conserve|\\bfumee?s?\\b(?! .*cuit)|salade composee|\\bdes de"
    },
    "note": "Carrefour : « jambons blancs » sans URL, page « charcuterie » parente avec filtre (première page seulement)."
   },
@@ -1109,7 +1117,7 @@
     ]
    },
    "filtre": {
-    "oui": "jambon cru|jambon sec|serrano|parme|bayonne|aoste|speck|bresaola|coppa|pancetta|lonzo|viande des grisons|pastrami|rosette|assortiment|plateau|chiffonnade|mortadelle|bacon",
+    "oui": "jambon cru|jambon sec|serrano|\\bparme\\b|bayonne|aoste|speck|bresaola|coppa|pancetta|lonzo|viande des grisons|pastrami|rosette|assortiment|plateau|chiffonnade|mortadelle|bacon",
     "non": "surgel|pizza|sandwich|pates|quiche|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|chips|conserve|jambon blanc|jambon cuit"
    }
   },
@@ -1280,7 +1288,7 @@
     ]
    },
    "filtre": {
-    "oui": "aperitif|tartinable|houmous|tarama|tzatziki|guacamole|rillette|blini|toast|canape|feuillete|\\bmini|bouchee|chorizo|saucisson|grignot|\\bdes de|\\bolives?\\b|tapenade|caviar d|brochette|\\bcubes?\\b",
+    "oui": "aperitif|tartinable|houmous|tarama|tzatziki|guacamole|rillette|blini|toast|canape|feuillete|\\bmini|bouchee|chorizo|saucisson|grignot|\\bdes de|\\bolives?\\b|tapenade|caviar d|brochette|\\bcubes?\\b|\\bapero\\b|assortiment",
     "non": "surgel|chips|biscuit aperitif|cacahu|sec\\b|boisson|\\bbiere|\\bvins?\\b|\\bjus\\b"
    }
   },
@@ -1348,7 +1356,7 @@
     ]
    },
    "filtre": {
-    "oui": "pizza|quiche|tarte|flammekueche|tarte flambee|pate a|pate feuilletee|pate brisee|pate sablee|pate a pizza|feuillete|cake|tourte|croque",
+    "oui": "pizza|quiche|tarte|flammekueche|tarte flambee|pate a|pate feuilletee|pate brisee|pate sablee|pate a pizza|feuillete|cake|\\btourte(?=s?\\b)|croque",
     "non": "surgel|sauce|chips|biscuit|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|fromage rape|pates fraiches|ravioli|gnocchi|dessert|tarte aux pommes|bebe|boisson"
    }
   },
@@ -1378,7 +1386,7 @@
    },
    "filtre": {
     "oui": "pates? fraiches?|\\bfraiches?\\b|\\bfrais\\b|ravioli|raviole|girasoli|cappelletti|quenelle|lasagnes? fraiches?|spaetzle|gnocchi a poeler|gnocchi(?= .*(frais|fraiche|poeler|rana|lustucru))|tortellini(?= .*(frais|fraiche|rana|lustucru))",
-    "non": "surgel|conserve|\\bseche|sauce\\b|fromage|chips|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|pizza|quiche|plat cuisine|sandwich|salade|dessert|bebe|boisson|poele"
+    "non": "surgel|conserve|\\bseche|sauce\\b|fromage|chips|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|pizza|quiche|plat cuisine|sandwich|salade|dessert|bebe|boisson|\\bpoelee?s?\\b"
    },
    "note": "Monoprix : « pâtes fraîches » sans URL, page « pâtes » (épicerie) avec filtre « frais »."
   },
@@ -1456,8 +1464,8 @@
     ]
    },
    "filtre": {
-    "oui": "vegetal|vegetarien|vegan|\\bvege|tofu|seitan|tempeh|soja|steak de|galette|falafel|nugget|\\bboulettes?\\b|lentille|pois chiche|houmous|protein|legumineuse|saucisse|lardon|jambon|haché|hache|alternative",
-    "non": "surgel|boisson|\\blait\\b|yaourt|dessert|fromage(?! vegetal)|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|viande de|jambon de porc|biscuit|chips|sauce\\b|bebe|complement|shampoings?|cheveux"
+    "oui": "vegetal|vegetarien|vegan|\\bvege|tofu|seitan|tempeh|soja|steak de|galette|falafel|nugget|\\bboulettes?\\b|lentille|pois chiche|houmous|protein|legumineuse|alternative|veggie",
+    "non": "surgel|boisson|\\blait\\b|yaourt|dessert|fromage(?! vegetal)|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|viande de|jambon de porc|biscuit|chips|sauce\\b|bebe|complement|shampoings?|cheveux|^(?!.*(?:vegeta|veggie|vegan|\\bvege\\b|\\bsoja\\b|tofu|seitan|tempeh|sans viande)).*\\b(?:lardons?|jambon|saucisses?|saucisson|bacon|chorizo|poulet|dinde|boeuf|porc|veau|agneau|merguez|volaille|canard)\\b"
    }
   },
   {
@@ -1491,8 +1499,8 @@
     ]
    },
    "filtre": {
-    "oui": "\\bpains?\\b|baguette|ficelle|\\bboules?\\b|miche|campagne|seigle|complet|cereales|precuit|batard|fougasse|ciabatta|focaccia|\\bpita|naan|tortilla|wrap|pain de mie",
-    "non": "surgel|biscotte|grille|chapelure|pain d epice|pain au lait|brioche|chocolat|croissant|viennois|burger|hot dog|pain de mie|sandwich garni|chips|biscuit|sans gluten(?! pain)|epice|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|beurre|confiture|\\bpates?\\b|\\bglaces?\\b|dessert"
+    "oui": "\\bpains?\\b|baguette|ficelle|\\bboules?\\b|\\bmiche(?=s?\\b)|campagne|seigle|complet|cereales|precuit|batard|fougasse|ciabatta|focaccia|\\bpita|naan|tortilla|wrap|pain de mie",
+    "non": "surgel|biscotte|\\bgrillee?s?\\b|chapelure|pain d epice|pain au lait|brioche|chocolat|croissant|viennois|burger|hot dog|pain de mie|sandwich garni|chips|biscuit|sans gluten(?! pain)|epice|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|beurre|confiture|\\bpates?\\b|\\bglaces?\\b|dessert"
    },
    "note": "Houra : la page « pain et boulangerie du marché » n’a pas de code relevé."
   },
@@ -2060,7 +2068,7 @@
    },
    "filtre": {
     "oui": "lentille|pois chiche|haricot (rouge|blanc|noir|\\bsecs?\\b|coco|mungo|pinto|lingot|azuki)|flageolet|feve|pois casse|pois cass|legume sec|legumineuse|mogette|cocos|edamame|haricots secs|soja",
-    "non": "surgel|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|plat cuisine|cassoulet|chili con|soupe|veloute|puree|salade composee|chips|biscuit|haricot vert|petit pois|pates|houmous|tartinable|bebe|boisson|\\blait\\b|sauce|tofu|steak|falafel|couscous (?:aux|au|royal)\\b|avec couscous|lentilles? de contact|\\bsolution|petit sale|\\bsaucisses?\\b.*\\blentilles?\\b|\\blentilles?\\b.*\\bsaucisses?\\b|\\bcuisinee?s?\\b|\\bsalades?\\b|\\bcurry\\b|\\bdahl\\b|\\bdal\\b|\\bfacon\\b|bolognaise|chorizo|\\bgalettes?\\b|\\bvegetales?\\b|\\bbouchees?\\b|\\bpoulet\\b|\\bdes \\d+ ?mois\\b|\\btorsades?\\b|\\bspaghetti|\\bplats?\\b"
+    "non": "surgel|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|plat cuisine|cassoulet|chili con|\\bsoupes? (?:de|d|aux?)\\b|veloute|puree|salade composee|chips|biscuit|haricot vert|petit pois|pates|houmous|tartinable|bebe|boisson|\\blait\\b|sauce|tofu|steak|falafel|couscous (?:aux|au|royal)\\b|avec couscous|lentilles? de contact|\\bsolution|petit sale|\\bsaucisses?\\b.*\\blentilles?\\b|\\blentilles?\\b.*\\bsaucisses?\\b|\\bcuisinee?s?\\b|(?<!pour )\\bsalades?\\b|^(?!.*\\b(?:special|pour|ideale?s?)\\b).*\\b(?:curry|dahl|dal|soupes?)\\b|\\bfacon\\b|bolognaise|chorizo|\\bgalettes?\\b|tranches? vegetales?|\\b(?:steaks?|haches?|galettes?|boulettes?|nuggets?|saucisses?) vegeta|\\bbouchees?\\b|\\bpoulet\\b|\\bdes \\d+ ?mois\\b|\\btorsades?\\b|\\bspaghetti|\\bplats?\\b"
    },
    "note": "Secs et en conserve : contenances différentes, donc produits distincts dans le rapprochement. Les falafels et les plats de couscous vont au rayon oriental. La recherche Auchan « lentilles » sert aussi les plats en conserve, et les salades repas ; « pois chiches » et « haricots rouges » aussi les plats en conserve : le filtre « non » écarte les plats, et les solutions pour lentilles de contact sont hors courses."
   },
@@ -2091,7 +2099,7 @@
    },
    "filtre": {
     "oui": "\\btomates?\\b",
-    "non": "ketchup|sauce|soupe|\\bsechee|cerise|chips|\\bthon|sardine|maquereau|jus de tomate|ravioli|pizza|farcie|gaspacho|mozzarella|tartin|plat|\\briz\\b|pates|lasagne|graine|plant|semence|grappe|\\bronde|vrac|barquette|fraiche|coeur de boeuf|\\broma|cocktail|allongee|ancienne|olivette|cornue"
+    "non": "ketchup|sauce|soupe|\\bsechee|cerise|chips|\\bthon|sardine|maquereau|jus de tomate|ravioli|pizza|farcie|gaspacho|mozzarella|tartin|plat|\\briz\\b|pates|lasagne|graine|plant|semence|grappe|\\bronde|vrac|barquette|fraiche|coeur de boeuf|\\broma\\b|cocktail|allongee|ancienne|olivette|cornue"
    },
    "note": "Rayon existant."
   },
@@ -2234,7 +2242,7 @@
    },
    "filtre": {
     "oui": "cassoulet|ravioli|couscous|paella|choucroute|chili|lentilles cuisinees|petit sale|\\bconfits?\\b|boeuf bourguignon|blanquette|plat cuisine|repas|\\bbox\\b|\\bcup\\b|instantan|micro|tajine|curry|colombo|risotto|puree|poelee|\\bnouilles?\\b|riz cuisine|pates cuisinees|hachis|gratin|tartiflette|saucisses lentilles|bolognaise|carbonara|cannelloni|lasagne|chakchouka|\\btripes|andouillette|\\bboulettes?\\b|sauce tomate|tomate farcie|\\bdahl\\b|\\bdal\\b|\\bcuisinee?s?\\b|\\bsaucisses?\\b.*\\blentilles?\\b|\\blentilles?\\b.*\\bsaucisses?\\b",
-    "non": "surgel|frais|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|sauce\\b(?! tomate)|soupe|veloute|bouillon|chips|biscuit|dessert|bebe|petit pot|pates seches|riz nature|lentilles nature|haricot nature|\\bthon|sardine|\\bdes \\d+ ?mois\\b"
+    "non": "surgel|frais|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|sauce\\b(?! tomate)|soupe|veloute|bouillon|chips|biscuit|dessert|bebe|petit pot|pates seches|riz nature|lentilles nature|haricot nature|\\bthon|sardine|\\bdes \\d+ ?mois\\b|tranches? vegetales?"
    },
    "note": "Les recherches Auchan « lentilles », « pois chiches » et « haricots rouges » sont partagées avec le rayon légumes secs : les plats (petit salé, saucisses aux lentilles, currys, dahls, lentilles cuisinées) viennent ici (filtres)."
   },
@@ -2307,7 +2315,7 @@
    },
    "filtre": {
     "oui": "\\bhuile\\b",
-    "non": "essentielle|massage|solaire|corps|cheveux|bebe|moteur|\\bthon|sardine|maquereau|anchois|olives |aux olives|piment|spray|vaporisateur|lampe|parfum|\\bseche|tomates sechees|artichaut|poivron|champignon|shampoings?|douche|demaquill|\\bsoins?\\b|capillaire|\\bongles\\b|levres|\\bbarbe\\b"
+    "non": "essentielle|massage|solaire|corps|cheveux|bebe|moteur|\\bthon|sardine|maquereau|anchois|olives |aux olives|piment|spray|vaporisateur|lampe|parfum|\\bseche|tomates sechees|artichaut|poivron|champignon|shampoings?|douche|demaquill|\\bsoins?\\b|capillaire|\\bongles\\b|levres|\\bbarbe\\b|creme lavante|\\blavantes?\\b|\\bmasques?\\b|\\bserums?\\b"
    },
    "note": "Rayon existant. La page Carrefour « huiles d’olive » est dans « ignore » (lue sans les noms)."
   },
@@ -2343,7 +2351,7 @@
    },
    "filtre": {
     "oui": "vinaigre|vinaigrette|sauce salade|sauce crudite|jus de citron|citron vert|balsamique|cidre|xeres|assaisonnement|cesar|yaourt a la|moutarde a l ancienne et miel",
-    "non": "blanc menager|menager|nettoyant|anticalcaire|entretien|chips|biscuit|cornichon|\\bolives?\\b|mayonnaise|ketchup|moutarde\\b|sauce tomate|soupe|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|huile d olive|citron frais|boisson|sirop|limonade|\\bthe\\b|\\bconfite?s?\\b|bonbon|anti calcaire|\\bspray\\b"
+    "non": "blanc menager|menager|nettoyant|anticalcaire|entretien|chips|biscuit|cornichon|\\bolives?\\b|mayonnaise|ketchup|moutarde\\b|sauce tomate|soupe|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|huile d olive|citron frais|boisson|sirop|limonade|\\bthe\\b|\\bconfite?s?\\b|bonbon|anti calcaire|\\bspray\\b|vaisselle|smoothie|nectar|\\bbieres?\\b|eau aromatisee|citronnade|jus multifruits|jus de fruits|\\bjus d (?:ananas|orange|abricot)\\b"
    }
   },
   {
@@ -2376,7 +2384,7 @@
     ]
    },
    "filtre": {
-    "oui": "\\bsel\\b|poivre|epice|curry|paprika|cumin|curcuma|cannelle|muscade|piment|herbe|thym|origan|basilic|persil|ciboulette|laurier|romarin|aneth|coriandre|gingembre|safran|colombo|tandoori|ras el|zaatar|sumac|cardamome|clou de girofle|baies|fleur de sel|gros sel|melange|aromate|ail semoule|oignon seche|vanille",
+    "oui": "\\bsel\\b|poivre|epice|curry|paprika|cumin|curcuma|cannelle|\\bmuscade\\b|piment|herbe|thym|origan|basilic|persil|ciboulette|laurier|romarin|aneth|coriandre|gingembre|safran|colombo|tandoori|ras el|zaatar|sumac|cardamome|clou de girofle|baies|fleur de sel|gros sel|melange|aromate|ail semoule|oignon seche|vanille",
     "non": "chips|biscuit|sauce\\b|soupe|bouillon|\\bcubes?\\b|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|cornichon|\\bolives?\\b|\\bthe\\b|infusion|sirop|bonbon|dentifrice|deodorant|\\bbain|regenerant|lave vaisselle|adoucisseur|plante fraiche|frais|surgel|sel de bain|gomme|gel douche|shampoing|\\bsavon|poivron|sucre vanille|gousse de vanille(?! .*epice)|extrait de vanille"
    },
    "note": "Sans la vanille et les arômes de pâtisserie (rayon aide à la pâtisserie)."
@@ -2506,7 +2514,7 @@
    },
    "filtre": {
     "oui": "sauce soja|soja|nuoc mam|nuoc|teriyaki|sweet chili|sriracha|huitre|hoisin|curry|lait de coco|creme de coco|pate de curry|tandoori|tikka|wok|sauce aigre|aigre douce|satay|sauce pour nems|nems|rouleaux de printemps|sauce barbecue|barbecue|bbq|salsa|guacamole|sauce mexicaine|tacos|fajita|sauce burger|sauce frite|sauce kebab|sauce fromagere|ponzu|miso|wasabi|gochujang|kimchi|sambal|harissa|chimichurri|sauce",
-    "non": "chips|biscuit|soupe|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|cornichon|\\bolives?\\b|mayonnaise|ketchup|moutarde|sauce tomate|bolognaise|pesto|carbonara|\\bnouilles?\\b|\\briz\\b|vermicelle|galette de riz|chips de crevette|tortilla|pates|dentifrice|boisson|\\bthe\\b|lait d amande|lait de soja|shampoings?|cheveux"
+    "non": "chips|biscuit|soupe|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|cornichon|\\bolives?\\b|mayonnaise|ketchup|moutarde|sauce tomate|bolognaise|pesto|carbonara|\\bnouilles?\\b|\\briz\\b|vermicelle|galette de riz|chips de crevette|tortilla|pates|dentifrice|boisson|\\bthe\\b|lait d amande|lait de soja|shampoings?|cheveux|dessert|yaourt|\\bbrasses?\\b|liegeois|\\bmousse\\b|tiramisu|skyr|kefir|fondant|\\bcremeux\\b|petit pot|\\bp ti(?:t|te)\\b|\\bdes \\d+ ?mois\\b|\\bsalades? de\\b|\\bgratins?\\b|douche"
    }
   },
   {
@@ -2684,7 +2692,7 @@
    },
    "filtre": {
     "oui": "capsule|dosette|pod|compatible|nespresso|senseo|dolce gusto|tassimo|vertuo|\\bl or\\b|barista",
-    "non": "moulu|\\bgrains?\\b|soluble|\\bthe\\b(?! capsule)|infusion(?! capsule)|chocolat en poudre|\\bmachine|cafetiere|detartrant|porte capsule|distributeur|biscuit|bonbon|lait concentre"
+    "non": "moulu|\\bgrains?\\b|soluble|\\bthe\\b(?! capsule)|infusion(?! capsule)|chocolat en poudre|\\bmachine|cafetiere|detartrant|porte capsule|distributeur|biscuit|bonbon|lait concentre|genio|piccolo|infinissima|mini me\\b|reservoir|\\byy\\d+"
    }
   },
   {
@@ -2904,7 +2912,7 @@
     ]
    },
    "filtre": {
-    "oui": "pate a tartiner|tartiner|nutella|nocciolata|noisette|speculoos|cacahuete|beurre de cacahuete|puree d amande|puree de noisette|puree de sesame|tahini|tahin|\\bcreme de|caramel au beurre|dulce|choco|chocolat",
+    "oui": "pate a tartiner|tartiner|nutella|nocciolata|noisette|speculoos|cacahuete|beurre de cacahuete|puree d amande|puree de noisette|puree de sesame|tahini|tahin|\\bcreme de\\b|caramel au beurre|dulce|choco|chocolat",
     "non": "confiture|\\bgelee|marmelade|miel\\b|fromage|biscuit|gateau|cereale|yaourt|dessert|\\blait\\b|boisson|bonbon|rillette|houmous|tapenade|tartinable sale|legume|poisson|\\bthon|sardine|chocolat en poudre|tablette|barre"
    }
   },
@@ -2932,7 +2940,7 @@
     ]
    },
    "filtre": {
-    "oui": "biscotte|tartine|cracotte|craquinette|wasa|krisprolls|pain grille|pain suedois|galette de riz|galette de mais|galette de ble|crackers petit dejeuner|pain des fleurs|toast|pain azyme|biscuit sec petit dejeuner",
+    "oui": "biscotte|tartine|cracotte|craquinette|\\bwasa\\b|krisprolls|pain grille|pain suedois|galette de riz|galette de mais|galette de ble|crackers petit dejeuner|pain des fleurs|toast|pain azyme|biscuit sec petit dejeuner",
     "non": "cereale|muesli|flocon|barre|confiture|\\bmiel\\b|pate a tartiner|biscuit chocolat|gateau|bonbon|yaourt|\\blait\\b|boisson|\\bthe\\b|\\bcafe\\b|pain de mie|baguette|frais|chips|crackers aperitif|\\btuc\\b|bretzel|fromage|beurre"
    }
   },
@@ -3064,7 +3072,7 @@
    },
    "filtre": {
     "oui": "crepe|gaufre|gaufrette fourree|cake|quatre quart|quatre quarts|brownie|muffin|cookie moelleux|moelleux|fondant|beignet|donut|pain d epice|\\broulee?s?\\b|genoise|savane|mini cake|financier|tarte|pancake|pastel|kouign|far breton|galette bretonne moelleuse|chausson|pain au lait",
-    "non": "madeleine|biscuit sec|\\bsablee?s?\\b|petit beurre|chips|crackers|bonbon|chocolat tablette|cereale|muesli|yaourt|\\blait\\b|boisson|\\bglaces?\\b|surgel|frais|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bebe|pate a crepe|preparation|farine|sucre|gaufrette aperitive|crepe salee garnie|fromage|crepe dentelle(?! .*chocolat)|vernis|\\bongles\\b"
+    "non": "madeleine|biscuit sec|\\bsablee?s?\\b|petit beurre|chips|crackers|bonbon|chocolat tablette|cereale|muesli|yaourt|\\blait\\b|boisson|\\bglaces?\\b|surgel|frais|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bebe|pate a crepe|preparation|farine|sucre|gaufrette aperitive|crepe salee garnie|fromage|crepe dentelle(?! .*chocolat)|vernis|\\bongles\\b|lavettes?|gloss|maquillage"
    }
   },
   {
@@ -3099,7 +3107,7 @@
     ]
    },
    "filtre": {
-    "oui": "tablette|chocolat|\\bnoire?s?\\b|\\bau lait|blanc|praline|noisette|caramel|\\bamande|degustation|dessert|lindt|milka|cote d or|nestle|poulain|kinder|cemoi|villars|valrhona|bonnat|weiss|alter eco|ethiquable|jardin bio|tony|ritter|toblerone|cadbury|galaxy",
+    "oui": "tablette|chocolat|\\bnoire?s?\\b|\\bau lait|blanc|praline|noisette|caramel|\\bamande|degustation|dessert|lindt|milka|cote d or|nestle|poulain|kinder|cemoi|villars|valrhona|bonnat|\\bweiss\\b|alter eco|ethiquable|jardin bio|tony|ritter|toblerone|cadbury|galaxy",
     "non": "\\bpoudre|boisson|biscuit|gateau|bonbon|barre|rocher|\\bbille|bouchee|boite de|ballotin|calendrier|oeuf de paques|lapin|pere noel|papillote|truffe|pate a tartiner|cereale|yaourt|lait\\b(?! chocolat)|\\bglaces?\\b|dessert pret|\\bcreme\\b|crepe|gaufre|madeleine|cookie|brownie|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bebe|chocolat a patisser|patissier|pepites|cacao en poudre|\\bcafe\\b|\\bthe\\b|sirop"
    }
   },
@@ -3138,7 +3146,7 @@
    },
    "filtre": {
     "oui": "rocher|ferrero|bouchee|\\bbille|barre|\\bmars\\b|snickers|twix|bounty|kinder|\\blion\\b|kitkat|kit kat|crunch|smarties|\\bm m\\b|maltesers|celebrations|ballotin|boite de chocolats|assortiment|praline|truffe|papillote|calendrier|\\boeuf|lapin|pere noel|chocolat|caramel|raffaello|mon cheri|schoko|bueno|duplo|toffifee|pralines|orangette|mendiant|escargot|nougat|chocolat au lait fourre|confiserie",
-    "non": "tablette|\\bpoudre|boisson|biscuit|gateau|bonbon gelifie|haribo|chewing|dragee|reglisse|menthe|sucette|pate a tartiner|cereale|yaourt|lait\\b|\\bglaces?\\b|\\bcreme\\b|crepe|gaufre|madeleine|cookie|brownie|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bebe|patisser|pepites|cacao|\\bcafe\\b|\\bthe\\b|sirop|barre de cereales|barre proteinee"
+    "non": "tablette|\\bpoudre|boisson|biscuit|gateau|bonbon gelifie|haribo|chewing|dragee|reglisse|menthe|sucette|pate a tartiner|cereale|yaourt|lait\\b|\\bglaces?\\b|\\bcreme\\b|crepe|gaufre|madeleine|cookie|brownie|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bebe|patisser|pepites|cacao|\\bcafe\\b|\\bthe\\b|sirop|barre de cereales|barre proteinee|boite de rangement|\\d+ ?x ?\\d+ ?cm\\b"
    }
   },
   {
@@ -3294,7 +3302,7 @@
     ]
    },
    "filtre": {
-    "oui": "levure|chocolat patissier|chocolat a patisser|pepite|arome|vanille|extrait|decor|vermicelle|perle|\\bcolorant|nappage|glacage|pate a sucre|fondant|preparation|\\bmix|gateau a preparer|\\bflans?\\b|entremet|creme anglaise|creme patissiere|pate a crepe|pate a tarte|lait concentre|lait en poudre|gelatine|agar|bicarbonate|sucre vanille|praline|amande en poudre|poudre d amande|noix de coco rapee|fruits confits|raisin sec|cerise confite|caramel liquide|\\bcoulis\\b|pate d amande|feuille de brick|pate filo|fecule|maizena|chapelure|mug cake|\\balsa|vahine|\\bancel|dr oetker|francine preparation",
+    "oui": "levure|chocolat patissier|chocolat a patisser|pepite|arome|vanille|extrait|\\bdecor(?=s?\\b)|decoration|decorer|\\b(?:amandes?|noisettes?|pistaches?|pignons?|noix)\\b.*\\bdecortiquee?s?\\b|vermicelle|perle|\\bcolorant|nappage|glacage|pate a sucre|fondant|preparation|\\bmix|gateau a preparer|\\bflans?\\b|entremet|creme anglaise|creme patissiere|pate a crepe|pate a tarte|lait concentre|lait en poudre|gelatine|agar|bicarbonate|sucre vanille|praline|amande en poudre|poudre d amande|noix de coco rapee|fruits confits|raisin sec|cerise confite|caramel liquide|\\bcoulis\\b|pate d amande|feuille de brick|pate filo|fecule|maizena|chapelure|mug cake|\\balsa|vahine|\\bancel|dr oetker|francine preparation",
     "non": "farine de ble|farine t|sucre en poudre|sucre en morceaux|sucre semoule|sucre glace|cassonade|tablette degustation|chocolat noir 70(?! .*patisser)|biscuit|gateau pret|madeleine|yaourt|dessert pret|compote|lait demi|lait entier|lait ecreme|boisson|\\bcafe\\b|\\bthe\\b|bonbon|confiture|\\bmiel\\b|pate a tartiner|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bebe|infantile|epice|\\bsel\\b|poivre|curry|bouillon|\\bcubes?\\b"
    }
   },
@@ -3319,7 +3327,11 @@
     ],
     "auchan": "text=eau%20plate"
    },
-   "note": "Rayon existant."
+   "note": "Rayon existant.",
+   "filtre": {
+    "oui": "",
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|radiateur|robinet(?! integre)|\\bfiltres?\\b|carafe|gourde|fontaine a eau|tuyau|arrosage|bouilloire|purificateur|adoucisseur|eau de (?:toilette|parfum|javel|rose|coco)|micellaire|oxygenee|demineralisee|\\bthe\\b|sirop"
+   }
   },
   {
    "id": "eaux-gazeuses",
@@ -3350,7 +3362,7 @@
    },
    "filtre": {
     "oui": "gazeuse|petillante|bulles|aromatisee|perrier|badoit|pellegrino|vichy|st yorre|saint yorre|quezac|salvetat|rozana|arvie|chateldon|eau de coco|\\bcarola|wattwiller|finement|intense",
-    "non": "plate(?! .*aromatis)|de javel|de toilette|micellaire|demaquillante|florale|\\bde rose|oxygenee|demineralisee|pour fer|radiateur|robinet|\\bchauffe|\\bfiltre|carafe|gazeificateur|sodastream|soda|\\bcola|limonade|\\bjus\\b|sirop|\\bbiere|\\bvins?\\b|\\bthe\\b|\\bcafe\\b|\\blait\\b|bebe"
+    "non": "plate(?! .*aromatis)|de javel|de toilette|micellaire|demaquillante|florale|\\bde rose|oxygenee|demineralisee|pour fer|radiateur|robinet|\\bchauffe|\\bfiltre|carafe|gazeificateur|sodastream|soda|\\bcola|limonade|\\bjus\\b(?! de citron)|sirop|\\bbiere|\\bvins?\\b|\\bthe\\b|\\bcafe\\b|\\blait\\b|bebe"
    },
    "note": "Monoprix : « eau gazeuse » sans URL, page « eau » parente avec filtre. Rayon existant « eaux » = plates seulement."
   },
@@ -3374,7 +3386,11 @@
     ],
     "auchan": "text=jus%20d%27orange"
    },
-   "note": "Rayon existant."
+   "note": "Rayon existant.",
+   "filtre": {
+    "oui": "",
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|gel douche|shampoing|\\bsavon|bougies?|parfum|diffuseur|desodoris|presse agrumes|extracteur|centrifugeuse|carafe|\\bthe\\b|sirop|soda|limonade|confiture|marmelade|bonbon"
+   }
   },
   {
    "id": "jus-autres",
@@ -3406,7 +3422,7 @@
    },
    "filtre": {
     "oui": "\\bjus\\b|\\bnectars?\\b|smoothie|pur jus|multifruit|multivitamin|pomme|raisin|ananas|cranberry|tomate|carotte|mangue|pamplemousse|fruit de la passion|\\bpoires?\\b|abricot|\\bpeches?\\b|grenade|citron|betterave|legume|\\bcoco\\b|tropical|exotique|fraise|cerise|goyave|acerola|pressade|tropicana|andros|joker|innocent|\\bpago|pressed",
-    "non": "orange(?! .*(multi|mangue|ananas|carotte|pomme))|sirop|soda|limonade|\\bcola|\\bthe glace|ice tea|\\beaux?\\b|\\bbiere|\\bvins?\\b|cidre|\\blait\\b|boisson lactee|yaourt|compote|confiture|bonbon|\\bgelee|bebe|infantile|jus de citron cuisine|vinaigre|gel douche|shampoing|\\bsavon|\\bthe\\b|\\bcafe\\b|energisante|sport|bougies? parfumees?|\\bbougies?\\b|parfumee|diffuseur|desodoris"
+    "non": "^(?!.*\\b(?:multi\\w*|smoothies?)\\b).*orange(?! .*(multi|mangue|ananas|carotte|pomme|maracuja|goyave|passion))|sirop|soda|limonade|\\bcola|\\bthe glace|ice tea|\\beaux?\\b|\\bbiere|\\bvins?\\b|cidre|\\blait\\b|boisson lactee|yaourt|compote|confiture|bonbon|\\bgelee|bebe|infantile|jus de citron cuisine|vinaigre|gel douche|shampoing|\\bsavon|\\bthe\\b|\\bcafe\\b|energisante|sport|bougies? parfumees?|\\bbougies?\\b|parfumee|diffuseur|desodoris|\\bcocottes?\\b|\\bfonte\\b|\\d+ ?cm\\b|\\brapes?\\b|electrique"
    },
    "note": "Jus frais (rayon fruits et légumes des enseignes) compris."
   },
@@ -3461,7 +3477,11 @@
     ],
     "auchan": "text=cola"
    },
-   "note": "Rayon existant."
+   "note": "Rayon existant.",
+   "filtre": {
+    "oui": "",
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bonbons?|gelifie|haribo|chewing|sucette|gel douche|shampoing|t shirt|casquette|peluche|figurine|\\bjouet"
+   }
   },
   {
    "id": "limonades",
@@ -3557,7 +3577,7 @@
     ]
    },
    "filtre": {
-    "oui": "vegetal|\\bamande|soja|avoine|\\bcoco\\b|\\briz\\b|noisette|epeautre|chanvre|\\bcajou\\b|\\bpois\\b|boisson|lait d|alpro|bjorg|oatly|sojasun|silk|biosoy|\\blima|isola|\\bvrai|joya|la vie claire|ecomil|vitariz|rice dream",
+    "oui": "vegetal|\\bamande|soja|avoine|\\bcoco\\b|\\briz\\b|noisette|epeautre|chanvre|\\bcajou\\b|\\bpois\\b|boisson|lait d (?:amande|avoine|riz|soja|coco|noisette|epeautre|cajou|chanvre|millet|quinoa|pois)\\b|alpro|bjorg|oatly|sojasun|silk|biosoy|\\blima\\b|isola|\\bvrai|joya|la vie claire|ecomil|vitariz|rice dream",
     "non": "lait de vache|lait demi|lait entier|lait ecreme|chevre|brebis|yaourt|dessert|\\bcreme\\b|fromage|\\bglaces?\\b|jus de fruit|\\bnectars?\\b|smoothie|sirop|soda|\\beaux?\\b|\\bbiere|\\bvins?\\b|\\bcafe\\b|\\bthe\\b|chocolat en poudre|infantile|bebe|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|huile|puree d amande|amandes seules|noix de coco rapee|lait concentre|creme de coco cuisine|lait de coco cuisine"
    }
   },
@@ -3594,7 +3614,7 @@
     ]
    },
    "filtre": {
-    "oui": "\\bbiere|blonde|\\bbrune|ambree|blanche|\\bipa\\b|lager|pils|pilsner|stout|abbaye|trappiste|triple|leffe|heineken|kronenbourg|1664|desperados|corona|grimbergen|affligem|pelforth|chouffe|duvel|chimay|guinness|carlsberg|\\bstella|jupiler|budweiser|bud\\b|\\bperoni|moretti|estrella|san miguel|brooklyn|lagunitas|goudale|ch ti|pietra|brewdog|\\bfut\\b|lambic|kriek|gueuze|biere de noel|bock|weizen|\\bsaison\\b|\\bporter\\b",
+    "oui": "\\bbiere|blonde|\\bbrune|ambree|\\bblanche(?=s?\\b)|\\bipa\\b|lager|pils|pilsner|stout|abbaye|trappiste|triple|leffe|heineken|kronenbourg|1664|desperados|corona|grimbergen|affligem|pelforth|chouffe|duvel|chimay|guinness|carlsberg|\\bstella|jupiler|budweiser|bud\\b|\\bperoni|moretti|estrella|san miguel|brooklyn|lagunitas|goudale|ch ti|pietra|brewdog|\\bfut\\b|lambic|kriek|gueuze|biere de noel|bock|weizen|\\bsaison\\b|\\bporter\\b",
     "non": "sans alcool|0 0|0,0|panache|panaché|cidre|\\bpoires?\\b|\\bvins?\\b|champagne|whisky|rhum|vodka|\\bgin\\b|soda|limonade|\\bcola|\\beaux?\\b|\\bjus\\b|sirop|chips|biscuit|cacahuete|levure de biere|shampoing|\\bsavon|verre a|tireuse|fut vide|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|\\bthe\\b|\\bcafe\\b|\\blait\\b|biere aromatisee tequila(?! .*biere)"
    }
   },
@@ -3631,8 +3651,8 @@
     ]
    },
    "filtre": {
-    "oui": "cidre|\\bpoires?\\b|sans alcool|0 0|0,0|panache|panaché|tourtel|loic raison|kerisac|ecusson|val de rance|maison sassy|cidrerie|dan armor|kerne|brut|\\bdoux|\\brose|\\bbouche|fermier|pommeau|\\bpoires?\\b",
-    "non": "biere blonde\\b(?! .*sans)|\\bvin\\b(?! .*sans alcool)|champagne|whisky|rhum|vodka|\\bgin\\b|soda|limonade|\\bcola|\\beau\\b|jus de pomme|jus\\b|sirop|chips|biscuit|cacahuete|vinaigre de cidre|poire fruit|poire au sirop|nectar de poire|\\bthe\\b|\\bcafe\\b|\\blait\\b|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|compote"
+    "oui": "cidre|\\bpoires?\\b|sans alcool|0 0|0,0|panache|panaché|tourtel|loic raison|kerisac|ecusson|val de rance|maison sassy|cidrerie|dan armor|kerne|brut|\\bdoux|\\brose\\b|\\bbouche|fermier|pommeau|\\bpoires?\\b",
+    "non": "biere blonde\\b(?! .*sans)|\\bvin\\b(?! .*sans alcool)|champagne|whisky|rhum|vodka|\\bgin\\b|soda|limonade|\\bcola|\\beau\\b|jus de pomme|^(?!.*\\b(?:bieres?|cidres?|panache)\\b).*\\bjus\\b|sirop|chips|biscuit|cacahuete|vinaigre de cidre|poire fruit|poire au sirop|nectar de poire|\\bthe\\b|\\bcafe\\b|\\blait\\b|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|compote"
    }
   },
   {
@@ -3668,7 +3688,7 @@
    },
    "filtre": {
     "oui": "rouge|bordeaux|bourgogne|cotes du rhone|chateauneuf|beaujolais|languedoc|roussillon|medoc|saint emilion|pomerol|margaux|pauillac|graves|cahors|bergerac|minervois|corbieres|fitou|gigondas|vacqueyras|crozes|saint joseph|cote rotie|chinon|bourgueil|saumur|anjou|pinot noir|merlot|cabernet|syrah|grenache|malbec|gamay|chianti|rioja|valpolicella|barolo|montepulciano|primitivo|tempranillo|carmenere|malbec|zinfandel|shiraz|vin de france|igp|aop|cuvee|chateau|domaine|\\breserve|\\bvins?\\b",
-    "non": "blanc|\\brose|rosé|champagne|cremant|mousseux|prosecco|cava|petillant|pétillant|sans alcool|cidre|\\bbiere|whisky|rhum|vodka|\\bgin\\b|porto|vermouth|martini|aperitif|vin cuit|vin chaud|sangria|vinaigre|\\bjus\\b|soda|\\beaux?\\b|chocolat|biscuit|fromage|verre|tire bouchon|carafe|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot"
+    "non": "\\bblancs?\\b|\\brose|rosé|champagne|cremant|mousseux|prosecco|cava|petillant|pétillant|sans alcool|cidre|\\bbiere|whisky|rhum|vodka|\\bgin\\b|porto|vermouth|martini|aperitif|vin cuit|vin chaud|sangria|vinaigre|\\bjus\\b|soda|\\beaux?\\b|chocolat|biscuit|fromage|verre|tire bouchon|carafe|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot"
    },
    "note": "Houra : univers Cave sans code relevé, découverte depuis la page « fontaines à vins » (code ancien)."
   },
@@ -3736,7 +3756,7 @@
     ]
    },
    "filtre": {
-    "oui": "\\brose|rosé|provence|bandol|\\btavel|cotes de provence|coteaux d aix|coteaux varois|gris|cinsault|rose d anjou|cabernet d anjou|rose de loire|luberon|ventoux|corse|igp|aop|\\bvins?\\b",
+    "oui": "\\brose|rosé|provence|bandol|\\btavel|cotes de provence|coteaux d aix|coteaux varois|\\bgris\\b|cinsault|rose d anjou|cabernet d anjou|rose de loire|luberon|ventoux|corse|igp|aop|\\bvins?\\b",
     "non": "rouge|blanc\\b(?! .*rose)|champagne|cremant|mousseux|prosecco|cava|petillant|pétillant|sans alcool|cidre|\\bbiere|whisky|rhum|vodka|\\bgin\\b|porto|vermouth|martini|aperitif|rose aromatise pamplemousse|rose pamplemousse|vin cuit|sangria|vinaigre|\\bjus\\b|soda|eau de rose|\\beaux?\\b|chocolat|biscuit|fromage|verre|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|chaussure|\\bfleur"
    }
   },
@@ -3771,8 +3791,8 @@
     ]
    },
    "filtre": {
-    "oui": "champagne|cremant|mousseux|prosecco|cava|petillant|pétillant|blanquette|clairette|brut|demi sec|blanc de blancs|blanc de noirs|moet|veuve clicquot|ruinart|nicolas feuillatte|mumm|lanson|taittinger|piper|canard duchene|pommery|mercier|vranken|charles de cazanove|lambrusco|\\basti|spumante|frizzante|vouvray petillant|bulles|pet nat|effervescent",
-    "non": "vin rouge|\\bvin blanc(?! .*petillant)|sans alcool|cidre|\\bbiere|whisky|rhum|vodka|\\bgin\\b|porto|kir pret|soda|limonade|eau minerale|eau petillante|eau gazeuse|\\bjus\\b|sirop|chocolat|biscuit|flute|verre|\\bseau|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bonbon|gel douche"
+    "oui": "champagne|cremant|mousseux|prosecco|cava|petillant|pétillant|blanquette|clairette|brut|demi sec|blanc de blancs|blanc de noirs|moet|veuve clicquot|ruinart|nicolas feuillatte|mumm|lanson|taittinger|\\bpiper\\b|canard duchene|pommery|mercier|vranken|charles de cazanove|lambrusco|\\basti|spumante|frizzante|vouvray petillant|bulles|pet nat|effervescent",
+    "non": "vin rouge|\\bvin blanc(?! .*petillant)|sans alcool|cidre|\\bbiere|whisky|rhum|vodka|\\bgin\\b|porto|kir pret|soda|limonade|eau minerale|eau petillante|eau gazeuse|\\bjus\\b|sirop|chocolat|biscuit|flute|verre|\\bseau|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|bonbon|gel douche|pochette|housse|bouchons?|stylos?|rafraichi"
    }
   },
   {
@@ -3912,8 +3932,8 @@
     ]
    },
    "filtre": {
-    "oui": "petit pot|petits pots|puree|legume|repas|plat|assiette|\\bbol\\b|(?<![a-z])mois\\b|bebe|bledichef|bledina|\\bhipp|babybio|good gout|yooji|popote|nestle naturnes|naturnes|petit navire bebe|carotte|poulet|boeuf|poisson|pates|\\briz\\b|jardiniere|ratatouille|haricot|courgette|potiron|patate|diversification|dejeuner|diner",
-    "non": "lait infantile|lait 1er|lait 2eme|croissance|yaourt|dessert|compote|fruit|cereale infantile|biscuit|lingette|couche|biberon|tetine|shampoing|\\bsavon|\\bcreme\\b|liniment|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|adulte|conserve de legumes"
+    "oui": "petit pot|petits pots|puree|legume|repas|plat|assiette|\\bbol\\b|(?<![a-z])mois\\b|bebe|bledichef|bledina|\\bhipp|babybio|good gout|yooji|popote|nestle naturnes|naturnes|petit navire bebe|carotte|poulet|boeuf|poisson|pates|\\briz\\b|jardiniere|ratatouille|haricot|courgette|potiron|patate|diversification|dejeuner|diner|\\bdes \\d+ ?mois\\b",
+    "non": "lait infantile|lait 1er|lait 2eme|croissance|yaourt|dessert|compote|fruit|cereale infantile|biscuit|lingette|couche|biberon|tetine|shampoing|\\bsavon|\\bcreme\\b|liniment|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|adulte|conserve de legumes|mini ?cuve|recuperateur|\\bmixeur|\\bblender|\\brobot"
    }
   },
   {
@@ -3948,8 +3968,8 @@
     ]
    },
    "filtre": {
-    "oui": "compote|fruit|dessert|lacte|yaourt|\\bbrassee?s?\\b|petit suisse|cereale|biscuit|boudoir|gourde|coupelle|pot de fruits|gouter|bledine|blédine|bledina|\\bhipp|babybio|good gout|nestle|naturnes|p tit|(?<![a-z])mois\\b|bebe|infantile|boisson bebe|jus bebe|eau bebe|mont roucous",
-    "non": "lait infantile|lait 1er|lait 2eme|croissance|petit pot legume|repas|plat|assiette|carotte|poulet|boeuf|poisson|lingette|couche|biberon|tetine|shampoing|\\bsavon|\\bcreme\\b|liniment|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|adulte|compote adulte|andros(?! .*bebe)|pom potes(?! .*bebe)"
+    "oui": "compote|fruit|dessert|\\blacte(?=e?s?\\b)|yaourt|\\bbrassee?s?\\b|petit suisse|cereale|biscuit|boudoir|gourde|coupelle|pot de fruits|gouter|bledine|blédine|bledina|\\bhipp|babybio|good gout|nestle|naturnes|p tit|(?<![a-z])mois\\b|bebe|infantile|boisson bebe|jus bebe|eau bebe|mont roucous|\\bdes \\d+ ?mois\\b",
+    "non": "lait infantile|lait 1er|lait 2eme|croissance|petit pot legume|repas|plat|assiette|carotte|poulet|boeuf|poisson|lingette|couche|biberon|tetine|shampoing|\\bsavon|\\bcreme\\b(?!.*\\b(?:dessert|semoule|vanille|cacao|chocolat|riz|caramel|bananes?|fruits?)\\b)|liniment|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|adulte|compote adulte|andros(?! .*bebe)|pom potes(?! .*bebe)|^(?!.*biscuit).*muesli(?!.*(?:bebe|mois|p tit))"
    }
   },
   {
@@ -3985,7 +4005,7 @@
     ]
    },
    "filtre": {
-    "oui": "couche|culotte|lingette|pampers|huggies|love and green|joone|lotus baby|tidoo|naty|bambo|lillydoo|little big change|pommette|taille|kg|nouveau ne|newborn|apprentissage|\\bpants|\\bchange|maxi|junior",
+    "oui": "couche|culotte|lingette|pampers|huggies|love and green|joone|lotus baby|tidoo|naty|bambo|lillydoo|little big change|pommette|taille|\\b\\d+ ?(?:a|-)? ?\\d+ ?kg\\b(?=.*\\b(?:couches?|culottes?|pants|taille|t\\d)\\b)|\\bt\\d\\b|nouveau ne|newborn|apprentissage|\\bpants|\\bchange|maxi|junior|lingettes? papier toilette",
     "non": "\\blait\\b|petit pot|compote|cereale|biscuit|biberon|tetine|shampoing|\\bsavon|\\bcreme\\b|liniment|lingette demaquillante|lingette nettoyante menage|lingette desinfectante|lingette wc|lingette sol|adulte|incontinence|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|couche lavable adulte|protection urinaire"
    }
   },
@@ -4205,7 +4225,7 @@
     ]
    },
    "filtre": {
-    "oui": "rasoir|\\blame|rasage|\\braser|apres rasage|after shave|mousse a raser|gel a raser|creme a raser|savon a barbe|\\bbarbe|epilation|epilatoire|cire|bande|creme depilatoire|veet|\\bnair|gillette|wilkinson|\\bbic|schick|venus|intuition|philips|braun|tondeuse|pince a epiler|epilateur|bandes de cire|decolorant duvet|baume barbe|huile a barbe|blaireau",
+    "oui": "rasoir|\\blame(?=s?\\b)|rasage|\\braser|apres rasage|after shave|mousse a raser|gel a raser|creme a raser|savon a barbe|\\bbarbe(?=s?\\b)|epilation|epilatoire|cire|bande|creme depilatoire|veet|\\bnair|gillette|wilkinson|\\bbic\\b|schick|venus|intuition|philips|braun|tondeuse|pince a epiler|epilateur|bandes de cire|decolorant duvet|baume barbe|huile a barbe|blaireau",
     "non": "dentifrice|shampoing|gel douche(?! .*rasage)|\\bsavon(?! .*barbe)|deodorant|creme visage|creme corps|lait corps|\\bchiens?\\b|chiot|(?<!le )\\bchats?\\b|chaton|bebe|lessive|cire a bougie|cire pour meuble|cire chaussure|cire voiture|cire epilation pour animaux|lame de scie|lame de cutter|rasoir pour pull|rasoir anti bouloche"
    },
    "note": "Monoprix : « épilation et rasage » sans URL : adresse à relever dans le menu du site."
@@ -4310,7 +4330,7 @@
     ]
    },
    "filtre": {
-    "oui": "visage|creme de jour|creme de nuit|creme hydratante|anti rides|anti age|contour des yeux|serum|demaquillant|eau micellaire|micellaire|nettoyant|gel nettoyant|mousse nettoyante|lotion|\\btonique|masque|gommage|exfoliant|levres|baume a levres|stick levres|labello|fond de teint|bb creme|cc creme|correcteur|anti cernes|\\bpoudre|blush|\\bfard|mascara|eye liner|eyeliner|crayon|rouge a levres|gloss|vernis|dissolvant|maquillage|pinceau|eponge beauty|cotons demaquillants(?! .*coton tige)|acne|boutons|imperfection|peau grasse|peau seche|peau sensible|nivea|garnier|l oreal|mixa|diadermine|bioderma|la roche posay|avene|uriage|nuxe|caudalie|weleda|cattier|\\bso bio|yves rocher|bourjois|maybelline|rimmel|gemey|\\bessie|sephora|eucerin|cerave|neutrogena|the ordinary|\\bcien",
+    "oui": "visage|creme de jour|creme de nuit|creme hydratante|anti rides|anti age|contour des yeux|serum|demaquillant|eau micellaire|micellaire|nettoyant|gel nettoyant|mousse nettoyante|lotion|\\btonique|masque|gommage|exfoliant|levres|baume a levres|stick levres|labello|fond de teint|bb creme|cc creme|correcteur|anti cernes|\\bpoudre|blush|\\bfard|mascara|eye liner|eyeliner|crayon|rouge a levres|gloss|vernis|dissolvant|maquillage|pinceau|eponge beauty|cotons demaquillants(?! .*coton tige)|acne|boutons|imperfection|peau grasse|peau seche|peau sensible|nivea|garnier|l oreal|mixa|diadermine|bioderma|la roche posay|avene|uriage|nuxe|caudalie|weleda|cattier|\\bso bio|yves rocher|bourjois|maybelline|rimmel|gemey|\\bessie|sephora|eucerin|cerave|neutrogena|the ordinary|\\bcien|pince a epiler",
     "non": "corps|mains|pieds|solaire|dentifrice|shampoing|cheveux|gel douche|\\bsavon\\b(?! .*visage)|deodorant|rasage|epilation|\\bchiens?\\b|chiot|(?<!le )\\bchats?\\b|chaton|bebe\\b(?! .*visage)|lessive|creme fraiche|creme dessert|masque chirurgical|masque ffp2|masque de protection|coton tige|mouchoir|lingette menage|parfum\\b(?! .*visage)|eau de toilette|eau de parfum|lunettes"
    }
   },
@@ -4334,7 +4354,11 @@
     ],
     "auchan": "text=papier%20toilette"
    },
-   "note": "Rayon existant."
+   "note": "Rayon existant.",
+   "filtre": {
+    "oui": "",
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|essuie tout|mouchoir|serviettes? de table|derouleur|distributeur|porte (?:rouleau|papier)|abattant|brosse|papier peint|papier cadeau|ramette|imprimante"
+   }
   },
   {
    "id": "mouchoirs-cotons",
@@ -4369,7 +4393,7 @@
     ]
    },
    "filtre": {
-    "oui": "mouchoir|kleenex|lotus|coton|disque|carre|coton tige|batonnet|oreille|demaquillant|ouate|compresse|serviette papier(?! .*table)|etui|boite de mouchoirs|paquet de mouchoirs",
+    "oui": "mouchoir|kleenex|lotus|coton|disque|\\bcarre(?=s?\\b)|coton tige|batonnet|oreille|demaquillant|ouate|compresse|serviette papier(?! .*table)|etui|boite de mouchoirs|paquet de mouchoirs",
     "non": "papier toilette|hygienique|essuie tout|serviette de table|nappe|mouchoir en tissu|bebe lingette|lingette|coton a repasser|coton a broder|\\bfil\\b|\\bchiens?\\b|chiot|(?<!le )\\bchats?\\b|chaton|dentifrice|shampoing|gel douche|\\bsavon|deodorant|\\bcreme\\b|rasage|coton demaquillant liquide|lait demaquillant|eau micellaire"
    }
   },
@@ -4454,7 +4478,11 @@
     ],
     "auchan": "text=lessive%20liquide"
    },
-   "note": "Rayon existant."
+   "note": "Rayon existant.",
+   "filtre": {
+    "oui": "",
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|lave vaisselle|vaisselle|seche linge|panier a linge|corbeille|\\bdoseur\\b|etendoir|fer a repasser"
+   }
   },
   {
    "id": "lessive-capsules-poudre",
@@ -4489,8 +4517,8 @@
     ]
    },
    "filtre": {
-    "oui": "capsule|pods|pod\\b|dose|dosette|tablette|\\bpoudre|\\bfeuille|lessive|lavage|ariel|skip|\\ble chat|persil|dash|\\bomo|x tra|\\bxtra\\b|bonux|maison verte|l arbre vert|rainett|ecover|super croix|\\bmir|woolite|formil|\\bcien",
-    "non": "liquide\\b(?! .*(capsule|pod|dose))|\\bgel\\b(?! .*(capsule|pod|dose))|adoucissant|assouplissant|detachant|anti calcaire|anticalcaire|nettoyant lave linge|entretien lave linge|parfum de linge|lingette anti decoloration|lave vaisselle|vaisselle|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|savon de marseille cube|savon noir|lessive bebe liquide|desodorisant|insecticide|\\bsols?\\b|vitre|wc"
+    "oui": "capsule|pods|pod\\b|\\bdose(?=s?\\b)|dosette|tablette|\\bpoudre|\\bfeuille|lessive|lavage|ariel|skip|\\ble chat|persil|dash|\\bomo|x tra|\\bxtra\\b|bonux|maison verte|l arbre vert|rainett|ecover|super croix|\\bmir\\b|woolite|formil|\\bcien",
+    "non": "liquide\\b(?! .*(capsule|pod|dose))|\\bgel\\b(?! .*(capsule|pod|dose))|adoucissant|assouplissant|detachant|anti calcaire|anticalcaire|nettoyant lave linge|entretien lave linge|parfum de linge|lingette anti decoloration|lave vaisselle|vaisselle|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|savon de marseille cube|savon noir|lessive bebe liquide|desodorisant|insecticide|\\bsols?\\b|vitre|wc|\\bcafes?\\b|senseo|nespresso|dolce gusto|tassimo"
    }
   },
   {
@@ -4527,7 +4555,7 @@
     ]
    },
    "filtre": {
-    "oui": "adoucissant|assouplissant|soupline|lenor|cajoline|detachant|vanish|k2r|dr beckmann|anti calcaire|anticalcaire|calgon|nettoyant lave linge|entretien lave linge|parfum de linge|parfum linge|anti decoloration|lingette anti decoloration|amidon|repassage|eau de repassage|lavage a la main|\\blaine|delicat|blanchissant|javel linge|desinfectant linge|anti acarien|anti mites|antimite|boule de lavage|filet de lavage|linge",
+    "oui": "adoucissant|assouplissant|soupline|lenor|cajoline|detachant|vanish|k2r|dr beckmann|anti calcaire|anticalcaire|calgon|nettoyant lave linge|entretien lave linge|parfum de linge|parfum linge|anti decoloration|lingette anti decoloration|amidon|repassage|eau de repassage|lavage a la main|\\blaine|delicat|blanchissant|javel linge|desinfectant linge|anti acarien|anti mites|antimite|boule de lavage|filet de lavage|\\blinge\\b|lingettes? (?:de )?protection couleurs?|protege et ravive|ravive le blanc|max protect|capte couleurs?|attrape couleurs?",
     "non": "lessive liquide(?! .*adoucissant)|lessive en poudre|lessive capsule|pods|lave vaisselle|vaisselle|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|\\bsols?\\b|vitre|wc|cuisine|salle de bain nettoyant|\\bfours?\\b|detachant tapis|detachant moquette|desodorisant|insecticide|savon noir|vinaigre blanc|bicarbonate|cintre|pince a linge|corde a linge|etendoir|fer a repasser|table a repasser|spray anti calcaire"
    }
   },
@@ -4552,7 +4580,11 @@
     ],
     "auchan": "text=liquide%20vaisselle"
    },
-   "note": "Rayon existant."
+   "note": "Rayon existant.",
+   "filtre": {
+    "oui": "",
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|lave vaisselle|egouttoir|eponge|\\bgant|brosse|\\bassiettes?\\b|couverts|jetable"
+   }
   },
   {
    "id": "lave-vaisselle",
@@ -4628,7 +4660,7 @@
     ]
    },
    "filtre": {
-    "oui": "nettoyant|multi usages|multi usage|multiusage|multi surfaces|degraissant|cuisine|\\bfours?\\b|plaque|inox|vitre|vitres|miroir|\\bsols?\\b|\\bsols|parquet|carrelage|lingette|javel|eau de javel|desinfectant|antibacterien|\\bcif|mr propre|monsieur propre|ajax|st marc|saint marc|carolin|cillit|antikal|starwax|bref|harpic(?! .*wc)|sanytol|la croix|lacroix|frottoir|vinaigre blanc|savon noir|bicarbonate|pierre d argile|pierre blanche|cristaux de soude|acide citrique|percarbonate|moquette|tapis|detachant tapis|meuble|\\bbois\\b|cuir|argenterie|cuivre|inox|plaque induction|hotte|micro ondes|frigo|refrigerateur|spray|surfaces|degraissant|anti graisse|anticalcaire(?! .*lave)|salle de bain|douche|baignoire|lavabo|robinet|moisissure|anti moisissure|joint|spray anti calcaire|anti calcaire|\\bcire\\b",
+    "oui": "nettoyant|multi usages|multi usage|multiusage|multi surfaces|degraissant|cuisine|\\bfours?\\b|\\bplaque(?=s?\\b)|inox|vitre|vitres|miroir|\\bsols?\\b|\\bsols|parquet|carrelage|lingette|javel|eau de javel|desinfectant|antibacterien|\\bcif\\b|mr propre|monsieur propre|ajax|st marc\\b|saint marc\\b|carolin|cillit|antikal|starwax|bref|harpic(?! .*wc)|sanytol|la croix|lacroix|frottoir|vinaigre blanc|savon noir|bicarbonate|pierre d argile|pierre blanche|cristaux de soude|acide citrique|percarbonate|moquette|tapis|detachant tapis|meuble|\\bbois\\b|cuir|argenterie|cuivre|inox|plaque induction|hotte|micro ondes|frigo|refrigerateur|spray|surfaces|degraissant|anti graisse|anticalcaire(?! .*lave)|salle de bain|douche|baignoire|lavabo|robinet|moisissure|anti moisissure|joint|spray anti calcaire|anti calcaire|\\bcire\\b",
     "non": "wc|toilette|cuvette|canalisation|deboucheur|destop|lessive|adoucissant|vaisselle(?! .*(multi|lingette))|lave vaisselle|eponge|\\bgant|brosse|balai|serpillere|\\bseau|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|desodorisant\\b(?! .*nettoyant)|insecticide|parfum d ambiance|bougie|vinaigre de cidre|vinaigre balsamique|bicarbonate alimentaire|savon noir cosmetique|lingette bebe|lingette demaquillante|lingette intime|gel hydroalcoolique|papier toilette|essuie tout|sac poubelle|cirage|chaussure|voiture|piscine|terreau"
    }
   },
@@ -4722,7 +4754,7 @@
     ]
    },
    "filtre": {
-    "oui": "sac poubelle|sacs poubelle|poubelle|\\bsac|eponge|\\bgant|grattoir|tampon|lavette|chiffon|microfibre|torchon|serpillere|serpilliere|balai|balayette|\\bpelle|\\bseau|brosse|plumeau|chamoisine|peau de chamois|raclette|essoreur|spontex|vileda|scotch brite|handy bag|albal|frio|alfapac|jex|o cedar|leifheit|lingette microfibre|pince a linge|cintre|corde a linge|etendoir|filet de lavage|boule antimites|absorbeur d humidite|rub|insectes pieges(?! .*insecticide)|tapette|tapette a mouche|cire pour meuble|cirage|chaussure|brosse a chaussures|embauchoir|lacet|semelle",
+    "oui": "sac poubelle|sacs poubelle|poubelle|\\bsac(?=s?\\b)|eponge|\\bgant|grattoir|tampon|lavette|\\bchiffon(?=s?\\b)|microfibre|torchon|serpillere|serpilliere|balai|balayette|\\bpelle|\\bseau|brosse|plumeau|chamoisine|peau de chamois|raclette|essoreur|spontex|vileda|scotch brite|handy bag|albal|frio|alfapac|jex|o cedar|leifheit|lingette microfibre|pince a linge|cintre|corde a linge|etendoir|filet de lavage|boule antimites|absorbeur d humidite|\\brub\\b|insectes pieges(?! .*insecticide)|tapette|tapette a mouche|cire pour meuble|cirage|chaussure|brosse a chaussures|embauchoir|lacet|semelle",
     "non": "lessive|adoucissant|liquide vaisselle|lave vaisselle|nettoyant|javel|wc|deboucheur|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|litiere|desodorisant|insecticide|aerosol|bougie|papier toilette|essuie tout|mouchoir|coton|sac congelation|sac de conservation|film alimentaire|aluminium|papier cuisson|sac a dos|sac de courses|sac cabas|sac isotherme|gant de toilette|gant d examen|gant jetable medical|gant de jardin|gant de cuisine anti chaleur|sac aspirateur"
    }
   },
@@ -4984,8 +5016,8 @@
     ]
    },
    "filtre": {
-    "oui": "\\boiseaux?\\b|perruche|canari|perroquet|graine|millet|boule de graisse|mangeoire|nichoir|rongeur|lapin|cochon d inde|cobaye|hamster|souris|\\brat\\b|chinchilla|furet|foin|copeaux|litiere rongeur|litiere lapin|paille|\\bcage|\\broue|poisson|aquarium|bassin|flocon|pompe|filtre aquarium|nourriture poisson|tetra|\\bsera|jbl|tortue|reptile|lezard|serpent|grillon|\\bpoule|\\bpoules|basse cour|volaille|mais concasse|ble pour poules|pondeuse|poulailler|abreuvoir|vitakraft|versele|\\briga|hami form|zolux|carrefour oiseau",
-    "non": "(?<!le )\\bchats?\\b|chaton|chaton|felin|\\bchiens?\\b|chiot|chiot|\\bcanin|croquette chat|croquette chien|litiere chat|catsan|whiskas|pedigree|royal canin|poisson frais|poisson surgele|poisson pane|sardine en conserve|\\bthon|poulet frais|poulet roti|oeufs de poule frais|oeufs\\b|lapin boucherie|lapin frais|graines de tournesol pour humain|graines de chia|graines de lin alimentaire|mais en conserve|pop corn|roue de secours|filtre a cafe|filtre eau|pompe a velo|cage a oiseau deco|souris d ordinateur|rat jouet|lezard jouet"
+    "oui": "\\boiseaux?\\b|perruche|canari|perroquet|graine|millet|boule de graisse|mangeoire|nichoir|rongeur|lapin|cochon d inde|cobaye|hamster|souris|\\brat\\b|chinchilla|furet|foin|copeaux|litiere rongeur|litiere lapin|paille|\\bcage|\\broue|poisson|aquarium|bassin|flocon|pompe|filtre aquarium|nourriture poisson|tetra|\\bsera|jbl|tortue|reptile|lezard|\\bserpent(?=s?\\b)|grillon|\\bpoule(?=s?\\b)|basse cour|volaille|mais concasse|ble pour poules|pondeuse|poulailler|abreuvoir|vitakraft|versele|\\briga\\b|hami form|zolux|carrefour oiseau",
+    "non": "(?<!le )\\bchats?\\b|chaton|chaton|felin|\\bchiens?\\b|chiot|chiot|\\bcanin|croquette chat|croquette chien|litiere chat|catsan|whiskas|pedigree|royal canin|poisson frais|poisson surgele|poisson pane|sardine en conserve|\\bthon|poulet frais|poulet roti|oeufs de poule frais|oeufs\\b|lapin boucherie|lapin frais|graines de tournesol pour humain|graines de chia|graines de lin alimentaire|mais en conserve|pop corn|roue de secours|filtre a cafe|filtre eau|pompe a velo|cage a oiseau deco|souris d ordinateur|rat jouet|lezard jouet|bouillon|soupe|poule au pot|pied (?:de )?poule|\\bvins?\\b|\\baop\\b|figurines?|peluche|statuette|\\bdeco\\b|lego|minecraft|puzzle|chaussettes|socquettes|\\bjupe|blazer|\\bdes \\d+ ans\\b|play figure|schleich|\\bpapo\\b|poule a bascule|cul de poule|poulie|zhu zhu|bitzee|animagic|set de construction|animal miniature"
    }
   },
   {
@@ -5015,7 +5047,7 @@
     ]
    },
    "filtre": {
-    "oui": "halal|hallal|isla|zakia|wassila|medina|reghalal|oriental viandes|dounia|samia|chaimaa|slaiss|merguez|kebab|chawarma|brochette|poulet|dinde|boeuf|agneau|\\bveaux?\\b|charcuterie|saucisse|cachir|mortadelle|lardon de volaille|jambon de dinde|plat|couscous|tajine|chorba|harissa|dattes|semoule|ramadan",
+    "oui": "halal|hallal|isla delice|isla mondial|\\bisla\\b|zakia|wassila|medina|reghalal|oriental viandes|dounia|samia|chaimaa|slaiss|merguez|kebab|chawarma|brochette|poulet|dinde|boeuf|agneau|\\bveaux?\\b|charcuterie|saucisse|cachir|mortadelle|lardon de volaille|jambon de dinde|\\bplats?\\b|couscous|tajine|chorba|harissa|dattes|semoule|ramadan",
     "non": "porc|cochon|\\blard\\b|jambon de porc|saucisson sec de porc|(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|\\bvins?\\b|\\bbiere|alcool|gelatine de porc|casher|cacher"
    },
    "note": "Carrefour : page charcuterie halal, boutique « produit du monde halal » (page boutique) et sous-page surgelés « halal » (sans URL : page viandes surgelées avec filtre). Monoprix : page « halal et casher » partagée avec le rayon casher (filtre). Houra : aucune page halal relevée. Un produit lu aussi dans un rayon ordinaire y reste et porte l’étiquette halal (voir plan)."
@@ -5105,8 +5137,8 @@
     ]
    },
    "filtre": {
-    "oui": "vegan|vegetal|vegetalien|\\bvege|sans lactose vegetal|soja|tofu|seitan|tempeh|alpro|bjorg|sojasun|oatly|violife|nurishh|happyvore|la vie\\b|heura|beyond|garden gourmet|herta le bon vegetal|cereal bio|\\blima|\\bvrai|jardin bio|la vie claire|alternative|fromage vegetal|dessert vegetal|boisson vegetale|steak vegetal|nugget vegetal|lardon vegetal|jambon vegetal|houmous|falafel|galette|legumineuse|pois chiche|lentille|protein|proteine vegetale|levure maltee|lait de coco|yaourt vegetal|glace vegetale|chocolat vegan|biscuit vegan|mayonnaise vegan|pate a tartiner vegan",
-    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|dentifrice|shampoing|gel douche|\\bsavon|creme visage|lessive|vaisselle|nettoyant|complement|gelule|cuir vegan|chaussure|\\bsac|\\bvetement|maquillage vegan|vernis|rouge a levres|viande de boeuf|poulet frais|porc|jambon de porc|lardon de porc|lait de vache|lait demi ecreme|lait entier|beurre doux|\\boeuf frais|\\bthon|sardine|saumon|fromage de vache|yaourt nature au lait|miel\\b"
+    "oui": "vegan|vegetal|vegetalien|\\bvege|sans lactose vegetal|soja|tofu|seitan|tempeh|alpro|bjorg|sojasun|oatly|violife|nurishh|happyvore|la vie\\b|heura|beyond|garden gourmet|herta le bon vegetal|cereal bio|\\blima\\b|\\bvrai|jardin bio|la vie claire|alternative|fromage vegetal|dessert vegetal|boisson vegetale|steak vegetal|nugget vegetal|lardon vegetal|jambon vegetal|houmous|falafel|galette|legumineuse|pois chiche|lentille|protein|proteine vegetale|levure maltee|lait de coco|yaourt vegetal|glace vegetale|chocolat vegan|biscuit vegan|mayonnaise vegan|pate a tartiner vegan",
+    "non": "(?<!le )\\bchats?\\b|chaton|\\bchiens?\\b|chiot|dentifrice|shampoing|gel douche|\\bsavon|creme visage|lessive|vaisselle|nettoyant|complement|gelule|cuir vegan|chaussure|\\bsacs?\\b|\\bvetement|maquillage vegan|vernis|rouge a levres|viande de boeuf|poulet frais|porc|jambon de porc|lardon de porc|lait de vache|lait demi ecreme|lait entier|beurre doux|\\boeuf frais|\\bthon|sardine|saumon|fromage de vache|yaourt nature au lait|miel\\b|^(?!.*(?:vegeta|veggie|vegan|\\bvege\\b|\\bsoja\\b|tofu|seitan|tempeh|sans viande)).*\\b(?:lardons?|jambon|saucisses?|saucisson|bacon|chorizo|poulet|dinde|boeuf|porc|veau|agneau|merguez|volaille|canard)\\b"
    },
    "note": "Carrefour : page « végétal et végétarien » (lue aussi pour le rayon traiteur végétal, les doublons sont rattachés au rayon ordinaire, voir plan). Houra : aucune page vegan relevée ; « végétarien et végétal » est lu pour le rayon traiteur végétal."
   },

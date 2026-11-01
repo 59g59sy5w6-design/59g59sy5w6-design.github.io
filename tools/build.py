@@ -61,22 +61,30 @@ def page_key(url):
 
 def place(label, rays, old=None):
     """Rayon d'un produit lu sur une page servant les rayons rays : les rayons filtrés qui l'acceptent, sinon le rayon
-    sans filtre ; à défaut, et seulement avec old (produit repris d'un relevé précédent, lu dans le rayon old, qu'un
-    filtre resserré écarte), le rayon filtré dont le filtre « oui » porte le mot qui l'a écarté (« capsule » exclu du
-    café désigne le rayon capsules), d'abord dans l'univers de old puis dans les autres (une semoule nature écartée du
-    rayon oriental va au rayon semoule), sinon un rayon filtré du même univers qui l'accepte. None quand aucun rayon ne
-    le prend."""
-    ok = [r for r in rays if r in lib.RAYON_FILTRE and not lib.hors_rayon(r, label)]
+    aux pages dédiées (lib.RAYON_DEDIE : sans filtre, ou filtre au « oui » vide) que son « non » n'écarte pas ; à défaut,
+    et seulement avec old (produit déjà rangé dans le rayon old au relevé précédent, qu'un filtre resserré écarte), le
+    rayon qui accepte le produit et nomme en entier un des mots qui l'ont écarté (lib.covers : « capsule » exclu du café
+    désigne le rayon capsules, « soupe » exclu des animaux le rayon soupes, « liquide vaisselle » exclu des vinaigres le
+    rayon vaisselle, mais « pied de poule » ne désigne pas le rayon volaille), du plus long au plus court, d'abord dans
+    l'univers de old puis dans les autres ; sinon un rayon filtré du même univers qui l'accepte. Un rayon aux pages
+    dédiées, qui accepte tout ce que son « non » n'écarte pas, ne reprend un produit que si sa recherche est dans le nom.
+    None quand aucun rayon ne le prend."""
+    ok = [r for r in rays if r in lib.RAYON_FILTRE and r not in lib.RAYON_DEDIE and not lib.hors_rayon(r, label)]
     if not ok:
-        ok = [r for r in rays if r not in lib.RAYON_FILTRE]
+        ok = [r for r in rays if r in lib.RAYON_DEDIE and not lib.hors_rayon(r, label)]
     if not ok and old:
         univers = lib.RAYON_BY_ID[old]['univers']
-        ok = [r['id'] for r in lib.RAYONS if r['univers'] == univers and r['id'] in lib.RAYON_FILTRE and not lib.hors_rayon(r['id'], label)]
-        exclu = lib.filtre_exclu(old, label)
-        if exclu:
-            named = [r for r in ok if lib.filtre_match(r, exclu)] or [
-                r['id'] for r in lib.RAYONS if r['id'] in lib.RAYON_FILTRE and lib.filtre_match(r['id'], exclu) and not lib.hors_rayon(r['id'], label)]
-            ok = named or ok
+        def taker(r):
+            if r == old or lib.hors_rayon(r, label):
+                return False
+            return bool(lib.precision(r, label)) if r in lib.RAYON_DEDIE else r in lib.RAYON_FILTRE
+        takers = [r['id'] for r in lib.RAYONS if taker(r['id'])]
+        ok = [r for r in takers if lib.RAYON_BY_ID[r]['univers'] == univers and r not in lib.RAYON_DEDIE]
+        for word in lib.filtre_exclus(old, label):
+            named = [r for r in takers if lib.covers(r, word.strip(), label)]
+            if named:
+                ok = [r for r in named if lib.RAYON_BY_ID[r]['univers'] == univers] or named
+                break
     return lib.best_rayon(ok, label) if ok else None
 
 
@@ -340,24 +348,37 @@ items += carried
 # l'accepte encore. Avec la page seule, chaque relevé d'un autre magasin le faisait passer au rayon de sa dernière page
 # (une semoule au rayon oriental, des céréales au rayon bébé), ou l'écartait. Un filtre resserré qui l'écarte des deux
 # l'envoie dans le rayon qui l'accepte (place avec old : fromage blanc lu sous « yaourts »), sinon l'écarte.
+# Une lecture du jour que le filtre de sa page écarte suit la même règle quand le produit est connu de l'état (old : son
+# rayon au relevé précédent) : sans quoi chaque produit déplacé par un filtre resserré disparaissait à la relecture de sa
+# page (des chiffonnades lues sous « apéritif frais », une pince à épiler lue sous « maquillage »). Un produit inconnu de
+# l'état reste écarté par le filtre final. Un produit qui change de rayon perd les étiquettes de régime que l'ancien rayon
+# lui donnait : un plat aux lardons sorti du traiteur végétal n'est plus vegan.
 moved = collections.Counter()
 kept = []
 for it in items:
-    if not it.get('carried') or it['ray'] not in lib.RAYON_BY_ID:
-        if it['ray'] in lib.RAYON_BY_ID:
-            kept.append(it)
+    if it['ray'] not in lib.RAYON_BY_ID:
         continue
     label = route_label(it)
     rays = [ry for rt, ry in lib.routes(it['src']) if rt == it['ret']]
-    page = (rays[0] if len(rays) == 1 else place(label, rays)) if rays else None
-    ok = [r for r in dict.fromkeys((page, it['ray'])) if r and not lib.hors_rayon(r, full_label(it))]
-    ray = lib.best_rayon(ok, label) if ok else place(label, rays or [it['ray']], it['ray'])
+    if it.get('carried'):
+        old = it['ray']
+        page = (rays[0] if len(rays) == 1 else place(label, rays)) if rays else None
+    else:
+        prev_it = prev_by_rid.get(it['rid'])
+        if not lib.hors_rayon(it['ray'], full_label(it)) or not prev_it or prev_it['ray'] not in lib.RAYON_BY_ID:
+            kept.append(it)
+            continue
+        old, page = prev_it['ray'], it['ray']
+    ok = [r for r in dict.fromkeys((page, old)) if r and not lib.hors_rayon(r, full_label(it))]
+    ray = lib.best_rayon(ok, label) if ok else place(label, rays or [old], old)
     if ray is None:
         continue
+    regimes = set(it.get('regimes') or [])
     if ray != it['ray']:
         moved[(it['ray'], ray)] += 1
+        regimes -= set(lib.RAYON_BY_ID[it['ray']].get('regimes') or [])
         it['ray'] = ray
-    it['regimes'] = sorted(set(it.get('regimes') or []) | set(lib.RAYON_BY_ID[ray].get('regimes') or []))
+    it['regimes'] = sorted(regimes | set(lib.RAYON_BY_ID[ray].get('regimes') or []))
     kept.append(it)
 items = kept
 
@@ -370,10 +391,13 @@ items, multi_rayon = [], {}
 for rid, lst in by_rid.items():
     best = max(lst, key=lambda it: it["ts"])
     rays = {it["ray"] for it in lst}
+    # seules comptent les lectures que le filtre de leur rayon accepte : une lecture écartée (produit inconnu de l'état lu
+    # sur une page qui ne le prend pas) ne fait ni perdre le produit ni ne lui donne les étiquettes de régime de sa page
+    good = [it for it in lst if not lib.hors_rayon(it["ray"], full_label(it))] or lst
     if len(rays) > 1:
         multi_rayon[rid] = sorted(rays)
-        best = dict(best, ray=lib.best_rayon(rays, route_label(best)))
-    best["regimes"] = sorted({x for it in lst for x in it.get("regimes") or []})
+        best = dict(best, ray=lib.best_rayon({it["ray"] for it in good}, route_label(best)))
+    best["regimes"] = sorted({x for it in good for x in it.get("regimes") or []})
     items.append(best)
 items = [it for it in items if not lib.hors_courses(it.get("label") or "") and not lib.hors_rayon(it["ray"], full_label(it))]
 
