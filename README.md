@@ -4,7 +4,7 @@ Tes courses au prix le plus bas, livraison comprise.
 
 Cabas est une application web gratuite, sans compte et sans publicité, qui compare les prix des courses chez Monoprix, Carrefour, Houra et Auchan (Île-de-France) et répartit le panier entre les enseignes pour payer le moins cher, minimums de commande et frais de livraison compris.
 
-Elle s'ouvre à l'adresse https://59g59sy5w6-design.github.io et s'installe sur l'écran d'accueil du téléphone.
+Elle s'ouvre à l'adresse https://cabas.mmt-advisory.com et s'installe sur l'écran d'accueil du téléphone. L'ancienne adresse y mène, et l'appli propose d'y emporter le panier, les listes et les réglages gardés à l'ancienne adresse, par un lien qui ne passe par aucun serveur.
 
 ## Ce qu'elle fait
 
@@ -42,7 +42,7 @@ Les prix sont relevés sur les pages de rayon publiques des sites des enseignes,
 
 ## Le dépôt
 
-Site statique servi par GitHub Pages : `index.html`, `app.css`, `boot.js` et `app.js` (l'interface ; `boot.js` pose la taille du texte, le thème, le contraste et le mode confort avant le premier rendu), `optimizer.js` et `worker.js` (la répartition du panier), `packs.js` (les illustrations, dessinées sans photo ni logo), `scan.js` (la lecture des codes-barres), `sw.js` (hors ligne), `data/` (le catalogue compact, ses détails par univers, les enseignes, l'historique des prix, les recettes et les listes toutes faites) et `tools/` (la chaîne de relevé des prix : `tools/rayons.json` décrit les 155 rayons et leurs pages chez chaque enseigne, `tools/catcheck.py` valide le catalogue). Tout est décrit dans `CLAUDE.md`.
+Site statique servi par GitHub Pages, sur le domaine du fichier `CNAME` : `index.html`, `app.css`, `boot.js` et `app.js` (l'interface ; `boot.js` pose la taille du texte, le thème, le contraste et le mode confort avant le premier rendu), `optimizer.js` et `worker.js` (la répartition du panier), `packs.js` (les illustrations, dessinées sans photo ni logo), `scan.js` (la lecture des codes-barres), `sw.js` (hors ligne), `data/` (le catalogue compact, ses détails par univers, les enseignes, l'historique des prix, les recettes et les listes toutes faites) et `tools/` (la chaîne de relevé des prix : `tools/rayons.json` décrit les 155 rayons et leurs pages chez chaque enseigne, `tools/catcheck.py` valide le catalogue). Tout est décrit dans `CLAUDE.md`.
 
 Tester en local : `python3 -m http.server 8000` à la racine pour ouvrir l'appli, puis `node tools/smoke.js`, `node tools/optcheck.js`, `node tools/a11y.cjs` (accessibilité de chaque écran), `node tools/textcheck.cjs` (les textes) et les autres scripts `tools/*check*` décrits dans `CLAUDE.md`.
 

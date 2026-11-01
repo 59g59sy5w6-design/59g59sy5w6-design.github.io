@@ -78,17 +78,21 @@ const server = http.createServer((req, res) => {
     if (await page.evaluate(() => location.search)) fail("GET : l'adresse garde ses paramètres");
     if (leaked().length) fail("GET : le serveur a reçu l'adresse partagée : " + leaked().map((x) => x.method + " " + x.url).join(", "));
 
-    /* 3. un lien de liste Cabas partagé ouvre sa page */
-    seen.length = 0;
+    /* 3. un lien de liste Cabas partagé ouvre sa page : de l'adresse de l'appli, puis de l'ancienne (envoyé avant le
+       déménagement) */
     const code = Buffer.from(JSON.stringify({ n: "Liste de test", i: [] }), "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-    await page.evaluate((u) => {
-      const f = document.createElement("form");
-      f.method = "post"; f.enctype = "multipart/form-data"; f.action = "./";
-      for (const [k, v] of [["title", "Ma liste"], ["text", "Ma liste sur Cabas"], ["url", u]]) { const i = document.createElement("textarea"); i.name = k; i.value = v; f.appendChild(i); }
-      document.body.appendChild(f); f.submit();
-    }, "https://59g59sy5w6-design.github.io/#/partage/" + code);
-    await page.waitForURL(/#\/partage\//, { timeout: 15000 }).catch(() => fail("lien de liste partagé : #/partage attendu, " + page.url()));
-    if (leaked().length) fail("lien de liste : le serveur a reçu le partage");
+    for (const site of ["https://cabas.mmt-advisory.com/", "https://59g59sy5w6-design.github.io/"]) {
+      seen.length = 0;
+      await page.goto(base + "#/"); await ready();
+      await page.evaluate((u) => {
+        const f = document.createElement("form");
+        f.method = "post"; f.enctype = "multipart/form-data"; f.action = "./";
+        for (const [k, v] of [["title", "Ma liste"], ["text", "Ma liste sur Cabas"], ["url", u]]) { const i = document.createElement("textarea"); i.name = k; i.value = v; f.appendChild(i); }
+        document.body.appendChild(f); f.submit();
+      }, site + "#/partage/" + code);
+      await page.waitForURL(/#\/partage\//, { timeout: 15000 }).catch(() => fail("lien de liste partagé (" + site + ") : #/partage attendu, " + page.url()));
+      if (leaked().length) fail("lien de liste (" + site + ") : le serveur a reçu le partage");
+    }
 
     /* le manifeste annonce bien la cible en POST */
     const man = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.webmanifest"), "utf8"));

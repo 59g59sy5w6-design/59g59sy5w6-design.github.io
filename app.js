@@ -7984,10 +7984,12 @@
     document.addEventListener("dragstart", (e) => { if (e.target.closest && e.target.closest(".item[data-rm]")) e.preventDefault(); });
   })();
   document.addEventListener("input", (e) => { const f = e.target.closest && e.target.closest(".field.err"); if (f) { f.classList.remove("err"); const h = $("small", f); if (h && h.dataset.hint != null) h.innerHTML = h.dataset.hint; } });
-  const APP_URL = "https://59g59sy5w6-design.github.io/";
-  const APP_HOST = "59g59sy5w6-design.github.io";
-  /* déménagement (voir sw.js et #/demenage) : la nouvelle adresse de l'appli, et l'ancienne, d'où partent les données */
-  const NEW_URL = "https://cabas.mmt-advisory.com/";
+  /* l'adresse de l'appli, dans les textes et les images à partager (domaine du fichier CNAME) */
+  const APP_URL = "https://cabas.mmt-advisory.com/";
+  const APP_HOST = "cabas.mmt-advisory.com";
+  /* déménagement (voir sw.js et #/demenage) : la nouvelle adresse de l'appli, et l'ancienne, d'où partent les données ;
+     ce code tourne sur les téléphones qui avaient l'appli à l'ancienne adresse */
+  const NEW_URL = APP_URL;
   const NEW_HOST = new URL(NEW_URL).host;
   const OLD_HOST = "59g59sy5w6-design.github.io";
   /* ---------- images à partager (réseaux sociaux, messageries) ----------
@@ -8134,7 +8136,8 @@
   function sharedPick(d) {
     const url = String(d.url || "").trim(), text = String(d.text || "").trim(), title = String(d.title || "").trim();
     const m = /#\/partage\/[A-Za-z0-9_-]+/.exec(url + " " + text);
-    const hash = m && (url + " " + text).includes(APP_HOST) ? m[0] : "#/ecrire";
+    /* un lien de liste Cabas, de cette adresse ou de l'ancienne (envoyé avant le déménagement) */
+    const hash = m && [APP_HOST, OLD_HOST].some((h) => (url + " " + text).includes(h)) ? m[0] : "#/ecrire";
     history.replaceState(null, "", location.pathname + hash);
     return hash === "#/ecrire" ? (text || title).split("\n").filter((l) => !/^\s*https?:\/\//i.test(l)).join("\n").trim().slice(0, 4000) : "";
   }
