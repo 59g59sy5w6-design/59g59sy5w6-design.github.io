@@ -53,16 +53,16 @@
       "description": "Ajoute chaque produit au panier de chaque enseigne, sans refaire tout le parcours"
     },
     {
-      "name": "Scanner un code-barres",
-      "short_name": "Scanner",
-      "url": "./#/scan",
-      "description": "En magasin, compare le prix d'un produit à celui des sites"
-    },
-    {
       "name": "Recommander un panier",
       "short_name": "Recommander",
       "url": "./#/recommander",
       "description": "Un panier déjà commandé, remis et réparti aux prix d'aujourd'hui"
+    },
+    {
+      "name": "Scanner un code-barres",
+      "short_name": "Scanner",
+      "url": "./#/scan",
+      "description": "En magasin, compare le prix d'un produit à celui des sites"
     },
     {
       "name": "Mode magasin",

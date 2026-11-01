@@ -110,7 +110,11 @@ const SHEETS = {
   /* « À venir » : la demande d'une enseigne ou d'une ville, le signalement ouvert sur ce choix */
   "comment-avenir": [["demander-enseigne", "#view [data-act=report][data-k=enseigne]"]],
 };
-const GROS_JS = `fetch("data/catalog.json").then((r) => r.json()).then((c) => { const b = {}; c.products.filter((p) => (p.o || []).length > 1).slice(0, 14).forEach((p) => { b[p.i] = 2; }); sessionStorage.setItem("a11yGros", JSON.stringify(b)); })`;
+/* plus un produit qui a un équivalent moins cher de même forme chez l'enseigne où il est le moins cher (« Économiser
+   encore » s'ouvre alors quelle que soit la répartition), le premier du catalogue */
+const GROS_JS = `fetch("data/catalog.json").then((r) => r.json()).then((c) => { const b = {}; c.products.filter((p) => (p.o || []).length > 1).slice(0, 14).forEach((p) => { b[p.i] = 2; });
+  try { const D = cabasDebug(), keep = D.S.basket; for (const q of c.products) { const p = D.S.prods.get(q.i), o = p && D.bestReal(p); if (!o || b[q.i]) continue; D.S.basket = { [q.i]: 2 }; if (D.swapFor(q.i, { paid: { [q.i]: { price: o.price, ret: o.ret } }, rets: new Set([o.ret]) })) { b[q.i] = 2; break; } } D.S.basket = keep; } catch (e) { /* sans cabasDebug : le panier des 14 */ }
+  sessionStorage.setItem("a11yGros", JSON.stringify(b)); })`;
 const CRANS = ["0.82", "0.9", "1", "1.12", "1.25"];
 const WIDTHS = { m: { width: 390, height: 844 }, d: { width: 1280, height: 800 } };
 function modeOf(id) {

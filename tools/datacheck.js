@@ -59,6 +59,7 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     prefs: { zip: "94120", off: { leclerc: true }, offv: 1, foyer: 3, shopDay: 6, voice: "slow", wake: false },
     hist: [{ d: plus(-7), t: 6120, s: 300, n: 5, items: { "candia-lait-1-2-ecreme-6-x-1-l": 1 }, o: [{ rid: "houra", name: "Houra", pick: false, t: 6120, items: { "candia-lait-1-2-ecreme-6-x-1-l": 1 } }], when: [], paid: { houra: 6000 } }],
     free: { f1: { t: "bougies d'anniversaire", q: 1, at: plus(-1) } }, seen: { welcome: 1 }, recent: ["lait"], ups: [], prepSnooze: plus(-1),
+    eans: { "2000000000015": { id: "candia-lait-1-2-ecreme-6-x-1-l", at: plus(-2) } },
   };
 
   try {
@@ -66,7 +67,10 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     await load(A, STATE);
     const P = await A.evaluate(() => cabasDebug().packState());
     if (P.app !== "cabas" || P.v !== 1) fail("packState : en-tête " + JSON.stringify({ app: P.app, v: P.v }));
-    for (const k of ["basket", "lists", "prefs", "hist", "free", "seen", "recent"]) if (!(k in P.data)) fail("packState : clé " + k + " absente");
+    for (const k of ["basket", "lists", "prefs", "hist", "free", "seen", "recent", "eans"]) if (!(k in P.data)) fail("packState : clé " + k + " absente");
+    /* codes-barres appris : un code en chiffres et un produit du catalogue, rien d'autre */
+    const EC = await A.evaluate(() => cabasDebug().importCheck({ app: "cabas", v: 1, data: { eans: { "2000000000015": { id: "candia-lait-1-2-ecreme-6-x-1-l", at: "2026-10-01" }, "abc": { id: "candia-lait-1-2-ecreme-6-x-1-l" }, "2000000000022": { id: "zz-inconnu" }, "2000000000039": "x" } } }).data.eans);
+    if (JSON.stringify(EC) !== '{"2000000000015":{"id":"candia-lait-1-2-ecreme-6-x-1-l","at":"2026-10-01"}}') fail("importCheck : codes-barres appris mal filtrés " + JSON.stringify(EC));
     if (P.data.prefs.shopDay !== 6 || P.data.lists[0].template !== true) fail("packState : prefs.shopDay ou lists[].template perdus");
     /* 2. une copie en fichier, depuis les réglages */
     await A.evaluate(() => { location.hash = "#/reglages"; }); await A.waitForTimeout(500);
@@ -151,10 +155,11 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     if (JSON.stringify(await all(B)) !== JSON.stringify(keep)) fail("« Ne rien changer » : les données ont changé");
     /* 6. effacer mes données : les nouvelles clés aussi */
     await B.evaluate(() => { location.hash = "#/reglages"; }); await B.waitForTimeout(500);
-    await B.evaluate(() => { localStorage.setItem("cabas.ups", JSON.stringify([{ id: "x", old: 1, now: 2, until: "2099-01-01" }])); localStorage.setItem("cabas.prepSnooze", JSON.stringify("2099-01-01")); });
+    await B.evaluate(() => { localStorage.setItem("cabas.ups", JSON.stringify([{ id: "x", old: 1, now: 2, until: "2099-01-01" }])); localStorage.setItem("cabas.prepSnooze", JSON.stringify("2099-01-01")); localStorage.setItem("cabas.eans", JSON.stringify({ "2000000000015": { id: "candia-lait-1-2-ecreme-6-x-1-l", at: "2026-10-01" } })); });
     await B.click("[data-act=reset]"); await B.waitForTimeout(400);
     await B.click("#sheet [data-act=resetok]"); await B.waitForTimeout(500);
     const z = await all(B);
+    if (z.eans) fail("effacer mes données : les codes-barres appris restent");
     if ((z.ups || []).length || z.prepSnooze || (z.prefs || {}).shopDay != null || (z.prefs || {}).voice !== "normal" || (z.prefs || {}).wake !== true || (z.lists || []).length) fail("effacer mes données : il reste " + JSON.stringify({ ups: z.ups, prepSnooze: z.prepSnooze, prefs: z.prefs && { shopDay: z.prefs.shopDay, voice: z.prefs.voice, wake: z.prefs.wake } }));
     if (outside.length) fail("des requêtes sont parties hors du site : " + outside.slice(0, 3).join(", "));
     [file, hf, nf].forEach((f) => { try { fs.unlinkSync(f); } catch (e) { /* déjà effacé */ } });

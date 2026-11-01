@@ -259,6 +259,26 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     const bud = await sp.evaluate(() => (document.querySelector(".sum .bud") || {}).textContent || "");
     const left = 30000 - 5250 - t0;
     if (!bud.includes(left >= 0 ? `il te reste ${eurC(left)} ce mois-ci` : `dépassé de ${eurC(-left)}`)) fail(`budget du mois : « ${bud} », attendu ${eurC(left)}`);
+    /* « Économiser encore » : jamais une autre forme de pâtes (des penne pour des spaghetti), ni un autre fruit ou légume,
+       sur tout le catalogue relevé (oracle indépendant : la liste des formes et des espèces) */
+    const SW = await sp.evaluate(() => {
+      const D = cabasDebug(), keep = D.S.basket, out = [], nm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ");
+      const FORMS = /\b(spaghettoni|spaghetti|capellini|penne|fusilloni|fusilli|torti|coquillettes?|farfalle|tagliatelles?|macaroni|maccheroni|linguine|lasagnes?|conchiglioni|conchiglie|radiatori|risoni|orecchiette|paccheri|mafaldine|mafaldelle|serpentini|coudes|gnocchi|ravioli|tortellini|vermicelles?|torsades|spirales|nouilles|rigatoni|cannelloni|pommes?|bananes?|kiwis?|clementines?|ananas|oranges?|citrons?|poires?|tomates?|courgettes?|carottes?|oignons?|poireaux|salades?|laitues?)\b/;
+      let n = 0;
+      for (const p of D.S.list) {
+        if (!["pates", "fruits", "legumes"].includes(p.r) || !p.qty) continue;
+        D.S.basket = { [p.id]: 1 };
+        const w = D.swapFor(p.id, null);
+        if (!w) continue;
+        n++;
+        const a = FORMS.exec(nm(p.name)), b = FORMS.exec(nm(w.to.name));
+        if (a && (!b || a[1].replace(/s$/, "") !== b[1].replace(/s$/, ""))) out.push(p.name + " -> " + w.to.name);
+      }
+      D.S.basket = keep;
+      return { n, out };
+    });
+    if (!SW.n) fail("Économiser encore : aucun remplacement sur les pâtes, fruits et légumes pour l'essai");
+    if (SW.out.length) fail("Économiser encore : une autre forme ou espèce proposée " + JSON.stringify(SW.out.slice(0, 6)));
     /* budgetFit : les remplacements les plus rentables au total exact, jusqu'à combler le dépassement */
     const bf = await sp.evaluate(() => { const D = cabasDebug(), sw = [{ from: { id: "a" }, to: { id: "a2" }, save: 1 }, { from: { id: "b" }, to: { id: "b2" }, save: 1 }, { from: { id: "c" }, to: { id: "c2" }, save: 1 }]; return D.budgetFit(10000, 10500, sw, new Map([["a", 10400], ["b", 10100], ["c", 10600]])); });
     if (bf.over !== 500 || bf.swaps.map((x) => x.from.id).join() !== "b,a" || bf.save !== 500 || !bf.enough) fail("budgetFit : " + JSON.stringify({ over: bf.over, ids: bf.swaps.map((x) => x.from.id), save: bf.save }));

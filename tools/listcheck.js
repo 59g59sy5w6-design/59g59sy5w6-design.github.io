@@ -1,4 +1,6 @@
-// Vérification de Ma liste : choix habituel mémorisé (repris d'office, ou signalé quand il est plus de 15 % plus cher,
+// Vérification de Ma liste : plus de soixante lignes du quotidien (lait, pommes, tomates, steak haché, café, thé, carottes,
+// citron, pain de mie...) dont chaque choix est le produit ordinaire attendu (rayon et mots du nom, jamais un identifiant),
+// « coca 6 x 1,5 l » (six bouteilles de 1,5 L) ; choix habituel mémorisé (repris d'office, ou signalé quand il est plus de 15 % plus cher,
 // « Garder le mien »), quantité habituelle d'après les paniers commandés (« × 2, comme d'habitude », « Toujours 1 »),
 // usualQty sur un historique fixe, orthographe (« spagetti x2 » trouve un spaghetti, « zzzz » reste sans suggestion,
 // « Tu voulais dire… ? Oui »), lignes libres (« Garder quand même », panier, texte partagé, liste partagée), puis, avec le
@@ -78,6 +80,91 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     for (const x of Q.slice(0, 3)) { const want = /pâtes/.test(x.t) ? 1000 : 6000; if (Math.abs(x.v - want) > want * 0.2) fail(`« ${x.t} » : ${x.v} au lieu de ${want} (quantité ${x.n})`); }
     for (const x of Q.slice(3)) { if (x.v < 12) fail(`« ${x.t} » : ${x.v} œufs`); if (x.pool.some((v) => v && (v < 12 || v > 16))) fail(`« ${x.t} » : vivier hors de la quantité demandée (${x.pool.join(", ")})`); }
     if (!L0.dear) fail("« lait » : aucun candidat 25 % plus cher à l'unité pour le test du choix habituel");
+
+    /* 0. soixante lignes du quotidien : chaque choix est le produit ordinaire attendu. Comparé au type de produit (rayon,
+       mots du nom, mots qui ne doivent pas y être), jamais à un identifiant, pour que le test survive aux relevés */
+    const DAILY = [
+      ["lait", /^laits?(-autres)?$/, /\blait\b/, /coco|amande|avoine|soja|riz|croissance|infantile|concentre/],
+      ["oeufs", /^oeufs$/, /oeuf/],
+      ["pain", /^pain$/, /pain|baguette|ficelle|flute|batard|boule/, /\bmie\b|burger|wrap|precuit|mini|bretzel|pita|panini|pinsa/],
+      ["baguette", /^pain$/, /baguette/],
+      ["pommes", /^fruits$/, /pomme/, /terre|compote|jus/],
+      ["bananes", /^fruits$/, /banane/],
+      ["tomates", /^legumes$/, /tomate/, /sechee|puree|concentre|sauce/],
+      ["salade", /^salades-herbes$/, /salade|laitue|batavia|frisee|mache|roquette|mesclun|iceberg|scarole|chene/],
+      ["poulet", /^volaille$/, /poulet/, /pomme|puree|riz/],
+      ["steak haché", /^viande-hachee$/, /steak|hache/, /oignon|vegetal|soja|puree/],
+      ["jambon", /^jambon-blanc$/, /jambon/],
+      ["lardons", /^lardons$/, /lardon/],
+      ["yaourt nature", /^yaourts$/, /yaourt.*nature|nature.*yaourt/, /fruit|vanille|fraise/],
+      ["beurre", /^beurre$/, /beurre/, /margarine|cacahuete|allege/],
+      ["crème fraîche", /^creme$/, /creme/, /dessert|chantilly|marron/],
+      ["fromage râpé", /^fromages$/, /rape/],
+      ["emmental", /^fromages(-pate-pressee)?$/, /emmental/],
+      ["pâtes", /^pates$/, null, /pizza|tarte|feuilletee|brisee|sablee/],
+      ["spaghetti", /^pates$/, /spaghetti/, /courge/],
+      ["riz", /^riz$/, /riz/, /au lait|gateau|galette/],
+      ["farine", /^farine$/, /farine/],
+      ["sucre", /^sucre$/, /sucre/, /vanill|glace|stevia|edulcorant/],
+      ["sel", /^epices$/, /\bsel\b/, /poivre|cacahuete/],
+      ["huile", /^huile$/, /huile/],
+      ["huile d'olive", /^huile$/, /olive/],
+      ["vinaigre", /^vinaigre-vinaigrette$/, /vinaigre\b/, /vinaigrette|citron/],
+      ["moutarde", /^mayonnaise-ketchup$/, /moutarde/, /mayonnaise/],
+      ["mayonnaise", /^mayonnaise-ketchup$/, /mayonnaise/],
+      ["ketchup", /^mayonnaise-ketchup$/, /ketchup/],
+      ["café", /^cafe$/, /cafe/, /grain|soluble|capsule|dosette/],
+      ["thé", /^the$/, /\bthe\b/, /glace|whisky/],
+      ["chocolat en poudre", /^chocolat-poudre$/, /chocolat|cacao/],
+      ["céréales", /^cereales$/, null, /barre|bebe|mois/],
+      ["confiture", /^confitures$/, /confiture/],
+      ["miel", /^confitures$/, /miel/],
+      ["eau", /^eaux$/, /eau/, /gazeuse|javel/],
+      ["eau gazeuse", /^eaux-gazeuses$/, /gazeuse|petillante|bulle/],
+      ["coca", /^sodas$/, /coca|cola/, /cerise|cherry|vanille/],
+      ["jus d'orange", /^jus$/, /orange/, /nectar|boisson|citron/],
+      ["bière", /^bieres$/, /biere/, /sans alcool/],
+      ["vin rouge", /^vin-rouge$/, null],
+      ["papier toilette", /^papier$/, /papier|toilette/, /lingette/],
+      ["essuie-tout", /^essuie-tout$/, /essuie/],
+      ["mouchoirs", /^mouchoirs-cotons$/, /mouchoir/],
+      ["lessive", /^lessive(-capsules-poudre)?$/, /lessive/],
+      ["adoucissant", /^adoucissant$/, /adoucissant/],
+      ["liquide vaisselle", /^vaisselle$/, /vaisselle/],
+      ["pastilles lave-vaisselle", /^lave-vaisselle$/, /pastille|tablette/],
+      ["éponges", /^sacs-poubelle$/, /eponge/],
+      ["sacs poubelle", /^sacs-poubelle$/, /sac/],
+      ["dentifrice", /^dentifrice$/, /dentifrice/],
+      ["brosse à dents", /^dentifrice$/, /brosse/, /enfant|kid|junior|electrique|bebe/],
+      ["shampoing", /^shampoing$/, /shamp/, /douche/],
+      ["gel douche", /^gel-douche$/, /douche/],
+      ["déodorant", /^deodorants$/, /deo/],
+      ["couches", /^couches$/, /couche/],
+      ["lingettes", /^(couches|toilette-bebe)$/, /lingette/],
+      ["croquettes chat", /^croquettes-chat$/, /croquette/],
+      ["litière", /^litiere$/, /litiere/],
+      ["compote", /^(compotes|desserts-frais)$/, /compote/, /bebe|mois/],
+      ["biscuits", /^biscuits-(secs|chocolat)$/, null, /bebe|mois|aperitif/],
+      ["chips", /^chips$/, /chips/],
+      ["carottes", /./, /carotte/, /pois|chou|puree|ecrase|soupe|veloute|bebe|mois|chien|chat|pomme/],
+      ["citron", /^fruits$/, /citron/, /jus|sirop|limonade/],
+      ["pain de mie", /^pain-de-mie$/, /\bmie\b/, /burger|wrap/],
+      ["oignons", /^pommes-de-terre$/, /oignon/, /frit/],
+      ["pommes de terre", /^pommes-de-terre$/, /pomme.*terre/, /dauphine|rissol|ecrase|gratin|croquette|noisette|poulet/],
+    ];
+    await page.evaluate((st) => { localStorage.setItem("cabas.prefs", JSON.stringify(st)); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })); }, PREFS);
+    await page.goto(base + "#/ecrire"); await page.reload(); await ready();
+    const daily = await page.evaluate((T) => { const D = cabasDebug(), P = D.S.prods, nm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/œ/g, "oe").replace(/[^a-z0-9]+/g, " ");
+      return T.map((t) => { const M = D.matchLine(D.parseLine(t)), p = M.pick && P.get(M.pick); return p ? { t, r: p.r, name: nm(p.brand + " " + p.name), shown: p.brand + " " + p.name } : { t, r: null }; }); }, DAILY.map((x) => x[0]));
+    if (DAILY.length < 60) fail("lignes du quotidien : moins de soixante lignes");
+    DAILY.forEach(([t, ray, want, not], i) => {
+      const d = daily[i];
+      if (!d.r) { fail(`« ${t} » : aucun produit`); return; }
+      if (!ray.test(d.r) || (want && !want.test(d.name)) || (not && not.test(d.name))) fail(`« ${t} » : « ${d.shown} » (rayon ${d.r}) n'est pas le produit ordinaire attendu`);
+    });
+    /* « coca 6 x 1,5 l » : six bouteilles de 1,5 L (ou un pack de six), pas six packs de 25 cl */
+    const six = await page.evaluate(() => { const D = cabasDebug(), M = D.matchLine(D.parseLine("coca 6 x 1,5 l")), p = M.pick && D.S.prods.get(M.pick), m = p && /^(\d+)\s*x/i.exec(p.format || ""); return p ? { total: p.qty.v * M.n, unit: p.qty.v / (m ? +m[1] : 1), shown: p.brand + " " + p.name + " " + p.format + " x" + M.n } : null; });
+    if (!six || Math.abs(six.total - 9000) > 1500 || Math.abs(six.unit - 1500) > 250) fail("« coca 6 x 1,5 l » : " + JSON.stringify(six));
 
     /* 1. choix habituel au bon prix : repris d'office, dit dans la ligne */
     let lines = await runList("lait", { prefs: Object.assign({}, PREFS, { usual: { lait: { id: L0.pick, at: "2026-10-01" } } }) });

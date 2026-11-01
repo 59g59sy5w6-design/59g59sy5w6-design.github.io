@@ -1,7 +1,7 @@
 // Audit des textes de Cabas : tutoiement, aucun tiret cadratin, aucun émoji, espace insécable avant : ; ? ! et dans les
-// guillemets, « simulé » à côté de chaque prix E.Leclerc, « saisi par toi » (ou « d'après ce que tu as collé ») à côté
-// de chaque montant qui n'est pas un prix relevé. Deux passes : les fichiers (sources servies, données, documentation),
-// puis le texte affiché (nœuds de texte, aria-label, placeholder) de chaque écran et de chaque feuille de tools/a11y.cjs,
+// guillemets, « simulé » à côté de chaque prix E.Leclerc (et dans chaque cellule de sa colonne d'un tableau), « saisi
+// par toi » (ou « d'après ce que tu as collé ») à côté de chaque montant qui n'est pas un prix relevé. Deux passes : les
+// fichiers (sources servies, données, documentation), puis le texte affiché (nœuds de texte, aria-label, placeholder) de chaque écran et de chaque feuille de tools/a11y.cjs,
 // à 390 px, états plein (E.Leclerc activé, un total payé, une ligne libre à prix saisi) et vide ; en plus, « Et si »
 // ouvert sur le gros panier et « Pas trouvé » dans une commande E.Leclerc.
 // Usage : node tools/textcheck.cjs [--routes=accueil,panier] [--all]. Code de sortie 1 au premier écart.
@@ -91,6 +91,13 @@ const AUDIT_JS = `((amounts) => {
       if (/Leclerc/.test(t.replace(/^\\s*Sans E\\.Leclerc\\s*$/, "").replace(/Ta commande E\\.Leclerc n'aurait plus aucun produit\\./g, ""))) { const box = near(el), bt = box.textContent + " " + (box.getAttribute("aria-label") || ""); if (/\\d+,\\d{2}\\s?€/.test(bt) && !/simul/i.test(bt)) out.push({ cat: "simulé", msg: "prix E.Leclerc sans « simulé » : « " + short(bt) + " »" }); }
       /* un montant saisi par la personne (total payé, prix d'une ligne libre) le dit */
       for (const a of amounts) if (t.includes(a)) { const box = near(el), bt = box.textContent; if (!/saisi par toi|d'après ce que tu as collé/i.test(bt)) out.push({ cat: "saisi par toi", msg: a + " € sans « saisi par toi » : « " + short(bt) + " »" }); }
+    }
+    /* un tableau : la cellule d'un prix de la colonne d'E.Leclerc dit elle-même qu'il est simulé (elle se lit seule) */
+    for (const td of root.querySelectorAll("td")) {
+      const tb = td.closest("table"), hr = tb && tb.querySelector("thead tr");
+      if (!hr || !shown(td)) continue;
+      const th = hr.children[[...td.parentElement.children].indexOf(td)];
+      if (th && /Leclerc/.test(th.textContent) && /\\d+,\\d{2}\\s?€/.test(td.textContent) && !/simul/i.test(td.textContent)) out.push({ cat: "simulé", msg: "prix E.Leclerc sans « simulé » dans une cellule : « " + short(td.textContent) + " »" });
     }
     for (const el of root.querySelectorAll("[aria-label], [placeholder], [title]")) {
       if (!shown(el)) continue;

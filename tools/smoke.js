@@ -235,6 +235,15 @@ const server = http.createServer((req, res) => {
        projets, aucune autre appli nommée ; « Demander une enseigne ou ta ville » ouvre le signalement sur ce choix, et
        le code postal écrit ne part pas dans le ticket */
     await page.goto(base + "#/reglages"); await ready();
+    /* « Commandes au plus » : compté par groupe d'enseigne utilisé (une seule commande Auchan, en livraison ou en
+       retrait ; E.Leclerc désactivé ne compte pas), comme dans le panier */
+    const mk = await page.evaluate(() => { const S = cabasDebug().S, g = new Set((S.allRets || []).filter((r) => !S.prefs.off[r.group || r.id]).map((r) => r.group || r.id)); return { want: g.size, got: document.querySelectorAll('#view [data-act="maxk"]').length }; });
+    if (mk.got !== mk.want) problems.push(`réglages : ${mk.got} choix de « Commandes au plus », ${mk.want} groupes d'enseignes utilisés`);
+    /* au clavier, une navigation donne le focus au titre de la nouvelle vue, avec son cadre, jamais à toute la vue */
+    await page.focus('#tabbar a[data-tab="rayons"]'); await page.keyboard.press("Enter"); await ready(); await page.waitForTimeout(500);
+    const kf = await page.evaluate(() => { const a = document.activeElement, v = document.getElementById("view"); return { tag: a.tagName, inView: v.contains(a), vis: a.matches(":focus-visible") && getComputedStyle(a).outlineStyle !== "none", view: getComputedStyle(v).outlineStyle }; });
+    if (kf.tag !== "H1" || !kf.inView || !kf.vis || kf.view !== "none") problems.push("navigation au clavier : focus " + JSON.stringify(kf));
+    await page.goto(base + "#/reglages"); await ready();
     await page.click('#view a[href="#/comment/avenir"]'); await ready(); await page.waitForTimeout(600);
     const av = await page.evaluate(() => { const h = document.getElementById("avenir"), l = document.querySelector("#view .soonl"); return h && l ? { top: Math.round(h.getBoundingClientRect().top), focus: document.activeElement === h, items: l.querySelectorAll(":scope > li").length, text: document.getElementById("view").textContent } : null; });
     if (!av) problems.push("à venir : section absente de #/comment/avenir");

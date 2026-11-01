@@ -281,6 +281,9 @@ const server = http.createServer((req, res) => {
     const man = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.webmanifest"), "utf8"));
     if (!man.share_target || man.share_target.method !== "POST" || man.share_target.enctype !== "multipart/form-data" || !man.share_target.params.text) fail("manifeste : share_target en POST attendu (le texte partagé ne part pas dans l'adresse)");
     for (const u of ["./#/remplir", "./#/recommander"]) if (!(man.shortcuts || []).some((s) => s.url === u)) fail("manifeste : raccourci " + u + " absent");
+    /* Android n'en montre que quatre : les quatre plus utiles d'abord (écrire, panier, remplir, recommander) */
+    const first4 = (man.shortcuts || []).slice(0, 4).map((s) => s.url).join();
+    if (first4 !== "./#/ecrire,./#/panier,./#/remplir,./#/recommander") fail("manifeste : quatre premiers raccourcis " + first4);
   } catch (e) {
     fail("parcours interrompu : " + e.message.split("\n")[0]);
   }
@@ -304,6 +307,65 @@ const server = http.createServer((req, res) => {
     if (SHOTS) await d.screenshot({ path: path.join(SHOTS, "8-ordinateur.png") });
     await dctx.close();
   } catch (e) { fail("ordinateur : " + e.message.split("\n")[0]); }
+
+  /* 12. « Pas trouvé » sur une ligne qui est l'équivalent pris par le panier souple : l'équivalent choisi remplace le
+     produit d'origine au panier (il sort du panier), sans rien ajouter de trop */
+  try {
+    const fctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
+    const f = await fctx.newPage();
+    f.on("pageerror", (e) => fail("panier souple, erreur JS : " + e.message));
+    const fready = () => f.waitForFunction(() => !document.querySelector("#view .sk") && document.querySelector("#view .wrap > *"), null, { timeout: 25000 });
+    await f.goto(base + "#/"); await fready();
+    await f.evaluate((PREFS) => { localStorage.clear(); localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1, first: { monoprix: 1, houra: 1, carrefour: 1, auchan: 1, "auchan-livraison-perreux": 1 } })); localStorage.setItem("cabas.prefs", JSON.stringify(Object.assign({}, PREFS, { maxOrders: 1 }))); }, PREFS);
+    await f.reload(); await fready();
+    /* un vrai panier qu'une commande prend en entier (« La semaine »), dont un produit a un équivalent moins cher chez
+       la même enseigne, accepté (cabas.flex) */
+    const pe = await f.evaluate(async () => {
+      const D = cabasDebug(), src = await fetch("app.js").then((r) => r.text()), ex = /\["semaine", "La semaine", "([^"]+)"/.exec(src);
+      const plan = D.listPlan(D.readList(ex[1])), b = {};
+      plan.picks.forEach((pk) => { if (pk.id) b[pk.id] = pk.n; });
+      for (const id of Object.keys(b)) {
+        const p = D.S.prods.get(id);
+        for (const rid of Object.keys(p.offers)) {
+          const po = p.offers[rid];
+          if (!po || !(po.price > 0) || po.sim) continue;
+          const E = D.equivOf(p, rid, 8).find((x) => x.e.id !== id && !b[x.e.id] && x.price < po.price);
+          if (E && D.equivOf(E.e, rid, 8).some((x) => x.e.id !== E.e.id)) return { b, P: id, E: E.e.id, rid };
+        }
+      }
+      return null;
+    });
+    if (!pe) fail("panier souple : pas de produit avec un équivalent moins cher pour l'essai");
+    else {
+      await f.evaluate(({ b, P, E }) => { localStorage.setItem("cabas.basket", JSON.stringify(b)); localStorage.setItem("cabas.flex", JSON.stringify({ [P]: [E] })); localStorage.setItem("cabas.guide", "{}"); }, pe);
+      await f.goto(base + "#/panier"); await f.reload(); await fready();
+      await f.waitForFunction(() => cabasDebug().RES().done, null, { timeout: 30000 }); await f.waitForTimeout(400);
+      await f.click("[data-act=fillgo]"); await f.waitForTimeout(700);
+      const line = await f.evaluate(({ E }) => { const s = cabasDebug().S.guide.snap; if (!s) return null; for (const o of s.orders) { const i = o.items.filter((x) => !x.st).findIndex((x) => x.id === E); if (i >= 0) return { rid: o.rid, i, src: o.items.filter((x) => !x.st)[i].src || null }; } return null; }, pe);
+      if (!line) fail("panier souple : l'équivalent accepté n'est pas pris dans l'instantané de « Remplir mes paniers »");
+      else {
+        if (!line.src || !line.src[pe.P]) fail("instantané : la ligne de l'équivalent ne dit pas quel produit du panier elle remplace " + JSON.stringify(line.src));
+        await f.evaluate((h) => { location.hash = h; }, "#/remplir/" + line.rid); await f.waitForTimeout(600);
+        await f.click(`[data-act=fillat][data-v="${line.i}"]`); await f.waitForTimeout(300);
+        await f.click("#view [data-act=fillmiss]"); await f.waitForTimeout(400);
+        const Q = await f.getAttribute("#sheet [data-act=fillequiv]", "data-e").catch(() => null);
+        if (!Q) fail("« Pas trouvé » sur l'équivalent pris : aucun équivalent proposé");
+        else {
+          const q0 = pe.b[pe.P];
+          await f.click("#sheet [data-act=fillequiv]"); await f.waitForTimeout(500);
+          const bk = await f.evaluate(() => JSON.parse(localStorage.getItem("cabas.basket") || "{}"));
+          const n = (id) => bk[id] || 0;
+          if (Q !== pe.P && n(pe.P)) fail(`« Pas trouvé » > équivalent : le produit d'origine reste au panier (${n(pe.P)})`);
+          if (n(Q) !== q0 + (Q !== pe.P ? pe.b[Q] || 0 : 0)) fail(`« Pas trouvé » > équivalent : ${n(Q)} exemplaires de l'équivalent choisi, ${q0} attendus`);
+          if (Q !== pe.E && n(pe.E)) fail("« Pas trouvé » > équivalent : l'équivalent pris par le panier souple arrive au panier");
+          await f.click("#toast button"); await f.waitForTimeout(400);
+          const back = await f.evaluate(() => JSON.parse(localStorage.getItem("cabas.basket") || "{}"));
+          if (JSON.stringify(back) !== JSON.stringify(pe.b)) fail("« Pas trouvé » > équivalent, « Annuler » : le panier n'est pas celui d'avant");
+        }
+      }
+    }
+    await fctx.close();
+  } catch (e) { fail("panier souple, Pas trouvé : " + e.message.split("\n")[0]); }
 
   await browser.close();
   server.close();

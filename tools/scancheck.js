@@ -1,8 +1,10 @@
 // Vérification du lecteur de codes-barres (scan.js) sur des images de synthèse : codes EAN-13 et EAN-8 à plusieurs
 // tailles, avec bruit, flou, éclairage inégal et inclinaison ; une image de bruit seul ne doit rien donner. Puis, quand
 // Playwright est là, le mode magasin (#/magasin) et le scanner : « Scanner un produit » depuis la liste, le code tapé
-// d'un produit du panier le coche dans la liste du magasin, ce qu'il reste à lire à voix haute (speakText), et la
-// feuille d'impression (sans barres ni boutons, la liste et la date).
+// d'un produit du panier le coche dans la liste du magasin, ce qu'il reste à lire à voix haute (speakText), la
+// feuille d'impression (sans barres ni boutons, la liste et la date), un code inconnu dont l'équivalent choisi est
+// retenu (cabas.eans : relu sans Open Food Facts, « Oublier ce choix » et « Annuler », coché en magasin), et la liste
+// du magasin qui suit la répartition (ouverte directement, puis après un changement du panier).
 // Usage : node tools/scancheck.js
 const fs = require("fs");
 const path = require("path");
@@ -90,9 +92,20 @@ async function storeCheck() {
   const P = withEan[0];
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: "block", locale: "fr-FR" });
+  /* Open Food Facts simulé : un code inconnu du catalogue a un nom (marque que Cabas ne relève pas), les autres répondent 404 */
+  const known = new Set(cat.products.map((p) => String(p.e || "").replace(/^0+/, "")));
+  let NEW = "";
+  for (let i = 1; i < 99 && !NEW; i++) for (let d = 0; d < 10; d++) { const c = "2000000000" + String(i).padStart(2, "0") + d; if (Scan.valid(c) && !known.has(c)) { NEW = c; break; } }
+  const offReq = [];
+  await ctx.route(/^https:\/\/world\.openfoodfacts\.org\//, (r) => {
+    const code = (/\/product\/(\d+)\.json/.exec(r.request().url()) || [])[1] || "";
+    offReq.push(code);
+    const ok = code === NEW;
+    r.fulfill({ status: ok ? 200 : 404, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(ok ? { status: 1, product: { product_name_fr: "Lait demi-écrémé", brands: "Laiterie d'Essai", quantity: "1 L" } } : { status: 0 }) });
+  });
   const page = await ctx.newPage();
   page.on("pageerror", (e) => fail("erreur JS : " + e.message));
-  page.on("console", (m) => { if (m.type() === "error") fail("console : " + m.text()); });
+  page.on("console", (m) => { if (m.type() === "error" && !/openfoodfacts\.org|404/.test(m.text() + ((m.location() || {}).url || ""))) fail("console : " + m.text()); });
   const ready = () => page.waitForFunction(() => !document.querySelector("#view .sk") && document.querySelector("#view .wrap > *"), null, { timeout: 25000 });
   try {
     await page.goto(base + "#/"); await ready();
@@ -128,12 +141,70 @@ async function storeCheck() {
     await page.emulateMedia({ media: "screen" });
     const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     if (over > 0) fail(`mode magasin : déborde de ${over} px en largeur`);
+    /* un code inconnu du catalogue : l'équivalent trouvé d'après Open Food Facts, choisi (« Ajouter »), est retenu sur le
+       téléphone (cabas.eans) ; le scan suivant le retrouve tout de suite, sans redemander, et le mode magasin le coche */
+    await page.evaluate(() => { localStorage.setItem("cabas.basket", "{}"); localStorage.setItem("cabas.guide", "{}"); localStorage.removeItem("cabas.eans"); });
+    await page.goto(base + "#/scan"); await page.reload(); await page.waitForTimeout(800);
+    const typeCode = async (c) => { await page.click("[data-act=scantype]"); await page.waitForTimeout(300); await page.fill("#eanIn", c); await page.click("#sheet [data-act=scantypeok]"); await page.waitForTimeout(1200); };
+    await typeCode(NEW);
+    const nearId = await page.evaluate(() => { const b = document.querySelector("#scres [data-learn] [data-act=inc]"); return b ? b.dataset.id : null; });
+    if (!nearId) fail("scanner : pas d'équivalent proposé pour un code inconnu (marque que Cabas ne relève pas)");
+    else {
+      await page.$eval("#scres [data-learn] [data-act=inc]", (el) => el.click()); await page.waitForTimeout(400);
+      const E = await page.evaluate(() => JSON.parse(localStorage.getItem("cabas.eans") || "{}"));
+      if (!E[NEW] || E[NEW].id !== nearId) fail("scanner : le produit choisi pour le code n'est pas retenu (cabas.eans) " + JSON.stringify(E));
+      const asked = offReq.filter((c) => c === NEW).length;
+      await page.click("[data-act=scanclear]"); await typeCode(NEW);
+      if (offReq.filter((c) => c === NEW).length !== asked) fail("scanner : un code appris est redemandé à Open Food Facts");
+      const card = await page.evaluate(() => document.getElementById("scres").textContent);
+      if (!/Ton choix pour ce code/.test(card) || !(await page.locator(`#scres [data-act=inc][data-id="${nearId}"], #scres [data-act=dec][data-id="${nearId}"]`).count())) fail("scanner : le code appris ne montre pas tout de suite le produit choisi « " + card.slice(0, 120) + " »");
+      /* « Oublier ce choix », puis « Annuler » */
+      await page.click("#scres [data-act=eanforget]"); await page.waitForTimeout(1200);
+      if ((await page.evaluate((c) => !!JSON.parse(localStorage.getItem("cabas.eans") || "{}")[c], NEW))) fail("scanner : « Oublier ce choix » garde le code");
+      await page.click("#toast button"); await page.waitForTimeout(600);
+      if (!(await page.evaluate((c) => !!JSON.parse(localStorage.getItem("cabas.eans") || "{}")[c], NEW))) fail("scanner : « Annuler » ne remet pas le code appris");
+      /* le mode magasin coche le produit appris quand son code est lu */
+      await page.goto(base + "#/magasin"); await ready(); await page.waitForTimeout(500);
+      await page.click("[data-act=storescan]"); await page.waitForTimeout(500);
+      await page.click("[data-act=scanclear]").catch(() => {}); await typeCode(NEW);
+      const ck2 = await page.evaluate((id) => !!(JSON.parse(localStorage.getItem("cabas.guide") || "{}").ck || {})["mag|" + id], nearId);
+      if (!ck2) fail("mode magasin : le produit d'un code appris n'est pas coché");
+    }
+    /* le mode magasin suit la répartition : ouvert directement, il la calcule ; le panier change (un retrait annulé),
+       la liste « À acheter en magasin » se recalcule sans quitter l'écran */
+    const mb = await page.evaluate(async () => {
+      const D = cabasDebug(), src = await fetch("app.js").then((r) => r.text()), ex = /\["semaine", "La semaine", "([^"]+)"/.exec(src);
+      const plan = D.listPlan(D.readList(ex[1])), b = {};
+      plan.picks.forEach((pk) => { if (pk.id) b[pk.id] = pk.n; });
+      const c = D.S.list.find((p) => { const k = Object.keys(p.offers); return k.length === 1 && k[0] === "carrefour"; });
+      if (c) b[c.id] = 1;
+      return { b, c: c && c.id };
+    });
+    if (!mb.c) fail("mode magasin : pas de produit vendu seulement par Carrefour pour l'essai");
+    else {
+      await page.evaluate((b) => { localStorage.setItem("cabas.basket", JSON.stringify(b)); localStorage.setItem("cabas.guide", "{}"); localStorage.setItem("cabas.prefs", JSON.stringify({ zip: "94120", off: { leclerc: true }, offv: 1, maxOrders: 1 })); }, mb.b);
+      await page.goto(base + "#/magasin"); await page.reload(); await ready();
+      await page.waitForFunction(() => cabasDebug().RES().done, null, { timeout: 25000 }); await page.waitForTimeout(400);
+      const magRow = () => page.locator(`#view .gi.big[data-p="${mb.c}"]`).count();
+      const magOn = () => page.locator("#view [data-act=storemode][data-v=mag][aria-checked=true]").count();
+      if (!(await magOn()) || !(await magRow())) fail("mode magasin ouvert directement : « À acheter en magasin » attendu avec le produit vendu seulement par Carrefour");
+      await page.goto(base + "#/panier"); await ready(); await page.waitForTimeout(600);
+      await page.$eval(`[data-act=dec][data-id="${mb.c}"]`, (el) => el.click()); await page.waitForTimeout(600);
+      await page.evaluate(() => { location.hash = "#/magasin"; }); await page.waitForTimeout(900);
+      if (await magRow()) fail("mode magasin : un produit retiré du panier reste dans la liste");
+      /* remis depuis sa fiche, sans repasser par le panier : la liste du magasin le reprend */
+      await page.evaluate((id) => { location.hash = "#/produit/" + id; }, mb.c); await ready(); await page.waitForTimeout(500);
+      await page.$eval(`[data-act=inc][data-id="${mb.c}"]`, (el) => el.click()); await page.waitForTimeout(300);
+      await page.evaluate(() => { location.hash = "#/magasin"; }); await page.waitForTimeout(300);
+      await page.waitForFunction(() => cabasDebug().RES().done, null, { timeout: 25000 }); await page.waitForTimeout(400);
+      if (!(await magOn()) || !(await magRow())) fail("mode magasin : le produit remis au panier n'est pas dans « À acheter en magasin »");
+    }
   } catch (e) { fail("parcours interrompu : " + e.message.split("\n")[0]); }
   await browser.close(); server.close();
   return problems;
 }
 storeCheck().then((pb) => {
   if (pb.length) console.log("Mode magasin, problèmes :\n- " + pb.join("\n- "));
-  else console.log("Mode magasin vérifié : liste par rayon en gros caractères, scanner qui coche, lecture, impression.");
+  else console.log("Mode magasin vérifié : liste par rayon en gros caractères, scanner qui coche, codes appris, lecture, impression, liste qui suit la répartition.");
   process.exit(decodeOk && !pb.length ? 0 : 1);
 });
