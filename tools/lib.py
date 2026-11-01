@@ -74,7 +74,15 @@ def key(s):
 # Une eau « avec robinet intégré » reste une eau.
 HORS_COURSES = re.compile(r'(^|\s)(radiateur|robinet d arrosage|robinet arrosage|pompe d arrosage|raccord|chauffe eau|recuperateur d eau|seche serviettes'
                           r'|distributeur mural|porte savon|lave main|meuble|etagere|tapis de bain|rideau|aspirateur|tondeuse a gazon|perceuse|visseuse'
-                          r'|echelle|carrelage|peinture|lampe|ampoule led e27 lot de 10 pro|jardiniere en bois)(\s|$)')
+                          r'|echelle|carrelage|peinture|lampe|ampoule led e27 lot de 10 pro|jardiniere en bois'
+                          # moules à gâteau et papier cuisson lus avec les moules (« moules ») ; pots, couvercles et confituriers
+                          # vides avec les confitures ; appareils pour biberons ; ciseaux à herbes ; solutions pour lentilles de contact
+                          r'|moules? (?:a (?:gateaux?|manque|tartes?|tartelettes|mini|cakes?|baguettes?|pain|charniere|savarin|madeleines?|quiches?'
+                          r'|patisseries?|financiers?|muffins?|cannele)|en (?:papier|silicone)|papier|silicone|cake|pour air ?fryer'
+                          r'|\d+ (?:financiers|tartelettes|madeleines))|lot de \d+ moules|set de \d+ moules'
+                          r'|couvercles? pour confitures?|confituriers?|pots? a confiture|pots? confiture en verre'
+                          r'|chauffe biberons?|sterilisateur|egouttoir|egoutte biberons?|porte biberons?|housses? de protection|cuiseur vapeur'
+                          r'|ciseaux (?:pour|a) herbes|solutions? (?:multifonctions?|pour lentilles)|lentilles de contact|lentilles souples)(\s|$)')
 
 
 def hors_courses(label):
