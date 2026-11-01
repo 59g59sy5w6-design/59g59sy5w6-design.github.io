@@ -68,6 +68,15 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
       return { pick: M.pick, dear: dear ? dear[0] : null, rayon: P.get(M.pick).r };
     });
     if (!L0.pick) fail("« lait » ne trouve aucun produit");
+    /* un nombre et une contenance : « coca 1,5 l x4 » fait quatre bouteilles ; le vivier reste en quantité équivalente
+       (80 % au moins, un tiers de plus au plus), et ce qui se compte (12 œufs) jamais sous le nombre demandé */
+    const Q = await page.evaluate(() => {
+      const D = cabasDebug(), P = D.S.prods, tot = (id, q) => { const p = P.get(id); return p.qty ? p.qty.v * q : 0; };
+      const one = (t) => { const M = D.matchLine(D.parseLine(t)); return { t, n: M.n, v: M.pick ? tot(M.pick, M.n) : 0, pool: [...(M.pool || new Map())].map(([id, q]) => tot(id, q)) }; };
+      return ["coca 1,5 l x4", "4 bouteilles de coca 1,5 l", "2 paquets de pâtes 500 g", "12 œufs", "une douzaine d'œufs"].map(one);
+    });
+    for (const x of Q.slice(0, 3)) { const want = /pâtes/.test(x.t) ? 1000 : 6000; if (Math.abs(x.v - want) > want * 0.2) fail(`« ${x.t} » : ${x.v} au lieu de ${want} (quantité ${x.n})`); }
+    for (const x of Q.slice(3)) { if (x.v < 12) fail(`« ${x.t} » : ${x.v} œufs`); if (x.pool.some((v) => v && (v < 12 || v > 16))) fail(`« ${x.t} » : vivier hors de la quantité demandée (${x.pool.join(", ")})`); }
     if (!L0.dear) fail("« lait » : aucun candidat 25 % plus cher à l'unité pour le test du choix habituel");
 
     /* 1. choix habituel au bon prix : repris d'office, dit dans la ligne */
@@ -135,7 +144,9 @@ const PREFS = { zip: "94120", off: { leclerc: true }, fee: {}, pick: {}, liv: {}
     lines = await runList("spagetti x2\nzzzz\nspagheti", { prefs: PREFS });
     const sp = lines[0];
     const nm = sp && sp.pick ? await page.evaluate((id) => { const p = cabasDebug().S.prods.get(id); return (p.brand + " " + p.name).toLowerCase(); }, sp.pick) : "";
-    if (!sp || !sp.pick || !/spaghetti/.test(nm) || sp.n !== 2) fail(`« spagetti x2 » : produit « ${nm} », quantité ${sp && sp.n}`);
+    /* deux paquets : 2 x 500 g, ou 1 kg quand la carte de la liste prend les produits d'une enseigne */
+    const spq = sp && sp.pick ? await page.evaluate(({ id, n }) => { const p = cabasDebug().S.prods.get(id); return p.qty ? p.qty.v * n : 0; }, { id: sp.pick, n: sp.n }) : 0;
+    if (!sp || !sp.pick || !/spaghetti/.test(nm) || Math.abs(spq - 1000) > 200) fail(`« spagetti x2 » : produit « ${nm} », quantité ${sp && sp.n} (${spq} g)`);
     const zz = lines[1];
     if (!zz || zz.pick || zz.sugg) fail("« zzzz » devrait rester sans produit ni suggestion");
     const miss = page.locator(".item.wli.miss").first();

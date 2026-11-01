@@ -691,7 +691,7 @@
       if (f && searchScored(f.to).length) { if (part("fix", `«\u00a0${f.from}\u00a0» lu «\u00a0${f.to}\u00a0»`)) { A.q = f.to; A.label = f.to; A.fix = f; } }
       else { const ls = readList(rest).filter((x) => x.pick); if (ls.length >= 2) { A.kind = "list"; A.lines = ls; A.smart = true; A.budget = A.max; return A; } }
     }
-    A.qty = L.size ? fmtSize(L.size) : L.nGiven && L.n > 1 ? "×\u00a0" + L.n : "";
+    A.qty = L.size ? (L.n > 1 ? L.n + "\u00a0× " : "") + fmtSize(L.size) : L.nGiven && L.n > 1 ? "×\u00a0" + L.n : "";
     A.smart = !!(A.parts.some((x) => x.k !== "fix") || A.question || L.nGiven || A.fees);
     return A;
   }
@@ -746,7 +746,8 @@
   /* quantité de la réponse : la contenance écrite (2 kg de riz), le nombre écrit, le nombre de personnes, sinon 1 */
   function askQty(A, p) {
     const L = A.L || {};
-    if (L.size && p.qty && p.qty.u === L.size.u && p.qty.v) return Math.max(1, Math.min(99, Math.round(L.size.v / p.qty.v)));
+    /* « 4 bouteilles de coca 1,5 l » : quatre fois la contenance écrite */
+    if (L.size && p.qty && p.qty.u === L.size.u && p.qty.v) return Math.max(1, Math.min(99, Math.round((L.size.v * (L.n > 1 ? L.n : 1)) / p.qty.v)));
     if (L.nGiven) return L.n;
     if (A.people) return (QTY_FOYER[p.r] || QTY_DEF)[A.people <= 1 ? 0 : A.people <= 2 ? 1 : A.people <= 4 ? 2 : 3];
     return 1;
@@ -765,7 +766,12 @@
       const tries = A.parts.filter((x) => !x.off && x.k !== "fix").map((x) => { const o = { off: Object.assign({}, S.askOff.off, { [x.k]: 1 }), price: S.askOff.price }; const B = askParse(A.raw, o); return { x, n: B.kind === "product" ? askList(B, searchScored(B.q).map((y) => y[1])).length : 0 }; }).filter((t) => t.n);
       return `<div class="empty">${emptyArt("filter")}<h2>Rien ne répond à toute ta demande</h2><p>${tries.length ? "Sans une de ces conditions, il y a des produits\u00a0:" : `Rien ne correspond à «\u00a0${esc(A.label)}\u00a0» avec ces conditions.`}</p>${tries.length ? `<div class="btns">${tries.slice(0, 3).map((t) => `<button class="btn plain" type="button" data-act="askpart" data-k="${esc(t.x.k)}">Sans «\u00a0${esc(t.x.label)}\u00a0», ${plural(t.n, "produit", "produits")}</button>`).join("")}</div>` : ""}</div>`;
     }
-    const p = list[0], o = askOffer(A, p), n = askQty(A, p), u = o ? unitPrice(p, o.price) : "";
+    /* sans tri demandé, le produit que Ma liste prendrait pour cette ligne (variante la plus simple, contenance écrite,
+       quantité comprise), s'il répond aussi au reste de la demande ; sinon le premier résultat */
+    let p = list[0], n = 0;
+    if (!A.sort && A.L && A.L.q) { const M = matchLine(A.L); if (M.pick && list.some((x) => x.id === M.pick)) { p = S.prods.get(M.pick); if (A.L.nGiven || A.L.size) n = M.n; } }
+    const o = askOffer(A, p), u = o ? unitPrice(p, o.price) : "";
+    n = Math.max(1, Math.min(99, n || askQty(A, p)));
     const title = A.sort === "unite" ? "Le moins cher " + (A.unitK ? "au " + A.unitK : "au kilo ou au litre") : A.sort === "prix" ? "Le prix le plus bas" : A.sort === "prixdesc" ? "Le plus cher" : "Ce que Cabas te propose";
     return `<div class="hcard ans"><a class="thumb" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 56)}</a><span><small class="lab">${esc(title)}</small><b>${esc(p.brand)} ${esc(p.name)}</b><small>${esc(p.format)}${o ? ", " + eur(o.price) + " chez " + esc(retName(o.ret)) + (o.sim ? " (prix simulé)" : "") : ""}${u ? ", " + esc(u) : ""}</small>` +
       (o ? `<button class="btn sm tint" type="button" data-act="askadd" data-id="${esc(p.id)}" data-n="${n}">${ic("plus")}Ajouter${n > 1 ? " " + n : ""} au panier<span class="sub">${eur(o.price * n)}</span></button>` : "") + `</span></div>`;
@@ -1038,8 +1044,12 @@
      panier souple), pris seulement à un prix relevé. */
   const pinOf = (id) => (S.prefs.pin || {})[id] || "";
   const banOf = (id) => (S.prefs.ban || {})[id] || {};
-  const flexOf = (id) => ((S.flex || {})[id] || []).map((e) => S.prods.get(e) || S.prods.get((S.alias || {})[e])).filter((e) => e && e.id !== id);
+  /* les équivalents acceptés (cabas.flex), revérifiés à chaque calcul : un équivalent gardé avant une règle plus stricte
+     ou un nouveau relevé n'est plus pris s'il n'est plus le même produit */
+  const flexOf = (id) => { const p = S.prods.get(id); return ((S.flex || {})[id] || []).map((e) => S.prods.get(e) || S.prods.get((S.alias || {})[e])).filter((e) => e && e.id !== id && equivOk(p, e, true, 0.2)); };
   const saveFlex = () => store.set("flex", S.flex);
+  /* l'épingle compte dans la répartition affichée (même règle que model) */
+  const pinLive = (id) => { const pin = pinOf(id), p = S.prods.get(id); return !!pin && !!p && S.rets.some((r) => offKey(r) === pin && retOn(r.id) && [p].concat(flexOf(id)).some((e) => { const x = e.offers[r.id]; return x && x.price > 0; })); };
   /* empreinte des règles des produits du panier, pour savoir quand refaire la répartition */
   function rulesKey(items) {
     const pin = {}, ban = {}, fx = {};
@@ -1058,9 +1068,12 @@
     for (const id of Object.keys(items)) {
       const q = items[id], p = S.prods.get(id);
       if (!p || !(q > 0)) continue;
-      const pin = o.free ? "" : pinOf(id), ban = o.free ? {} : banOf(id), usePin = !!pin && groups.includes(pin), no = [];
-      groups.forEach((g, ci) => { if ((usePin && g !== pin) || ban[g]) no.push(ci); });
       const opts = [p].concat(o.exact ? [] : flexOf(id)).map((e) => ({ id: e.id, at: chans.map((ch) => { const x = e.offers[ch.id]; return x && x.price > 0 ? { cost: Math.round(x.price * 100) * q, sim: !!x.sim } : null; }) }));
+      /* l'épingle ne vaut que si une enseigne du groupe épinglé, parmi celles de ce réglage, vend le produit ou un
+         équivalent accepté (Auchan en livraison qui ne vend pas ce que vend le retrait) : sinon Cabas le prend ailleurs */
+      const pin = o.free ? "" : pinOf(id), ban = o.free ? {} : banOf(id), no = [];
+      const usePin = !!pin && opts.some((op) => groups.some((g, ci) => g === pin && op.at[ci]));
+      groups.forEach((g, ci) => { if ((usePin && g !== pin) || ban[g]) no.push(ci); });
       src.push({ id, q, opts, no });
     }
     return buildModel(src, chans, store, mode !== false);
@@ -1080,9 +1093,11 @@
     get otherDone() { return !this.by || this.by[!this.mode].done; },
   };
   let W = null, wSeq = 0, wBusy = false, cartTimer = 0;
+  /* empreinte de tout ce qui change la répartition : le panier, les enseignes, les frais, les règles des produits */
+  const cartBase = () => JSON.stringify([S.basket, S.prefs.off, S.prefs.fee, S.prefs.extraCost, retsFor(true).map((r) => r.id), retsFor(false).map((r) => r.id), rulesKey()]);
   function cartResult() {
     const mode = S.prefs.comp !== false;
-    const base = JSON.stringify([S.basket, S.prefs.off, S.prefs.fee, S.prefs.extraCost, retsFor(true).map((r) => r.id), retsFor(false).map((r) => r.id), rulesKey()]);
+    const base = cartBase();
     if (!RES.by || RES.base !== base) {
       const by = { true: { M: model(true), steps: {}, done: false }, false: { M: model(false), steps: {}, done: false } };
       for (const m of [true, false]) if (!by[m].M.lines.length || !by[m].M.chans.length) by[m].done = true;
@@ -1134,6 +1149,12 @@
   function cartUpdate(d) {
     /* une feuille qui compare au total du panier (Compléter malin, tenir le budget) et la section « Et si » suivent le calcul */
     if (d.done) auxPaint();
+    /* le mini panier des autres écrans passe des produits seuls au total livraison comprise */
+    if (d.done && (d.mode == null || d.mode === RES.mode) && $(".mini[data-tab=panier]")) {
+      const box = document.createElement("div"); box.innerHTML = miniHtml();
+      const nm = box.querySelector(".mini[data-tab=panier]");
+      if (nm) $$(".mini[data-tab=panier]").forEach((m) => { m.innerHTML = nm.innerHTML; });
+    }
     /* « Remplir mes paniers » avant le premier geste montre la répartition en cours : redessinée quand elle arrive */
     if (S.route.name === "remplir") { if ((d.done || d.k === RES.K) && $("#sheet").hidden && (!fillUsable() || (S.route.id && !fillOrd(S.route.id)))) { clearTimeout(cartTimer); cartTimer = setTimeout(rerender, 40); } return; }
     if (S.route.name !== "panier") return;
@@ -1152,8 +1173,9 @@
   const fullTotal = (r) => r.itemsTotal + r.feesTotal + (r.compTotal || 0);
   function segLabel(k) {
     const s = RES.steps[k];
-    /* un trait d'union conditionnel : dans la colonne étroite du grand écran, « incom-plet » plutôt qu'une coupure au hasard */
-    return !s ? "…" : s.full ? eurC(fullTotal(s.full)) : "incom\u00adplet";
+    /* deux mots courts plutôt que « incomplet » : dans la colonne étroite du grand écran, en grand texte, le libellé passe
+       à la ligne entre les mots, jamais au milieu d'un mot */
+    return !s ? "…" : s.full ? eurC(fullTotal(s.full)) : "pas tout";
   }
   function updateSegLabels() { document.querySelectorAll("[data-segk]").forEach((el) => { el.textContent = segLabel(+el.dataset.segk); }); }
   function nextTier(ch, sub) {
@@ -1707,7 +1729,7 @@
     const p0 = S.prods.get(id), a = x && x.alt && S.prods.get(x.alt), p = a || p0;
     const unit = cost / q / 100, pin = pinOf(id), notes = [];
     if (a) notes.push(["swap", `Équivalent pris par Cabas, au lieu de ${pname(p0)}`]);
-    if (pin) notes.push(["pin", S.rets.some((r) => offKey(r) === pin && p0.offers[r.id] && p0.offers[r.id].price > 0) ? `Toujours chez ${groupName(pin)}` : `Épinglé chez ${groupName(pin)}, qui ne le vend pas ici`]);
+    if (pin) notes.push(["pin", pinLive(id) ? `Toujours chez ${groupName(pin)}` : `Épinglé chez ${groupName(pin)}, qui ne le vend pas ici\u00a0: Cabas le prend ailleurs`]);
     if (Object.keys(banOf(id)).length) notes.push(["x", "Jamais chez " + joinEt(Object.keys(banOf(id)).map(groupName))]);
     return `<div class="item" data-rm="p:${esc(id)}"><a class="thumb" href="${hp(p.id)}" aria-label="${esc(p.brand + " " + p.name)}">${img(p, 56)}</a><a class="it" href="${hp(p.id)}"><b><strong>${esc(p.brand)}</strong> ${esc(p.name)}</b><small>${esc(p.format)}${q > 1 ? ", " + eur(unit) + " l'unité" : ""}${note ? ", " + esc(note) : ""}</small>${notes.map(([i, t]) => `<small class="inote">${ic(i)}<span>${esc(t)}</span></small>`).join("")}</a><div class="ir"><button class="lp lpb hit" type="button" data-act="itemopt" data-id="${esc(id)}" aria-label="${cost ? eurC(cost) + ", " : ""}où le prendre">${cost ? eurC(cost) : "–"}${ic("down")}</button>${buyCtl(id, "item")}</div></div>`;
   }
@@ -1902,7 +1924,8 @@
       const singles = M.chans.map((c, i) => singleBasket(M, i)).filter((x) => x.have > 0);
       let hint = "";
       if (singles.length) {
-        const g = singles.map((x) => ({ s: x, gap: x.ch.P.min - x.sub })).sort((x, y) => x.gap - y.gap)[0];
+        /* comme la carte de Ma liste : l'enseigne qui prend le plus de produits, puis celle à qui il manque le moins */
+        const g = singles.map((x) => ({ s: x, gap: x.ch.P.min - x.sub })).sort((x, y) => y.s.have - x.s.have || x.gap - y.gap)[0];
         if (g.gap > 0) hint = ` Chez ${esc(S.retMap.get(g.s.ch.id).name)}, ${g.s.missing ? "les produits disponibles font" : "ton panier fait"} ${eurC(g.s.sub)}\u00a0: il manque ${eurC(g.gap)} pour atteindre le minimum de ${eurC(g.s.ch.P.min).replace(",00", "")}.`;
       }
       /* petit panier : en magasin, pas de minimum ; l'enseigne qui a des magasins et vend le plus de produits, au total le plus bas */
@@ -1965,7 +1988,7 @@
     return {
       title: "Réglages", grouped: true,
       html: `<h1 class="lt">Réglages</h1>` +
-        `<h2 class="gh">Affichage</h2><div class="group">${lookHtml()}${TTS() ? `<div class="row stack"><span class="rt" id="voiceL">Lecture à voix haute<small>Pour écouter ta liste, ta répartition et ta liste du magasin.</small></span><div class="seg" role="radiogroup" aria-labelledby="voiceL">${[["slow", "Lente"], ["normal", "Normale"]].map(([v, l]) => `<button type="button" role="radio" data-act="voice" data-v="${v}" aria-checked="${(S.prefs.voice === "slow" ? "slow" : "normal") === v}">${l}</button>`).join("")}</div></div>` : ""}<button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
+        `<h2 class="gh">Affichage</h2><div class="group">${lookHtml()}${ttsOK() ? `<div class="row stack"><span class="rt" id="voiceL">Lecture à voix haute<small>Pour écouter ta liste, ta répartition et ta liste du magasin.</small></span><div class="seg" role="radiogroup" aria-labelledby="voiceL">${[["slow", "Lente"], ["normal", "Normale"]].map(([v, l]) => `<button type="button" role="radio" data-act="voice" data-v="${v}" aria-checked="${(S.prefs.voice === "slow" ? "slow" : "normal") === v}">${l}</button>`).join("")}</div></div>` : ""}<button class="row link" type="button" data-act="welcome">Reprendre les questions de départ</button></div>` +
         `<h2 class="gh">Livraison</h2><div class="group"><button class="row" type="button" data-act="zip"><span class="rt">Code postal</span><span class="val">${S.prefs.zip ? esc(S.prefs.zip) : "À indiquer"}</span>${ic("chev", "chev")}</button></div>` +
         `<p class="gf">${S.prefs.zip && !inZone() ? "Les enseignes de Cabas livrent en Île-de-France\u00a0: ton code postal n'est pas encore couvert." : "Les enseignes de Cabas livrent en Île-de-France. Chacune confirme ses créneaux au moment de commander."}</p>` +
         `<h2 class="gh">Enseignes</h2><div class="group">${S.rets.map((r) => `<div class="row"><a class="rt" href="#/enseigne/${esc(r.id)}">${esc(r.name)}<small>${esc(feeShort(r))}</small></a><label class="sw hit"><input type="checkbox" role="switch" data-act="ret" data-id="${esc(r.id)}"${retOn(r.id) ? " checked" : ""} aria-label="Utiliser ${esc(r.name)}"><span></span></label></div>`).join("")}</div>` +
@@ -1996,7 +2019,7 @@
   VIEWS.enseigne = (r) => {
     /* #/enseigne/<groupe> (auchan, leclerc) ouvre l'option retenue du groupe ; une option précise s'ouvre telle quelle */
     const G = groupsOf()[r.id];
-    const R0 = S.retMap.get(r.id) || S.allMap.get(r.id) || (G && S.allMap.get(pickFor(r.id, S.prefs.comp !== false)));
+    const R0 = (G && S.allMap.get(pickFor(r.id, S.prefs.comp !== false))) || S.retMap.get(r.id) || S.allMap.get(r.id);
     if (!R0) return notFound("enseigne");
     const ch = R0.channel || {}, T = tiersOf(R0);
     const rows = T.map((t, i) => {
@@ -2284,8 +2307,12 @@
     if (!n) return "";
     const fm = fillMini();
     if (fm) return fm;
-    /* les lignes libres ne comptent pas dans la pastille : elles n'ont pas de prix relevé */
-    return `<a class="mini" href="#/panier" data-tab="panier"><span class="mn">${n}</span><span class="ml">Voir le panier${nf ? `<small>+ ${plural(nf, "ligne libre", "lignes libres")}</small>` : ""}</span><span class="mp">${eur(subtotal())}</span></a>`;
+    /* le total du panier, livraison comprise, quand la répartition de ce panier est calculée ; sinon les produits seuls,
+       et c'est dit. Les lignes libres ne comptent pas dans la pastille : elles n'ont pas de prix relevé */
+    const tot = RES.by && RES.done && RES.base === cartBase() && RES.mode === (S.prefs.comp !== false) ? cartTotal() : null;
+    const sim = tot != null ? simIn((RES.steps[RES.K] || {}).full) : Object.keys(S.basket).some((id) => { const b = S.prods.has(id) && best(S.prods.get(id)); return b && b.sim; });
+    const sub = [(tot != null ? "Livraison comprise" : "Produits, hors livraison") + (sim ? ", prix simulés" : ""), nf ? "+ " + plural(nf, "ligne libre", "lignes libres") : ""].filter(Boolean).join(", ");
+    return `<a class="mini" href="#/panier" data-tab="panier"><span class="mn">${n}</span><span class="ml">Voir le panier<small>${sub}</small></span><span class="mp">${tot != null ? eurC(tot) : eur(subtotal())}</span></a>`;
   }
   function renderChrome(V) {
     V = V || lastV || {};
@@ -2504,16 +2531,21 @@
     }
     let pick = null, n = L.n;
     /* vivier : les produits acceptables pour cette ligne, avec la quantité à prendre de chacun (pour choisir, parmi eux,
-       celui qui rend la commande la moins chère, livraison comprise : listPlan) */
+       celui qui rend la commande la moins chère, livraison comprise : listPlan). Quantité équivalente : pas moins de 80 %
+       de ce qui est demandé, au plus un tiers de plus ; ce qui se compte (œufs, rouleaux, couches, capsules, lavages,
+       pièces) jamais sous le nombre demandé : pour 12 œufs, deux boîtes de 6 ou une de 12, pas une boîte de 10 ni de 18 */
     const pool = new Map();
+    const fit = (p, tot, u) => { const s = sz(p); if (!s || !tot || !p.qty || p.qty.u !== u) return null; const q = Math.max(1, u === "pc" ? Math.ceil(tot / s - 1e-9) : Math.round(tot / s)), r = (q * s) / tot; return r >= 0.8 - 1e-9 && r <= 1.34 ? q : 0; };
     if (L.size) {
+      /* « coca 1,5 l x4 », « 4 bouteilles de coca 1,5 l » : quatre fois la contenance écrite */
+      const tv = L.size.v * (L.n > 1 ? L.n : 1);
       const same = plain.filter((p) => p.qty && p.qty.u === L.size.u);
       const near = same.filter((p) => Math.abs(sz(p) - L.size.v) / L.size.v <= 0.15);
       const le = same.filter((p) => sz(p) <= L.size.v * 1.15);
       const set = near.length ? near : le.length ? le : same.length ? [same.slice().sort((a, b) => sz(a) - sz(b))[0]] : plain;
-      set.forEach((p) => pool.set(p.id, p.qty && p.qty.u === L.size.u && sz(p) ? Math.max(1, Math.round(L.size.v / sz(p))) : 1));
       pick = set.slice().sort(byVal)[0];
-      if (pick.qty && pick.qty.u === L.size.u && sz(pick)) n = Math.max(1, Math.round(L.size.v / sz(pick)));
+      if (pick.qty && pick.qty.u === L.size.u && sz(pick)) n = Math.max(1, Math.round(tv / sz(pick)));
+      set.forEach((p) => { const q = fit(p, tv, L.size.u); if (q !== 0 || p === pick) pool.set(p.id, p === pick ? n : q || 1); });
     } else {
       /* formats courants : ceux que partagent plusieurs produits pertinents (1 L et 6 x 1 L pour le lait, 500 g et 1 kg pour les pâtes) */
       const keyS = (p) => (sz(p) ? p.qty.u + Math.round(sz(p) / Math.pow(10, Math.floor(Math.log10(sz(p))) - 1)) : "");
@@ -2535,7 +2567,7 @@
          un pack de douze canettes ; les rouleaux, œufs ou lavages se comptent en quantité équivalente */
       const multi = (p) => { const m = /^(\d+)\s*x/i.exec(p.format || ""); return m ? +m[1] : 1; };
       const tot = sz(pick) * n, pk = multi(pick);
-      common.filter((p) => multi(p) === pk).forEach((p) => { const s = sz(p); pool.set(p.id, s && tot && p.qty.u === pick.qty.u ? Math.max(1, Math.round(tot / s)) : n); });
+      common.filter((p) => multi(p) === pk).forEach((p) => { const q = p === pick ? n : pick.qty ? fit(p, tot, pick.qty.u) : null; if (q !== 0) pool.set(p.id, q || n); });
       if (L.n > 1) plain.filter((p) => packsOf(p) === L.n).forEach((p) => pool.set(p.id, 1));
     }
     /* choix mémorisé pour cette ligne (« Autre choix » retenu une fois) : repris tant qu'il est vendu par tes enseignes,
@@ -2564,7 +2596,7 @@
   /* La liste entière, livraison comprise : pour chaque ensemble d'une à trois enseignes, chaque ligne prend le produit
      du vivier le moins cher dans ces enseignes ; une enseigne dont la commande n'atteint pas son minimum disqualifie
      l'ensemble ; frais de livraison et de service comptés. Renvoie le meilleur plan : lignes couvertes, puis total. */
-  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems, composeMenu, ghIssueUrl, ghBody, scrub, watchCheck, watchHits, factsOf, factsFetch, allergHit, cmpVerdict, recFits });
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) window.cabasDebug = () => ({ S, listPlan, matchLine, chansOf, retsFor, parseLine, readList, fuzzyWord, fixQuery, suggestions, usualQty, cartText, freeList, best, bestReal, perUnit, dietOk, dietOn, details, detailsNow, unpack, merge: mergeCatalog, univGroups, myRayons, swapFor, recCost, freshText, searchScored, fillSnap, fillText, basketKey, leadText, fillLink, ordState, arrival, nextRun, askParse, askList, composeList, feeGap, basketAt, autoPick, applyAutoPick, model, equivOf, topupGain, topupCands, budgetFit, monthSpend, basketLimit, placeOf, cartTotal, wifList, auxGet, RES: () => RES, AUX: () => AUX, cleanPaste, rhythm, autoTemplate, weekTpl, tplDue, prepNow, cadOf, moves, momentOf, spendByMonth, recordFill, loadHist, trackDrops, speakText, packState, packLink, unpackState, importCheck, storeItems, composeMenu, ghIssueUrl, ghBody, scrub, watchCheck, watchHits, factsOf, factsFetch, allergHit, cmpVerdict, recFits });
   /* jeu d'essai (tests) : un petit catalogue v2 ajouté au catalogue chargé, rayons et produits compris */
   function mergeCatalog(extra) {
     const c = unpack(extra), seen = new Set(S.list.map((p) => p.id));
@@ -2607,8 +2639,9 @@
         for (const m of movable) { if (subs[j] >= chans[sub[j]].P.min) break; subs[m.pk.j] -= m.pk.by[m.pk.j].c; m.pk.j = j; subs[j] += m.pk.by[j].c; }
       }
       if (sub.some((ci, j) => subs[j] > 0 && subs[j] < chans[ci].P.min) || subs.every((s) => s === 0)) {
-        /* une seule enseigne sous son minimum : de combien ? (pour le dire quand aucune livraison n'est possible) */
-        if (sub.length === 1 && subs[0] > 0) { const gap = chans[sub[0]].P.min - subs[0]; if (!short || covered > short.covered || (covered === short.covered && gap < short.gap)) short = { ch: chans[sub[0]].id, gap, covered, sub: subs[0] }; }
+        /* une seule enseigne sous son minimum : de combien ? (pour le dire quand aucune livraison n'est possible) ; avec
+           ses produits, pour que le panier compte les mêmes */
+        if (sub.length === 1 && subs[0] > 0) { const gap = chans[sub[0]].P.min - subs[0]; if (!short || covered > short.covered || (covered === short.covered && gap < short.gap)) short = { ch: chans[sub[0]].id, gap, covered, sub: subs[0], picks: picks.map((pk) => ({ line: pk.line, id: pk.j >= 0 ? pk.by[pk.j].id : null, n: pk.j >= 0 ? pk.by[pk.j].n : 0 })) }; }
         continue;
       }
       picks.forEach((pk) => { if (pk.j >= 0) { pk.id = pk.by[pk.j].id; pk.n = pk.by[pk.j].n; pk.ch = chans[sub[pk.j]].id; } else pk.id = null; delete pk.by; });
@@ -2710,12 +2743,15 @@
       };
     }
     /* la liste entière, livraison comprise : l'ensemble d'enseignes le moins cher, minimums et frais compris ; quand il
-       prend toute la liste, ses produits sont choisis d'office (« Autre choix » reste là pour en changer) */
+       prend toute la liste, ses produits sont choisis d'office (« Autre choix » reste là pour en changer). Quand aucune
+       enseigne n'atteint son minimum, les produits de celle que la carte nomme sont choisis de même : le panier dit
+       alors ce qu'il manque pour les mêmes produits. */
     let plan = null;
     try {
       plan = W.lines.some((x) => x.pick) ? listPlan(W.lines) : null;
-      if (plan && !plan.short && plan.covered === plan.n && !W.planApplied) {
-        for (const pk of plan.picks) if (pk.id) { pk.line.pick = pk.id; pk.line.n = pk.n; }
+      const apply = plan && !W.planApplied ? (plan.short ? plan.short.picks : plan.covered === plan.n ? plan.picks : null) : null;
+      if (apply) {
+        for (const pk of apply) if (pk.id) { pk.line.pick = pk.id; pk.line.n = pk.n; }
         W.planApplied = true;
         plan = listPlan(W.lines);
       }
@@ -3134,7 +3170,7 @@
       const G = [...gs.entries()], lab = (v) => eur(v.o.price) + (v.o.sim ? ", simulé" : "");
       const pl = placeOf(id), a = pl && pl.alt && S.prods.get(pl.alt);
       const now = pl ? `Dans ta répartition\u00a0: ${pl.mag ? "en magasin chez " : "chez "}${esc(retName(pl.ret))}, ${eurC(pl.cost)}${!pl.mag && (S.allMap.get(pl.ret) || {}).simulated ? " (prix simulé)" : ""}${a ? `, avec l'équivalent ${esc(pname(a))}` : ""}.` : RES.done ? "Ce produit n'entre dans aucune commande pour l'instant." : "Calcul de la répartition…";
-      const lost = pin && !gs.has(pin) ? `<p class="gf">Épinglé chez ${esc(groupName(pin))}, qui ne le vend pas parmi tes enseignes actuelles\u00a0: Cabas le prend ailleurs.</p>` : "";
+      const lost = pin && !pinLive(id) ? `<p class="gf">Épinglé chez ${esc(groupName(pin))}, qui ne le vend pas parmi tes enseignes actuelles\u00a0: Cabas le prend ailleurs.</p>` : "";
       const eq = equivOf(p, null, 6), on = !!(S.flex || {})[id], acc = new Set((S.flex || {})[id] || []);
       const total = cartTotal();
       return {
@@ -3212,8 +3248,10 @@
     if (Object.keys(rk[0]).length || Object.keys(rk[1]).length) out.push({ key: tag("free"), w: "free", label: "Sans tes choix d'enseigne", sub: "Sans épingles ni exclusions", M: () => model(mode, { free: true }) });
     auxAsk(out.filter((x) => x.M).map((x) => ({ key: x.key, M: x.M, K })));
     out.forEach((x) => { if (x.M) x.r = auxGet(x.key); });
-    return { cur: st.full ? fullTotal(st.full) : null, lines: res.M.lines.length, rows: out };
+    return { cur: st.full ? fullTotal(st.full) : null, sim: !!st.full && simIn(st.full), lines: res.M.lines.length, rows: out };
   }
+  /* une répartition (ou son résumé) qui passe par une enseigne à prix simulés (E.Leclerc) */
+  const simIn = (f) => !!f && (f.orders || []).some((o) => (S.allMap.get(o.id || (o.ch && o.ch.id)) || {}).simulated);
   const ordersText = (f) => { const ns = f.orders.map((o) => (S.allMap.get(o.id) || {}).name || o.id); return (ns.length === 1 ? "une commande chez " : ns.length + " commandes\u00a0: ") + joinEt(ns) + (f.comp ? ", " + plural(f.comp, "produit", "produits") + " en magasin" : "") + (f.alts ? ", " + plural(f.alts, "équivalent", "équivalents") : ""); };
   function wifBody() {
     const W = wifList();
@@ -3226,15 +3264,15 @@
       if (r === undefined) sub += "Calcul…";
       else if (r === null) sub += "Calcul impossible pour l'instant.";
       else if (less > 0) { val = "–"; sub += `Il manquerait ${plural(less, "produit", "produits")}, que ${x.w === "sans" ? "seul " + esc(groupName(x.g)) + " vend" : "tes autres enseignes ne vendent pas"}.`; }
-      else if (f && less < 0) { val = eurC(f.total); ok = true; sub += `Avec ${plural(-less, "produit", "produits")} de plus, que tes choix écartaient\u00a0: ` + ordersText(f) + "."; }
+      else if (f && less < 0) { val = eurC(f.total); ok = true; sub += `Avec ${plural(-less, "produit", "produits")} de plus, que tes choix écartaient\u00a0: ` + ordersText(f) + (simIn(f) ? ", prix simulés" : "") + "."; }
       else if (f) {
         const d = W.cur == null ? null : f.total - W.cur;
         val = eurC(f.total); ok = true;
-        sub += (d == null ? "" : Math.abs(d) < 1 ? "Même total, " : d > 0 ? `${eurC(d)} de plus, ` : `${eurC(-d)} de moins, `) + ordersText(f) + ".";
+        sub += (d == null ? "" : Math.abs(d) < 1 ? "Même total, " : d > 0 ? `${eurC(d)} de plus, ` : `${eurC(-d)} de moins, `) + ordersText(f) + (simIn(f) ? ", prix simulés" : "") + ".";
       } else { val = "–"; sub += r.partial && r.partial.skipped ? `Il manquerait ${plural(r.partial.skipped, "produit", "produits")}.` : "Aucune commande possible pour tout le panier."; }
       return `<div class="row wifr"><span class="rt">${esc(x.label)}<small>${sub}</small></span><span class="val num">${val}</span><button class="btn sm tint" type="button" data-act="wifgo" data-w="${x.w}"${x.g ? ` data-g="${esc(x.g)}"` : ""}${ok ? "" : " disabled"} aria-label="Appliquer, ${esc(x.label.toLowerCase())}">Appliquer</button></div>`;
     };
-    return (W.cur != null ? `<div class="row wifr cur"><span class="rt">Ta répartition<small>Chaque total compte tout le panier, livraison comprise, en ${RES.K === 1 ? "une commande" : RES.K + " commandes au plus"}.</small></span><span class="val num">${eurC(W.cur)}</span></div>` : "") + W.rows.map(row).join("");
+    return (W.cur != null ? `<div class="row wifr cur"><span class="rt">Ta répartition<small>Chaque total compte tout le panier, livraison comprise, en ${RES.K === 1 ? "une commande" : RES.K + " commandes au plus"}${W.sim ? ", avec des prix simulés" : ""}.</small></span><span class="val num">${eurC(W.cur)}</span></div>` : "") + W.rows.map(row).join("");
   }
   /* Compléter malin : sous le minimum d'une enseigne ou près d'un palier de livraison, les produits de tes habitudes,
      de tes listes et de tes produits à racheter qu'elle vend (sinon des produits courants), du moins cher au plus cher ;
@@ -3308,11 +3346,14 @@
     const res = cartResult(), st = res.steps[res.K], bst = st && (st.full || st.partial);
     if (!bst || !bst.orders.length) return null;
     const it = (l, cost) => { const p = S.prods.get(l.id); return { id: l.id, q: l.q, cost, nm: pname(p), f: (p && p.format) || "" }; };
+    /* un même produit deux fois dans une commande (l'équivalent pris par le panier souple est déjà au panier) : une seule
+       ligne, quantités et coûts additionnés, pour une seule coche et le bon nombre d'exemplaires sur le site */
+    const merge = (L, k) => { const m = new Map(); for (const x of L) { const y = m.get(k(x)); if (y) { y.q += x.q; y.cost += x.cost; } else m.set(k(x), x); } return [...m.values()]; };
     return {
       id: Date.now().toString(36), at: new Date().toISOString(), key: basketKey(), full: !!st.full,
       /* l'équivalent pris par Cabas (panier souple) est le produit à mettre dans le panier de l'enseigne */
-      orders: bst.orders.map((o) => ({ rid: o.ch.id, P: o.ch.P, items: o.items.map((x) => it(x.alt ? { id: x.alt, q: x.l.q } : x.l, x.cost)) })),
-      comp: (bst.completed || []).map((x) => Object.assign(it(x.alt ? { id: x.alt, q: x.l.q } : x.l, x.cost), { ret: x.ret })),
+      orders: bst.orders.map((o) => ({ rid: o.ch.id, P: o.ch.P, items: merge(o.items.map((x) => it(x.alt ? { id: x.alt, q: x.l.q } : x.l, x.cost)), (x) => x.id) })),
+      comp: merge((bst.completed || []).map((x) => Object.assign(it(x.alt ? { id: x.alt, q: x.l.q } : x.l, x.cost), { ret: x.ret })), (x) => x.ret + "|" + x.id),
       skipped: (bst.skipped || []).map((x) => it(x.l, 0)),
     };
   }
@@ -3373,25 +3414,42 @@
   function feeEffect(o, sub2) {
     const r = S.allMap.get(o.rid) || { name: o.rid }, st = ordState(o), fee2 = sub2 > 0 ? feeAt(o.P, sub2) : 0;
     if (sub2 <= 0) return `Ta commande ${r.name} n'aurait plus aucun produit.`;
-    let t = `Ta commande ${r.name} passe à ${eurC(sub2 + fee2)}`;
+    let t = `Ta commande ${r.name} passe à ${eurC(sub2 + fee2)}${r.simulated ? " (prix simulés)" : ""}`;
     if (fee2 !== st.fee) t += `, ${pickup(r) ? "retrait" : "livraison"} ${feeWord(r, fee2 - o.P.fixed)} au lieu de ${feeWord(r, st.fee - o.P.fixed)}`;
     if (o.P.min && sub2 < o.P.min) t += `\u00a0; sous le minimum de ${eurC(o.P.min).replace(",00", "")}, il manquera ${eurC(o.P.min - sub2)}`;
     return t + ".";
   }
-  /* Équivalents d'un produit : même rayon, mêmes caractéristiques, même nombre d'unités. Vendus par l'enseigne rid
-     (« Pas trouvé », contenance à 25 % près, prix simulé admis chez une enseigne simulée) ; sans rid, dans tes enseignes,
-     au meilleur prix relevé (panier souple, contenance à 20 % près, jamais un prix simulé). n : combien, 4 par défaut. */
+  /* le même produit, hors marque : le premier nom de chacun (« pomme » de « Pommes Gala », « barre » de « Barres repas
+     minceur ») se retrouve dans le nom de l'autre, et les deux noms partagent au moins 60 % des mots du plus court. Des
+     pommes ne sont pas des ananas, des barres repas pas un assortiment de chocolats, une sauce béarnaise pas une sauce
+     algérienne. */
+  const nameW = (p) => p._nw || (p._nw = [...new Set(norm(p.name).split(" ").filter((w) => w.length > 2 && !STOP.has(w) && !/^\d/.test(w)).map(stem))]);
+  const sameKind = (p, e) => {
+    const a = nameW(p), b = nameW(e);
+    if (!a.length || !b.length || !b.includes(a[0]) || !a.includes(b[0])) return false;
+    return a.filter((w) => b.includes(w)).length >= 0.6 * Math.min(a.length, b.length);
+  };
+  /* e peut-il remplacer p : même rayon, mêmes caractéristiques, même nombre d'unités, même produit, contenance à tol près ;
+     pour le panier souple (any), jamais dans un rayon au poids variable (fruits, légumes, viandes, poissons, fromages à
+     la coupe), où le même rayon ne fait pas le même produit */
+  function equivOk(p, e, any, tol) {
+    if (!p || !e || e === p || e.r !== p.r || sig(e) !== sig(p) || packsOf(e) !== packsOf(p) || !sameKind(p, e)) return false;
+    if (any && (rayon(p.r) || {}).frais) return false;
+    return !(p.qty && p.qty.v && (!e.qty || e.qty.u !== p.qty.u || Math.abs(e.qty.v - p.qty.v) / p.qty.v > tol));
+  }
+  /* Équivalents d'un produit (equivOk). Vendus par l'enseigne rid (« Pas trouvé », contenance à 25 % près, prix simulé
+     admis chez une enseigne simulée) ; sans rid, dans tes enseignes, au meilleur prix relevé (panier souple, contenance
+     à 20 % près, jamais un prix simulé). n : combien, 4 par défaut. */
   function equivOf(p, rid, n) {
     if (!p) return [];
     const any = !rid;
     if (any && !(p.qty && p.qty.v)) return [];
-    const s = sig(p), k = packsOf(p), diet = dietOn(), simOk = !any && !!(S.allMap.get(rid) || {}).simulated, tol = any ? 0.2 : 0.25, out = [];
+    const diet = dietOn(), simOk = !any && !!(S.allMap.get(rid) || {}).simulated, tol = any ? 0.2 : 0.25, out = [];
     for (const e of inRayon(p.r)) {
-      if (e === p || e.r !== p.r || sig(e) !== s || packsOf(e) !== k || (diet && !dietOk(e))) continue;
-      if (p.qty && p.qty.v && (!e.qty || e.qty.u !== p.qty.u || Math.abs(e.qty.v - p.qty.v) / p.qty.v > tol)) continue;
+      if (!equivOk(p, e, any, tol) || (diet && !dietOk(e))) continue;
       const o = any ? bestReal(e) : e.offers[rid];
       if (!o || !(o.price > 0) || (o.sim && !simOk)) continue;
-      out.push({ e, price: o.price, u: perUnit(e, o.price), ret: o.ret || rid });
+      out.push({ e, price: o.price, u: perUnit(e, o.price), ret: o.ret || rid, sim: !!o.sim });
     }
     return out.sort((a, b) => (a.u != null && b.u != null ? a.u - b.u : a.price - b.price)).slice(0, n || 4);
   }
@@ -3431,14 +3489,17 @@
       if (m.length) { L.push("En magasin, aux prix relevés en ligne\u00a0:"); m.forEach((x) => L.push(line(x, x.nm) + ", chez " + retName(x.ret))); L.push(""); }
       const fr = freeList();
       if (fr.length) { L.push("À chercher\u00a0:"); fr.forEach((f) => L.push(`- ${f.q > 1 ? f.q + " x " : ""}${f.t}${f.price > 0 ? ", " + eur(f.price) + " prix saisi par toi" : ""}`)); L.push(""); }
-      L.push(`Total\u00a0: ${eurC(snapTotal(s, pv))}, frais compris, aux prix relevés`);
+      L.push(`Total\u00a0: ${eurC(snapTotal(s, pv))}, frais compris, ${s.orders.some((o) => (S.allMap.get(o.rid) || {}).simulated) ? "estimation avec des prix simulés" : "aux prix relevés"}`);
     }
     return L.join("\n").trim();
   }
   function copyText(tx, ok) {
     (navigator.clipboard && tx ? navigator.clipboard.writeText(tx) : Promise.reject()).then(() => toast(ok || "Liste copiée", null, "check"), () => toast("Copie impossible sur cet appareil"));
   }
-  /* commandes notées comme passées : le panier rejoint l'historique quand chaque commande est passée ou abandonnée */
+  /* commandes notées comme passées : le panier rejoint l'historique quand chaque commande est passée ou abandonnée ;
+     une commande à prix simulés (E.Leclerc) y garde le drapeau sim, pour n'être jamais dite « aux prix relevés » */
+  const histSim = (o) => !!o && typeof o === "object" && !!(o.sim || (S.allMap.get(o.rid) || {}).simulated);
+  const hSim = (h) => !!h && (h.o || []).some(histSim);
   const whenOf = (rids) => rids.map((rid) => { const r = S.allMap.get(rid), w = (S.guide.when || {})[rid]; return r && w && w.d ? { rid, name: r.name, pick: pickup(r), d: w.d, s: w.s || "", where: (r.channel || {}).where || "" } : null; }).filter(Boolean);
   function recordFill() {
     const s = snapOf();
@@ -3447,7 +3508,7 @@
     const os = s.orders.filter((o) => S.guide.done[o.rid]);
     if (!os.length) { saveGuide(); return; }
     const items = {}, lines = [], add = (y, sim) => { items[y.id] = Math.min(99, (items[y.id] || 0) + y.q); if (!sim) lines.push(y); };
-    const o = os.map((x) => { const st = ordState(x), r = S.allMap.get(x.rid) || {}, its = {}; st.L.forEach((y) => { its[y.id] = y.q; add(y, r.simulated); }); return { rid: x.rid, name: r.name || x.rid, pick: pickup(r), t: st.tot, items: its }; });
+    const o = os.map((x) => { const st = ordState(x), r = S.allMap.get(x.rid) || {}, its = {}; st.L.forEach((y) => { its[y.id] = y.q; add(y, r.simulated); }); const v = { rid: x.rid, name: r.name || x.rid, pick: pickup(r), t: st.tot, items: its }; if (r.simulated) v.sim = true; return v; });
     const mag = magOf(s);
     mag.forEach((y) => add(y, false));
     const t = o.reduce((a, x) => a + x.t, 0) + mag.reduce((a, y) => a + y.cost, 0);
@@ -3659,7 +3720,7 @@
       return {
         body: `<p>${x.q > 1 ? x.q + " × " : ""}<b>${esc(x.nm)}</b>${x.f ? ", " + esc(x.f) : ""}, introuvable sur ${esc(r.service)}\u00a0? Choisis ce que Cabas en fait.</p>` +
           (alt ? `<div class="group"><a class="row link" href="${esc(alt.url)}" target="_blank" rel="noopener" data-act="fillbroken" data-id="${esc(rid)}" data-p="${esc(id)}"><span class="rt">Le lien n'ouvre pas le bon produit<small>${alt.kind === "recherche" ? "Chercher sur " + esc(r.service) + " à la place" : "Ouvrir " + esc(r.service) + " pour le chercher"}. Cabas s'en souviendra.</small></span>${ic("ext", "ext")}</a></div>` : "") +
-          (eqs.length ? `<h3 class="gh">Un équivalent chez ${esc(r.name)}</h3><div class="group">${eqs.map((q) => `<button class="opt alt" type="button" data-act="fillequiv" data-id="${esc(rid)}" data-p="${esc(id)}" data-e="${esc(q.e.id)}"><span class="thumb">${img(q.e, 40)}</span><span class="at"><b>${esc(q.e.brand)}</b> ${esc(q.e.name)}<small>${esc(q.e.format)}${q.u != null ? ", " + esc(unitPrice(q.e, q.price)) : ""}</small></span><span class="ap">${eur(q.price)}</span>${ic("chev", "chev")}</button>`).join("")}</div>` : "") +
+          (eqs.length ? `<h3 class="gh">Un équivalent chez ${esc(r.name)}</h3><div class="group">${eqs.map((q) => `<button class="opt alt" type="button" data-act="fillequiv" data-id="${esc(rid)}" data-p="${esc(id)}" data-e="${esc(q.e.id)}"><span class="thumb">${img(q.e, 40)}</span><span class="at"><b>${esc(q.e.brand)}</b> ${esc(q.e.name)}<small>${esc(q.e.format)}${q.u != null ? ", " + esc(unitPrice(q.e, q.price)) : ""}${q.sim ? ", prix simulé" : ""}</small></span><span class="ap">${eur(q.price)}</span>${ic("chev", "chev")}</button>`).join("")}</div>` : "") +
           `<h3 class="gh">Ou bien</h3><div class="group">` +
           others.map(({ o2, cost, sim }) => { const r2 = S.allMap.get(o2.rid) || { name: o2.rid }; return `<button class="row" type="button" data-act="fillmove" data-id="${esc(rid)}" data-p="${esc(id)}" data-to="${esc(o2.rid)}"><span class="rt">Le mettre chez ${esc(r2.name)}<small>${eurC(cost)} chez ${esc(r2.name)}${sim ? ", prix simulé" : ""}. ${esc(feeEffect(o2, ordState(o2).sub + cost))} ${esc(without)}</small></span>${ic("chev", "chev")}</button>`; }).join("") +
           (mag ? `<button class="row" type="button" data-act="fillmag" data-id="${esc(rid)}" data-p="${esc(id)}"><span class="rt">L'acheter en magasin<small>Environ ${eurC(mag.cost)} chez ${esc(retName(mag.ret).split(" ")[0])}, au prix relevé en ligne. ${esc(without)}</small></span>${ic("chev", "chev")}</button>` : "") +
@@ -3714,7 +3775,7 @@
     const a = arrival();
     if (!a) return "";
     const n = Object.values(a.o.items || {}).reduce((x, q) => x + q, 0);
-    return `<section class="hcard col arr" aria-labelledby="arrT"><div class="arrh">${ic(a.o.pick ? "store" : "truck", "si")}<span><b id="arrT">Ta commande ${esc(a.o.name)} est ${a.o.pick ? "retirée" : "arrivée"}\u00a0?</b><small>${a.w ? (a.o.pick ? "Retrait prévu " : "Livraison prévue ") + esc(whenText({ d: a.w.d, s: a.w.s })) : "Commandée le " + esc(dayFr(a.h.d))}, ${plural(n, "article", "articles")}, ${eurC(a.o.t)} prévus.</small></span><button class="x" type="button" data-act="arrlater" data-id="${a.hi}" data-r="${esc(a.o.rid)}" aria-label="Plus tard">${ic("x")}</button></div>` +
+    return `<section class="hcard col arr" aria-labelledby="arrT"><div class="arrh">${ic(a.o.pick ? "store" : "truck", "si")}<span><b id="arrT">Ta commande ${esc(a.o.name)} est ${a.o.pick ? "retirée" : "arrivée"}\u00a0?</b><small>${a.w ? (a.o.pick ? "Retrait prévu " : "Livraison prévue ") + esc(whenText({ d: a.w.d, s: a.w.s })) : "Commandée le " + esc(dayFr(a.h.d))}, ${plural(n, "article", "articles")}, ${eurC(a.o.t)} prévus${histSim(a.o) ? ", prix simulés" : ""}.</small></span><button class="x" type="button" data-act="arrlater" data-id="${a.hi}" data-r="${esc(a.o.rid)}" aria-label="Plus tard">${ic("x")}</button></div>` +
       `<div class="btns two"><button class="btn sm tint" type="button" data-act="arrok" data-id="${a.hi}" data-r="${esc(a.o.rid)}">Oui, tout est là</button><button class="btn sm ghost" type="button" data-act="arrmiss" data-id="${a.hi}" data-r="${esc(a.o.rid)}">Il manquait quelque chose</button></div></section>`;
   }
   function arrMissSheet(hi, rid) {
@@ -3740,7 +3801,7 @@
     openSheet({
       title: "Total payé", focus: "#paid0", right: `<button class="txtbtn primary" type="button" data-act="paidok" data-id="${hi}">OK</button>`,
       body: `<p>Le montant de ta facture, si tu veux le garder. Il est saisi par toi et reste à part\u00a0: Cabas ne s'en sert jamais comme prix relevé.</p>` +
-        rows.map((o, i) => field("paid" + i, os.length ? "Payé chez " + esc(o.name) : "Payé pour ce panier", `type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" data-r="${esc(o.rid)}" placeholder="Par exemple ${esc(frNum(Math.round(o.t) / 100))}" value="${paid[o.rid] ? esc(frNum(paid[o.rid] / 100)) : ""}"`, `Prévu ${eurC(o.t)} aux prix relevés.`, "€")).join(""),
+        rows.map((o, i) => field("paid" + i, os.length ? "Payé chez " + esc(o.name) : "Payé pour ce panier", `type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" data-r="${esc(o.rid)}" placeholder="Par exemple ${esc(frNum(Math.round(o.t) / 100))}" value="${paid[o.rid] ? esc(frNum(paid[o.rid] / 100)) : ""}"`, `Prévu ${eurC(o.t)} ${(os.length ? histSim(o) : hSim(h)) ? "avec des prix simulés" : "aux prix relevés"}.`, "€")).join(""),
     });
   }
   const paidSum = (h) => Object.values(h.paid || {}).reduce((a, c) => a + (c > 0 ? c : 0), 0);
@@ -3793,7 +3854,7 @@
     return {
       title: "Recommander", grouped: true,
       html: `<h1 class="lt">Recommander</h1><p class="lt-sub">${H.length ? "Un panier déjà commandé, remis et réparti aux prix d'aujourd'hui." : "Aucun panier commandé pour l'instant"}</p>` +
-        (H.length ? `<div class="group">${H.map(({ h, i }) => `<div class="row stack"><span class="rt">${esc(dateFr(h.d))}<small>${plural(Object.keys(h.items).length, "produit", "produits")}${names(h).length ? ", " + esc(joinEt(names(h))) : ""}, ${eurC(h.t)} à l'époque</small></span><div class="acts"><button class="btn sm tint" type="button" data-act="refill" data-id="${i}">Recommander et remplir</button></div></div>`).join("")}</div>` +
+        (H.length ? `<div class="group">${H.map(({ h, i }) => `<div class="row stack"><span class="rt">${esc(dateFr(h.d))}<small>${plural(Object.keys(h.items).length, "produit", "produits")}${names(h).length ? ", " + esc(joinEt(names(h))) : ""}, ${eurC(h.t)} à l'époque${hSim(h) ? ", avec des prix simulés" : ""}</small></span><div class="acts"><button class="btn sm tint" type="button" data-act="refill" data-id="${i}">Recommander et remplir</button></div></div>`).join("")}</div>` +
           (S.todo.length ? `<p class="gf">Les produits qui manquaient à ta dernière livraison sont ajoutés aussi.</p>` : "")
           : `<div class="empty">${emptyArt("bag")}<h2>Rien à recommander</h2><p>Quand tu as rempli tes paniers et passé tes commandes, ils reviennent ici en un geste.</p><a class="btn" href="#/ecrire">${ic("pen")}Écrire ma liste</a></div>`),
     };
@@ -3820,7 +3881,7 @@
     return {
       title: "Tes économies", grouped: true,
       html: `<h1 class="lt">Tes économies</h1><p class="lt-sub">${H.length ? `${eurC(s)} sur ${plural(H.length, "panier", "paniers")}` : "Aucun panier commandé pour l'instant"}</p>` +
-        (H.length ? `<div class="group">${H.map((x, i) => { const hi = S.hist.length - 1 - i, names = (x.o || []).map((v) => (typeof v === "string" ? v : v && v.name)).filter(Boolean), pd = paidSum(x); return `<div class="row stack"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${names.length ? ", " + esc(joinEt(names)) : ""}, ${eurC(x.t)} aux prix relevés${x.s ? ", " + eurC(x.s) + " économisés" : ""}</small>${pd ? `<small>Payé ${eurC(pd)}, saisi par toi</small>` : ""}</span><div class="acts">${x.items ? `<button class="btn sm plain" type="button" data-act="refill" data-id="${hi}">Recommander et remplir</button>` : ""}<button class="act" type="button" data-act="paid" data-id="${hi}">${pd ? "Modifier le total payé" : "Indiquer le total payé"}</button></div></div>`; }).join("")}</div>` +
+        (H.length ? `<div class="group">${H.map((x, i) => { const hi = S.hist.length - 1 - i, names = (x.o || []).map((v) => (typeof v === "string" ? v : v && v.name)).filter(Boolean), pd = paidSum(x); return `<div class="row stack"><span class="rt">${esc(dateFr(x.d))}<small>${plural(x.n || 0, "article", "articles")}${names.length ? ", " + esc(joinEt(names)) : ""}, ${eurC(x.t)} ${hSim(x) ? "estimés avec des prix simulés" : "aux prix relevés"}${x.s ? ", " + eurC(x.s) + " économisés" : ""}</small>${pd ? `<small>Payé ${eurC(pd)}, saisi par toi</small>` : ""}</span><div class="acts">${x.items ? `<button class="btn sm plain" type="button" data-act="refill" data-id="${hi}">Recommander et remplir</button>` : ""}<button class="act" type="button" data-act="paid" data-id="${hi}">${pd ? "Modifier le total payé" : "Indiquer le total payé"}</button></div></div>`; }).join("")}</div>` +
           `<p class="gf">Un panier compte quand toutes ses commandes sont notées comme passées. L'économie d'un panier additionne, pour chaque produit, l'écart entre le prix payé et son prix moyen dans les enseignes qui le vendent, et ce que les remplacements par un équivalent moins cher ont fait gagner. Selon les prix relevés. Le total payé, quand tu l'indiques, est saisi par toi\u00a0: il reste à part et n'entre dans aucun calcul.</p>` +
           `<div class="pad btns" style="padding-top:18px"><button class="btn tint" type="button" data-act="sharesave">${ic("share")}Partager mes économies</button></div>` +
           `<div class="group" style="margin-top:28px"><a class="row" href="#/mouvements"><span class="rt">Tes dépenses et ce qui a bougé<small>Tes dépenses de chaque mois, les hausses et les baisses de tes produits</small></span>${ic("chev", "chev")}</a></div>` +
@@ -3876,11 +3937,13 @@
 
   /* commandes passées, à venir : celles du panier en cours, puis celles des paniers d'avant pas encore livrées */
   function upcoming() {
-    const today = isoDay(new Date()), out = [];
+    const now = new Date(), today = isoDay(now), hr = now.getHours() + now.getMinutes() / 60, out = [];
     const W = S.guide.when || {};
+    /* à venir : pas un créneau d'aujourd'hui déjà fini, pas une commande dont tu as dit qu'elle est arrivée (ou non) */
+    const ahead = (rid, w) => { if (!w || !w.d || w.d < today) return false; const sl = SLOTS.find((x) => x[0] === w.s); if (w.d === today && sl && hr >= sl[3]) return false; return !(S.hist || []).some((h) => h.arr && h.arr[rid] && (h.when || []).some((x) => x.rid === rid && x.d === w.d)); };
     /* un créneau n'existe que pour une commande passée ; il survit au panier vidé (clearok garde when) */
-    for (const rid of Object.keys(W)) { const w = W[rid]; const r = S.retMap.get(rid) || S.allMap.get(rid); if (r && w && w.d && w.d >= today) out.push({ rid, name: r.name, pick: pickup(r), w, where: (r.channel || {}).where || "" }); }
-    for (const h of S.hist || []) for (const x of h.when || []) if (x.d >= today && !out.some((y) => y.rid === x.rid && y.w.d === x.d)) out.push({ rid: x.rid, name: x.name, pick: x.pick, w: { d: x.d, s: x.s }, where: x.where || "" });
+    for (const rid of Object.keys(W)) { const w = W[rid]; const r = S.retMap.get(rid) || S.allMap.get(rid); if (r && ahead(rid, w)) out.push({ rid, name: r.name, pick: pickup(r), w, where: (r.channel || {}).where || "" }); }
+    for (const h of S.hist || []) for (const x of h.when || []) if (ahead(x.rid, x) && !out.some((y) => y.rid === x.rid && y.w.d === x.d)) out.push({ rid: x.rid, name: x.name, pick: x.pick, w: { d: x.d, s: x.s }, where: x.where || "" });
     return out.sort((a, b) => (a.w.d + a.w.s).localeCompare(b.w.d + b.w.s));
   }
   function ordersCard() {
@@ -3892,7 +3955,9 @@
     const sl = SLOTS.find((x) => x[0] === s) || [null, null, 9, 18];
     const pad = (n) => String(n).padStart(2, "0"), dt = (h) => d.replace(/-/g, "") + "T" + pad(h) + "0000";
     const uid = `${d}-${name.replace(/\W/g, "")}@cabas`;
-    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Cabas//FR", "BEGIN:VEVENT", `UID:${uid}`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`, `DTSTART;TZID=Europe/Paris:${dt(sl[2])}`, `DTEND;TZID=Europe/Paris:${dt(sl[3])}`, `SUMMARY:${pick ? "Retrait" : "Livraison"} ${name} (Cabas)`, where ? `LOCATION:${where}` : "", "BEGIN:VALARM", "TRIGGER:-PT60M", "ACTION:DISPLAY", `DESCRIPTION:${pick ? "Retrait" : "Livraison"} ${name} dans une heure`, "END:VALARM", "END:VEVENT", "END:VCALENDAR"].filter(Boolean);
+    /* le fuseau Europe/Paris décrit dans le fichier (RFC 5545 : un VTIMEZONE pour chaque TZID cité), heure d'été comprise */
+    const tz = ["BEGIN:VTIMEZONE", "TZID:Europe/Paris", "BEGIN:DAYLIGHT", "TZOFFSETFROM:+0100", "TZOFFSETTO:+0200", "TZNAME:CEST", "DTSTART:19700329T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU", "END:DAYLIGHT", "BEGIN:STANDARD", "TZOFFSETFROM:+0200", "TZOFFSETTO:+0100", "TZNAME:CET", "DTSTART:19701025T030000", "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU", "END:STANDARD", "END:VTIMEZONE"];
+    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Cabas//FR", ...tz, "BEGIN:VEVENT", `UID:${uid}`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`, `DTSTART;TZID=Europe/Paris:${dt(sl[2])}`, `DTEND;TZID=Europe/Paris:${dt(sl[3])}`, `SUMMARY:${pick ? "Retrait" : "Livraison"} ${name} (Cabas)`, where ? `LOCATION:${where}` : "", "BEGIN:VALARM", "TRIGGER:-PT60M", "ACTION:DISPLAY", `DESCRIPTION:${pick ? "Retrait" : "Livraison"} ${name} dans une heure`, "END:VALARM", "END:VEVENT", "END:VCALENDAR"].filter(Boolean);
     return lines.join("\r\n");
   }
   function downloadIcs(rid, d, s) {
@@ -4079,7 +4144,7 @@
       }
       if ((bst.completed || []).length) { L.push("", `En magasin\u00a0: ${eurC(bst.compTotal)}`); bst.completed.forEach((x) => L.push(line(x.alt || x.l.id, x.l.q) + ", chez " + retName(x.ret))); }
       if ((bst.skipped || []).length) { L.push("", "Hors commande"); bst.skipped.forEach((x) => L.push(line(x.l.id, x.l.q))); }
-      L.push("", `Total\u00a0: ${eurC(fullTotal(bst))}, frais compris${st.full ? "" : ", sans les produits hors commande"}`);
+      L.push("", `Total\u00a0: ${eurC(fullTotal(bst))}, frais compris${st.full ? "" : ", sans les produits hors commande"}${simIn(bst) ? ", estimation avec des prix simulés" : ""}`);
     } else {
       L.push("");
       Object.keys(S.basket).filter((id) => S.prods.has(id)).forEach((id) => L.push(line(id, S.basket[id])));
@@ -4214,16 +4279,16 @@
     (S.hist || []).forEach((h, hi) => {
       if (!h || !h.d || h.d.slice(0, 7) !== key) return;
       const os = (h.o || []).filter((x) => x && x.rid), paid = h.paid || {};
-      let t = 0, own = 0;
+      let t = 0, own = 0, sim = 0;
       if (!os.length) { if (paid.all > 0) { t = paid.all; own = 1; } else t = h.t || 0; }
       else {
         let rel = 0;
-        for (const o of os) { rel += o.t || 0; if (paid[o.rid] > 0) { t += paid[o.rid]; own++; } else t += o.t || 0; }
+        for (const o of os) { rel += o.t || 0; if (paid[o.rid] > 0) { t += paid[o.rid]; own++; } else { t += o.t || 0; if (histSim(o)) sim++; } }
         /* achats en magasin du panier, aux prix relevés */
         t += Math.max(0, (h.t || 0) - rel);
       }
       spent += t; typed += own;
-      rows.push({ hi, d: h.d, t, own, names: os.map((o) => o.name).filter(Boolean) });
+      rows.push({ hi, d: h.d, t, own, sim, names: os.map((o) => o.name).filter(Boolean) });
     });
     return { month: key, spent, n: rows.length, typed, rows };
   }
@@ -4254,7 +4319,7 @@
     S.budMode = byMonth() ? "mois" : "panier"; S.budDraft = null;
     const build = () => {
       const mo = S.budMode === "mois", m = monthSpend(), v = S.budDraft != null ? S.budDraft : frNum(S.prefs.budget);
-      const rows = m.rows.slice().reverse().map((x) => `<div class="row"><span class="rt">${esc(dayFr(x.d))}<small>${x.names.length ? esc(joinEt(x.names)) + ", " : ""}${x.own ? "payé, saisi par toi" : "aux prix relevés"}</small></span><span class="val num">${eurC(x.t)}</span><button class="act" type="button" data-act="paid" data-id="${x.hi}" aria-label="${x.own ? "Modifier le total payé" : "Indiquer le total payé"} du ${esc(dayFr(x.d))}">${x.own ? "Modifier" : "Total payé"}</button></div>`).join("");
+      const rows = m.rows.slice().reverse().map((x) => `<div class="row"><span class="rt">${esc(dayFr(x.d))}<small>${x.names.length ? esc(joinEt(x.names)) + ", " : ""}${x.own ? "payé, saisi par toi" + (x.sim ? ", le reste avec des prix simulés" : "") : x.sim ? "estimation avec des prix simulés" : "aux prix relevés"}</small></span><span class="val num">${eurC(x.t)}</span><button class="act" type="button" data-act="paid" data-id="${x.hi}" aria-label="${x.own ? "Modifier le total payé" : "Indiquer le total payé"} du ${esc(dayFr(x.d))}">${x.own ? "Modifier" : "Total payé"}</button></div>`).join("");
       return {
         body: `<p>${mo ? "Les paniers que tu commandes dans le mois s'additionnent\u00a0: le panier te dit ce qu'il te reste ce mois-ci." : "Le panier te dit ce qu'il reste, ou de combien tu dépasses, frais compris."} Laisse vide pour ne pas en avoir.</p>` +
           `<div class="pad"><div class="seg" role="radiogroup" aria-label="Budget"><button type="button" role="radio" data-act="budmode" data-v="panier" aria-checked="${!mo}">Par panier</button><button type="button" role="radio" data-act="budmode" data-v="mois" aria-checked="${mo}">Par mois</button></div></div>` +
@@ -4277,9 +4342,10 @@
     const pick = [];
     let save = 0;
     for (const c of cand) { if (save >= over) break; pick.push(Object.assign({}, c.x, { gain: c.g })); save += c.g; }
+    /* le coût de la répartition, et l'équivalent qu'elle a pris (panier souple) : la ligne montre ce qui est payé */
     const st = RES.steps[RES.K], bst = st && (st.full || st.partial), cost = new Map();
-    if (bst) { bst.orders.forEach((o) => o.items.forEach((x) => cost.set(x.l.id, x.cost))); (bst.completed || []).forEach((x) => cost.set(x.l.id, x.cost)); }
-    const cuts = [...cost.entries()].filter(([id]) => S.basket[id] > 0 && !pick.some((x) => x.from.id === id)).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, c]) => ({ id, q: S.basket[id], cost: c }));
+    if (bst) { bst.orders.forEach((o) => o.items.forEach((x) => cost.set(x.l.id, { c: x.cost, alt: x.alt || null }))); (bst.completed || []).forEach((x) => cost.set(x.l.id, { c: x.cost, alt: x.alt || null })); }
+    const cuts = [...cost.entries()].filter(([id]) => S.basket[id] > 0 && !pick.some((x) => x.from.id === id)).sort((a, b) => b[1].c - a[1].c).slice(0, 5).map(([id, v]) => ({ id, q: S.basket[id], cost: v.c, alt: v.alt }));
     return { over, swaps: pick, save, cuts, enough: save >= over, cands: cand.map((c) => Object.assign({}, c.x, { gain: c.g })) };
   }
   /* les remplacements retenus, un par un, chacun gardé seulement si le total exact du panier avec lui et les précédents
@@ -4320,7 +4386,7 @@
       } else swHtml += `<p class="gf">Aucun remplacement ne fait baisser le total du panier, livraison comprise.</p>`;
       return {
         body: `<p>Ce panier dépasse ${what} de <b>${eurC(total - lim)}</b>.</p>` + swHtml +
-          (F.cuts.length ? `<h3 class="gh">Ce qui pèse le plus</h3><div class="order inset">${F.cuts.map((c) => itemRow(c.id, c.cost, c.q)).join("")}</div><p class="gf">Un exemplaire de moins, ou un produit retiré\u00a0: le total se recalcule, livraison comprise.</p>` : ""),
+          (F.cuts.length ? `<h3 class="gh">Ce qui pèse le plus</h3><div class="order inset">${F.cuts.map((c) => itemRow(c.id, c.cost, c.q, "", { alt: c.alt })).join("")}</div><p class="gf">Un exemplaire de moins, ou un produit retiré\u00a0: le total se recalcule, livraison comprise.</p>` : ""),
         foot: `<div class="swfoot"><span aria-live="polite">Total du panier\u00a0: <b>${eurC(total)}</b>, pour ${eurC(lim)}</span></div>`,
       };
     };
@@ -4421,7 +4487,8 @@
   }
   /* vérification de ce qui arrive : forme de chaque clé, bornes, aucune clé inconnue gardée ; renvoie les données
      nettoyées, ce qui a été écarté, et un résumé pour la confirmation */
-  function importCheck(obj) {
+  /* link : arrivé par un lien d'envoi vers un autre téléphone, qui ne porte jamais que les clés de XKEYS */
+  function importCheck(obj, link) {
     const errs = [], data = {}, skip = [];
     const isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
     const safeK = (k) => typeof k === "string" && k.length > 0 && k.length <= 200 && !/^(__proto__|constructor|prototype)$/.test(k);
@@ -4430,14 +4497,16 @@
     const cents = (v) => Number.isInteger(v) && v >= 0 && v <= 10000000;
     const iso = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v) && v.length <= 40;
     const items = (v) => { if (!isObj(v)) return null; const o = {}; for (const k of Object.keys(v).slice(0, 600)) if (safeK(k) && qty(v[k])) o[k] = v[k]; return o; };
+    /* panier et listes : seulement des produits du catalogue (ou un ancien identifiant qui y renvoie) */
+    const known = (v) => { const o = items(v); if (o) for (const k of Object.keys(o)) if (!S.prods.has(k) && !(S.alias || {})[k]) delete o[k]; return o; };
     const map = (v, ok, n) => { if (!isObj(v)) return null; const o = {}; for (const k of Object.keys(v).slice(0, n || 2000)) if (safeK(k) && ok(v[k])) o[k] = v[k]; return o; };
     const json = (v, n) => { try { return JSON.stringify(v).length <= n; } catch (e) { return false; } };
     if (!isObj(obj) || obj.app !== "cabas" || !isObj(obj.data)) return { ok: false, errs: ["Ce n'est pas une copie de Cabas."], data, skip, sum: {} };
     if (obj.v !== 1) return { ok: false, errs: ["Cette copie vient d'une autre version de Cabas."], data, skip, sum: {} };
     const D = obj.data;
     const V = {
-      basket: (v) => items(v),
-      lists: (v) => (Array.isArray(v) ? v.slice(0, 100).filter((L) => isObj(L) && str(L.id, 40) && str(L.name, 80) && isObj(L.items)).map((L) => { const o = { id: L.id, name: L.name, items: items(L.items) || {}, at: iso(L.at) ? L.at.slice(0, 10) : isoDay(new Date()) }; if (Array.isArray(L.free)) o.free = L.free.slice(0, 20).filter((f) => Array.isArray(f) && str(f[0], 60) && qty(f[1])).map((f) => [f[0], f[1]]); if (L.template === true) o.template = true; if (isObj(L.cad)) o.cad = map(L.cad, (c) => [0, 14, 21, 28].includes(c), 600); return o; }) : null),
+      basket: (v) => known(v),
+      lists: (v) => (Array.isArray(v) ? v.slice(0, 100).filter((L) => isObj(L) && str(L.id, 40) && str(L.name, 80) && isObj(L.items)).map((L) => { const o = { id: L.id, name: L.name, items: known(L.items) || {}, at: iso(L.at) ? L.at.slice(0, 10) : isoDay(new Date()) }; if (Array.isArray(L.free)) o.free = L.free.slice(0, 20).filter((f) => Array.isArray(f) && str(f[0], 60) && qty(f[1])).map((f) => [f[0], f[1]]); if (L.template === true) o.template = true; if (isObj(L.cad)) o.cad = map(L.cad, (c) => [0, 14, 21, 28].includes(c), 600); return o; }) : null),
       prefs: (v) => {
         if (!isObj(v)) return null;
         const o = {};
@@ -4481,7 +4550,7 @@
       reports: (v) => (Array.isArray(v) ? v.slice(-50).filter((r) => isObj(r) && str(r.id, 40) && iso(r.at) && str(r.k, 20) && (r.pid == null || str(r.pid, 200)) && (r.ret == null || str(r.ret, 40)) && (r.text == null || str(r.text, 500))).map((r) => ({ id: r.id, at: r.at, k: r.k, pid: r.pid || "", ret: r.ret || "", text: r.text || "", sent: iso(r.sent) ? r.sent : undefined })) : null),
     };
     for (const k of Object.keys(D)) {
-      if (!V[k]) { skip.push(k); continue; }
+      if (!V[k] || (link && !XKEYS.includes(k))) { skip.push(k); continue; }
       const c = V[k](D[k]);
       if (c == null) errs.push(k); else data[k] = c;
     }
@@ -4552,7 +4621,7 @@
   /* #/transfert/<x> : ce qui arrive d'un autre téléphone, vérifié, puis remplacé seulement si tu le confirmes */
   VIEWS.transfert = (r) => {
     const X = S.xfer && S.xfer.id === r.id ? S.xfer : (S.xfer = { id: r.id, st: "wait", R: null });
-    if (X.st === "wait" && !X.p) X.p = unpackState(r.id).then((o) => { X.R = o ? importCheck(o) : null; X.st = X.R && X.R.ok ? "ok" : "bad"; if (S.route.name === "transfert") rerender(); });
+    if (X.st === "wait" && !X.p) X.p = unpackState(r.id).then((o) => { X.R = o ? importCheck(o, true) : null; X.st = X.R && X.R.ok ? "ok" : "bad"; if (S.route.name === "transfert") rerender(); });
     const R = X.R;
     return {
       title: "Transfert", grouped: true,
@@ -4567,6 +4636,11 @@
   /* La liste, la répartition du panier ou ce qu'il reste à prendre en magasin, lus à voix haute par la synthèse vocale
      du téléphone (speechSynthesis, voix française, débit lent ou normal : prefs.voice). Rien ne quitte le téléphone. */
   const TTS = () => (window.speechSynthesis && typeof window.SpeechSynthesisUtterance === "function" ? window.speechSynthesis : null);
+  /* seulement une voix française installée sur l'appareil (localService) : une voix en ligne enverrait le texte lu à
+     son fournisseur. Tant que le navigateur n'a pas encore listé ses voix, le bouton reste là ; s'il n'en a aucune sur
+     l'appareil, « Écouter » disparaît */
+  const ttsVoice = () => { const t = TTS(); return t ? t.getVoices().find((x) => /^fr/i.test(x.lang) && x.localService) || null : null; };
+  const ttsOK = () => { const t = TTS(); return !!t && (!t.getVoices().length || !!ttsVoice()); };
   const sayEur = (c) => { c = Math.round(c); const e = Math.floor(c / 100), ct = c % 100; return `${e} euro${e > 1 ? "s" : ""}${ct ? " " + ct : ""}`; };
   /* « 6 x 1 L » se dit « 6 fois 1 litre », « 500 g » « 500 grammes » */
   const sayFmt = (f) => String(f || "").replace(/(\d),(\d)/g, "$1 virgule $2").replace(/(\d)\s*[x×]\s*(\d)/gi, "$1 fois $2")
@@ -4620,15 +4694,15 @@
     if (!tts || !text) return;
     if (speaking) { speakStop(); return; }
     tts.cancel();
-    const u = new window.SpeechSynthesisUtterance(text), vs = tts.getVoices();
-    u.lang = "fr-FR"; u.rate = S.prefs.voice === "slow" ? 0.8 : 1;
-    const v = vs.find((x) => /^fr[-_]FR/i.test(x.lang) && x.localService) || vs.find((x) => /^fr[-_]FR/i.test(x.lang)) || vs.find((x) => /^fr/i.test(x.lang));
-    if (v) u.voice = v;
+    const v = ttsVoice();
+    if (!v) { toast("Pas de voix française sur cet appareil\u00a0: la lecture passerait par Internet, Cabas ne s'en sert pas."); return; }
+    const u = new window.SpeechSynthesisUtterance(text);
+    u.lang = v.lang; u.voice = v; u.rate = S.prefs.voice === "slow" ? 0.8 : 1;
     u.onend = u.onerror = () => { if (speaking === u) { speaking = null; markSpeak(false); } };
     speaking = u; markSpeak(true);
     tts.speak(u);
   }
-  const speakBtn = (k, label, cls, id) => (TTS() ? `<button class="${cls || "btn tint"}" type="button" data-act="speak" data-k="${k}"${id ? ` data-id="${esc(id)}"` : ""} aria-pressed="false">${ic("speaker")}<span class="sl2" data-l="${esc(label)}">${esc(label)}</span></button>` : "");
+  const speakBtn = (k, label, cls, id) => (ttsOK() ? `<button class="${cls || "btn tint"}" type="button" data-act="speak" data-k="${k}"${id ? ` data-id="${esc(id)}"` : ""} aria-pressed="false">${ic("speaker")}<span class="sl2" data-l="${esc(label)}">${esc(label)}</span></button>` : "");
 
   /* ---------- baisses de prix ---------- */
   /* À chaque nouveau relevé, les produits du panier et des listes sont comparés au prix vu la fois d'avant
@@ -5182,9 +5256,10 @@
   /* ---------- historique des prix ---------- */
   /* data/history.json (tools/history.py, à chaque relevé) : les prix relevés qui ont changé, par produit et enseigne.
      Chargé à la première fiche produit ouverte ; la courbe n'apparaît qu'à partir de deux relevés différents. */
-  let HIST = null, histP = null;
+  /* histDone : la demande est finie, historique reçu ou non (hors ligne, page quittée pendant la lecture) */
+  let HIST = null, histP = null, histDone = false;
   function loadHist() {
-    if (!histP) histP = fetch("data/history.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).then((h) => (HIST = h)).catch(() => null);
+    if (!histP) histP = fetch("data/history.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).then((h) => (HIST = h), () => null).then((h) => { histDone = true; return h; });
     return histP;
   }
   function histHtml(p) {
@@ -5267,35 +5342,39 @@
     const by = new Map();
     for (const h of S.hist || []) {
       if (!h || !h.d) continue;
-      const k = h.d.slice(0, 7), x = by.get(k) || { month: k, t: 0, n: 0, paid: 0, np: 0 };
+      const k = h.d.slice(0, 7), x = by.get(k) || { month: k, t: 0, n: 0, paid: 0, np: 0, sim: 0 };
       x.t += h.t || 0; x.n++;
+      if (hSim(h)) x.sim++;
       const pd = paidSum(h);
       if (pd > 0) { x.paid += pd; x.np++; }
       by.set(k, x);
     }
     const now = new Date(), out = [];
-    for (let i = (n || 6) - 1; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 15), k = isoDay(d).slice(0, 7); out.push(by.get(k) || { month: k, t: 0, n: 0, paid: 0, np: 0 }); }
+    for (let i = (n || 6) - 1; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 15), k = isoDay(d).slice(0, 7); out.push(by.get(k) || { month: k, t: 0, n: 0, paid: 0, np: 0, sim: 0 }); }
     return out;
   }
   const monthShort = (key) => { try { return new Date(key + "-15T12:00:00").toLocaleDateString("fr-FR", { month: "short" }).replace(/\.$/, ""); } catch (e) { return key.slice(5); } };
   const moveRow = (m) => `<a class="row th" href="${hp(m.p.id)}"><span class="thumb">${img(m.p, 48)}</span><span class="rt">${esc(pname(m.p))}<small>${esc(retName(m.rid))}, ${eur(m.from)} puis ${eur(m.to)} le ${esc(dayFr(m.d))}</small></span><span class="val num mv ${m.to < m.from ? "dn" : "up"}">${m.pct > 0 ? "+" : "−"}${Math.abs(m.pct)}${NB}%</span></a>`;
   VIEWS.mouvements = () => {
-    if (!HIST) loadHist().then(() => { if (S.route.name === "mouvements" && $("#sheet").hidden) rerender(); });
+    /* redessiné une fois la lecture finie, reçue ou non ; elle n'est jamais relancée quand l'historique manque : sinon
+       chaque rendu en relancerait une autre, sans fin, et l'onglet se figerait (hors ligne, page quittée pendant la lecture) */
+    if (!HIST && !histDone) loadHist().then(() => { if (S.route.name === "mouvements" && $("#sheet").hidden) rerender(); });
     const M = HIST ? moves(false) : { down: [], up: [] }, A = HIST ? moves(true, 14) : { down: [], up: [] };
     const mine = new Set(M.down.concat(M.up).map((m) => m.p.id)), aD = A.down.filter((m) => !mine.has(m.p.id)).slice(0, 6), aU = A.up.filter((m) => !mine.has(m.p.id)).slice(0, 6);
     const months = spendByMonth(6), max = Math.max(1, ...months.map((x) => x.t)), anySpend = months.some((x) => x.n);
     const bars = `<div class="spend" role="img" aria-label="${esc(months.map((x) => `${monthName(x.month)} ${x.n ? eurC(x.t) : "rien"}`).join(", "))}">${months.map((x) => `<div class="sb"><span class="sv">${x.n ? esc(eurR(Math.round(x.t / 100))) : ""}</span><span class="bar"><i style="height:${x.n ? Math.max(4, Math.round((100 * x.t) / max)) : 0}%"></i></span><span class="sm">${esc(monthShort(x.month))}</span></div>`).join("")}</div>`;
     const cur = months[months.length - 1], prev = months[months.length - 2];
-    const loading = !HIST ? `<div class="group" aria-busy="true"><div class="row"><span class="rt"><span class="skl"></span><small class="skl s"></small></span></div></div>` : "";
+    const failed = !HIST && histDone, loading = HIST ? "" : `<div class="group" aria-busy="true"><div class="row"><span class="rt"><span class="skl"></span><small class="skl s"></small></span></div></div>`;
     return {
       title: "Ce qui a bougé", grouped: true,
       html: `<h1 class="lt">Ce qui a bougé</h1><p class="lt-sub">Les prix relevés de tes produits qui ont changé ces quatre dernières semaines, et tes dépenses.</p>` +
-        `<h2 class="gh">Moins cher sur tes produits</h2>` + (loading || (M.down.length ? `<div class="group">${M.down.map(moveRow).join("")}</div>` : `<p class="gf">Aucune baisse sur tes produits pour l'instant.</p>`)) +
-        `<h2 class="gh">Plus cher sur tes produits</h2>` + (loading || (M.up.length ? `<div class="group">${M.up.map(moveRow).join("")}</div>` : `<p class="gf">Aucune hausse sur tes produits pour l'instant.</p>`)) +
+        (failed ? `<p class="gf">L'historique des prix n'a pas pu être chargé. Réessaie avec une connexion.</p>` :
+          `<h2 class="gh">Moins cher sur tes produits</h2>` + (loading || (M.down.length ? `<div class="group">${M.down.map(moveRow).join("")}</div>` : `<p class="gf">Aucune baisse sur tes produits pour l'instant.</p>`)) +
+          `<h2 class="gh">Plus cher sur tes produits</h2>` + (loading || (M.up.length ? `<div class="group">${M.up.map(moveRow).join("")}</div>` : `<p class="gf">Aucune hausse sur tes produits pour l'instant.</p>`))) +
         (!myIds().length && HIST ? `<p class="gf">Tes produits sont ceux de ton panier, de tes listes et de tes paniers commandés.</p>` : "") +
         (aD.length || aU.length ? `<h2 class="gh">Dans tout le catalogue, ces deux dernières semaines</h2><div class="group">${aD.concat(aU).map(moveRow).join("")}</div>` : "") +
         `<p class="gf">Seuls les prix relevés sur les sites comptent, à 3${NB}% et 10 centimes près, jamais les prix simulés ni ceux que tu as saisis. Chaque baisse ou hausse est celle de l'enseigne où le produit est le moins cher aujourd'hui, dans tes enseignes.</p>` +
-        `<h2 class="gh">Tes dépenses</h2>` + (anySpend ? `<div class="group">${bars}</div><p class="gf">${cur.n ? `En ${monthName(cur.month)}, ${eurC(cur.t)} sur ${plural(cur.n, "panier commandé", "paniers commandés")}` : `Rien de commandé en ${monthName(cur.month)}`}${prev && prev.n ? `, contre ${eurC(prev.t)} en ${monthName(prev.month)}` : ""}, aux prix relevés.${months.some((x) => x.np) ? ` Payé, d'après ce que tu as indiqué\u00a0: ${eurC(months.reduce((a, x) => a + x.paid, 0))} sur ${plural(months.reduce((a, x) => a + x.np, 0), "panier", "paniers")}, saisi par toi, à part.` : ""}</p>` :
+        `<h2 class="gh">Tes dépenses</h2>` + (anySpend ? `<div class="group">${bars}</div><p class="gf">${cur.n ? `En ${monthName(cur.month)}, ${eurC(cur.t)} sur ${plural(cur.n, "panier commandé", "paniers commandés")}` : `Rien de commandé en ${monthName(cur.month)}`}${prev && prev.n ? `, contre ${eurC(prev.t)} en ${monthName(prev.month)}` : ""}, ${months.some((x) => x.sim) ? "aux prix relevés, et aux prix simulés pour " + esc(joinEt(S.allRets.filter((r) => r.simulated).map((r) => r.name))) : "aux prix relevés"}.${months.some((x) => x.np) ? ` Payé, d'après ce que tu as indiqué\u00a0: ${eurC(months.reduce((a, x) => a + x.paid, 0))} sur ${plural(months.reduce((a, x) => a + x.np, 0), "panier", "paniers")}, saisi par toi, à part.` : ""}</p>` :
           `<p class="gf">Quand tu remplis tes paniers avec Cabas et que tu passes tes commandes, tes dépenses de chaque mois s'affichent ici.</p>`) +
         `<div class="group" style="margin-top:24px"><a class="row" href="#/economies"><span class="rt">Tes économies</span>${ic("chev", "chev")}</a></div>`,
     };
@@ -5761,7 +5840,7 @@
       case "dellist": confirmSheet("Supprimer la liste\u00a0?", "La liste sera supprimée de cet appareil. Ton panier ne change pas.", "Supprimer", "delok", id); break;
       case "delok": { const undo = snap("lists"); S.lists = S.lists.filter((x) => x.id !== id); saveLists(); closeSheet(); back(); undoable("Liste supprimée", undo, 5000); break; }
       case "reset": confirmSheet("Effacer mes données\u00a0?", "Le panier, les listes, les recherches récentes et les réglages seront effacés de cet appareil.", "Tout effacer", "resetok"); break;
-      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports"].forEach((x) => store.del(x)); S.facts = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
+      case "resetok": S.basket = {}; S.lists = []; S.recent = []; S.prefs = Object.assign({}, PREFS0, { off: { leclerc: true }, fee: {}, pick: {}, pickManual: {}, liv: {}, keep: {}, usual: {}, qty1: {}, diet: {}, lead: {}, pin: {}, ban: {}, allergens: [], offv: 1 }); S.hist = []; S.menu = []; S.guide = { ck: {}, done: {}, when: {} }; S.todo = []; S.free = {}; S.flex = {}; S.cartView = "cmd"; S.wifOpen = false; S.wl = null; S.seen = {}; S.undo = null; S.fixed = null; S.freeEdit = null; S.askOff = null; S._ask = null; S._compose = null; S.fraisAmt = null; S.rq = ""; S.filt = {}; DIETV.v++; S._sug = null; RECM = null; ["basket", "lists", "recent", "prefs", "seen", "hist", "menu", "guide", "free", "todo", "flex"].forEach((x) => store.set(x, x === "lists" || x === "recent" || x === "hist" || x === "menu" || x === "todo" ? [] : {})); store.set("draft", ""); ["seenp", "drops", "ups"].forEach((x) => store.set(x, x === "seenp" ? {} : [])); store.set("seenAt", ""); store.del("univ"); store.del("prepSnooze"); ["facts", "watch", "watchHits", "reports"].forEach((x) => store.del(x)); S.facts = null; FX.pend.clear(); FX.fail.clear(); S.compose = null; S.rep = null; S.cmp = null; S.storeMode = null; S.storeScan = 0; S.xfer = null; S.imp = null; S.prof = null; try { if (window.caches) caches.delete("cabas-partage").catch(() => {}); } catch (e) { /* cache indisponible */ } speakStop(); wakeOff(); applyLook(); savePrefs(); applyGroups(); closeSheet(); renderChrome(); rerender(); toast("Données effacées"); break;
       case "toastact": { const el = $("#toast"), f = el._act; el.hidden = true; el._act = null; S.undo = null; if (f) f(); break; }
       /* scanner */
       case "scantype": scanTypeSheet(); break;
@@ -6639,21 +6718,32 @@
   /* hors ligne : une bannière sur l'accueil et le panier, posée sur offline et retirée sur online */
   S.offline = navigator.onLine === false;
   for (const ev of ["online", "offline"]) window.addEventListener(ev, () => { S.offline = ev === "offline"; if (S.ready && $("#sheet").hidden && (S.route.name === "home" || S.route.name === "panier")) rerender(); });
-  /* partage vers Cabas (share_target du manifeste, en GET) : le texte reçu devient une liste à lire, un lien de liste
-     Cabas ouvre sa page ; l'adresse est nettoyée tout de suite, rien n'est envoyé nulle part */
-  function sharedIn() {
+  /* partage vers Cabas (share_target du manifeste, en POST) : sw.js garde le texte reçu dans le cache « cabas-partage »
+     et ouvre ./?partage=1#/ecrire, sans rien envoyer sur le réseau ; une ancienne cible en GET (?title=&text=&url=) est
+     servie par sw.js depuis le cache. Le texte devient une liste à lire, un lien de liste Cabas ouvre sa page ; l'adresse
+     est nettoyée tout de suite. */
+  function sharedPick(d) {
+    const url = String(d.url || "").trim(), text = String(d.text || "").trim(), title = String(d.title || "").trim();
+    const m = /#\/partage\/[A-Za-z0-9_-]+/.exec(url + " " + text);
+    const hash = m && (url + " " + text).includes(APP_HOST) ? m[0] : "#/ecrire";
+    history.replaceState(null, "", location.pathname + hash);
+    return hash === "#/ecrire" ? (text || title).split("\n").filter((l) => !/^\s*https?:\/\//i.test(l)).join("\n").trim().slice(0, 4000) : "";
+  }
+  async function sharedIn() {
     try {
       const q = new URLSearchParams(location.search);
+      if (q.has("partage")) {
+        history.replaceState(null, "", location.pathname + "#/ecrire");
+        let d = null;
+        try { const c = await caches.open("cabas-partage"), r = await c.match("partage"); if (r) { d = await r.json(); await c.delete("partage"); } } catch (e) { /* cache indisponible : Ma liste s'ouvre vide */ }
+        return d ? sharedPick(d) : null;
+      }
       if (!["title", "text", "url"].some((k) => q.has(k))) return null;
-      const url = (q.get("url") || "").trim(), text = (q.get("text") || "").trim(), title = (q.get("title") || "").trim();
-      const m = /#\/partage\/[A-Za-z0-9_-]+/.exec(url + " " + text);
-      const hash = m && (url + " " + text).includes(APP_HOST) ? m[0] : "#/ecrire";
-      history.replaceState(null, "", location.pathname + hash);
-      return hash === "#/ecrire" ? (text || title).split("\n").filter((l) => !/^\s*https?:\/\//i.test(l)).join("\n").trim().slice(0, 4000) : "";
+      return sharedPick({ title: q.get("title"), text: q.get("text"), url: q.get("url") });
     } catch (e) { return null; }
   }
   (async () => {
-    const shared = sharedIn();
+    const shared = await sharedIn();
     const h0 = location.hash || "#/";
     const t0 = tabOf(h0);
     if (t0) { S.tab = t0; S.stacks[t0] = [h0]; } else { S.tab = "accueil"; S.stacks.accueil = ["#/", h0]; }
@@ -6684,7 +6774,7 @@
     const kick = () => { if (!S.ready) { dataT = setTimeout(kick, 1000); return; } dataT = 0; refreshData(); };
     navigator.serviceWorker.addEventListener("message", (e) => {
       if (!e.data || e.data.type !== "data") return;
-      if (/history/.test(e.data.path)) { histP = null; HIST = null; }
+      if (/history/.test(e.data.path)) { histP = null; HIST = null; histDone = false; }
       clearTimeout(dataT); dataT = setTimeout(kick, 400);
     });
   }

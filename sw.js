@@ -1,6 +1,6 @@
 /* Cabas hors ligne : l'appli et le dernier relevé de prix restent disponibles sans réseau.
    Changer VERSION à chaque mise en ligne pour que les téléphones récupèrent les nouveaux fichiers. */
-const VERSION = "cabas-2026-10-31-24";
+const VERSION = "cabas-2026-10-31-25";
 /* l'appli : toujours rechargée du réseau à l'installation d'une version */
 const SHELL = [
   "./", "index.html", "app.css", "boot.js", "app.js", "packs.js", "scan.js", "optimizer.js", "worker.js", "manifest.webmanifest",
@@ -12,12 +12,16 @@ const DATA = ["data/catalog.json", "data/retailers.json", "data/meta.json", "dat
 /* les détails par univers (data/details/<univers>.json : noms chez l'enseigne, liens, offres) sont chargés à la demande,
    servis comme les autres données (cache d'abord) et repris du cache précédent à l'installation d'une version */
 const DETAILS = /\/data\/details\/[^/]+\.json$/;
+/* partage vers Cabas (share_target du manifeste, en POST) : le texte reçu reste dans le téléphone. Il est gardé dans ce
+   cache, que la page lit puis vide, et la page s'ouvre sur Ma liste ; rien ne part sur le réseau */
+const SHARE = "cabas-partage";
+const SHARE_KEYS = ["title", "text", "url"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(VERSION);
     await c.addAll(SHELL.map((f) => new Request(f, { cache: "reload" })));
-    const old = (await caches.keys()).filter((k) => k !== VERSION);
+    const old = (await caches.keys()).filter((k) => k !== VERSION && k !== SHARE);
     for (const f of DATA) {
       let hit = null;
       for (const k of old) { hit = await (await caches.open(k)).match(f); if (hit) break; }
@@ -32,7 +36,7 @@ self.addEventListener("install", (e) => {
   })());
 });
 self.addEventListener("activate", (e) => {
-  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== SHARE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 const sameVersion = (a, b) => {
@@ -63,11 +67,23 @@ async function serveData(e, req, url) {
   if (hit) return hit;
   return net.catch(() => Response.error());
 }
+async function shareIn(req) {
+  const d = {};
+  try { const f = await req.formData(); for (const k of SHARE_KEYS) d[k] = String(f.get(k) || "").slice(0, 8000); } catch (err) { /* formulaire illisible : Ma liste s'ouvre vide */ }
+  await (await caches.open(SHARE)).put("partage", new Response(JSON.stringify(d), { headers: { "Content-Type": "application/json" } }));
+  return Response.redirect(new URL("./?partage=1#/ecrire", self.registration.scope).href, 303);
+}
+/* la page de l'appli sans toucher au réseau : pour une adresse qui porte un texte partagé (ancienne cible en GET) */
+async function shell() {
+  const hit = (await caches.match("index.html")) || (await caches.match("./"));
+  return hit || fetch(new URL("./", self.registration.scope).href);
+}
 self.addEventListener("fetch", (e) => {
-  const req = e.request;
-  if (req.method !== "GET") return;
-  const url = new URL(req.url);
+  const req = e.request, url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  if (req.method === "POST" && req.mode === "navigate") { e.respondWith(shareIn(req)); return; }
+  if (req.method !== "GET") return;
+  if (req.mode === "navigate" && SHARE_KEYS.concat("partage").some((k) => url.searchParams.has(k))) { e.respondWith(shell()); return; }
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then((res) => { const copy = res.clone(); caches.open(VERSION).then((c) => c.put("index.html", copy)); return res; }).catch(() => caches.match("index.html")));
     return;

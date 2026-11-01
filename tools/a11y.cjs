@@ -74,7 +74,7 @@ const ROUTES = [
   ["remplir", "#/remplir"], ["remplir-guide", "#/remplir/monoprix"], ["remplir-fin", "#/remplir/houra"], ["remplir-avant", "#/remplir/carrefour"], ["recommander", "#/recommander"],
   ["magasin", "#/magasin"], ["mouvements", "#/mouvements"], ["transfert", TRANSFERT],
   ["comparer", "#/comparer/barilla-pates-capellini-n-1-500-g/barilla-pates-spaghetti-n-5-500-g"],
-  ["frais", "#/frais"], ["frais-houra", "#/frais/houra"], ["rayon-bio", "#/rayon/bio"], ["recette-semaine", "#/repas/omelette-fromage"],
+  ["frais", "#/frais"], ["frais-houra", "#/frais/houra"], ["rayon-bio", "#/rayon/bio"], ["rayon-halal", "#/rayon/halal"], ["recette-semaine", "#/repas/omelette-fromage"],
   ["demande", "#/recherche"],
 ];
 /* phrase de « Demande à Cabas » tapée sur l'écran « demande » */
@@ -337,4 +337,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch((e) => { console.error(e); process.exit(1); });
-else module.exports = { server, ROUTES, STATES, EMPTY_TOO, SHEETS, GROS_JS, OFF, ready, prepare, sleep };
+else module.exports = { server, ROUTES, STATES, EMPTY_TOO, SHEETS, GROS_JS, GROS_STEPS, OFF, ready, prepare, sleep };

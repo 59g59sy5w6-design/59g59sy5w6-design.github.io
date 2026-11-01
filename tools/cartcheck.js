@@ -222,6 +222,35 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     if (t0 == null) fail("panier intelligent : pas de total pour le panier d'essai");
     if ((await shown(sp)) !== eurC(t0)) fail(`le total affiché (${await shown(sp)}) n'est pas celui de la répartition (${eurC(t0)})`);
 
+    step = "équivalents et épingles";
+    /* panier souple : un équivalent est le même produit (pas d'ananas pour des pommes, pas d'assortiment de chocolats
+       pour des barres repas), jamais dans un rayon au poids variable ; une épingle vers un groupe dont l'option du
+       réglage ne vend pas le produit ne le fait pas sortir de la répartition ; l'instantané de « Remplir mes paniers »
+       ne met jamais deux fois le même produit dans une commande */
+    const eqk = await sp.evaluate(() => {
+      const D = cabasDebug(), S = D.S, out = [];
+      for (const p of S.list) {
+        if (!p.qty || !p.qty.v) continue;
+        const E = D.equivOf(p, null, 6);
+        if (E.length && (S.rayMap.get(p.r) || {}).frais) out.push("rayon au poids : " + p.name + " / " + E[0].e.name);
+      }
+      const g = S.prods.get("gerlinea-barres-repas-minceur-saveur-chocolat-310-g");
+      if (g) D.equivOf(g, null, 6).forEach((x) => { if (!/barre/i.test(x.e.name)) out.push("barres repas / " + x.e.name); });
+      /* épingle Auchan, tout livré : un produit que le retrait Auchan vend et pas la livraison, vendu ailleurs */
+      const lv = D.retsFor(false).find((r) => r.group === "auchan"), rt = D.retsFor(true).find((r) => r.group === "auchan");
+      const p = lv && rt && S.list.find((x) => x.offers[rt.id] && !x.offers[lv.id] && x.offers.monoprix && x.offers.carrefour);
+      if (p) {
+        const keep = S.prefs.pin; S.prefs.pin = { [p.id]: "auchan" };
+        const M = D.model(false, { basket: { [p.id]: 1 } });
+        S.prefs.pin = keep;
+        if (M.uncovered.includes(p.id)) out.push("épingle Auchan sans offre en livraison : " + p.name + " sort de la répartition");
+      }
+      return out;
+    });
+    eqk.slice(0, 5).forEach((m) => fail("panier souple : " + m));
+    const dup = await sp.evaluate(() => { const s = cabasDebug().fillSnap(); return s ? s.orders.filter((o) => new Set(o.items.map((x) => x.id)).size !== o.items.length).map((o) => o.rid) : []; });
+    if (dup.length) fail("instantané : un même produit deux fois dans " + dup.join(", "));
+
     step = "budget du mois";
     /* budget du mois : le total payé saisi (52,50 €) remplace le total relevé (50,00 €) du panier commandé ce mois-ci,
        le panier de janvier ne compte pas */
@@ -414,6 +443,11 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     await vp.click("[data-act=speak][data-k=liste]"); await vp.waitForTimeout(300);
     const s3 = await vp.evaluate(() => window.__said), t3 = (s3[s3.length - 1] || {}).text || "";
     if (!/^Ta liste : 2 produits trouvés sur 3\./.test(t3) || !/Pas trouvé : zzzzzz/.test(t3)) fail("écouter Ma liste : « " + t3.slice(0, 160) + " »");
+    /* une voix française en ligne seulement (localService faux) : le texte partirait chez son fournisseur, « Écouter »
+       n'est pas proposé */
+    await vp.evaluate(() => { window.speechSynthesis.getVoices = () => [{ lang: "fr-FR", name: "en ligne", localService: false }]; location.hash = "#/panier"; });
+    await vp.waitForTimeout(600);
+    if (await vp.locator("[data-act=speak]").count()) fail("écouter : proposé alors que la seule voix française passe par Internet");
   } catch (e) {
     fail("écouter interrompu : " + e.message.split("\n")[0]);
   }

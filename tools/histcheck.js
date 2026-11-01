@@ -114,6 +114,29 @@ const fixture = (name) => JSON.parse(fs.readFileSync(path.join(__dirname, "fixtu
   } catch (e) {
     fail("parcours interrompu : " + e.message.split("\n")[0]);
   }
+
+  /* quitter #/mouvements pendant la lecture de l'historique, ou sans historique (hors ligne) : l'onglet ne se fige pas,
+     l'écran dit que l'historique manque */
+  for (const how of ["recharger aussitôt", "historique introuvable"]) {
+    const c2 = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block", locale: "fr-FR" });
+    if (how === "historique introuvable") await c2.route(/\/data\/history\.json/, (r) => r.abort());
+    const p2 = await c2.newPage();
+    p2.on("pageerror", (e) => fail(how + ", erreur JS : " + e.message));
+    try {
+      await p2.goto(base + "#/"); await p2.waitForFunction(() => !document.querySelector("#view .sk") && document.querySelector("#view .wrap > *"), null, { timeout: 25000 });
+      await p2.evaluate(() => localStorage.setItem("cabas.seen", JSON.stringify({ welcome: 1 })));
+      await p2.goto(base + "#/mouvements");
+      if (how === "historique introuvable") {
+        await p2.waitForTimeout(800);
+        const t = await p2.evaluate(() => document.querySelector("#view").textContent);
+        if (!/n'a pas pu être chargé/.test(t)) fail(how + " : l'écran ne dit pas que l'historique manque");
+      }
+      await p2.reload({ timeout: 10000 });
+    } catch (e) {
+      fail(`#/mouvements, ${how} : la page ne se recharge pas (${e.message.split("\n")[0]})`);
+    }
+    await c2.close();
+  }
   await browser.close();
   server.close();
   if (problems.length) { console.log("Problèmes :\n- " + problems.join("\n- ")); process.exit(1); }

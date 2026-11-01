@@ -82,11 +82,15 @@ const plus = (n) => iso(new Date(Date.now() + n * 864e5));
     const IC = await A.evaluate(() => {
       const D = cabasDebug(), c = (o) => D.importCheck(o);
       const bad = [c(null), c({ app: "autre", v: 1, data: {} }), c({ app: "cabas", v: 2, data: { basket: {} } }), c({ app: "cabas", v: 1, data: { inconnu: 1 } })].map((r) => r.ok);
-      const r = c(JSON.parse('{"app":"cabas","v":1,"data":{"basket":{"a":2,"b":500,"c":"3","__proto__":4},"lists":[{"id":"x","name":"<img src=x id=piege>","items":{"a":1}},{"id":"y","name":"' + "n".repeat(200) + '","items":{}}],"prefs":{"zip":"abcde","foyer":4,"theme":"fluo","shopDay":9,"voice":"slow","off":{"leclerc":true}},"hist":[{"d":"2026-10-01","t":-5,"items":{}},{"d":"2026-10-02","t":5000,"s":10,"n":3,"items":{"a":1},"paid":{"houra":-1,"monoprix":4000}}],"menu":[{"id":"r","portions":500}],"truc":[1,2]}}'));
-      return { bad, ok: r.ok, basket: r.data.basket, lists: r.data.lists.map((l) => l.name), prefs: r.data.prefs, hist: r.data.hist, menu: r.data.menu, skip: r.skip, proto: Object.getPrototypeOf(r.data.basket) === Object.prototype };
+      /* « a » : un produit du catalogue ; « zz-inconnu » n'en est pas un, il ne revient ni au panier ni dans les listes */
+      const r = c(JSON.parse(('{"app":"cabas","v":1,"data":{"basket":{"a":2,"b":500,"c":"3","zz-inconnu":1,"__proto__":4},"lists":[{"id":"x","name":"<img src=x id=piege>","items":{"a":1}},{"id":"y","name":"' + "n".repeat(200) + '","items":{}}],"prefs":{"zip":"abcde","foyer":4,"theme":"fluo","shopDay":9,"voice":"slow","off":{"leclerc":true}},"hist":[{"d":"2026-10-01","t":-5,"items":{}},{"d":"2026-10-02","t":5000,"s":10,"n":3,"items":{"a":1},"paid":{"houra":-1,"monoprix":4000}}],"menu":[{"id":"r","portions":500}],"truc":[1,2]}}').replace(/"a"/g, JSON.stringify("tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l"))));
+      /* un lien d'envoi n'apporte que les clés de l'envoi : pas l'instantané de « Remplir mes paniers » */
+      const link = D.importCheck({ app: "cabas", v: 1, data: { basket: {}, guide: { ck: {}, done: {}, snap: { orders: [] } } } }, true);
+      return { bad, ok: r.ok, basket: r.data.basket, linkGuide: "guide" in link.data, linkSkip: link.skip, lists: r.data.lists.map((l) => l.name), prefs: r.data.prefs, hist: r.data.hist, menu: r.data.menu, skip: r.skip, proto: Object.getPrototypeOf(r.data.basket) === Object.prototype };
     });
     if (IC.bad.some(Boolean)) fail("importCheck : une copie invalide est acceptée " + JSON.stringify(IC.bad));
-    if (!IC.ok || JSON.stringify(IC.basket) !== '{"a":2}') fail("importCheck : panier mal filtré " + JSON.stringify(IC.basket));
+    if (!IC.ok || JSON.stringify(IC.basket) !== '{"tropicana-jus-d-orange-pressee-sans-pulpe-pur-jus-1-l":2}') fail("importCheck : panier mal filtré " + JSON.stringify(IC.basket));
+    if (IC.linkGuide || !IC.linkSkip.includes("guide")) fail("importCheck : un lien d'envoi ne doit pas apporter cabas.guide");
     if (IC.lists.length !== 1) fail("importCheck : une liste au nom de 200 caractères doit être écartée " + JSON.stringify(IC.lists));
     if ("zip" in IC.prefs || "theme" in IC.prefs || "shopDay" in IC.prefs || IC.prefs.foyer !== 4 || IC.prefs.voice !== "slow") fail("importCheck : réglages mal filtrés " + JSON.stringify(IC.prefs));
     if (IC.hist.length !== 1 || JSON.stringify(IC.hist[0].paid) !== '{"monoprix":4000}') fail("importCheck : historique mal filtré " + JSON.stringify(IC.hist));

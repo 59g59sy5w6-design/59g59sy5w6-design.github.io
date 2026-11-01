@@ -267,7 +267,8 @@ const server = http.createServer((req, res) => {
     if ((await page.locator("#view [data-act=refill]").count()) < 1) fail("#/recommander : aucun panier à recommander");
     await over("recommander");
 
-    /* 10. « Coller ma liste » et partage vers Cabas (share_target en GET) */
+    /* 10. « Coller ma liste » et partage vers Cabas (share_target en POST, traité par sw.js : voir tools/sharecheck.js ;
+       ici, l'ancienne cible en GET, que sw.js sert depuis le cache) */
     await page.evaluate(() => navigator.clipboard.writeText("lait demi-écrémé\n2 paquets de pâtes\ncafé moulu"));
     await page.evaluate(() => { window.cabasDebug().S.wl = null; location.hash = "#/ecrire"; });
     await page.waitForTimeout(400);
@@ -278,7 +279,7 @@ const server = http.createServer((req, res) => {
     if (await page.evaluate(() => location.search)) fail("partage vers Cabas : l'adresse garde ses paramètres");
     if ((await page.locator(".wli").count()) !== 2) fail("partage vers Cabas : 2 lignes attendues (le lien est écarté), " + (await page.locator(".wli").count()));
     const man = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.webmanifest"), "utf8"));
-    if (!man.share_target || man.share_target.method !== "GET" || !man.share_target.params.text) fail("manifeste : share_target en GET attendu");
+    if (!man.share_target || man.share_target.method !== "POST" || man.share_target.enctype !== "multipart/form-data" || !man.share_target.params.text) fail("manifeste : share_target en POST attendu (le texte partagé ne part pas dans l'adresse)");
     for (const u of ["./#/remplir", "./#/recommander"]) if (!(man.shortcuts || []).some((s) => s.url === u)) fail("manifeste : raccourci " + u + " absent");
   } catch (e) {
     fail("parcours interrompu : " + e.message.split("\n")[0]);

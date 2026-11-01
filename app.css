@@ -826,7 +826,7 @@ body.grouped .empty .art { background: var(--card); }
 .steps .ic { display: inline-block; vertical-align: -4px; width: 20px; height: 20px; color: var(--brand-ink); }
 
 /* ---------- toast ---------- */
-.toast { position: fixed; z-index: 60; left: 50%; bottom: calc(var(--sb) + var(--tab) + var(--dock-h) + 12px); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; min-height: 48px; max-width: calc(100% - 32px); padding: 10px 18px; border-radius: var(--r-pill); background: var(--toast-bg); color: #fff; font-size: 0.9375rem; font-weight: 500; line-height: 1.25rem; box-shadow: var(--sh-2); animation: toastin var(--t-2) var(--e-out); }
+.toast { position: fixed; z-index: 60; left: 50%; bottom: calc(var(--sb) + var(--tab) + var(--dock-h) + 12px); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; min-height: 48px; width: max-content; max-width: calc(100% - 32px); padding: 10px 18px; border-radius: var(--r-pill); background: var(--toast-bg); color: #fff; font-size: 0.9375rem; font-weight: 500; line-height: 1.25rem; box-shadow: var(--sh-2); animation: toastin var(--t-2) var(--e-out); }
 .toast .ic { width: 18px; height: 18px; color: var(--toast-link); stroke-width: 2.4; }
 .toast button { min-height: var(--tap); margin: -10px -8px -10px 4px; padding: 0 10px; color: var(--toast-link); font-weight: 700; white-space: nowrap; border-radius: var(--r-pill); }
 body.has-sheet .toast { bottom: calc(var(--sb) + 92px); z-index: 61; }
@@ -977,7 +977,8 @@ details.univ > summary .chev { width: 22px; height: 22px; color: var(--ink-3); s
 details.univ[open] > summary .chev { transform: rotate(90deg); }
 details.univ > summary:active { background: var(--fill); }
 details.univ > .cats { padding-bottom: 10px; }
-.cats.big .cat b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* le nom du rayon est le seul libellé de la tuile : il s'affiche en entier */
+.cats.big .cat b { display: block; overflow-wrap: break-word; hyphens: auto; }
 .cats.big .cat .ct img { inset: 12%; width: 76%; height: 76%; }
 .chips.univ { margin-top: 2px; }
 .hcard .thumb { position: relative; width: 48px; height: 48px; border-radius: var(--r-s); background: var(--shelf); flex: none; }
@@ -1057,7 +1058,7 @@ button.gt { width: 100%; text-align: left; padding: 0; }
 .banner.ask { margin-top: 4px; }
 .banner.ask b { margin-bottom: 0; }
 .gf.ask { padding-top: 0; padding-bottom: 10px; }
-.tagset.askex .chip { height: auto; min-height: var(--tap); padding-top: 8px; padding-bottom: 8px; white-space: normal; text-align: left; line-height: 1.25; }
+.tagset.askex .chip { flex: 0 1 auto; max-width: 100%; height: auto; min-height: var(--tap); padding-top: 8px; padding-bottom: 8px; white-space: normal; text-align: left; line-height: 1.25; }
 .hcard.ans { align-items: flex-start; }
 .hcard.ans > .thumb { position: relative; width: 56px; height: 56px; border-radius: var(--r-s); background: var(--shelf); flex: none; }
 .hcard.ans > .thumb img { position: absolute; inset: 4%; width: 92%; height: 92%; }
@@ -1196,7 +1197,10 @@ html[data-simple] .chip { min-height: 60px; padding: 0 20px; font-size: 1rem; }
 html[data-simple] .chips { flex-wrap: wrap; overflow: visible; position: static; -webkit-mask-image: none; mask-image: none; }
 html[data-simple] .act { min-height: 60px; margin: -12px 0; font-size: 1rem; }
 html[data-simple] .item .acts .act, html[data-simple] .row .acts .act, html[data-simple] .fnav .act, html[data-simple] .fend-acts .act, html[data-simple] .sh .act { margin: 0; }
-html[data-simple] :is(.gf, .foot, .sn, .hint, .trust, .prose) a { padding: 21px 2px; margin: -21px -2px; }
+/* liens dans le texte : 60 px de haut quelle que soit la taille du texte, sans écarter les lignes du paragraphe */
+html[data-simple] :is(.gf, .foot, .sn, .hint, .trust, .prose) a { display: inline-block; min-height: 60px; padding: 21px 2px; margin: -21px -2px; }
+@supports (padding: 1lh) { html[data-simple] :is(.gf, .foot, .sn, .hint, .trust, .prose) a { padding-block: calc((60px - 1lh) / 2); margin-block: calc((1lh - 60px) / 2); } }
+html[data-simple] .meta { min-height: var(--tap); }
 html[data-simple] .skip { padding: 20px 22px; }
 html[data-simple] .seg.tall button { min-height: 64px; }
 html[data-simple] .buybar .stepper button { width: 60px; height: 60px; }
@@ -1222,4 +1226,4 @@ html[data-simple] .box { width: 30px; height: 30px; }
 html[data-simple] .btns { gap: 14px; }
 html[data-simple] .hcard { padding: 18px 16px; margin-top: 12px; }
 html[data-simple] .tab .ic { width: 28px; height: 28px; }
-html[data-simple] .tab span { font-size: 0.875rem; }
+html[data-simple] .tab span { font-size: max(13px, 0.875rem); }

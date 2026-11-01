@@ -2,7 +2,8 @@
 // guillemets, « simulé » à côté de chaque prix E.Leclerc, « saisi par toi » (ou « d'après ce que tu as collé ») à côté
 // de chaque montant qui n'est pas un prix relevé. Deux passes : les fichiers (sources servies, données, documentation),
 // puis le texte affiché (nœuds de texte, aria-label, placeholder) de chaque écran et de chaque feuille de tools/a11y.cjs,
-// à 390 px, états plein (E.Leclerc activé, un total payé, une ligne libre à prix saisi) et vide.
+// à 390 px, états plein (E.Leclerc activé, un total payé, une ligne libre à prix saisi) et vide ; en plus, « Et si »
+// ouvert sur le gros panier et « Pas trouvé » dans une commande E.Leclerc.
 // Usage : node tools/textcheck.cjs [--routes=accueil,panier] [--all]. Code de sortie 1 au premier écart.
 const fs = require("fs");
 const path = require("path");
@@ -86,7 +87,8 @@ const AUDIT_JS = `((amounts) => {
       if (!t.trim() || !el || el.closest("script, style, svg") || !shown(el)) continue;
       check(t, el, "texte");
       /* E.Leclerc : un prix à côté de son nom dit qu'il est simulé */
-      if (/Leclerc/.test(t)) { const box = near(el), bt = box.textContent + " " + (box.getAttribute("aria-label") || ""); if (/\\d+,\\d{2}\\s?€/.test(bt) && !/simul/i.test(bt)) out.push({ cat: "simulé", msg: "prix E.Leclerc sans « simulé » : « " + short(bt) + " »" }); }
+      /* sauf les mentions d'E.Leclerc sans montant à lui (« Sans E.Leclerc » de « Et si », commande vidée par « Pas trouvé ») */
+      if (/Leclerc/.test(t.replace(/^\\s*Sans E\\.Leclerc\\s*$/, "").replace(/Ta commande E\\.Leclerc n'aurait plus aucun produit\\./g, ""))) { const box = near(el), bt = box.textContent + " " + (box.getAttribute("aria-label") || ""); if (/\\d+,\\d{2}\\s?€/.test(bt) && !/simul/i.test(bt)) out.push({ cat: "simulé", msg: "prix E.Leclerc sans « simulé » : « " + short(bt) + " »" }); }
       /* un montant saisi par la personne (total payé, prix d'une ligne libre) le dit */
       for (const a of amounts) if (t.includes(a)) { const box = near(el), bt = box.textContent; if (!/saisi par toi|d'après ce que tu as collé/i.test(bt)) out.push({ cat: "saisi par toi", msg: a + " € sans « saisi par toi » : « " + short(bt) + " »" }); }
     }
@@ -106,6 +108,9 @@ function stateOf(st) {
   s.prefs = Object.assign({}, s.prefs, { off: {} });
   s.hist = s.hist.map((h, i) => (i === s.hist.length - 1 ? Object.assign({}, h, { paid: { all: Math.round(parseFloat(PAID.replace(",", ".")) * 100) } }) : h));
   s.free = { f1: { t: "Galettes de sarrasin du marché", q: 1, price: parseFloat(FREE.replace(",", ".")), ret: "", at: iso(new Date()) } };
+  /* une commande E.Leclerc dans le remplissage en cours, pour « Pas trouvé » (équivalents et frais à prix simulés) */
+  s.guide.snap.orders.push({ rid: "leclerc-livraison", P: { min: 0, fixed: 0, tiers: [{ from: 0, fee: 690 }, { from: 10000, fee: 0 }] }, items: [{ id: "contrex-eau-minerale-naturelle-6-x-1-l", q: 2, cost: 506, nm: "Contrex Eau minérale naturelle", f: "6 x 1 L" }] });
+  s.seen.first = Object.assign({}, s.seen.first, { leclerc: 1, "leclerc-livraison": 1 });
   return s;
 }
 
@@ -123,7 +128,7 @@ async function main() {
     page.on("pageerror", (e) => errs.push(String(e).slice(0, 160)));
     let first = true;
     const audit = async (where) => { screens++; for (const f of await page.evaluate(`${AUDIT_JS}(${JSON.stringify(st === "plein" ? [PAID, FREE] : [])})`)) add(where, f.cat, f.msg); };
-    for (const [rname, hash] of A.ROUTES) {
+    for (const [rname, hash] of A.ROUTES.concat(st === "plein" ? [["remplir-leclerc", "#/remplir/leclerc-livraison"]] : [])) {
       if (ROUTE_FILTER && !ROUTE_FILTER.has(rname)) continue;
       if (st === "vide" && !A.EMPTY_TOO.includes(rname)) continue;
       const where = `${st} ${rname}`;
@@ -134,9 +139,12 @@ async function main() {
         await A.prepare(page, rname, st);
         await audit(where);
         const gros = rname === "panier" && st === "plein";
-        if (gros) { await page.evaluate(A.GROS_JS); await page.reload({ waitUntil: "domcontentloaded" }); await A.ready(page, rname); await audit(`${st} gros panier`); }
+        if (gros) {
+          await page.evaluate(A.GROS_JS); await page.reload({ waitUntil: "domcontentloaded" }); await A.ready(page, rname); await audit(`${st} gros panier`);
+          for (const [sname, go, back] of A.GROS_STEPS) { await go(page); await audit(`${st} ${sname}`); await back(page); }
+        }
         if (st !== "plein") continue;
-        for (const [sname, sel] of A.SHEETS[gros ? "panier-gros" : rname] || []) {
+        for (const [sname, sel] of A.SHEETS[gros ? "panier-gros" : rname === "remplir-leclerc" ? "remplir-guide" : rname] || []) {
           const btn = await page.$(sel);
           if (!btn) continue;
           await page.evaluate((s) => { const b = document.querySelector(s); b.scrollIntoView({ block: "center" }); b.click(); }, sel);
