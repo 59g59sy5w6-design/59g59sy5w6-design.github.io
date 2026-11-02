@@ -4,13 +4,6 @@ function feeAt(P, x) {
   for (const t of P.tiers) if (x >= t.from) f = t.fee;
   return f + P.fixed;
 }
-function minFee(P, lo, hi) {
-  const a = Math.max(lo, P.min, 1);
-  if (a > hi) return Infinity;
-  let m = feeAt(P, a);
-  for (const t of P.tiers) if (t.from > a && t.from <= hi) m = Math.min(m, feeAt(P, t.from));
-  return m;
-}
 function isSpecial(P) { return P.min > 0 || P.fixed > 0 || P.tiers.length > 1 || P.tiers.some((t) => t.fee > 0); }
 function tierOptions(P) {
   const out = [];
@@ -214,34 +207,6 @@ function solveSubset(sub, M, lambda, budget, deadline, bestScore) {
   best.truncated = truncated;
   return best;
 }
-function* subsets(chans, K) {
-  const groups = [];
-  const idx = new Map();
-  const skip = [];
-  chans.forEach((c, i) => { if (c.skip) { skip.push(i); return; } const g = c.store.retailer || c.storeId; if (!idx.has(g)) { idx.set(g, groups.length); groups.push([]); } groups[idx.get(g)].push(i); });
-  const cur = [];
-  function* rec(g) {
-    if (g === groups.length) { if (cur.length) yield cur.concat(skip); return; }
-    yield* rec(g + 1);
-    if (cur.length < K) for (const ci of groups[g]) { cur.push(ci); yield* rec(g + 1); cur.pop(); }
-  }
-  yield* rec(0);
-}
-function optimise(M, K, lambda, budgetMs) {
-  const t0 = performance.now();
-  const byK = {}; let truncated = false, count = 0;
-  if (!M.lines.length || !M.chans.length) return { best: null, byK, truncated, count, ms: 0 };
-  for (const sub of subsets(M.chans, K)) {
-    const r = solveSubset(sub, M, lambda, 300000);
-    count++;
-    if (r && r.truncated) truncated = true;
-    if (r && !r.none) { const k = r.orders.length; if (!byK[k] || r.score < byK[k].score) byK[k] = r; }
-    if (performance.now() - t0 > (budgetMs || 5000)) { truncated = true; break; }
-  }
-  let best = null;
-  for (const k in byK) if (!best || byK[k].score < best.score) best = byK[k];
-  return { best, byK, truncated, count, ms: performance.now() - t0 };
-}
 function singleBasket(M, ci) {
   let sub = 0, have = 0; const items = [];
   M.offers.forEach((offs, li) => { const o = offs.find((x) => x.c === ci); if (o) { sub += o.cost; have++; items.push({ l: M.lines[li], ...o }); } });
@@ -256,11 +221,6 @@ const SKIP_COST = 100000;
 function withSkip(M) {
   const SK = M.chans.length;
   return { ...M, chans: M.chans.concat([{ id: "__skip", skip: true, store: { retailer: "__skip" }, P: { min: 0, fixed: 0, tiers: [{ from: 0, fee: 0 }] } }]), offers: M.offers.map((o) => o.concat([{ c: SK, cost: SKIP_COST }])) };
-}
-function solve(M, K, lambda) {
-  let R = optimise(M, K, lambda), partial = false;
-  if (!R.best && M.lines.length) { R = optimise(withSkip(M), K, lambda); partial = true; }
-  return { best: R.best, byK: R.byK, truncated: R.truncated, partial };
 }
 
 /* Sous-ensembles d'exactement k enseignes, au plus une par groupe. */

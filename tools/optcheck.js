@@ -19,7 +19,7 @@
 const fs = require("fs");
 const path = require("path");
 const src = fs.readFileSync(path.join(__dirname, "..", "optimizer.js"), "utf8");
-const O = new Function(src + "; return { runAll, feeAt, buildModel, bestAt, totalsAt, HOWS, howPick, howChans };")();
+const O = new Function(src + "; return { runAll, feeAt, buildModel, bestAt, totalsAt, HOWS, howPick, howChans, singleBasket };")();
 
 let seed = 12345;
 const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
@@ -423,4 +423,46 @@ for (let t = 0; t < N3; t++) {
 console.log(`Seuil d'un magasin de plus : ${mTested} cas, ${mKeep} magasins retenus au-delà du seuil, ${mMore} magasins de plus laissés sous le seuil, ${mTie} égalités au seuil retenues.`);
 console.log(`Quatre façons : ${hTested} cas (${hMag} en magasin dont ${hMagMulti} dans plusieurs magasins, ${hDrive} en drive, ${hMiss} produits hors de leur façon, ${hNoChan} façons sans enseigne), ${hBad} écart${hBad > 1 ? "s" : ""}.`);
 console.log(`Panier intelligent : ${sTested} cas (${pinned} épingles tirées, ${alts} équivalents pris, ${flexWins} fois le panier souple moins cher), ${topups} « Compléter malin », ${sans} « Et si : sans », ${sBad} écart${sBad > 1 ? "s" : ""}.`);
-process.exit(bad || sBad || hBad ? 1 : 0);
+/* cas particuliers : les replis de howPick (un groupe sans l'option voulue, un choix inconnu ou qui ne convient pas)
+   et le panier entier chez une seule enseigne (singleBasket : sous-total, produits manquants, minimum, frais) */
+let cTested = 0, cBad = 0;
+const cEq = (got, want, msg) => { cTested++; if (got !== want) { cBad++; console.log(`écart : ${msg} : ${got}, attendu ${want}`); } };
+{
+  const R = (id, livraison) => ({ id, channel: { mode: "retrait" }, livraison }), L = (id) => ({ id, channel: { mode: "livraison" } });
+  const r1 = R("r1", "l1"), r2 = R("r2"), l1 = L("l1"), l2 = L("l2");
+  cEq(O.howPick([], "x", "mix"), null, "howPick sans option");
+  cEq(O.howPick([r1, l1], "zz", "mix"), "r1", "howPick, choix inconnu");
+  cEq(O.howPick([l1, r1], "r1", "mix"), "r1", "howPick, première façon");
+  cEq(O.howPick([l1, r1], "r1", "mag"), "r1", "howPick, tout en magasin");
+  cEq(O.howPick([r1, l1, l2], "r1", "liv"), "l1", "tout livré, livraison du secteur");
+  cEq(O.howPick([r1, l1, l2], "r1", "liv", { r1: "l2" }), "l2", "tout livré, livraison choisie");
+  cEq(O.howPick([r2, r1, l2], "r2", "liv", { r2: "r1" }), "l2", "tout livré, choix d'un retrait ignoré");
+  cEq(O.howPick([r2, l1, l2], "r2", "liv"), "l1", "tout livré, sans livraison du secteur");
+  cEq(O.howPick([r2, R("r3")], "r2", "liv"), "r2", "tout livré, groupe sans livraison");
+  cEq(O.howPick([l1, l2, r1], "l1", "drive"), "r1", "tout en drive, retrait du secteur");
+  cEq(O.howPick([l2, r1, r2], "l2", "drive", null, { l2: "r2" }), "r2", "tout en drive, retrait choisi");
+  cEq(O.howPick([l2, l1, r2], "l2", "drive", null, { l2: "l1" }), "r2", "tout en drive, choix d'une livraison ignoré");
+  cEq(O.howPick([l2, r2], "l2", "drive"), "r2", "tout en drive, sans retrait du secteur");
+  cEq(O.howPick([l1, l2], "l1", "drive"), "l1", "tout en drive, groupe sans retrait");
+  cEq(O.howPick([r1, l1], "r1", "drive"), "r1", "tout en drive, déjà un retrait");
+  cEq(O.howPick([r1, l1], "l1", "liv"), "l1", "tout livré, déjà une livraison");
+}
+{
+  const P0 = { min: 5000, fixed: 0, tiers: [{ from: 0, fee: 599 }, { from: 8000, fee: 0 }] }, P1 = { min: 1000, fixed: 100, tiers: [{ from: 0, fee: 499 }] };
+  const M = { lines: [{ id: "a" }, { id: "b" }, { id: "c" }], chans: [{ id: "x", P: P0 }, { id: "y", P: P1 }],
+    offers: [[{ c: 0, cost: 1000 }, { c: 1, cost: 900 }], [{ c: 1, cost: 500 }], [{ c: 0, cost: 3000 }]] };
+  let b = O.singleBasket(M, 0);
+  cEq(b.sub, 4000, "singleBasket, sous-total"); cEq(b.have, 2, "singleBasket, produits vendus"); cEq(b.missing, 1, "singleBasket, produits manquants");
+  cEq(b.ok, false, "singleBasket, sous le minimum"); cEq(b.fee, null, "singleBasket, frais sous le minimum"); cEq(b.items.length, 2, "singleBasket, lignes");
+  cEq(b.items.map((x) => x.l.id).join(), "a,c", "singleBasket, produits"); cEq(b.ch.id, "x", "singleBasket, enseigne");
+  b = O.singleBasket(M, 1);
+  cEq(b.sub, 1400, "singleBasket, autre enseigne"); cEq(b.ok, true, "singleBasket, minimum atteint"); cEq(b.fee, 599, "singleBasket, frais et frais fixes");
+  b = O.singleBasket(Object.assign({}, M, { chans: [{ id: "x", P: Object.assign({}, P0, { min: 4000 }) }, M.chans[1]] }), 0);
+  cEq(b.ok, true, "singleBasket, minimum tout juste atteint"); cEq(b.fee, 599, "singleBasket, frais au minimum");
+  b = O.singleBasket(Object.assign({}, M, { offers: [[{ c: 0, cost: 5000 }], [], [{ c: 0, cost: 3000 }]] }), 0);
+  cEq(b.sub, 8000, "singleBasket, palier"); cEq(b.fee, 0, "singleBasket, livraison offerte au palier");
+  b = O.singleBasket(Object.assign({}, M, { offers: [[], [], []] }), 0);
+  cEq(b.sub, 0, "singleBasket, rien de vendu"); cEq(b.missing, 3, "singleBasket, tout manque"); cEq(b.fee, null, "singleBasket, frais sans produit");
+}
+console.log(`Cas particuliers : ${cTested} cas (replis de l'option d'un groupe, panier chez une seule enseigne), ${cBad} écart${cBad > 1 ? "s" : ""}.`);
+process.exit(bad || sBad || hBad || cBad ? 1 : 0);
